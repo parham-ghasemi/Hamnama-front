@@ -1,0 +1,161 @@
+@use "../../styles//abstracts//variables" as vr;
+@use "../../styles//abstracts//mixins" as mx;
+@use "sass:color";
+
+.plan-details {
+  min-height: 90vh;
+  @include mx.flex-center;
+  gap: vr.$space-2xl;
+  margin-top: vr.$space-4xl * 2;
+
+  &__card {
+    @include mx.flex-center;
+    flex-direction: column;
+    gap: vr.$space-lg;
+    background-color: vr.$color-card-bg;
+    border-radius: vr.$radius-lg;
+    padding: 20px 0;
+    width: 400px;
+    border: solid 1px
+      color.adjust(vr.$color-card-bg, $lightness: 10%, $saturation: -40%);
+    box-shadow: 0 0 20px 0px
+      color.adjust(vr.$color-primary, $saturation: -30%, $alpha: -0.8);
+
+    transition: transform 200ms ease;
+    &:hover {
+      transform: translateY(-20px);
+    }
+
+    &__icon {
+      $light-purple: color.adjust(
+        vr.$color-card-bg,
+        $alpha: -0.2,
+        $lightness: 10%
+      );
+      @include mx.glass-effect($light-purple, 20px, 20px);
+      border-radius: vr.$radius-md;
+      padding: vr.$space-md;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      > svg {
+        font-size: vr.$font-xl;
+        color: vr.$color-primary;
+      }
+    }
+
+    &__title {
+      font-size: vr.$font-2xl;
+      font-weight: 700;
+      color: vr.$color-white;
+    }
+
+    &__durations {
+      @include mx.flex-center;
+      gap: vr.$space-lg;
+
+      &__card {
+        @include mx.flex-center;
+        gap: vr.$space-md;
+        flex-direction: column;
+        height: 90px;
+        width: 70px;
+        $light-purple: color.adjust(
+          vr.$color-card-bg,
+          $alpha: -0.5,
+          $lightness: 20%
+        );
+        @include mx.glass-effect($light-purple, 20px, vr.$radius-sm);
+        cursor: pointer;
+
+        &:hover {
+          background-color: color.adjust($light-purple, $lightness: -5%);
+        }
+
+        &--selected {
+          background-color: color.adjust($light-purple, $lightness: -10%);
+        }
+
+        > span {
+          font-weight: 700;
+        }
+        > svg {
+          font-size: vr.$font-xl;
+        }
+      }
+    }
+
+    &__current-price {
+      $light-purple: color.adjust(
+        vr.$color-card-bg,
+        $alpha: -0.5,
+        $lightness: 10%
+      );
+      @include mx.glass-effect($light-purple, 20px, 20px);
+      border-radius: vr.$radius-md;
+      @include mx.flex-center;
+      flex-direction: column;
+      padding: vr.$space-md;
+      gap: vr.$space-sm;
+      width: 80%;
+
+      &__main {
+        font-size: vr.$font-3xl;
+        font-weight: 600;
+        line-height: 100%;
+      }
+
+      &__discount {
+        color: vr.$color-primary;
+        display: flex;
+        gap: vr.$space-md;
+        &__old-price {
+          text-decoration: line-through;
+          &::after {
+            content: " تومان";
+          }
+        }
+        &__discount-percent {
+          display: flex;
+          align-items: center;
+        }
+      }
+    }
+
+    &__buyBtn {
+      $light-purple: color.adjust(
+        vr.$color-card-bg,
+        $alpha: -0.5,
+        $lightness: 10%
+      );
+      @include mx.glass-effect($light-purple, 20px, 20px);
+      width: 70%;
+      padding: vr.$space-lg;
+      font-size: vr.$font-lg;
+      font-weight: 700;
+      margin-top: 15px;
+      cursor: pointer;
+      transition: background ease 200ms;
+      &:hover {
+        background: vr.$color-button-bg-hover;
+      }
+    }
+
+    &__features {
+      display: flex;
+      gap: vr.$space-md;
+      flex-direction: column;
+      margin-top: vr.$space-2xl;
+
+      > li {
+        display: flex;
+        gap: vr.$space-lg;
+
+        > svg {
+          color: vr.$color-primary;
+        }
+      }
+    }
+  }
+}

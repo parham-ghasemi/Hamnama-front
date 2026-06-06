@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import DesktopLayout from "./layouts/DesktopLayout";
 import Auth from "./pages/Auth/Auth";
+import PlanDetails from "./pages/planDetails/PlanDetails";
 
 const queryClient = new QueryClient({});
 
@@ -22,6 +23,7 @@ function App() {
             <Route element={<DesktopLayout />}>
               <Route index element={<Home />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/plan-details" element={<PlanDetails />} />
               <Route path="*" element={<p className="text-6xl font-black text-center my-60">THIS PAGE WAS NOT FOUND!</p>} />
             </Route>
           </Routes>
