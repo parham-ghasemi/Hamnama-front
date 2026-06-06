@@ -1,0 +1,57 @@
+@use "../../../styles//abstracts//variables" as vr;
+@use "../../../styles//abstracts//mixins" as mx;
+@use "sass:color";
+
+.auth-phone-input {
+  @include mx.flex-center;
+  flex-direction: column;
+  gap: vr.$space-xl;
+
+  &__title {
+    font-size: vr.$font-header;
+    font-weight: 700;
+
+    > a {
+      color: vr.$color-primary;
+      &:hover {
+        color: color.adjust(vr.$color-primary, $lightness: 5%);
+      }
+    }
+  }
+  &__subtitle {
+    font-size: vr.$font-lg;
+    color: vr.$color-gray;
+  }
+
+  &__input {
+    background-color: vr.$color-card-bg;
+    text-align: center;
+    border-radius: vr.$radius-sm;
+    padding: vr.$space-lg;
+    width: 400px;
+    outline: none;
+
+    &:focus {
+      background-color: color.adjust(vr.$color-card-bg, $lightness: 3%);
+    }
+  }
+
+  &__error {
+    color: vr.$color-red;
+  }
+
+  &__subBtn {
+    background: vr.$color-button-bg;
+    width: 300px;
+    padding: vr.$space-md;
+    border-radius: vr.$radius-md;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: vr.$font-lg;
+    margin-top: vr.$space-4xl;
+
+    &:hover {
+      background: vr.$color-button-bg-hover;
+    }
+  }
+}

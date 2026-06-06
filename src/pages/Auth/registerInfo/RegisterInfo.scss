@@ -1,0 +1,102 @@
+@use "../../../styles/abstracts/variables" as vr;
+@use "../../../styles/abstracts/mixins" as mx;
+@use "sass:color";
+
+.register-info {
+  @include mx.flex-center;
+  flex-direction: column;
+  gap: vr.$space-2xl;
+
+  &__group {
+    @include mx.flex-center;
+    flex-direction: column;
+    gap: vr.$space-md;
+  }
+
+  &__label {
+    font-size: vr.$font-lg;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  &__input-wrapper {
+    position: relative;
+    width: 400px;
+    padding: vr.$space-lg;
+
+    display: flex;
+    align-items: center;
+    justify-content: left;
+  }
+
+  &__input {
+    position: absolute;
+    inset: 0;
+
+    background-color: vr.$color-card-bg;
+
+    border-radius: vr.$radius-sm;
+
+    text-align: center;
+
+    outline: none;
+
+    &:focus {
+      background-color: color.adjust(vr.$color-card-bg, $lightness: 3%);
+    }
+  }
+
+  &__icon,
+  &__icon-btn {
+    z-index: 2;
+    font-size: vr.$font-lg;
+  }
+
+  &__icon-btn {
+    cursor: pointer;
+  }
+
+  &__rules {
+    display: flex;
+    flex-direction: column;
+    gap: vr.$space-sm;
+
+    color: vr.$color-red;
+    text-align: center;
+  }
+
+  &__submit-btn {
+    background: vr.$color-button-bg;
+
+    width: 300px;
+
+    padding: vr.$space-md;
+
+    border-radius: vr.$radius-md;
+
+    cursor: pointer;
+
+    font-weight: 700;
+    font-size: vr.$font-lg;
+
+    margin-top: vr.$space-lg;
+
+    &:hover {
+      background: vr.$color-button-bg-hover;
+    }
+  }
+
+  &__terms {
+    color: vr.$color-gray;
+    text-align: center;
+    max-width: 500px;
+
+    > a {
+      color: vr.$color-primary;
+
+      &:hover {
+        color: color.adjust(vr.$color-primary, $lightness: 5%);
+      }
+    }
+  }
+}

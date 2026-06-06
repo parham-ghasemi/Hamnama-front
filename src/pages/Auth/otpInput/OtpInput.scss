@@ -1,0 +1,108 @@
+@use "../../../styles/abstracts/variables" as vr;
+@use "../../../styles/abstracts/mixins" as mx;
+@use "sass:color";
+
+.otp-input {
+  @include mx.flex-center;
+  flex-direction: column;
+  gap: vr.$space-xl;
+
+  &__title {
+    font-size: vr.$font-header;
+    font-weight: 700;
+  }
+
+  &__subtitle {
+    font-size: vr.$font-lg;
+    color: vr.$color-gray;
+  }
+
+  &__content {
+    display: flex;
+    gap: vr.$space-lg;
+    align-items: center;
+  }
+
+  &__fields {
+    display: flex;
+    gap: vr.$space-md;
+    flex-direction: row-reverse;
+  }
+
+  &__field {
+    width: 72px;
+    height: 72px;
+
+    background: vr.$color-card-bg;
+    border-radius: vr.$radius-sm;
+
+    text-align: center;
+    font-size: vr.$font-xl;
+    font-weight: 700;
+
+    outline: none;
+
+    &:focus {
+      background: color.adjust(vr.$color-card-bg, $lightness: 3%);
+    }
+  }
+
+  &__timer {
+    width: 72px;
+    height: 72px;
+
+    background: vr.$color-card-bg;
+    border-radius: vr.$radius-sm;
+
+    @include mx.flex-center;
+
+    font-size: vr.$font-lg;
+    font-weight: 700;
+  }
+
+  &__resend {
+    background: transparent;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: vr.$font-xl;
+
+    &:hover {
+      color: vr.$color-primary;
+    }
+  }
+
+  &__change-phone {
+    color: vr.$color-primary;
+    cursor: pointer;
+
+    &:hover {
+      color: color.adjust(vr.$color-primary, $lightness: 5%);
+    }
+  }
+
+  &__error {
+    color: vr.$color-red;
+  }
+
+  &__subBtn {
+    background: vr.$color-button-bg;
+    width: 300px;
+    padding: vr.$space-md;
+    border-radius: vr.$radius-md;
+
+    cursor: pointer;
+
+    font-size: vr.$font-lg;
+    font-weight: 700;
+
+    margin-top: vr.$space-4xl;
+
+    &:hover {
+      background: vr.$color-button-bg-hover;
+    }
+  }
+}

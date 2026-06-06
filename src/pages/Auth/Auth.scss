@@ -1,0 +1,8 @@
+@use "../../styles//abstracts//variables" as vr;
+@use "../../styles//abstracts//mixins" as mx;
+@use "sass:color";
+
+.auth-container {
+  min-height: 100vh;
+  @include mx.flex-center;
+}

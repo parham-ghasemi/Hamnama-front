@@ -2,6 +2,7 @@ import { useState } from 'react';
 import './Header.scss';
 import { PiCaretRightBold, PiMoonStarsFill, PiSunFill, PiUserFill } from "react-icons/pi";
 import clsx from 'clsx';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [activeMode, setActiveMode] = useState('dark');
@@ -9,9 +10,9 @@ const Header = () => {
 
   return (
     <div className="header">
-      <div className="header__logo">
+      <Link to={`/`} className="header__logo">
         <img src="/Logo.svg" alt="" />
-      </div>
+      </Link>
 
       <div className="header__left">
         <button className="header__left__watchbtn">
