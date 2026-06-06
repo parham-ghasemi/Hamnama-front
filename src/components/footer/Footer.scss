@@ -1,0 +1,65 @@
+@use "../../styles/abstracts/variables" as vr;
+@use "sass:color";
+
+.footer {
+  width: 90%;
+  margin: vr.$space-4xl auto;
+  margin-bottom: 0;
+  border-top: 1px solid color.adjust(vr.$color-white, $alpha: -0.5);
+  padding: vr.$space-3xl 0;
+  display: flex;
+  justify-content: space-evenly;
+
+  &__section-title {
+    font-weight: 700;
+    font-size: vr.$font-md;
+  }
+  &__quick,
+  &__useful,
+  &__contact {
+    display: flex;
+    flex-direction: column;
+    gap: vr.$space-md;
+    > li {
+      color: vr.$color-gray;
+      cursor: pointer;
+      transition: color ease 200ms;
+
+      &:hover {
+        color: vr.$color-light-gray;
+      }
+    }
+  }
+
+  &__social {
+    display: flex;
+    flex-direction: column;
+    gap: vr.$space-md;
+    height: 100%;
+  }
+
+  &__social-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: vr.$space-sm;
+
+    > svg {
+      background-color: vr.$color-gray;
+      color: vr.$color-black;
+      width: 50px;
+      height: 50px;
+      padding: vr.$space-sm;
+      border-radius: vr.$radius-md;
+    }
+  }
+}
+
+.footer-rights {
+  margin: 0 auto;
+  width: 90%;
+  font-size: vr.$font-sm;
+  border-top: 1px solid color.adjust(vr.$color-white, $alpha: -0.7);
+  text-align: center;
+  padding: vr.$space-md;
+}

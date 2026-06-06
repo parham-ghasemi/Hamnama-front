@@ -1,0 +1,50 @@
+// Colors
+$color-bg: linear-gradient(90deg, #0c0517 0%, #0f0826 100%);
+$color-button-bg:
+  linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0.2) 100%),
+  #e27439;
+$color-button-bg-hover:
+  linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0.2) 100%),
+  #e47e48;
+
+$color-primary: #e27439;
+
+$color-red: #b23840;
+$color-yellow: #e0a340;
+$color-white: #ddd;
+$color-black: #333;
+$color-green: #38e351;
+$color-light-gray: #d9d9d9;
+$color-dark-gray: #302f2e;
+$color-gray: #abaaaa;
+$color-card-bg: #2a172f;
+
+// Radius
+$radius-xs: 4px;
+$radius-sm: 6px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 24px;
+$radius-circle: 100%;
+
+// Space
+$space-xs: 4px;
+$space-sm: 8px;
+$space-md: 12px;
+$space-lg: 16px;
+$space-xl: 24px;
+$space-2xl: 28px;
+$space-3xl: 32px;
+$space-4xl: 52px;
+
+// Shadow
+$shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+
+// Font-size
+$font-sm: 12px;
+$font-md: 16px;
+$font-lg: 24px;
+$font-xl: 32px;
+$font-2xl: 38px;
+$font-3xl: 42px;
+$font-header: 48px;

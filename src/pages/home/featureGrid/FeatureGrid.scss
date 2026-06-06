@@ -1,0 +1,63 @@
+@use "../../../styles/abstracts/variables" as vr;
+@use "sass:color";
+@use "../../../styles/abstracts/mixins" as mx;
+
+.home-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  grid-column-gap: vr.$space-xl;
+  grid-row-gap: vr.$space-3xl;
+
+  width: 73%;
+  margin: 0 auto;
+  margin-top: vr.$space-4xl * 2;
+
+  &__item {
+    background: vr.$color-button-bg;
+    border-radius: vr.$radius-sm;
+    display: flex;
+    align-items: center;
+    padding: vr.$space-md;
+    gap: vr.$space-md;
+    box-shadow: 0 0 10px 1px color.adjust(vr.$color-primary, $alpha: -0.4);
+
+    &:hover {
+      box-shadow: 0 0 10px 1px color.adjust(vr.$color-primary, $alpha: -0.1);
+      outline: 1px solid vr.$color-primary;
+      .home-feature-grid__item__right {
+        box-shadow: 1px 1px 0 0 #eee;
+      }
+    }
+
+    &__right {
+      @include mx.flex-center;
+      height: 60px;
+      width: 60px;
+      background-color: color.adjust(
+        vr.$color-primary,
+        $lightness: -20%,
+        $alpha: -0.4
+      );
+      border-radius: vr.$radius-xs;
+      font-size: vr.$font-xl;
+      box-shadow: 0.5px 0.5px 0 0 #eee;
+      transition: box-shadow 200ms ease;
+    }
+
+    &__left {
+      width: 80%;
+      @include mx.flex-center;
+      flex-direction: column;
+      gap: vr.$space-sm;
+
+      &__title {
+        font-weight: 700;
+        font-size: vr.$font-md;
+      }
+      &__desc {
+        font-size: vr.$font-sm;
+      }
+    }
+  }
+}

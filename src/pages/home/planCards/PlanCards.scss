@@ -1,0 +1,169 @@
+@use "../../../styles//abstracts//variables" as vr;
+@use "sass:color";
+@use "../../../styles/abstracts/mixins" as mx;
+
+.home-planCards {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: vr.$space-2xl;
+  margin-top: vr.$space-4xl * 2;
+
+  &__card:nth-child(even) {
+    transform: translateY(-50px);
+    &:hover {
+      transform: translateY(-60px);
+    }
+  }
+
+  &__card {
+    @include mx.flex-center;
+    flex-direction: column;
+    gap: vr.$space-sm;
+    background-color: vr.$color-card-bg;
+    border-radius: vr.$radius-lg;
+    padding: 20px 0;
+    width: 350px;
+    border: solid 1px
+      color.adjust(vr.$color-card-bg, $lightness: 10%, $saturation: -40%);
+    box-shadow: 0 0 20px 0px
+      color.adjust(vr.$color-primary, $saturation: -30%, $alpha: -0.8);
+
+    transition: transform 200ms ease;
+    &:hover {
+      transform: translateY(-20px);
+    }
+
+    &__icon {
+      $light-purple: color.adjust(
+        vr.$color-card-bg,
+        $alpha: -0.5,
+        $lightness: 7%
+      );
+      @include mx.glass-effect($light-purple, 20px, 20px);
+      border-radius: vr.$radius-md;
+      padding: vr.$space-md;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      > svg {
+        font-size: vr.$font-xl;
+        color: vr.$color-primary;
+      }
+    }
+
+    &__title {
+      font-size: vr.$font-2xl;
+      font-weight: 700;
+      color: vr.$color-primary;
+    }
+
+    &__desc {
+      font-size: vr.$font-md;
+      color: color.adjust(vr.$color-gray, $lightness: -20%);
+    }
+
+    &__sep {
+      width: 60%;
+      height: 2px;
+      margin-top: 10px;
+      position: relative;
+
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 10%,
+        rgba(238, 238, 238, 1) 50%,
+        rgba(255, 255, 255, 0) 90%
+      );
+    }
+
+    &__users-title {
+      font-weight: 600;
+      font-size: vr.$font-lg;
+    }
+    &__users {
+      font-weight: 500;
+      font-size: vr.$font-lg;
+    }
+
+    &__price-container {
+      @include mx.flex-center;
+      flex-direction: column;
+      width: 85%;
+
+      &__discount {
+        border-radius: vr.$radius-sm vr.$radius-sm 0 0;
+        background-color: vr.$color-primary;
+        @include mx.flex-center;
+        gap: vr.$space-sm;
+        padding: 0 vr.$space-sm;
+
+        &__old-price {
+          text-decoration: line-through;
+          font-weight: 600;
+          font-size: vr.$font-lg;
+        }
+
+        &__discount-percent {
+          @include mx.flex-center;
+        }
+      }
+
+      &__current-price {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        width: 100%;
+        height: 87px;
+        position: relative;
+        justify-content: end;
+        padding: vr.$space-xs;
+
+        $light-purple: color.adjust(
+          vr.$color-card-bg,
+          $alpha: -0.5,
+          $lightness: 10%
+        );
+        @include mx.glass-effect($light-purple, 20px, 20px);
+        border-radius: vr.$radius-md;
+
+        &__main {
+          font-size: vr.$font-3xl;
+          font-weight: 600;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+
+        &__sub {
+          color: vr.$color-gray;
+          font-size: vr.$font-sm;
+          font-weight: 500;
+        }
+      }
+    }
+
+    &__buyBtn {
+      background: vr.$color-button-bg;
+      width: 60%;
+      border-radius: vr.$radius-md;
+      padding: vr.$space-sm;
+      font-size: vr.$font-lg;
+      font-weight: 700;
+      margin-top: 15px;
+      cursor: pointer;
+      transition: background ease 200ms;
+      &:hover {
+        background: vr.$color-button-bg-hover;
+      }
+    }
+
+    &__more {
+      color: color.adjust(vr.$color-primary, $lightness: -20%);
+      margin-top: 5px;
+      cursor: pointer;
+    }
+  }
+}

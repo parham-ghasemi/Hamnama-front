@@ -1,0 +1,5 @@
+@use "../abstracts/variables" as vr;
+
+.color-primary {
+  color: vr.$color-primary;
+}

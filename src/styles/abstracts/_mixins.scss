@@ -1,0 +1,32 @@
+@use "./breakpoints" as bp;
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin mobile {
+  @media (max-width: bp.$mobile) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: bp.$tablet) {
+    @content;
+  }
+}
+
+@mixin glass-effect(
+  $color: rgba(255, 255, 255, 0.15),
+  $blur: 16px,
+  $radius: 12px
+) {
+  background: $color;
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur); // Required for Safari
+  border-radius: $radius;
+  border: 1px solid rgba(255, 255, 255, 0.2); // Translucent border
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}

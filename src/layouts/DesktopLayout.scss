@@ -1,0 +1,15 @@
+@use "../styles/abstracts/variables" as vr;
+
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: vr.$color-bg;
+  position: relative;
+  cursor: context-menu;
+  color: vr.$color-white;
+
+  &__content {
+    flex: 1;
+  }
+}

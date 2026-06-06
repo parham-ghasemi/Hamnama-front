@@ -1,0 +1,58 @@
+@use "../../../styles/abstracts/variables" as vr;
+@use "sass:color";
+@use "../../../styles/abstracts/mixins" as mx;
+
+.home-faq {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: vr.$space-lg;
+  margin-top: vr.$space-3xl;
+
+  &__item {
+    width: 73%;
+    &__trigger {
+      $light-purple: color.adjust(
+        vr.$color-card-bg,
+        $alpha: -0.5,
+        $lightness: 7%
+      );
+      @include mx.glass-effect($light-purple, 20px, vr.$radius-md);
+      &:hover {
+        $light-purple: color.adjust(
+          vr.$color-card-bg,
+          $alpha: -0.5,
+          $lightness: 10%
+        );
+        @include mx.glass-effect($light-purple, 20px, vr.$radius-md);
+      }
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: vr.$space-md vr.$space-xl;
+      cursor: pointer;
+    }
+    &__trigger--show {
+      border-radius: vr.$radius-md vr.$radius-md 0 0;
+    }
+
+    &__answer {
+      height: 0px;
+      overflow: hidden;
+      transition: height ease 200ms;
+    }
+    &__answer--show {
+      height: 100px;
+      $light-purple: color.adjust(
+        vr.$color-card-bg,
+        $alpha: -0.5,
+        $lightness: 7%
+      );
+      @include mx.glass-effect($light-purple, 20px, 20px);
+      border-radius: 0 0 vr.$radius-md vr.$radius-md;
+      padding: vr.$space-md vr.$space-xl;
+      line-height: 200%;
+    }
+  }
+}

@@ -1,0 +1,169 @@
+@use "../../styles/abstracts/variables" as vr;
+
+.header {
+  z-index: 999;
+  width: 100vw;
+  display: flex;
+  padding: 0px vr.$space-md;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  right: 0;
+  left: 0;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(15px);
+
+  &__logo {
+    height: 76px;
+    width: 230px;
+    margin-right: 40px;
+  }
+
+  &__left {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: vr.$space-lg;
+    height: 45px;
+
+    &__mode {
+      display: flex;
+      align-items: center;
+      position: relative;
+      height: 100%;
+
+      background-color: vr.$color-dark-gray;
+      border-radius: vr.$radius-xl;
+      box-shadow: vr.$shadow;
+
+      &__slider {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        width: 48px;
+        height: 45px;
+
+        border-radius: vr.$radius-circle;
+        background-color: lighten(vr.$color-dark-gray, 16);
+
+        transition:
+          transform 350ms cubic-bezier(0.22, 1, 0.36, 1),
+          background-color 200ms ease;
+
+        &--dark {
+          transform: translateX(48px);
+        }
+
+        &--light {
+          transform: translateX(0);
+        }
+      }
+
+      &__icon {
+        position: relative;
+        z-index: 2;
+        font-size: 26px;
+
+        width: 48px;
+        height: 40px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        transition:
+          color 250ms ease,
+          transform 150ms ease;
+
+        &:hover {
+          cursor: pointer;
+          transform: scale(0.9);
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+    }
+
+    &__watchbtn {
+      font-size: vr.$font-md;
+      background: vr.$color-button-bg;
+      border-radius: vr.$radius-md;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: vr.$space-xs;
+      padding: vr.$space-md vr.$space-md;
+      cursor: pointer;
+      transition: background 200ms ease;
+      box-shadow: vr.$shadow;
+      height: 100%;
+      flex-wrap: wrap;
+
+      &:hover {
+        background: vr.$color-button-bg-hover;
+      }
+
+      &__Icon {
+        font-size: 16px;
+        transition: transform 200ms ease;
+      }
+      &:hover {
+        .header__left__watchbtn__Icon {
+          transform: translateX(2px) scale(1.1);
+        }
+      }
+    }
+    &__user {
+      height: 100%;
+      &__profile {
+        height: 100%;
+        background-color: vr.$color-dark-gray;
+        display: flex;
+        align-items: center;
+        gap: vr.$space-sm;
+        padding: vr.$space-sm vr.$space-md;
+        border-radius: vr.$radius-md;
+        font-weight: 600;
+        box-shadow: vr.$shadow;
+
+        &__photo {
+          background-color: vr.$color-light-gray;
+          color: vr.$color-gray;
+          border-radius: vr.$radius-circle;
+          width: 32px;
+          height: 32px;
+          overflow: hidden;
+
+          > svg {
+            height: 100%;
+            width: 100%;
+            transform: translateY(5px);
+          }
+        }
+      }
+
+      &__loginbtn {
+        height: 100%;
+        background: vr.$color-button-bg;
+        border-radius: vr.$radius-md;
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        gap: vr.$space-xs;
+        padding: vr.$space-md vr.$space-xl;
+        cursor: pointer;
+        transition: background 200ms ease;
+        box-shadow: vr.$shadow;
+        flex-wrap: wrap;
+        font-size: vr.$font-md;
+        &:hover {
+          background: vr.$color-button-bg-hover;
+        }
+      }
+    }
+  }
+}

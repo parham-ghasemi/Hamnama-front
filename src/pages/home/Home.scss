@@ -1,0 +1,135 @@
+@use "../../styles//abstracts//variables" as vr;
+@use "sass:color";
+
+.home-page {
+  width: 100%;
+  min-height: 100vh;
+
+  &__hero {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    > h1 {
+      font-size: vr.$font-header;
+      font-weight: 700;
+
+      // Typewriter animation
+      overflow: hidden; /* Ensures the content is not revealed until the animation */
+      border-left: 0.15em solid vr.$color-primary; /* The typwriter cursor */
+      white-space: nowrap; /* Keeps the content on a single line */
+      margin: 0 auto; /* Gives that scrolling effect as the typing happens */
+      letter-spacing: 0.1em; /* Adjust as needed */
+      animation:
+        typing 3.5s steps(40, end),
+        blink-caret 0.75s infinite;
+
+      > span {
+        color: vr.$color-primary;
+        font-weight: 800;
+      }
+    }
+  }
+
+  &__button-title {
+    text-align: center;
+    font-size: vr.$font-lg;
+    margin-top: vr.$space-lg;
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: center;
+    gap: 82px;
+    margin-top: vr.$space-4xl;
+
+    > button {
+      background: vr.$color-button-bg;
+      transition: background 150ms ease;
+      font-size: vr.$font-xl;
+      padding: vr.$space-2xl vr.$space-4xl * 2;
+      border-radius: vr.$radius-md;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover {
+        background: vr.$color-button-bg-hover;
+      }
+    }
+  }
+
+  &__steps-title {
+    text-align: center;
+    font-size: vr.$font-xl;
+    font-weight: 700;
+    margin-top: vr.$space-4xl * 2;
+    > span {
+      color: vr.$color-primary;
+      font-weight: 800;
+    }
+  }
+
+  &__features-title {
+    text-align: center;
+    font-size: vr.$font-xl;
+    font-weight: 700;
+    margin-top: vr.$space-4xl * 1.5;
+    > span {
+      color: vr.$color-primary;
+      font-weight: 800;
+    }
+  }
+
+  &__plans-title {
+    text-align: center;
+    font-size: vr.$font-xl;
+    font-weight: 700;
+    margin-top: vr.$space-4xl * 1.5;
+    > span {
+      color: vr.$color-primary;
+      font-weight: 800;
+    }
+  }
+
+  &__faq-title {
+    text-align: center;
+    font-size: vr.$font-xl;
+    font-weight: 700;
+    margin-top: vr.$space-4xl * 1.5;
+  }
+
+  &__faq-subtitle {
+    text-align: center;
+    font-size: vr.$font-md;
+    font-weight: 600;
+    margin-top: vr.$space-lg;
+    color: vr.$color-primary;
+    cursor: pointer;
+    transition: color 150ms ease;
+    &:hover {
+      color: color.adjust(vr.$color-primary, $lightness: 10%);
+    }
+  }
+}
+
+/* The typing effect */
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 50%;
+  }
+}
+
+/* The typewriter cursor effect */
+@keyframes blink-caret {
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: vr.$color-primary;
+  }
+}

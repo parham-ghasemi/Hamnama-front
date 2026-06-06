@@ -1,0 +1,10 @@
+@forward "./styles/abstracts/variables";
+@forward "./styles/abstracts/mixins";
+
+@use "./styles/abstracts/font";
+@use "./styles/base/globals";
+
+img {
+  width: 100%;
+  height: 100%;
+}
