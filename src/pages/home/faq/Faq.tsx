@@ -35,6 +35,8 @@ const Faq = () => {
 
   return (
     <div className='home-faq'>
+      <div className='home-faq__blob'></div>
+
       {
         questions.map((ques, ind) => (
           <div className="home-faq__item" onClick={() => toggleShow(ind)} key={`homefaq-${ind}`}>

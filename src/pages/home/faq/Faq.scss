@@ -8,6 +8,12 @@
   align-items: center;
   gap: vr.$space-lg;
   margin-top: vr.$space-3xl;
+  position: relative;
+
+  &__blob {
+    @include mx.background-blob(1600px, 400px, 0px, auto, auto, 0px);
+    transform: translate(-50%, -40%);
+  }
 
   &__item {
     width: 73%;
@@ -17,14 +23,25 @@
         $alpha: -0.5,
         $lightness: 7%
       );
-      @include mx.glass-effect($light-purple, 20px, vr.$radius-md);
+      @include mx.glass-card(
+        $radius: vr.$radius-md,
+        $blur: 20px,
+        $top: $light-purple,
+        $bottom: $light-purple
+      );
+
       &:hover {
-        $light-purple: color.adjust(
+        $light-purple-hover: color.adjust(
           vr.$color-card-bg,
           $alpha: -0.5,
           $lightness: 10%
         );
-        @include mx.glass-effect($light-purple, 20px, vr.$radius-md);
+        @include mx.glass-card(
+          $radius: vr.$radius-md,
+          $blur: 20px,
+          $top: $light-purple-hover,
+          $bottom: $light-purple-hover
+        );
       }
 
       display: flex;
@@ -34,7 +51,7 @@
       cursor: pointer;
     }
     &__trigger--show {
-      border-radius: vr.$radius-md vr.$radius-md 0 0;
+      border-radius: vr.$radius-md vr.$radius-md 0 0 !important;
     }
 
     &__answer {
@@ -49,8 +66,12 @@
         $alpha: -0.5,
         $lightness: 7%
       );
-      @include mx.glass-effect($light-purple, 20px, 20px);
-      border-radius: 0 0 vr.$radius-md vr.$radius-md;
+      @include mx.glass-card(
+        $radius: 0 0 vr.$radius-md vr.$radius-md,
+        $blur: 20px,
+        $top: $light-purple,
+        $bottom: $light-purple
+      );
       padding: vr.$space-md vr.$space-xl;
       line-height: 200%;
     }

@@ -1,10 +1,11 @@
 import { PiCaretDownFill, PiHeartFill, PiUserFill, PiUsersFill } from 'react-icons/pi';
 import './PlanCards.scss';
+import { BsPeopleFill, BsPersonFill } from 'react-icons/bs';
 
 const PlanCards = () => {
   const plans = [
     {
-      icon: <PiUsersFill />,
+      icon: <BsPeopleFill />,
       title: 'پلن گروهی',
       desc: 'مناسب جمع دوستان و خانوادگی',
       numberOfUsers: 7,
@@ -13,14 +14,14 @@ const PlanCards = () => {
     },
     {
       icon: <PiHeartFill />,
-      title: 'کاپلی',
+      title: 'پلن کاپلی',
       desc: 'با پارتنرت فیلم ببین',
       numberOfUsers: 2,
       price: 110000,
       discount: { percent: 15, newPrice: 79000, daysLeft: 30 },
     },
     {
-      icon: <PiUserFill />,
+      icon: <BsPersonFill />,
       title: 'پلن تک نفره',
       desc: 'مناسب خرید تنها',
       numberOfUsers: 1,
@@ -31,6 +32,9 @@ const PlanCards = () => {
 
   return (
     <div className='home-planCards'>
+      <div className='home-planCards__blob-top'></div>
+      <div className='home-planCards__blob-bottom'></div>
+
       {
         plans.map((plan, ind) => (
           <div className='home-planCards__card' key={`homeplancards-${ind}`}>

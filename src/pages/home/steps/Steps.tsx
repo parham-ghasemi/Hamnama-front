@@ -4,6 +4,8 @@ const Steps = () => {
   const steps = ['ساخت حساب کاربری', "ساخت اتاق سینما", "انتخاب فیلم و تماشا"]
   return (
     <div className='home-steps'>
+      <div className="home-steps__blob"></div>
+
       <div className="home-steps__right-bar">
         <span className='home-steps__right-bar__white-bar'></span>
         <span className='home-steps__right-bar__dot'></span>

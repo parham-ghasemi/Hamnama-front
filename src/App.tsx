@@ -14,7 +14,7 @@ const queryClient = new QueryClient({});
 function App() {
 
   return (
-    <div className="w-full min-h-screen font-fa" dir="rtl">
+    <div className="w-full min-h-screen font-fa cursor-default" dir="rtl">
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <ScrollToTop />

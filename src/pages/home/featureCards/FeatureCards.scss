@@ -15,15 +15,12 @@
     @include mx.flex-center;
     flex-direction: column;
     gap: vr.$space-xl;
-    background-color: vr.$color-card-bg;
-    border-radius: vr.$radius-lg;
+
+    // Applied glass-card mixin & stripped old solid overrides
+    @include mx.glass-card($radius: vr.$radius-lg);
     width: 250px;
     height: 250px;
     padding: 20px 40px;
-    border: solid 1px
-      color.adjust(vr.$color-card-bg, $lightness: 10%, $saturation: -40%);
-    box-shadow: 0 0 20px 0px
-      color.adjust(vr.$color-primary, $saturation: -30%, $alpha: -0.8);
 
     &__icon {
       $light-purple: color.adjust(
@@ -31,10 +28,15 @@
         $alpha: -0.5,
         $lightness: 7%
       );
-      @include mx.glass-effect($light-purple, 20px, 20px);
+      // Updated to glass-card with explicit layout arguments
+      @include mx.glass-card(
+        $radius: vr.$radius-md,
+        $blur: 20px,
+        $top: $light-purple,
+        $bottom: $light-purple
+      );
       height: 100%;
       width: 100%;
-      border-radius: vr.$radius-md;
       display: flex;
       align-items: center;
       justify-content: center;

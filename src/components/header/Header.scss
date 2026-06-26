@@ -2,7 +2,7 @@
 
 .header {
   z-index: 999;
-  width: 100vw;
+  height: 90px;
   display: flex;
   padding: 0px vr.$space-md;
   justify-content: space-between;
@@ -15,8 +15,8 @@
   backdrop-filter: blur(15px);
 
   &__logo {
-    height: 76px;
-    width: 230px;
+    height: 56px; // Shrunk from 76px to fit the 90px header elegantly
+    width: auto; // Kept auto to prevent distortion, adjust width if needed
     margin-right: 40px;
   }
 
@@ -25,16 +25,15 @@
     align-items: center;
     justify-content: space-evenly;
     gap: vr.$space-lg;
-    height: 45px;
 
     &__mode {
       display: flex;
       align-items: center;
       position: relative;
-      height: 100%;
+      height: 46px; // Shrunk from 60px
 
       background-color: vr.$color-dark-gray;
-      border-radius: vr.$radius-xl;
+      border-radius: 999px;
       box-shadow: vr.$shadow;
 
       &__slider {
@@ -42,8 +41,8 @@
         top: 0;
         left: 0;
 
-        width: 48px;
-        height: 45px;
+        width: 46px; // Shrunk from 60px
+        height: 46px; // Shrunk from 60px
 
         border-radius: vr.$radius-circle;
         background-color: lighten(vr.$color-dark-gray, 16);
@@ -53,7 +52,9 @@
           background-color 200ms ease;
 
         &--dark {
-          transform: translateX(48px);
+          transform: translateX(
+            40px
+          ); // Adjusted translation for smaller container
         }
 
         &--light {
@@ -64,10 +65,10 @@
       &__icon {
         position: relative;
         z-index: 2;
-        font-size: 26px;
+        font-size: 22px; // Scaled down slightly from 30px
 
-        width: 48px;
-        height: 40px;
+        width: 43px; // Adjusted proportionally
+        height: 46px; // Shrunk from 60px
 
         display: flex;
         align-items: center;
@@ -89,27 +90,28 @@
     }
 
     &__watchbtn {
-      font-size: vr.$font-md;
-      background: vr.$color-button-bg;
+      font-size: 16px; // Scaled down from 21px
+      font-weight: bold;
+      background: vr.$color-primary;
       border-radius: vr.$radius-md;
       display: flex;
       justify-content: center;
       align-items: center;
       gap: vr.$space-xs;
-      padding: vr.$space-md vr.$space-md;
       cursor: pointer;
       transition: background 200ms ease;
       box-shadow: vr.$shadow;
-      height: 100%;
       flex-wrap: wrap;
+      height: 46px; // Shrunk from 60px
+      width: 160px; // Shrunk from 190px to maintain aspect ratio
 
       &:hover {
-        background: vr.$color-button-bg-hover;
+        background: vr.$color-primary-hover;
       }
 
       &__Icon {
-        font-size: 16px;
         transition: transform 200ms ease;
+        font-size: 20px; // Scaled down from 26px
       }
       &:hover {
         .header__left__watchbtn__Icon {
@@ -117,15 +119,18 @@
         }
       }
     }
+
     &__user {
-      height: 100%;
+      display: flex;
+      align-items: center;
+
       &__profile {
-        height: 100%;
+        height: 46px; // Changed from 100% to match button heights
         background-color: vr.$color-dark-gray;
         display: flex;
         align-items: center;
         gap: vr.$space-sm;
-        padding: vr.$space-sm vr.$space-md;
+        padding: 0 vr.$space-md; // Cleaned up vertical padding since height is fixed
         border-radius: vr.$radius-md;
         font-weight: 600;
         box-shadow: vr.$shadow;
@@ -134,34 +139,35 @@
           background-color: vr.$color-light-gray;
           color: vr.$color-gray;
           border-radius: vr.$radius-circle;
-          width: 32px;
-          height: 32px;
+          width: 28px; // Scaled down from 32px
+          height: 28px; // Scaled down from 32px
           overflow: hidden;
 
           > svg {
             height: 100%;
             width: 100%;
-            transform: translateY(5px);
+            transform: translateY(4px);
           }
         }
       }
 
       &__loginbtn {
-        height: 100%;
-        background: vr.$color-button-bg;
+        height: 46px; // Shrunk from 60px
+        width: 110px; // Shrunk from 124px
+        background: vr.$color-primary;
         border-radius: vr.$radius-md;
         display: flex;
         justify-content: center;
-        align-content: center;
+        align-items: center; // Changed from align-content for better single-line alignment
         gap: vr.$space-xs;
-        padding: vr.$space-md vr.$space-xl;
         cursor: pointer;
         transition: background 200ms ease;
         box-shadow: vr.$shadow;
         flex-wrap: wrap;
-        font-size: vr.$font-md;
+        font-size: 18px; // Scaled down from 25px
+        font-weight: 600;
         &:hover {
-          background: vr.$color-button-bg-hover;
+          background: vr.$color-primary-hover;
         }
       }
     }

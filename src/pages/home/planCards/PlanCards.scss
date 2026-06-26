@@ -8,6 +8,7 @@
   justify-content: center;
   gap: vr.$space-2xl;
   margin-top: vr.$space-4xl * 2;
+  position: relative;
 
   &__card:nth-child(even) {
     transform: translateY(-50px);
@@ -16,18 +17,24 @@
     }
   }
 
+  // &__blob-bottom {
+  //   @include mx.background-blob(600px, 400px, 60%, -5%, auto, auto);
+  // }
+  &__blob-top {
+    @include mx.background-blob(900px, 600px, -70%, auto, auto, -10%);
+  }
+
   &__card {
     @include mx.flex-center;
     flex-direction: column;
-    gap: vr.$space-sm;
-    background-color: vr.$color-card-bg;
-    border-radius: vr.$radius-lg;
+    justify-content: space-between;
+    position: relative;
+
+    // Upgraded main plan card container to glass-card
+    @include mx.glass-card($radius: vr.$radius-xl);
     padding: 20px 0;
-    width: 350px;
-    border: solid 1px
-      color.adjust(vr.$color-card-bg, $lightness: 10%, $saturation: -40%);
-    box-shadow: 0 0 20px 0px
-      color.adjust(vr.$color-primary, $saturation: -30%, $alpha: -0.8);
+    width: 440px;
+    height: 680px;
 
     transition: transform 200ms ease;
     &:hover {
@@ -40,15 +47,20 @@
         $alpha: -0.5,
         $lightness: 7%
       );
-      @include mx.glass-effect($light-purple, 20px, 20px);
-      border-radius: vr.$radius-md;
-      padding: vr.$space-md;
+      @include mx.glass-card(
+        $radius: vr.$radius-md,
+        $blur: 20px,
+        $top: $light-purple,
+        $bottom: $light-purple
+      );
       display: flex;
       align-items: center;
       justify-content: center;
+      height: 85px;
+      width: 85px;
 
       > svg {
-        font-size: vr.$font-xl;
+        font-size: 48px;
         color: vr.$color-primary;
       }
     }
@@ -125,8 +137,12 @@
           $alpha: -0.5,
           $lightness: 10%
         );
-        @include mx.glass-effect($light-purple, 20px, 20px);
-        border-radius: vr.$radius-md;
+        @include mx.glass-card(
+          $radius: vr.$radius-md,
+          $blur: 20px,
+          $top: $light-purple,
+          $bottom: $light-purple
+        );
 
         &__main {
           font-size: vr.$font-3xl;

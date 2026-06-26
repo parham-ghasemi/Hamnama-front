@@ -5,11 +5,14 @@
   display: flex;
   flex-direction: column;
   background: vr.$color-bg;
-  position: relative;
-  cursor: context-menu;
   color: vr.$color-white;
 
   &__content {
     flex: 1;
+    position: relative;
+    z-index: 0;
+    width: 100vw;
+    overflow: hidden;
+    // This serves as the anchor point for your page-level absolute positioning
   }
 }

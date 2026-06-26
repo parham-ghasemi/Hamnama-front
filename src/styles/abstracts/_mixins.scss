@@ -30,3 +30,86 @@
   border: 1px solid rgba(255, 255, 255, 0.2); // Translucent border
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
+
+@mixin glass-card(
+  $radius: 28px,
+  $blur: 12px,
+  $border: rgba(15, 8, 38, 0.5),
+  $top: rgba(255, 255, 255, 0.1),
+  $bottom: rgba(71, 0, 113, 0.1)
+) {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+
+  border-radius: $radius;
+
+  background: linear-gradient(180deg, $top, $bottom);
+
+  border: 1px solid $border;
+
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+    0 20px 60px rgba(0, 0, 0, 0.45);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(255, 255, 255, 0.06) 20%,
+      transparent 40%
+    );
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+
+    background-image: radial-gradient(
+      rgba(255, 255, 255, 0.08) 0.5px,
+      transparent 0.5px
+    );
+
+    background-size: 4px 4px;
+    opacity: 0.12;
+    mix-blend-mode: soft-light;
+  }
+}
+
+// _mixins.scss
+@mixin background-blob(
+  $width,
+  $height,
+  $top: auto,
+  $right: auto,
+  $bottom: auto,
+  $left: auto
+) {
+  position: absolute;
+  width: $width;
+  height: $height;
+  top: $top;
+  right: $right;
+  bottom: $bottom;
+  left: $left;
+
+  border-radius: 50%;
+  background: #ff4400a3;
+  opacity: 20%;
+  filter: blur(120px); // Adjust the blur amount to match Figma's softness
+  z-index: -1; // Sits safely behind the page content
+  pointer-events: none; // Stops it from blocking clicks on buttons/links
+}

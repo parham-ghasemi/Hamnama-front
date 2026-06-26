@@ -1,11 +1,18 @@
 @use "../../../styles/abstracts/variables" as vr;
+@use "../../../styles/abstracts/mixins" as mx;
 
 .home-steps {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: vr.$space-3xl;
-  height: 350px;
+  height: 400px;
+  position: relative;
+
+  &__blob {
+    @include mx.background-blob(1400px, 400px, 50%, 50%, auto, auto);
+    transform: translate(50%, -50%);
+  }
 
   &__right-bar {
     height: 100%;
@@ -36,9 +43,9 @@
       z-index: 1;
       height: 10px;
       width: 10px;
-      background-color: vr.$color-yellow;
+      background-color: #ffa400;
       border-radius: vr.$radius-circle;
-      box-shadow: 0px 0px 5px 3px vr.$color-primary;
+      box-shadow: 0px 0px 200px 50px vr.$color-primary;
       animation: light-blink 800ms infinite;
     }
   }
@@ -49,13 +56,14 @@
     gap: vr.$space-lg;
 
     > li {
-      border-radius: vr.$radius-md;
+      border-radius: vr.$radius-xl;
       background: vr.$color-button-bg;
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: vr.$space-md vr.$space-3xl;
-      width: 550px;
+      width: 750px;
+      height: 90px;
 
       > span {
         font-size: vr.$font-2xl;

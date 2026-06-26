@@ -1,5 +1,6 @@
 import { PiArchiveFill, PiChatsCircleFill, PiClockFill, PiDevicesFill, PiFilmReelFill, PiFilmStripBold, PiFolderOpenFill, PiHexagonFill, PiMusicNotesFill } from 'react-icons/pi';
 import './FeatureGrid.scss';
+import { BsMusicPlayerFill } from 'react-icons/bs';
 
 const FeatureGrid = () => {
   const gridItems = [
@@ -14,7 +15,7 @@ const FeatureGrid = () => {
       desc: "آپلود مستقیم یا پخش از لینک"
     },
     {
-      icon: <PiMusicNotesFill />,
+      icon: <BsMusicPlayerFill />,
       title: "رادیو موزیک",
       desc: "پخش موزیک همزمان با دوستان"
     },
@@ -52,6 +53,7 @@ const FeatureGrid = () => {
 
   return (
     <div className="home-feature-grid">
+      <div className="home-feature-grid__blob"></div>
       {
         gridItems.map((item, indx) => (
           <div className="home-feature-grid__item" key={`homefeature-grid-${indx}`}>

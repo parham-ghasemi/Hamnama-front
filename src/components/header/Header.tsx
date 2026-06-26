@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import './Header.scss';
 import { PiCaretRightBold, PiMoonStarsFill, PiSunFill, PiUserFill } from "react-icons/pi";
+import { BsChevronRight } from "react-icons/bs";
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
 
@@ -16,7 +17,7 @@ const Header = () => {
 
       <div className="header__left">
         <button className="header__left__watchbtn">
-          <PiCaretRightBold className='header__left__watchbtn__Icon' />
+          <PiCaretRightBold className='header__left__watchbtn__Icon' style={{ strokeWidth: 10 }} />
           <p className='header__left_watchbtn__text'>
             شروع به تماشا
           </p>

@@ -8,23 +8,35 @@
   grid-template-rows: repeat(3, 1fr);
   grid-column-gap: vr.$space-xl;
   grid-row-gap: vr.$space-3xl;
+  position: relative;
 
-  width: 73%;
+  width: 1076px;
   margin: 0 auto;
-  margin-top: vr.$space-4xl * 2;
+  margin-top: 160px;
+
+  &__blob {
+    @include mx.background-blob(1600px, 600px, 50%, 50%, auto, auto);
+    transform: translate(50%, -50%);
+  }
 
   &__item {
-    background: vr.$color-button-bg;
+    background: #e27439;
+    background: linear-gradient(
+      180deg,
+      rgba(226, 116, 57, 0.45) 0%,
+      rgba(248, 185, 151, 0.45) 100%
+    );
     border-radius: vr.$radius-sm;
     display: flex;
     align-items: center;
     padding: vr.$space-md;
     gap: vr.$space-md;
-    box-shadow: 0 0 10px 1px color.adjust(vr.$color-primary, $alpha: -0.4);
+    height: 115px;
+    width: 340px;
 
     &:hover {
-      box-shadow: 0 0 10px 1px color.adjust(vr.$color-primary, $alpha: -0.1);
-      outline: 1px solid vr.$color-primary;
+      // box-shadow: 0 0 10px 1px color.adjust(vr.$color-primary, $alpha: -0.1);
+      // outline: 1px solid vr.$color-primary;
       .home-feature-grid__item__right {
         box-shadow: 1px 1px 0 0 #eee;
       }
