@@ -45,8 +45,13 @@ const Faq = () => {
               <PiCaretDownBold />
             </div>
 
-            <div className={clsx(show.indexOf(ind) >= 0 ? 'home-faq__item__answer home-faq__item__answer--show' : 'home-faq__item__answer')}>
+            {/* <div className={clsx(show.indexOf(ind) >= 0 ? 'home-faq__item__answer home-faq__item__answer--show' : 'home-faq__item__answer')}>
               {ques.a}
+            </div> */}
+            <div className={clsx(show.indexOf(ind) >= 0 ? 'home-faq__item__answer home-faq__item__answer--show' : 'home-faq__item__answer')}>
+              <div> {/* <-- Inner wrapper ensures smooth calculation */}
+                {ques.a}
+              </div>
             </div>
           </div>
         ))

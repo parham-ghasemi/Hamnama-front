@@ -18,6 +18,8 @@
   &__item {
     width: 73%;
     &__trigger {
+      font-size: 24px;
+      font-weight: 600;
       $light-purple: color.adjust(
         vr.$color-card-bg,
         $alpha: -0.5,
@@ -29,6 +31,25 @@
         $top: $light-purple,
         $bottom: $light-purple
       );
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: vr.$space-xl vr.$space-xl;
+      cursor: pointer;
+      position: relative;
+
+      &::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 2px;
+        height: 50px;
+        background-color: vr.$color-white;
+        border-radius: 10px 0 0 10px;
+        transition: width ease 200ms;
+      }
 
       &:hover {
         $light-purple-hover: color.adjust(
@@ -42,25 +63,43 @@
           $top: $light-purple-hover,
           $bottom: $light-purple-hover
         );
-      }
 
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: vr.$space-md vr.$space-xl;
-      cursor: pointer;
+        &::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 4px;
+          height: 50px;
+          background-color: vr.$color-white;
+          border-radius: 10px 0 0 10px;
+        }
+      }
     }
     &__trigger--show {
       border-radius: vr.$radius-md vr.$radius-md 0 0 !important;
     }
 
     &__answer {
-      height: 0px;
+      display: grid;
+      grid-template-rows: 0fr; /* Starts collapsed */
       overflow: hidden;
-      transition: height ease 200ms;
+      transition: grid-template-rows ease 200ms;
+
+      // Keep background styles or padding safe inside an inner container
+      & > div {
+        min-height: 0;
+        padding: vr.$space-md vr.$space-xl vr.$space-md vr.$space-xl; /* Padding goes here! */
+        line-height: 200%;
+        opacity: 0;
+        transition: opacity ease 150ms;
+      }
     }
+
     &__answer--show {
-      height: 100px;
+      grid-template-rows: 1fr; /* Animates smoothly to its exact content size */
+
       $light-purple: color.adjust(
         vr.$color-card-bg,
         $alpha: -0.5,
@@ -72,8 +111,10 @@
         $top: $light-purple,
         $bottom: $light-purple
       );
-      padding: vr.$space-md vr.$space-xl;
-      line-height: 200%;
+
+      & > div {
+        opacity: 1;
+      }
     }
   }
 }
