@@ -18,56 +18,80 @@
   &__item {
     width: 73%;
     &__trigger {
+      height: 98px;
       font-size: 24px;
       font-weight: 600;
-      $light-purple: color.adjust(
-        vr.$color-card-bg,
-        $alpha: -0.5,
-        $lightness: 7%
-      );
-      @include mx.glass-card(
-        $radius: vr.$radius-md,
-        $blur: 20px,
-        $top: $light-purple,
-        $bottom: $light-purple
-      );
+      // $light-purple: color.adjust(
+      //   vr.$color-card-bg,
+      //   $alpha: -0.5,
+      //   $lightness: 7%
+      // );
+      // @include mx.glass-card(
+      //   $radius: 17px,
+      //   $blur: 20px,
+      //   $top: $light-purple,
+      //   $bottom: $light-purple
+      // );
+      border-radius: 17px;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
+        linear-gradient(
+          90deg,
+          rgba(0, 0, 0, 0.2) 0%,
+          rgba(71, 0, 113, 0.02) 100%
+        );
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: vr.$space-xl vr.$space-xl;
       cursor: pointer;
       position: relative;
+      overflow: hidden;
 
       &::before {
         content: "";
         position: absolute;
-        left: 0;
+        right: 0;
         top: 50%;
         transform: translateY(-50%);
-        width: 2px;
+        width: 4px;
         height: 50px;
         background-color: vr.$color-white;
         border-radius: 10px 0 0 10px;
         transition: width ease 200ms;
       }
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.09)),
+          linear-gradient(90deg, rgba(0, 0, 0, 0.2), rgba(71, 0, 113, 0.02));
+        opacity: 0;
+        transition: opacity 150ms ease;
+        pointer-events: none;
+      }
 
       &:hover {
-        $light-purple-hover: color.adjust(
-          vr.$color-card-bg,
-          $alpha: -0.5,
-          $lightness: 10%
-        );
-        @include mx.glass-card(
-          $radius: vr.$radius-md,
-          $blur: 20px,
-          $top: $light-purple-hover,
-          $bottom: $light-purple-hover
-        );
+        // $light-purple-hover: color.adjust(
+        //   vr.$color-card-bg,
+        //   $alpha: -0.5,
+        //   $lightness: 10%
+        // );
+        // @include mx.glass-card(
+        //   $radius: 17px,
+        //   $blur: 20px,
+        //   $top: $light-purple-hover,
+        //   $bottom: $light-purple-hover
+        // );
 
+        &::after {
+          opacity: 1;
+        }
         &::before {
           content: "";
           position: absolute;
-          left: 0;
+          right: 0;
           top: 50%;
           transform: translateY(-50%);
           width: 4px;
@@ -78,7 +102,7 @@
       }
     }
     &__trigger--show {
-      border-radius: vr.$radius-md vr.$radius-md 0 0 !important;
+      border-radius: 17px 17px 0 0 !important;
     }
 
     &__answer {
@@ -100,17 +124,26 @@
     &__answer--show {
       grid-template-rows: 1fr; /* Animates smoothly to its exact content size */
 
-      $light-purple: color.adjust(
-        vr.$color-card-bg,
-        $alpha: -0.5,
-        $lightness: 7%
-      );
-      @include mx.glass-card(
-        $radius: 0 0 vr.$radius-md vr.$radius-md,
-        $blur: 20px,
-        $top: $light-purple,
-        $bottom: $light-purple
-      );
+      // $light-purple: color.adjust(
+      //   vr.$color-card-bg,
+      //   $alpha: -0.5,
+      //   $lightness: 7%
+      // );
+      // @include mx.glass-card(
+      //   $radius: 0 0 vr.$radius-md vr.$radius-md,
+      //   $blur: 20px,
+      //   $top: $light-purple,
+      //   $bottom: $light-purple
+      // );
+
+      border-radius: 0 0 17px 17px;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
+        linear-gradient(
+          180deg,
+          rgba(0, 0, 0, 0.2) 0%,
+          rgba(71, 0, 113, 0.02) 100%
+        );
 
       & > div {
         opacity: 1;

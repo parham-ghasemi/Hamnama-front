@@ -32,13 +32,14 @@ const PlanCards = () => {
 
   return (
     <div className='home-planCards'>
-      <div className='home-planCards__blob-top'></div>
+      {/* <div className='home-planCards__blob-top'></div> */}
       <div className='home-planCards__blob-bottom'></div>
 
       {
         plans.map((plan, ind) => (
           <div className='home-planCards__card' key={`homeplancards-${ind}`}>
             <div className="home-planCards__card__icon">
+              <div className="home-planCards__card__icon__glow"></div>
               {plan.icon}
             </div>
 
@@ -57,7 +58,9 @@ const PlanCards = () => {
                 plan.discount && (
                   <div className='home-planCards__card__price-container__discount'>
                     <div className="home-planCards__card__price-container__discount__old-price">
-                      {plan.price}
+                      {
+                        plan.price.toLocaleString().replace(',', "،")
+                      }
                     </div>
 
                     <div className="home-planCards__card__price-container__discount__discount-percent">
@@ -70,10 +73,13 @@ const PlanCards = () => {
               <div className='home-planCards__card__price-container__current-price'>
                 <p className='home-planCards__card__price-container__current-price__main'>
                   {plan.discount ? plan.discount.newPrice.toLocaleString().replace(',', "،") : plan.price}
+                  <span>
+                    هــــزار تومان
+                  </span>
                 </p>
 
                 <p className='home-planCards__card__price-container__current-price__sub'>
-                  {`مدت زمان ${plan.discount.daysLeft} باقی مانده.`}
+                  {`مدت زمان ${plan.discount.daysLeft} روز `}
                 </p>
               </div>
             </div>

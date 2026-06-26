@@ -26,11 +26,10 @@ const FeatureCards = () => {
       {
         cards.map((card, ind) => (
           <div className="home-feature-cards__card" key={`home-f-card-${ind}`}>
+            <div className='home-feature-cards__card__glow'></div>
             <div className="home-feature-cards__card__icon">
               {card.icon}
             </div>
-
-            <div className="home-feature-cards__card__sep" />
 
             <div className="home-feature-cards__card__title">
               {card.title}

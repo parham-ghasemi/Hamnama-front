@@ -3,10 +3,10 @@
 
 .footer {
   width: 90%;
-  margin: vr.$space-4xl auto;
+  margin: 100px auto;
   margin-bottom: 0;
   border-top: 1px solid color.adjust(vr.$color-white, $alpha: -0.5);
-  padding: vr.$space-3xl 0;
+  padding: 50px 0;
   display: flex;
   justify-content: space-evenly;
 
@@ -19,7 +19,7 @@
   &__contact {
     display: flex;
     flex-direction: column;
-    gap: vr.$space-md;
+    gap: 30px;
     > li {
       color: vr.$color-gray;
       cursor: pointer;

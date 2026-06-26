@@ -6,11 +6,11 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  grid-column-gap: vr.$space-xl;
-  grid-row-gap: vr.$space-3xl;
+  grid-column-gap: 63px;
+  grid-row-gap: 69px;
   position: relative;
 
-  width: 1076px;
+  width: 1265px;
   margin: 0 auto;
   margin-top: 160px;
 
@@ -20,41 +20,62 @@
   }
 
   &__item {
-    background: #e27439;
-    background: linear-gradient(
-      180deg,
-      rgba(226, 116, 57, 0.45) 0%,
-      rgba(248, 185, 151, 0.45) 100%
-    );
-    border-radius: vr.$radius-sm;
+    // 1. Strict Dimensions & Radius
+    width: 380px;
+    height: 113px;
+    border-radius: 17px;
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
+      linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(71, 0, 113, 0.02) 100%
+      );
+
     display: flex;
     align-items: center;
-    padding: vr.$space-md;
+    padding: 32px;
     gap: vr.$space-md;
-    height: 115px;
-    width: 340px;
+    transition: transform 400ms ease;
 
     &:hover {
-      // box-shadow: 0 0 10px 1px color.adjust(vr.$color-primary, $alpha: -0.1);
-      // outline: 1px solid vr.$color-primary;
-      .home-feature-grid__item__right {
-        box-shadow: 1px 1px 0 0 #eee;
+      // transform: scale(1.03);
+      transform: translateY(-10px);
+
+      .home-feature-grid__item__right__glow {
+        opacity: 1;
       }
     }
 
     &__right {
       @include mx.flex-center;
-      height: 60px;
-      width: 60px;
-      background-color: color.adjust(
-        vr.$color-primary,
-        $lightness: -20%,
-        $alpha: -0.4
-      );
-      border-radius: vr.$radius-xs;
+      // 3. Icon Background Customization
+      width: 56px;
+      height: 56px;
+      background-color: #48261f;
+      border-radius: 7px;
+
       font-size: vr.$font-xl;
-      box-shadow: 0.5px 0.5px 0 0 #eee;
       transition: box-shadow 200ms ease;
+      color: vr.$color-primary;
+      position: relative;
+
+      &__glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 220%;
+        height: 220%;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(
+          circle,
+          color.adjust(vr.$color-primary, $alpha: -0.8),
+          transparent 60%
+        );
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        pointer-events: none;
+      }
     }
 
     &__left {
@@ -64,11 +85,13 @@
       gap: vr.$space-sm;
 
       &__title {
-        font-weight: 700;
-        font-size: vr.$font-md;
+        font-weight: 900;
+        font-size: 20px;
+        color: vr.$color-primary;
       }
       &__desc {
-        font-size: vr.$font-sm;
+        font-size: 15px;
+        font-weight: 600;
       }
     }
   }

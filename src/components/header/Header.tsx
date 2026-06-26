@@ -32,7 +32,7 @@ const Header = () => {
               </div>
             </div>
           ) : (
-            <button className='header__left__user__loginbtn' onClick={() => setIsLogedin(true)}>ورود</button>
+            <button className='header__left__user__loginbtn' onClick={() => setIsLogedin(true)}>ورود | ثبت نام</button>
           )}
         </div>
 

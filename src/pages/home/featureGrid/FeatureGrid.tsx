@@ -53,11 +53,12 @@ const FeatureGrid = () => {
 
   return (
     <div className="home-feature-grid">
-      <div className="home-feature-grid__blob"></div>
+      {/* <div className="home-feature-grid__blob"></div> */}
       {
         gridItems.map((item, indx) => (
           <div className="home-feature-grid__item" key={`homefeature-grid-${indx}`}>
             <div className="home-feature-grid__item__right">
+              <div className="home-feature-grid__item__right__glow"></div>
               {item.icon}
             </div>
 

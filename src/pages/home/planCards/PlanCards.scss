@@ -10,7 +10,7 @@
   margin-top: vr.$space-4xl * 2;
   position: relative;
 
-  &__card:nth-child(even) {
+  &__card:nth-child(odd) {
     transform: translateY(-50px);
     &:hover {
       transform: translateY(-60px);
@@ -27,59 +27,81 @@
   &__card {
     @include mx.flex-center;
     flex-direction: column;
-    justify-content: space-between;
+    // justify-content: space-between;
     position: relative;
 
     // Upgraded main plan card container to glass-card
-    @include mx.glass-card($radius: vr.$radius-xl);
+    // @include mx.glass-card($radius: 26px);
+    outline: 0.5px solid #ffffff2f;
     padding: 20px 0;
-    width: 440px;
-    height: 680px;
+    width: 442px;
+    min-height: 680px;
+    border-radius: 26px;
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
+      linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0%, rgba(71, 0, 113, 0.02) 100%);
 
-    transition: transform 200ms ease;
+    transition: transform 300ms ease;
     &:hover {
       transform: translateY(-20px);
+      .home-planCards__card__icon {
+        background-color: #ffffff0a;
+      }
+      .home-planCards__card__icon__glow {
+        opacity: 1;
+      }
     }
 
     &__icon {
-      $light-purple: color.adjust(
-        vr.$color-card-bg,
-        $alpha: -0.5,
-        $lightness: 7%
-      );
-      @include mx.glass-card(
-        $radius: vr.$radius-md,
-        $blur: 20px,
-        $top: $light-purple,
-        $bottom: $light-purple
-      );
       display: flex;
       align-items: center;
       justify-content: center;
       height: 85px;
       width: 85px;
+      background-color: #ffffff1a;
+      border-radius: 17px;
+      position: relative;
+      transition: background-color ease 400ms;
 
       > svg {
         font-size: 48px;
         color: vr.$color-primary;
       }
+      &__glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 200%;
+        height: 200%;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(
+          circle,
+          color.adjust(vr.$color-primary, $alpha: -0.6),
+          transparent 60%
+        );
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        pointer-events: none;
+      }
     }
 
     &__title {
-      font-size: vr.$font-2xl;
+      font-size: 50px;
       font-weight: 700;
       color: vr.$color-primary;
+      margin-top: 30px;
     }
 
     &__desc {
-      font-size: vr.$font-md;
+      font-size: 22px;
       color: color.adjust(vr.$color-gray, $lightness: -20%);
+      margin-top: 7px;
     }
 
     &__sep {
       width: 60%;
       height: 2px;
-      margin-top: 10px;
+      margin: 20px 0;
       position: relative;
 
       background: linear-gradient(
@@ -92,33 +114,36 @@
 
     &__users-title {
       font-weight: 600;
-      font-size: vr.$font-lg;
+      font-size: 32px;
     }
     &__users {
       font-weight: 500;
-      font-size: vr.$font-lg;
+      font-size: 32px;
     }
 
     &__price-container {
       @include mx.flex-center;
       flex-direction: column;
       width: 85%;
+      margin-top: 10px;
 
       &__discount {
-        border-radius: vr.$radius-sm vr.$radius-sm 0 0;
+        border-radius: 13px 13px 0 0;
         background-color: vr.$color-primary;
         @include mx.flex-center;
         gap: vr.$space-sm;
         padding: 0 vr.$space-sm;
+        height: 43px;
 
         &__old-price {
           text-decoration: line-through;
           font-weight: 600;
-          font-size: vr.$font-lg;
+          font-size: 20px;
         }
 
         &__discount-percent {
           @include mx.flex-center;
+          gap: 4px;
         }
       }
 
@@ -127,59 +152,76 @@
         align-items: center;
         flex-direction: column;
         width: 100%;
-        height: 87px;
+        height: 100px;
         position: relative;
         justify-content: end;
         padding: vr.$space-xs;
+        border-radius: 17px;
+        background-color: #ffffff1a;
 
-        $light-purple: color.adjust(
-          vr.$color-card-bg,
-          $alpha: -0.5,
-          $lightness: 10%
-        );
-        @include mx.glass-card(
-          $radius: vr.$radius-md,
-          $blur: 20px,
-          $top: $light-purple,
-          $bottom: $light-purple
-        );
+        // $light-purple: color.adjust(
+        //   vr.$color-card-bg,
+        //   $alpha: -0.5,
+        //   $lightness: 10%
+        // );
+        // @include mx.glass-card(
+        //   $radius: vr.$radius-md,
+        //   $blur: 20px,
+        //   $top: $light-purple,
+        //   $bottom: $light-purple
+        // );
 
         &__main {
-          font-size: vr.$font-3xl;
+          font-size: 46px;
           font-weight: 600;
           position: absolute;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
+          display: flex;
+          gap: 10px;
+
+          span {
+            // background-color: blanchedalmond;
+            font-size: 16px;
+            display: block;
+          }
         }
 
         &__sub {
-          color: vr.$color-gray;
-          font-size: vr.$font-sm;
-          font-weight: 500;
+          color: #ffffff30;
+          font-size: 18px;
+          // font-weight: 500;
         }
       }
     }
 
     &__buyBtn {
-      background: vr.$color-button-bg;
-      width: 60%;
-      border-radius: vr.$radius-md;
+      background: vr.$color-primary;
+      width: 235px;
+      height: 72px;
+      border-radius: 17px;
       padding: vr.$space-sm;
-      font-size: vr.$font-lg;
+      font-size: 37px;
       font-weight: 700;
-      margin-top: 15px;
+      margin-top: 20px;
       cursor: pointer;
       transition: background ease 200ms;
       &:hover {
-        background: vr.$color-button-bg-hover;
+        background: vr.$color-primary-hover;
       }
     }
 
     &__more {
-      color: color.adjust(vr.$color-primary, $lightness: -20%);
-      margin-top: 5px;
+      color: vr.$color-primary;
+      margin-top: 20px;
       cursor: pointer;
+      font-size: 22px;
+      font-weight: 200;
+      cursor: pointer;
+      &:hover {
+        color: vr.$color-primary-hover;
+      }
     }
   }
 }

@@ -41,7 +41,7 @@
   }
 
   &__subBtn {
-    background: vr.$color-button-bg;
+    background: vr.$color-primary;
     width: 300px;
     padding: vr.$space-md;
     border-radius: vr.$radius-md;
@@ -51,7 +51,7 @@
     margin-top: vr.$space-4xl;
 
     &:hover {
-      background: vr.$color-button-bg-hover;
+      background: vr.$color-primary-hover;
     }
   }
 }

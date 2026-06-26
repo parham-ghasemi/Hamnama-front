@@ -6,7 +6,7 @@
   justify-content: center;
   align-items: center;
   gap: vr.$space-3xl;
-  height: 400px;
+  height: 500px;
   position: relative;
 
   &__blob {
@@ -53,31 +53,44 @@
   &__steps-container {
     display: flex;
     flex-direction: column;
-    gap: vr.$space-lg;
+    gap: 50px;
 
     > li {
       border-radius: vr.$radius-xl;
-      background: vr.$color-button-bg;
+      background-color: vr.$color-primary-bg;
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: vr.$space-md vr.$space-3xl;
-      width: 750px;
-      height: 90px;
+      width: 770px;
+      height: 110px;
 
       > span {
-        font-size: vr.$font-2xl;
+        font-size: 60px;
+        line-height: 100%;
         font-weight: 800;
-        border-left: 1px solid vr.$color-white;
+        // border-left: 0.7px solid vr.$color-white;
         width: vr.$space-4xl;
         text-align: right;
+        display: flex;
+        gap: 17px;
+        color: vr.$color-white;
+
+        &::after {
+          content: "";
+          display: block;
+          height: 59px;
+          width: 0.7px;
+          background-color: vr.$color-white;
+        }
       }
 
       > p {
-        font-size: vr.$font-xl;
+        font-size: 40px;
         font-weight: 700;
         text-align: center;
         width: 100%;
+        text-shadow: 0 4px 4px #00000067;
       }
     }
   }

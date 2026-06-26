@@ -1,14 +1,15 @@
 // Colors
 $color-bg: linear-gradient(90deg, #0c0517 0%, #0f0826 100%);
-$color-button-bg:
+$color-primary:
   linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0.2) 100%),
-  #e27439;
-$color-button-bg-hover:
+  #c0523c;
+$color-primary-hover:
   linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0.2) 100%),
-  #e47e48;
+  #d73717;
 
-$color-primary: #e27439;
-$color-primary-hover: #de7e4a;
+$color-primary: #d04e2f;
+$color-primary-bg: #c0523c;
+$color-primary-bg-hover: #de7e4a;
 
 $color-red: #b23840;
 $color-yellow: #e0a340;

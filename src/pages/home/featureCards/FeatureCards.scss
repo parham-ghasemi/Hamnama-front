@@ -8,41 +8,62 @@
   margin-top: vr.$space-2xl;
 
   &__card {
-    transition: transform ease 200ms;
+    transition: transform ease 400ms;
+    position:
+      relative,
+      box-shadow ease 300ms;
+    overflow: hidden;
+
     &:hover {
       transform: scale(1.03);
+
+      .home-feature-cards__card__glow {
+        opacity: 1;
+      }
     }
+    &__glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 135%;
+      height: 135%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(
+        circle,
+        color.adjust(vr.$color-primary, $alpha: -0.8),
+        transparent 60%
+      );
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+
     @include mx.flex-center;
     flex-direction: column;
     gap: vr.$space-xl;
 
-    // Applied glass-card mixin & stripped old solid overrides
-    @include mx.glass-card($radius: vr.$radius-lg);
-    width: 250px;
-    height: 250px;
-    padding: 20px 40px;
+    // @include mx.glass-card($radius: vr.$radius-lg);
+    background:
+      linear-gradient(rgba(72, 0, 113, 0.1), rgba(72, 0, 113, 0.1)),
+      linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1));
+    border-radius: 22px;
+    width: 260px;
+    height: 260px;
+    padding: 20px 0px;
 
     &__icon {
-      $light-purple: color.adjust(
-        vr.$color-card-bg,
-        $alpha: -0.5,
-        $lightness: 7%
-      );
-      // Updated to glass-card with explicit layout arguments
-      @include mx.glass-card(
-        $radius: vr.$radius-md,
-        $blur: 20px,
-        $top: $light-purple,
-        $bottom: $light-purple
-      );
+      background-color: #5f4d6e59;
+      border-radius: 20px;
+
       height: 100%;
-      width: 100%;
+      width: 174px;
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
 
       > svg {
-        font-size: 70px;
+        font-size: 110px;
         color: vr.$color-primary;
       }
     }
@@ -60,8 +81,8 @@
     }
 
     &__title {
-      font-weight: 600;
-      font-size: 18px;
+      font-weight: 800;
+      font-size: 25px;
     }
   }
 }
