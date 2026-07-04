@@ -1,0 +1,37 @@
+@use "../../styles/abstracts/variables" as vr;
+
+.user-dashboard-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  // background: vr.$color-bg;
+  background: #0c0517;
+  background: linear-gradient(
+    -90deg,
+    rgba(12, 5, 23, 1) 0%,
+    rgba(15, 8, 38, 1) 100%
+  );
+  color: vr.$color-white;
+
+  &__content {
+    flex: 1;
+    position: relative;
+    z-index: 0;
+    width: 100vw;
+    overflow: hidden;
+    margin-top: 90px;
+    display: flex;
+
+    &__sidebar-container {
+      width: 265px;
+      height: calc(100vh - 90px);
+      position: fixed;
+      top: 90px;
+    }
+
+    &__page-container {
+      width: 100%;
+      min-width: calc(100vh - 90px);
+    }
+  }
+}

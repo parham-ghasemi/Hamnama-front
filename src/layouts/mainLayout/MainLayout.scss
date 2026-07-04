@@ -1,6 +1,6 @@
-@use "../styles/abstracts/variables" as vr;
+@use "../../styles/abstracts/variables" as vr;
 
-.layout {
+.main-layout {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
