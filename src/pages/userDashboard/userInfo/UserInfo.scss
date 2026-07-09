@@ -1,3 +1,165 @@
 @use "../../../styles//abstracts//variables" as vr;
 @use "../../../styles//abstracts//mixins" as mx;
 @use "sass:color";
+
+.user-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 47px 26px;
+
+  > * {
+    border-radius: 15px;
+    background-color: color.adjust(
+      vr.$color-primary-bg,
+      $alpha: -0.9,
+      $lightness: 20%
+    );
+    background-color: #ea9c7233;
+  }
+
+  &__top-card {
+    grid-area: 1 / 1 / 2 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 26px;
+    height: 142px;
+
+    &__right {
+      @include mx.flex-center;
+      gap: 25px;
+
+      &__img {
+        height: 72px;
+        width: 72px;
+        position: relative;
+        cursor: pointer;
+
+        &:hover {
+          > span {
+            height: 25px;
+            width: 25px;
+            bottom: 3px;
+          }
+        }
+
+        > img {
+          height: 72px;
+          width: 72px;
+          border-radius: 100%;
+          object-fit: cover;
+        }
+        > span {
+          position: absolute;
+          right: 0;
+          bottom: 0;
+          box-shadow: 0 0 5px 0 vr.$color-black;
+          height: 22px;
+          width: 22px;
+          border-radius: 100%;
+          background-color: color.adjust(vr.$color-gray, $lightness: -10%);
+          @include mx.flex-center;
+          transition: all 200ms ease;
+        }
+      }
+
+      &__subinfo {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+
+        > p {
+          font-size: 19px;
+          font-weight: 700;
+        }
+
+        > span {
+          font-size: 15px;
+          font-weight: 700;
+          color: vr.$color-gray;
+        }
+      }
+    }
+
+    &__left {
+      > button {
+        height: 66px;
+        width: 157px;
+        border-radius: 12px;
+        background-color: vr.$color-primary-bg;
+        transition: background-color 200ms ease;
+        font-size: 16px;
+        font-weight: 900;
+        text-shadow: 0px 3px 3px vr.$color-black;
+        cursor: pointer;
+        box-shadow: 0 4px 4px 0 color.adjust(vr.$color-black, $alpha: -0.8);
+
+        &:hover {
+          background-color: vr.$color-primary-bg-hover;
+        }
+      }
+    }
+  }
+
+  &__chart-container {
+    @include mx.flex-center;
+    height: 450px;
+  }
+
+  &__info-card {
+    padding: 40px 26px;
+
+    &__section {
+      height: 100px;
+      display: flex;
+      justify-content: space-between;
+      margin-top: 38px;
+      border-bottom: 1px solid vr.$color-gray;
+
+      &:last-of-type {
+        border-bottom: none;
+      }
+      &:first-of-type {
+        margin-top: 0;
+      }
+
+      &__right {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        > p {
+          font-weight: 900;
+          font-size: 19px;
+        }
+        > span {
+          font-size: 20px;
+          font-weight: 600;
+          color: vr.$color-gray;
+        }
+      }
+
+      &__left {
+        > button {
+          height: 50px;
+          width: 170px;
+          border-radius: 16px;
+          border: 1px solid vr.$color-white;
+          @include mx.flex-center;
+          gap: 5px;
+          font-size: 13px;
+          font-weight: 900;
+          cursor: pointer;
+          transition: background-color 200ms ease;
+          > svg {
+            font-size: 16px;
+          }
+
+          &:hover {
+            background-color: color.adjust(vr.$color-white, $alpha: -0.95);
+          }
+        }
+      }
+    }
+  }
+}
