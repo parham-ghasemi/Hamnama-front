@@ -1,4 +1,5 @@
 @use "./breakpoints" as bp;
+@use "./variables" as vr;
 
 @mixin flex-center {
   display: flex;
@@ -107,7 +108,7 @@
   left: $left;
 
   border-radius: 50%;
-  background: #ff4400a3;
+  background: vr.$color-primary;
   opacity: 20%;
   filter: blur(120px); // Adjust the blur amount to match Figma's softness
   z-index: -1; // Sits safely behind the page content

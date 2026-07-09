@@ -21,17 +21,20 @@
     overflow: hidden;
     margin-top: 90px;
     display: flex;
+    justify-content: end;
 
     &__sidebar-container {
       width: 265px;
       height: calc(100vh - 90px);
       position: fixed;
       top: 90px;
+      right: 0;
     }
 
     &__page-container {
-      width: 100%;
+      width: calc(100% - 265px);
       min-width: calc(100vh - 90px);
+      padding: 26px;
     }
   }
 }

@@ -24,7 +24,7 @@
   }
 
   &__input {
-    background-color: vr.$color-card-bg;
+    background-color: color.adjust(vr.$color-light-gray, $alpha: -0.8);
     text-align: center;
     border-radius: 12px;
     padding: vr.$space-lg;
@@ -32,7 +32,11 @@
     outline: none;
 
     &:focus {
-      background-color: color.adjust(vr.$color-card-bg, $lightness: 3%);
+      background-color: color.adjust(
+        vr.$color-light-gray,
+        $lightness: 3%,
+        $alpha: -0.8
+      );
     }
   }
 

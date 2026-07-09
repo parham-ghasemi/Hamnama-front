@@ -10,6 +10,7 @@ import Auth from "./pages/Auth/Auth";
 import PlanDetails from "./pages/planDetails/PlanDetails";
 import UserDashboardLayout from "./layouts/userDashboardLayout/UserDashboardLayout";
 import UserInfo from "./pages/userDashboard/userInfo/UserInfo";
+import Payments from "./pages/userDashboard/payments/Payments";
 
 const queryClient = new QueryClient({});
 
@@ -26,6 +27,7 @@ function App() {
             <Route path="user" element={<UserDashboardLayout />}>
               <Route index element={<Navigate to={"info"} replace />} />
               <Route path="info" element={<UserInfo />} />
+              <Route path="payments" element={<Payments />} />
             </Route>
 
             <Route element={<DesktopLayout />}>

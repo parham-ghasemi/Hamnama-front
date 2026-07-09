@@ -7,7 +7,7 @@ const Sidebar = () => {
 
   const items = [
     { text: "اطلاعات کاربر", link: "/user/info" },
-    { text: "پرداخت ها", link: "/user/payment" },
+    { text: "پرداخت ها", link: "/user/payments" },
     { text: "تیکت", link: "/user/ticket" },
     { text: "رتبه بندی", link: "/user/ranking" },
     { text: "مدیریت اعضا", link: "/user/plan-users" },
