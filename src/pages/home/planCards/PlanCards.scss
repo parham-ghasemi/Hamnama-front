@@ -30,16 +30,12 @@
     // justify-content: space-between;
     position: relative;
 
-    // Upgraded main plan card container to glass-card
-    // @include mx.glass-card($radius: 26px);
-    outline: 0.5px solid #ffffff2f;
+    outline: vr.$card-outline;
     padding: 20px 0;
     width: 442px;
     min-height: 680px;
     border-radius: 26px;
-    background:
-      linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
-      linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0%, rgba(71, 0, 113, 0.02) 100%);
+    background: vr.$color-card-bg;
 
     transition: transform 300ms ease;
     &:hover {

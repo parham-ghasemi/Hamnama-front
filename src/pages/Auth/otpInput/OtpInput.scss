@@ -34,7 +34,7 @@
     height: 72px;
 
     background: vr.$color-card-bg;
-    border-radius: vr.$radius-sm;
+    border-radius: 12px;
 
     text-align: center;
     font-size: vr.$font-xl;
@@ -52,11 +52,11 @@
     height: 72px;
 
     background: vr.$color-card-bg;
-    border-radius: vr.$radius-sm;
+    border-radius: 12px;
 
     @include mx.flex-center;
 
-    font-size: vr.$font-lg;
+    font-size: 20px;
     font-weight: 700;
   }
 

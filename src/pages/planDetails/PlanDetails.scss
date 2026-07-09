@@ -12,35 +12,25 @@
     @include mx.flex-center;
     flex-direction: column;
     gap: vr.$space-lg;
-    background-color: vr.$color-card-bg;
+    justify-content: space-evenly;
+    background: vr.$color-card-bg;
+    outline: vr.$card-outline;
     border-radius: vr.$radius-lg;
     padding: 20px 0;
     width: 400px;
-    border: solid 1px
-      color.adjust(vr.$color-card-bg, $lightness: 10%, $saturation: -40%);
-    box-shadow: 0 0 20px 0px
-      color.adjust(vr.$color-primary, $saturation: -30%, $alpha: -0.8);
-
-    transition: transform 200ms ease;
-    &:hover {
-      transform: translateY(-20px);
-    }
+    height: 885px;
 
     &__icon {
-      $light-purple: color.adjust(
-        vr.$color-card-bg,
-        $alpha: -0.2,
-        $lightness: 10%
-      );
-      @include mx.glass-effect($light-purple, 20px, 20px);
-      border-radius: vr.$radius-md;
-      padding: vr.$space-md;
+      background-color: color.adjust(vr.$color-light-gray, $alpha: -0.8);
+      border-radius: 20px;
+      height: 90px;
+      width: 90px;
       display: flex;
       align-items: center;
       justify-content: center;
 
       > svg {
-        font-size: vr.$font-xl;
+        font-size: 60px;
         color: vr.$color-primary;
       }
     }
@@ -59,22 +49,26 @@
         @include mx.flex-center;
         gap: vr.$space-md;
         flex-direction: column;
-        height: 90px;
-        width: 70px;
-        $light-purple: color.adjust(
-          vr.$color-card-bg,
-          $alpha: -0.5,
-          $lightness: 20%
-        );
-        @include mx.glass-effect($light-purple, 20px, vr.$radius-sm);
+        height: 99px;
+        width: 85px;
+        background-color: color.adjust(vr.$color-light-gray, $alpha: -0.8);
         cursor: pointer;
+        border-radius: 12px;
 
         &:hover {
-          background-color: color.adjust($light-purple, $lightness: -5%);
+          background-color: color.adjust(
+            vr.$color-light-gray,
+            $lightness: -5%,
+            $alpha: -0.8
+          );
         }
 
         &--selected {
-          background-color: color.adjust($light-purple, $lightness: -10%);
+          background-color: color.adjust(
+            vr.$color-light-gray,
+            $alpha: -0.8,
+            $lightness: -10%
+          );
         }
 
         > span {
@@ -87,17 +81,12 @@
     }
 
     &__current-price {
-      $light-purple: color.adjust(
-        vr.$color-card-bg,
-        $alpha: -0.5,
-        $lightness: 10%
-      );
-      @include mx.glass-effect($light-purple, 20px, 20px);
-      border-radius: vr.$radius-md;
+      background-color: color.adjust(vr.$color-light-gray, $alpha: -0.8);
+      border-radius: 20px;
       @include mx.flex-center;
       flex-direction: column;
       padding: vr.$space-md;
-      gap: vr.$space-sm;
+      gap: 14px;
       width: 80%;
 
       &__main {
@@ -124,21 +113,17 @@
     }
 
     &__buyBtn {
-      $light-purple: color.adjust(
-        vr.$color-card-bg,
-        $alpha: -0.5,
-        $lightness: 10%
-      );
-      @include mx.glass-effect($light-purple, 20px, 20px);
-      width: 70%;
-      padding: vr.$space-lg;
-      font-size: vr.$font-lg;
+      height: 67px;
+      width: 252px;
+      border-radius: 18px;
+      font-size: 35px;
       font-weight: 700;
-      margin-top: 15px;
+      // margin-top: 15px;
+      background-color: vr.$color-primary-bg;
       cursor: pointer;
       transition: background ease 200ms;
       &:hover {
-        background: vr.$color-primary-hover;
+        background: vr.$color-primary-bg-hover;
       }
     }
 
@@ -146,7 +131,7 @@
       display: flex;
       gap: vr.$space-md;
       flex-direction: column;
-      margin-top: vr.$space-2xl;
+      // margin-top: vr.$space-2xl;
 
       > li {
         display: flex;

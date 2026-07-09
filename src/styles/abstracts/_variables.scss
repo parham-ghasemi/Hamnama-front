@@ -9,7 +9,7 @@ $color-primary-hover:
 
 $color-primary: #d04e2f;
 $color-primary-bg: #c0523c;
-$color-primary-bg-hover: #de7e4a;
+$color-primary-bg-hover: #e3693c;
 
 $color-red: #b23840;
 $color-yellow: #e0a340;
@@ -19,7 +19,12 @@ $color-green: #38e351;
 $color-light-gray: #d9d9d9;
 $color-dark-gray: #302f2e;
 $color-gray: #abaaaa;
-$color-card-bg: #2a172f;
+
+$color-card-bg:
+  linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
+  linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0%, rgba(71, 0, 113, 0.02) 100%);
+
+$card-outline: 0.5px solid #ffffff2f;
 
 // Radius
 $radius-xs: 4px;
