@@ -10,6 +10,8 @@ const UserInfo = () => {
 
   return (
     <div className='user-info'>
+      <div className="user-info__blob" />
+
       <div className="user-info__top-card">
         <div className="user-info__top-card__right">
           <div className="user-info__top-card__right__img">

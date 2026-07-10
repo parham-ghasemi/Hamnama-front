@@ -11,6 +11,8 @@ import PlanDetails from "./pages/planDetails/PlanDetails";
 import UserDashboardLayout from "./layouts/userDashboardLayout/UserDashboardLayout";
 import UserInfo from "./pages/userDashboard/userInfo/UserInfo";
 import Payments from "./pages/userDashboard/payments/Payments";
+import Tickets from "./pages/userDashboard/tickets/Tickets";
+import TicketChat from "./pages/userDashboard/tickets/ticketChat/TicketChat";
 
 const queryClient = new QueryClient({});
 
@@ -28,6 +30,8 @@ function App() {
               <Route index element={<Navigate to={"info"} replace />} />
               <Route path="info" element={<UserInfo />} />
               <Route path="payments" element={<Payments />} />
+              <Route path="ticket" element={<Tickets />} />
+              <Route path="ticket/:id" element={<TicketChat />} />
             </Route>
 
             <Route element={<DesktopLayout />}>

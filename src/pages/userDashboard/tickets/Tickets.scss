@@ -1,0 +1,294 @@
+@use "../../../styles//abstracts//variables" as vr;
+@use "../../../styles//abstracts//mixins" as mx;
+@use "sass:color";
+
+.user-tickets {
+  @include mx.flex-center;
+  align-items: start;
+  position: relative;
+  height: 100%;
+
+  &__list-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 23px;
+
+    &__header {
+      @include mx.flex-center;
+      justify-content: space-evenly;
+
+      width: 100%;
+      height: 97px;
+
+      background-color: color.adjust(vr.$color-light-gray, $alpha: -0.75);
+      border-radius: 17px;
+
+      &__cell {
+        width: 175px;
+        font-size: 18px;
+        font-weight: 700;
+        text-align: center;
+
+        &.icon {
+          width: 40px;
+        }
+      }
+    }
+
+    &__body-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 17px;
+      width: 100%;
+
+      &__row {
+        @include mx.flex-center;
+        justify-content: space-evenly;
+
+        width: 100%;
+        height: 97px;
+
+        background-color: color.adjust(vr.$color-light-gray, $alpha: -0.87);
+        border-radius: 17px;
+
+        cursor: pointer;
+        transition: 0.2s;
+
+        &:hover {
+          background-color: color.adjust(vr.$color-light-gray, $alpha: -0.8);
+        }
+
+        &__cell {
+          @include mx.flex-center;
+
+          width: 175px;
+          text-align: center;
+          font-size: 18px;
+          font-weight: 700;
+
+          &.green {
+            color: vr.$color-green;
+          }
+
+          &.yellow {
+            color: vr.$color-yellow;
+          }
+
+          &.red {
+            color: vr.$color-red;
+          }
+
+          &.icon {
+            width: 40px;
+            font-size: 40px;
+          }
+        }
+      }
+    }
+  }
+
+  &__new-ticket {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    @include mx.flex-center;
+    gap: 18px;
+    border-radius: 250px;
+    height: 62px;
+    width: 239px;
+    background-color: color.adjust(vr.$color-white, $alpha: -0.68);
+    font-size: 18px;
+    font-weight: 700;
+    transition: background-color 200ms ease;
+
+    > span {
+      height: 40px;
+      width: 40px;
+      border-radius: 50%;
+      @include mx.flex-center;
+      background-color: color.adjust(vr.$color-light-gray, $alpha: -0.57);
+      font-size: 27px;
+      stroke-width: 8px;
+      position: absolute;
+      left: 11px;
+    }
+
+    &:hover {
+      background-color: color.adjust(vr.$color-white, $alpha: -0.6);
+    }
+
+    border: none;
+    outline: none;
+    cursor: pointer;
+  }
+  &__modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    z-index: 999;
+    @include mx.flex-center;
+
+    // Initial hidden state for animation
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 300ms ease;
+
+    &.is-active {
+      opacity: 1;
+      pointer-events: all;
+
+      .user-tickets__modal-content {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+    }
+  }
+
+  &__modal-content {
+    width: 550px;
+    max-width: 90%;
+    background-color: color.adjust(vr.$color-dark-gray, $alpha: -0.6);
+    border: 1px solid color.adjust(vr.$color-white, $alpha: -0.8);
+    border-radius: 26px;
+    padding: 30px;
+    direction: rtl;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+    // Dynamic zoom-in transition entry
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+    transition:
+      transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 300ms ease;
+
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      border-bottom: 1px solid color.adjust(vr.$color-white, $alpha: -0.85);
+      padding-bottom: 15px;
+
+      > h3 {
+        font-size: 20px;
+        font-weight: 700;
+        color: vr.$color-white;
+      }
+
+      .close-icon {
+        font-size: 28px;
+        color: color.adjust(vr.$color-white, $alpha: -0.4);
+        cursor: pointer;
+        transition: color 200ms ease;
+        @include mx.flex-center;
+
+        &:hover {
+          color: vr.$color-white;
+        }
+      }
+    }
+
+    &__form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        > label {
+          font-size: 15px;
+          font-weight: 700;
+          color: color.adjust(vr.$color-white, $alpha: -0.3);
+        }
+
+        > input,
+        > textarea {
+          width: 100%;
+          background-color: color.adjust(vr.$color-white, $alpha: -0.93);
+          border: 1px solid color.adjust(vr.$color-white, $alpha: -0.75);
+          border-radius: 14px;
+          padding: 14px;
+          color: vr.$color-white;
+          font-size: 16px;
+          outline: none;
+          transition: border-color 200ms ease;
+
+          &:focus {
+            border-color: color.adjust(vr.$color-white, $alpha: -0.4);
+          }
+        }
+
+        > textarea {
+          height: 140px;
+          resize: none;
+
+          // Reusing custom tiny scrollbar mechanics
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+          &::-webkit-scrollbar {
+            width: 3px;
+          }
+          &::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+          }
+        }
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: flex-start;
+        gap: 15px;
+        margin-top: 10px;
+
+        > button {
+          height: 48px;
+          width: 135px;
+          border-radius: 14px;
+          font-size: 16px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: background-color 200ms ease;
+          border: none;
+
+          &.submit-btn {
+            background-color: vr.$color-white;
+            color: vr.$color-black;
+            &:hover {
+              background-color: color.adjust(vr.$color-white, $alpha: -0.15);
+            }
+          }
+
+          &.cancel-btn {
+            background-color: transparent;
+            color: vr.$color-white;
+            border: 1px solid color.adjust(vr.$color-white, $alpha: -0.6);
+            &:hover {
+              background-color: color.adjust(vr.$color-white, $alpha: -0.9);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &__blob {
+    @include mx.background-blob(
+      $width: 100%,
+      $height: 80%,
+      $top: 50%,
+      $left: 50%
+    );
+
+    transform: translate(-50%, -50%);
+  }
+}
