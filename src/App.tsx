@@ -13,6 +13,7 @@ import UserInfo from "./pages/userDashboard/userInfo/UserInfo";
 import Payments from "./pages/userDashboard/payments/Payments";
 import Tickets from "./pages/userDashboard/tickets/Tickets";
 import TicketChat from "./pages/userDashboard/tickets/ticketChat/TicketChat";
+import Leaderboard from "./pages/userDashboard/leaderboard/Leaderboard";
 
 const queryClient = new QueryClient({});
 
@@ -30,6 +31,7 @@ function App() {
               <Route index element={<Navigate to={"info"} replace />} />
               <Route path="info" element={<UserInfo />} />
               <Route path="payments" element={<Payments />} />
+              <Route path="leaderboard" element={<Leaderboard />} />
               <Route path="ticket" element={<Tickets />} />
               <Route path="ticket/:id" element={<TicketChat />} />
             </Route>

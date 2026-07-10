@@ -109,7 +109,7 @@
 
   border-radius: 50%;
   background: vr.$color-primary;
-  opacity: 15%;
+  opacity: 10%;
   filter: blur(120px); // Adjust the blur amount to match Figma's softness
   z-index: -1; // Sits safely behind the page content
   pointer-events: none; // Stops it from blocking clicks on buttons/links

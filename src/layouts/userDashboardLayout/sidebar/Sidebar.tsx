@@ -9,7 +9,7 @@ const Sidebar = () => {
     { text: "اطلاعات کاربر", link: "/user/info" },
     { text: "پرداخت ها", link: "/user/payments" },
     { text: "تیکت", link: "/user/ticket" },
-    { text: "رتبه بندی", link: "/user/ranking" },
+    { text: "رتبه بندی", link: "/user/leaderboard" },
     { text: "مدیریت اعضا", link: "/user/plan-users" },
   ]
 
