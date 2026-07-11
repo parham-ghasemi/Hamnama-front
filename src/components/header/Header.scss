@@ -106,7 +106,7 @@
     &__watchbtn {
       font-size: 18px;
       font-weight: 700;
-      background: dark.$color-primary;
+      background: dark.$color-primary-bg;
       border-radius: dark.$radius-md;
       display: flex;
       justify-content: center;
@@ -120,16 +120,16 @@
       width: 160px;
 
       @include mx.light {
-        background: light.$color-primary;
+        background: light.$color-primary-bg;
         color: light.$color-white;
         box-shadow: light.$shadow;
       }
 
       &:hover {
-        background: dark.$color-primary-hover;
+        background: dark.$color-primary-bg-hover;
 
         @include mx.light {
-          background: light.$color-primary-hover;
+          background: light.$color-primary-bg-hover;
         }
       }
 
@@ -189,7 +189,7 @@
       &__loginbtn {
         height: 46px;
         width: 120px;
-        background: dark.$color-primary;
+        background: dark.$color-primary-bg;
         border-radius: dark.$radius-md;
         display: flex;
         justify-content: center;
@@ -203,16 +203,16 @@
         font-weight: 700;
 
         @include mx.light {
-          background: light.$color-primary;
+          background: light.$color-primary-bg;
           color: light.$color-white;
           box-shadow: light.$shadow;
         }
 
         &:hover {
-          background: dark.$color-primary-hover;
+          background: dark.$color-primary-bg-hover;
 
           @include mx.light {
-            background: light.$color-primary-hover;
+            background: light.$color-primary-bg-hover;
           }
         }
       }

@@ -1,5 +1,5 @@
 @use "../../styles//abstracts//variables" as dark;
-
+@use "../../styles/abstracts/variables.light" as light;
 @use "../../styles//abstracts//mixins" as mx;
 @use "sass:color";
 
@@ -21,6 +21,12 @@
     width: 400px;
     height: 885px;
 
+    @include mx.light {
+      outline: light.$card-outline;
+      background: light.$color-card-bg;
+      box-shadow: 0 3px 4px 0 color.adjust(light.$color-black, $alpha: -0.75);
+    }
+
     &__icon {
       background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
       border-radius: 20px;
@@ -30,9 +36,17 @@
       align-items: center;
       justify-content: center;
 
+      @include mx.light {
+        background-color: light.$color-primary;
+      }
+
       > svg {
         font-size: 60px;
         color: dark.$color-primary;
+
+        @include mx.light {
+          color: light.$color-white;
+        }
       }
     }
 
@@ -40,6 +54,10 @@
       font-size: dark.$font-2xl;
       font-weight: 700;
       color: dark.$color-white;
+
+      @include mx.light {
+        color: light.$color-primary;
+      }
     }
 
     &__durations {
@@ -56,12 +74,21 @@
         cursor: pointer;
         border-radius: 12px;
 
+        @include mx.light {
+          background-color: rgba(0, 0, 0, 0.05);
+          color: light.$color-black;
+        }
+
         &:hover {
           background-color: color.adjust(
             dark.$color-light-gray,
             $lightness: -5%,
             $alpha: -0.8
           );
+
+          @include mx.light {
+            background-color: light.$color-primary-bg-hover;
+          }
         }
 
         &--selected {
@@ -70,6 +97,11 @@
             $alpha: -0.8,
             $lightness: -10%
           );
+
+          @include mx.light {
+            background-color: light.$color-primary-bg;
+            color: light.$color-white;
+          }
         }
 
         > span {
@@ -90,6 +122,11 @@
       gap: 14px;
       width: 80%;
 
+      @include mx.light {
+        background-color: rgba(0, 0, 0, 0.05);
+        color: light.$color-black;
+      }
+
       &__main {
         font-size: dark.$font-3xl;
         font-weight: 600;
@@ -100,6 +137,11 @@
         color: dark.$color-primary;
         display: flex;
         gap: dark.$space-md;
+
+        @include mx.light {
+          color: light.$color-primary;
+        }
+
         &__old-price {
           text-decoration: line-through;
           &::after {
@@ -119,12 +161,21 @@
       border-radius: 18px;
       font-size: 35px;
       font-weight: 700;
-      // margin-top: 15px;
       background-color: dark.$color-primary-bg;
       cursor: pointer;
       transition: background ease 200ms;
+
+      @include mx.light {
+        background-color: light.$color-primary-bg;
+        color: light.$color-white;
+      }
+
       &:hover {
         background: dark.$color-primary-bg-hover;
+
+        @include mx.light {
+          background: light.$color-primary-bg-hover;
+        }
       }
     }
 
@@ -132,7 +183,10 @@
       display: flex;
       gap: dark.$space-md;
       flex-direction: column;
-      // margin-top: dark.$space-2xl;
+
+      @include mx.light {
+        color: light.$color-black;
+      }
 
       > li {
         display: flex;
@@ -140,6 +194,10 @@
 
         > svg {
           color: dark.$color-primary;
+
+          @include mx.light {
+            color: light.$color-primary;
+          }
         }
       }
     }

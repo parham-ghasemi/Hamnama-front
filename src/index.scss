@@ -8,3 +8,16 @@ img {
   width: 100%;
   height: 100%;
 }
+
+html.theme-transitioning {
+  &,
+  * {
+    transition:
+      background 300ms ease,
+      background-color 300ms ease,
+      color 300ms ease,
+      border-color 300ms ease,
+      outline-color 300ms ease,
+      box-shadow 300ms ease;
+  }
+}

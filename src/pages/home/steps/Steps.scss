@@ -15,57 +15,87 @@
     transform: translate(50%, -50%);
   }
 
-  &__right-bar {
-    height: 100%;
-    display: flex;
-    justify-content: space-evenly;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
+  > .img {
+    position: absolute;
+    right: 100px;
+    height: 622px;
+    width: 622px;
 
-    &__white-bar {
+    > img {
+      height: 100% !important;
+      width: 100%;
       position: absolute;
+      object-fit: contain;
       top: 0;
-      bottom: 0;
-      height: 100%;
-      width: 1px;
-      background: #ffffff;
-      background: linear-gradient(
-        0deg,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 1) 25%,
-        rgba(255, 255, 255, 1) 75%,
-        rgba(255, 255, 255, 0) 100%
-      );
-      z-index: 0;
+      transition: opacity ease 300ms !important;
 
-      @include mx.light {
-        background: #000000;
-        background: linear-gradient(
-          0deg,
-          rgba(0, 0, 0, 0) 0%,
-          rgba(0, 0, 0, 1) 25%,
-          rgba(0, 0, 0, 1) 75%,
-          rgba(0, 0, 0, 0) 100%
-        );
+      &.light {
+        opacity: 0;
+        height: 86vh;
       }
     }
 
-    &__dot {
-      z-index: 1;
-      height: 10px;
-      width: 10px;
-      background-color: #ffa400; // Hardcoded accent color; keeping consistent unless you want it changed
-      border-radius: dark.$radius-circle;
-      box-shadow: 0px 0px 200px 50px dark.$color-primary;
-      animation: light-blink 800ms infinite;
-
-      @include mx.light {
-        background-color: #aa71a1;
-        box-shadow: 0px 0px 200px 50px light.$color-primary;
+    &--light {
+      > img.light {
+        opacity: 1;
+      }
+      > img.dark {
+        opacity: 0;
       }
     }
   }
+
+  // &__right-bar {
+  //   height: 100%;
+  //   display: flex;
+  //   justify-content: space-evenly;
+  //   flex-direction: column;
+  //   align-items: center;
+  //   position: relative;
+
+  //   &__white-bar {
+  //     position: absolute;
+  //     top: 0;
+  //     bottom: 0;
+  //     height: 100%;
+  //     width: 1px;
+  //     background: #ffffff;
+  //     background: linear-gradient(
+  //       0deg,
+  //       rgba(255, 255, 255, 0) 0%,
+  //       rgba(255, 255, 255, 1) 25%,
+  //       rgba(255, 255, 255, 1) 75%,
+  //       rgba(255, 255, 255, 0) 100%
+  //     );
+  //     z-index: 0;
+
+  //     @include mx.light {
+  //       background: #000000;
+  //       background: linear-gradient(
+  //         0deg,
+  //         rgba(0, 0, 0, 0) 0%,
+  //         rgba(0, 0, 0, 1) 25%,
+  //         rgba(0, 0, 0, 1) 75%,
+  //         rgba(0, 0, 0, 0) 100%
+  //       );
+  //     }
+  //   }
+
+  //   &__dot {
+  //     z-index: 1;
+  //     height: 10px;
+  //     width: 10px;
+  //     background-color: #ffa400; // Hardcoded accent color; keeping consistent unless you want it changed
+  //     border-radius: dark.$radius-circle;
+  //     box-shadow: 0px 0px 200px 50px dark.$color-primary;
+  //     animation: light-blink 800ms infinite;
+
+  //     @include mx.light {
+  //       background-color: #aa71a1;
+  //       box-shadow: 0px 0px 200px 50px light.$color-primary;
+  //     }
+  //   }
+  // }
 
   &__steps-container {
     display: flex;

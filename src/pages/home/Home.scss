@@ -26,7 +26,8 @@
       > img {
         position: absolute;
         top: 0;
-        transition: opacity ease 200ms;
+        transition: opacity ease 300ms !important;
+
         &.light {
           opacity: 0;
           height: 86vh;
@@ -110,10 +111,10 @@
       }
 
       &:hover {
-        background: dark.$color-primary-hover;
+        background: dark.$color-primary-bg-hover;
 
         @include mx.light {
-          background: light.$color-primary-hover;
+          background: light.$color-primary-bg-hover;
         }
       }
     }
