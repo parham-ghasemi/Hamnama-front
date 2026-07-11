@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import './Header.scss';
 import { PiCaretRightBold, PiMoonStarsFill, PiSunFill, PiUserFill } from "react-icons/pi";
-import { BsChevronRight } from "react-icons/bs";
 import clsx from 'clsx';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const [activeMode, setActiveMode] = useState('dark');
   const [isLogedin, setIsLogedin] = useState(false);
+
+  const nav = useNavigate();
 
   return (
     <div className="header">
@@ -16,7 +17,7 @@ const Header = () => {
       </Link>
 
       <div className="header__left">
-        <button className="header__left__watchbtn">
+        <button className="header__left__watchbtn" onClick={() => nav('/join-room')}>
           <PiCaretRightBold className='header__left__watchbtn__Icon' style={{ strokeWidth: 10 }} />
           <p className='header__left_watchbtn__text'>
             شروع به تماشا

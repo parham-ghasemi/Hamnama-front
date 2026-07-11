@@ -14,6 +14,7 @@ import Payments from "./pages/userDashboard/payments/Payments";
 import Tickets from "./pages/userDashboard/tickets/Tickets";
 import TicketChat from "./pages/userDashboard/tickets/ticketChat/TicketChat";
 import Leaderboard from "./pages/userDashboard/leaderboard/Leaderboard";
+import Join from "./pages/room/join/Join";
 
 const queryClient = new QueryClient({});
 
@@ -26,6 +27,8 @@ function App() {
           <ScrollToTop />
           <Toaster position="top-right" />
           <Routes>
+
+            <Route path="join-room" element={<Join />} />
 
             <Route path="user" element={<UserDashboardLayout />}>
               <Route index element={<Navigate to={"info"} replace />} />
