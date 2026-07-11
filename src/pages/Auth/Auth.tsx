@@ -32,7 +32,7 @@ const Auth = () => {
      * const exists = response.exists;
      */
 
-    const exists = true; // fake for now
+    const exists = false; // fake for now
 
     setIsExistingUser(exists);
 
