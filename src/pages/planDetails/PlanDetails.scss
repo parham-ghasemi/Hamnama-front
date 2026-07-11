@@ -1,27 +1,28 @@
-@use "../../styles//abstracts//variables" as vr;
+@use "../../styles//abstracts//variables" as dark;
+
 @use "../../styles//abstracts//mixins" as mx;
 @use "sass:color";
 
 .plan-details {
   min-height: 90vh;
   @include mx.flex-center;
-  gap: vr.$space-2xl;
-  margin-top: vr.$space-4xl * 2;
+  gap: dark.$space-2xl;
+  margin-top: dark.$space-4xl * 2;
 
   &__card {
     @include mx.flex-center;
     flex-direction: column;
-    gap: vr.$space-lg;
+    gap: dark.$space-lg;
     justify-content: space-evenly;
-    background: vr.$color-card-bg;
-    outline: vr.$card-outline;
-    border-radius: vr.$radius-lg;
+    background: dark.$color-card-bg;
+    outline: dark.$card-outline;
+    border-radius: dark.$radius-lg;
     padding: 20px 0;
     width: 400px;
     height: 885px;
 
     &__icon {
-      background-color: color.adjust(vr.$color-light-gray, $alpha: -0.8);
+      background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
       border-radius: 20px;
       height: 90px;
       width: 90px;
@@ -31,33 +32,33 @@
 
       > svg {
         font-size: 60px;
-        color: vr.$color-primary;
+        color: dark.$color-primary;
       }
     }
 
     &__title {
-      font-size: vr.$font-2xl;
+      font-size: dark.$font-2xl;
       font-weight: 700;
-      color: vr.$color-white;
+      color: dark.$color-white;
     }
 
     &__durations {
       @include mx.flex-center;
-      gap: vr.$space-lg;
+      gap: dark.$space-lg;
 
       &__card {
         @include mx.flex-center;
-        gap: vr.$space-md;
+        gap: dark.$space-md;
         flex-direction: column;
         height: 99px;
         width: 85px;
-        background-color: color.adjust(vr.$color-light-gray, $alpha: -0.8);
+        background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
         cursor: pointer;
         border-radius: 12px;
 
         &:hover {
           background-color: color.adjust(
-            vr.$color-light-gray,
+            dark.$color-light-gray,
             $lightness: -5%,
             $alpha: -0.8
           );
@@ -65,7 +66,7 @@
 
         &--selected {
           background-color: color.adjust(
-            vr.$color-light-gray,
+            dark.$color-light-gray,
             $alpha: -0.8,
             $lightness: -10%
           );
@@ -75,30 +76,30 @@
           font-weight: 700;
         }
         > svg {
-          font-size: vr.$font-xl;
+          font-size: dark.$font-xl;
         }
       }
     }
 
     &__current-price {
-      background-color: color.adjust(vr.$color-light-gray, $alpha: -0.8);
+      background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
       border-radius: 20px;
       @include mx.flex-center;
       flex-direction: column;
-      padding: vr.$space-md;
+      padding: dark.$space-md;
       gap: 14px;
       width: 80%;
 
       &__main {
-        font-size: vr.$font-3xl;
+        font-size: dark.$font-3xl;
         font-weight: 600;
         line-height: 100%;
       }
 
       &__discount {
-        color: vr.$color-primary;
+        color: dark.$color-primary;
         display: flex;
-        gap: vr.$space-md;
+        gap: dark.$space-md;
         &__old-price {
           text-decoration: line-through;
           &::after {
@@ -119,26 +120,26 @@
       font-size: 35px;
       font-weight: 700;
       // margin-top: 15px;
-      background-color: vr.$color-primary-bg;
+      background-color: dark.$color-primary-bg;
       cursor: pointer;
       transition: background ease 200ms;
       &:hover {
-        background: vr.$color-primary-bg-hover;
+        background: dark.$color-primary-bg-hover;
       }
     }
 
     &__features {
       display: flex;
-      gap: vr.$space-md;
+      gap: dark.$space-md;
       flex-direction: column;
-      // margin-top: vr.$space-2xl;
+      // margin-top: dark.$space-2xl;
 
       > li {
         display: flex;
-        gap: vr.$space-lg;
+        gap: dark.$space-lg;
 
         > svg {
-          color: vr.$color-primary;
+          color: dark.$color-primary;
         }
       }
     }

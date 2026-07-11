@@ -1,39 +1,40 @@
-@use "../../../styles//abstracts//variables" as vr;
+@use "../../../styles//abstracts//variables" as dark;
+
 @use "../../../styles//abstracts//mixins" as mx;
 @use "sass:color";
 
 .auth-phone-input {
   @include mx.flex-center;
   flex-direction: column;
-  gap: vr.$space-xl;
+  gap: dark.$space-xl;
 
   &__title {
-    font-size: vr.$font-header;
+    font-size: dark.$font-header;
     font-weight: 700;
 
     > a {
-      color: vr.$color-primary;
+      color: dark.$color-primary;
       &:hover {
-        color: color.adjust(vr.$color-primary, $lightness: 5%);
+        color: color.adjust(dark.$color-primary, $lightness: 5%);
       }
     }
   }
   &__subtitle {
-    font-size: vr.$font-lg;
-    color: vr.$color-gray;
+    font-size: dark.$font-lg;
+    color: dark.$color-gray;
   }
 
   &__input {
-    background-color: color.adjust(vr.$color-light-gray, $alpha: -0.8);
+    background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
     text-align: center;
     border-radius: 12px;
-    padding: vr.$space-lg;
+    padding: dark.$space-lg;
     width: 400px;
     outline: none;
 
     &:focus {
       background-color: color.adjust(
-        vr.$color-light-gray,
+        dark.$color-light-gray,
         $lightness: 3%,
         $alpha: -0.8
       );
@@ -41,21 +42,21 @@
   }
 
   &__error {
-    color: vr.$color-red;
+    color: dark.$color-red;
   }
 
   &__subBtn {
-    background: vr.$color-primary;
+    background: dark.$color-primary;
     width: 300px;
-    padding: vr.$space-md;
-    border-radius: vr.$radius-md;
+    padding: dark.$space-md;
+    border-radius: dark.$radius-md;
     cursor: pointer;
     font-weight: 700;
-    font-size: vr.$font-lg;
-    margin-top: vr.$space-4xl;
+    font-size: dark.$font-lg;
+    margin-top: dark.$space-4xl;
 
     &:hover {
-      background: vr.$color-primary-hover;
+      background: dark.$color-primary-hover;
     }
   }
 }

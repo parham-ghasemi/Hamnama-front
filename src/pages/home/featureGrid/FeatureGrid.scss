@@ -1,4 +1,5 @@
-@use "../../../styles/abstracts/variables" as vr;
+@use "../../../styles/abstracts/variables" as dark;
+@use "../../../styles/abstracts/variables.light" as light;
 @use "sass:color";
 @use "../../../styles/abstracts/mixins" as mx;
 
@@ -32,18 +33,26 @@
         rgba(71, 0, 113, 0.02) 100%
       );
 
+    @include mx.light {
+      background: light.$color-card-bg;
+      box-shadow: 0 4px 4px 0 color.adjust(light.$color-black, $alpha: -0.75);
+    }
+
     display: flex;
     align-items: center;
     padding: 32px;
-    gap: vr.$space-md;
+    gap: dark.$space-md;
     transition: transform 400ms ease;
 
     &:hover {
-      // transform: scale(1.03);
       transform: translateY(-10px);
 
       .home-feature-grid__item__right__glow {
         opacity: 1;
+
+        @include mx.light {
+          opacity: 0; // Turns off glow layer visibility on hover in light mode
+        }
       }
     }
 
@@ -55,10 +64,15 @@
       background-color: #48261f;
       border-radius: 7px;
 
-      font-size: vr.$font-xl;
+      font-size: dark.$font-xl;
       transition: box-shadow 200ms ease;
-      color: vr.$color-primary;
+      color: dark.$color-primary;
       position: relative;
+
+      @include mx.light {
+        background-color: light.$color-light-gray;
+        color: light.$color-primary;
+      }
 
       &__glow {
         position: absolute;
@@ -69,12 +83,17 @@
         transform: translate(-50%, -50%);
         background: radial-gradient(
           circle,
-          color.adjust(vr.$color-primary, $alpha: -0.8),
+          color.adjust(dark.$color-primary, $alpha: -0.8),
           transparent 60%
         );
         opacity: 0;
         transition: opacity 0.4s ease;
         pointer-events: none;
+
+        @include mx.light {
+          display: none; // Completely drops the asset node in light mode
+          background: transparent;
+        }
       }
     }
 
@@ -82,13 +101,18 @@
       width: 80%;
       @include mx.flex-center;
       flex-direction: column;
-      gap: vr.$space-sm;
+      gap: dark.$space-sm;
 
       &__title {
         font-weight: 900;
         font-size: 20px;
-        color: vr.$color-primary;
+        color: dark.$color-primary;
+
+        @include mx.light {
+          color: light.$color-primary;
+        }
       }
+
       &__desc {
         font-size: 15px;
         font-weight: 600;

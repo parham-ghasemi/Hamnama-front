@@ -1,17 +1,32 @@
-@use "../../styles/abstracts/variables" as vr;
+@use "../../styles/abstracts/variables" as dark;
+@use "../../styles/abstracts/variables.light" as light;
+@use "../../styles/abstracts/mixins" as mx;
 
 .main-layout {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  // background: vr.$color-bg;
+  // background: dark.$color-bg;
   background: #0c0517;
   background: linear-gradient(
     -90deg,
     rgba(12, 5, 23, 1) 0%,
     rgba(15, 8, 38, 1) 100%
   );
-  color: vr.$color-white;
+  color: dark.$color-white;
+  transition: background 200ms ease;
+
+  // * {
+  //   transition:
+  //     background 200ms ease,
+  //     background-color 200ms ease,
+  //     color 200ms ease;
+  // }
+
+  @include mx.light {
+    background: light.$color-bg;
+    color: light.$color-black;
+  }
 
   &__content {
     flex: 1;

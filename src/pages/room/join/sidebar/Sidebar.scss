@@ -1,4 +1,5 @@
-@use "../../../../styles//abstracts//variables" as vr;
+@use "../../../../styles//abstracts//variables" as dark;
+
 @use "../../../../styles//abstracts//mixins" as mx;
 @use "sass:color";
 
@@ -12,7 +13,7 @@
   flex-direction: column;
   align-items: center;
   gap: 35px;
-  background-color: color.adjust(vr.$color-black, $alpha: -0.5);
+  background-color: color.adjust(dark.$color-black, $alpha: -0.5);
   z-index: 2;
 
   // Reusing custom tiny scrollbar mechanics
@@ -39,7 +40,7 @@
     width: 100%;
 
     > li {
-      background-color: color.adjust(vr.$color-white, $alpha: -0.85);
+      background-color: color.adjust(dark.$color-white, $alpha: -0.85);
       border-radius: 10px;
       @include mx.flex-center;
       justify-content: space-between;
@@ -67,7 +68,7 @@
           position: absolute;
           left: 0;
           bottom: 0;
-          background-color: color.adjust(vr.$color-green, $alpha: -0.5);
+          background-color: color.adjust(dark.$color-green, $alpha: -0.5);
           border-radius: 100%;
         }
       }
@@ -90,7 +91,7 @@
         width: 5px;
         height: 33px;
         border-radius: 7px 0 0 7px;
-        background-color: vr.$color-white;
+        background-color: dark.$color-white;
       }
     }
   }

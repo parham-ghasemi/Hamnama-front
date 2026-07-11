@@ -1,4 +1,5 @@
-@use "../../../styles//abstracts//variables" as vr;
+@use "../../../styles//abstracts//variables" as dark;
+
 @use "../../../styles//abstracts//mixins" as mx;
 @use "sass:color";
 
@@ -16,7 +17,7 @@
 
     &__header {
       @include mx.flex-center;
-      background-color: color.adjust(vr.$color-light-gray, $alpha: -0.75);
+      background-color: color.adjust(dark.$color-light-gray, $alpha: -0.75);
       justify-content: space-evenly;
       height: 97px;
       width: 100%;
@@ -38,7 +39,7 @@
       &__row {
         @include mx.flex-center;
         justify-content: space-evenly;
-        background-color: color.adjust(vr.$color-light-gray, $alpha: -0.87);
+        background-color: color.adjust(dark.$color-light-gray, $alpha: -0.87);
         height: 97px;
         width: 100%;
         border-radius: 17px;
@@ -53,13 +54,13 @@
           &__text {
             font-weight: 600;
             font-size: 16px;
-            color: color.adjust(vr.$color-dark-gray, $lightness: 20%);
+            color: color.adjust(dark.$color-dark-gray, $lightness: 20%);
           }
           &.red {
-            color: vr.$color-red;
+            color: dark.$color-red;
           }
           &.green {
-            color: vr.$color-green;
+            color: dark.$color-green;
           }
         }
       }

@@ -1,11 +1,12 @@
-@use "../../../styles/abstracts/variables" as vr;
+@use "../../../styles/abstracts/variables" as dark;
+@use "../../../styles/abstracts/variables.light" as light;
 @use "../../../styles/abstracts/mixins" as mx;
 
 .home-steps {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: vr.$space-3xl;
+  gap: dark.$space-3xl;
   height: 500px;
   position: relative;
 
@@ -37,16 +38,32 @@
         rgba(255, 255, 255, 0) 100%
       );
       z-index: 0;
+
+      @include mx.light {
+        background: #000000;
+        background: linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0) 0%,
+          rgba(0, 0, 0, 1) 25%,
+          rgba(0, 0, 0, 1) 75%,
+          rgba(0, 0, 0, 0) 100%
+        );
+      }
     }
 
     &__dot {
       z-index: 1;
       height: 10px;
       width: 10px;
-      background-color: #ffa400;
-      border-radius: vr.$radius-circle;
-      box-shadow: 0px 0px 200px 50px vr.$color-primary;
+      background-color: #ffa400; // Hardcoded accent color; keeping consistent unless you want it changed
+      border-radius: dark.$radius-circle;
+      box-shadow: 0px 0px 200px 50px dark.$color-primary;
       animation: light-blink 800ms infinite;
+
+      @include mx.light {
+        background-color: #aa71a1;
+        box-shadow: 0px 0px 200px 50px light.$color-primary;
+      }
     }
   }
 
@@ -56,32 +73,44 @@
     gap: 50px;
 
     > li {
-      border-radius: vr.$radius-xl;
-      background-color: vr.$color-primary-bg;
+      border-radius: dark.$radius-xl;
+      background-color: dark.$color-primary-bg;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: vr.$space-md vr.$space-3xl;
+      padding: dark.$space-md dark.$space-3xl;
       width: 770px;
       height: 110px;
+
+      @include mx.light {
+        background-color: light.$color-primary-bg;
+        color: light.$color-white;
+      }
 
       > span {
         font-size: 60px;
         line-height: 100%;
         font-weight: 800;
-        // border-left: 0.7px solid vr.$color-white;
-        width: vr.$space-4xl;
+        width: dark.$space-4xl;
         text-align: right;
         display: flex;
         gap: 17px;
-        color: vr.$color-white;
+        color: dark.$color-white;
+
+        @include mx.light {
+          color: light.$color-white;
+        }
 
         &::after {
           content: "";
           display: block;
           height: 59px;
           width: 0.7px;
-          background-color: vr.$color-white;
+          background-color: dark.$color-white;
+
+          @include mx.light {
+            background-color: light.$color-white;
+          }
         }
       }
 
@@ -90,7 +119,7 @@
         font-weight: 700;
         text-align: center;
         width: 100%;
-        text-shadow: 0 4px 4px #00000067;
+        text-shadow: 0 4px 4px #00000067; // Optional: can adjust text-shadow opacity/color for light theme if needed
       }
     }
   }

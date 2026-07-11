@@ -1,11 +1,12 @@
-@use "../../../styles/abstracts/variables" as vr;
+@use "../../../styles/abstracts/variables" as dark;
+@use "../../../styles/abstracts/variables.light" as light;
 @use "sass:color";
 @use "../../../styles/abstracts/mixins" as mx;
 
 .home-feature-cards {
   @include mx.flex-center;
-  gap: vr.$space-3xl;
-  margin-top: vr.$space-2xl;
+  gap: dark.$space-3xl;
+  margin-top: dark.$space-2xl;
 
   &__card {
     transition: transform ease 400ms;
@@ -21,6 +22,7 @@
         opacity: 1;
       }
     }
+
     &__glow {
       position: absolute;
       top: 50%;
@@ -30,19 +32,26 @@
       transform: translate(-50%, -50%);
       background: radial-gradient(
         circle,
-        color.adjust(vr.$color-primary, $alpha: -0.8),
+        color.adjust(dark.$color-primary, $alpha: -0.8),
         transparent 60%
       );
       opacity: 0;
       transition: opacity 0.4s ease;
       pointer-events: none;
+
+      @include mx.light {
+        background: radial-gradient(
+          circle,
+          color.adjust(light.$color-white, $alpha: -0.8),
+          transparent 60%
+        );
+      }
     }
 
     @include mx.flex-center;
     flex-direction: column;
-    gap: vr.$space-xl;
+    gap: dark.$space-xl;
 
-    // @include mx.glass-card($radius: vr.$radius-lg);
     background:
       linear-gradient(rgba(72, 0, 113, 0.1), rgba(72, 0, 113, 0.1)),
       linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1));
@@ -51,10 +60,14 @@
     height: 260px;
     padding: 20px 0px;
 
+    @include mx.light {
+      background: light.$color-card-bg;
+      box-shadow: 0 4px 4px 0 color.adjust(light.$color-black, $alpha: -0.75);
+    }
+
     &__icon {
       background-color: #5f4d6e59;
       border-radius: 20px;
-
       height: 100%;
       width: 174px;
       display: flex;
@@ -62,22 +75,40 @@
       justify-content: center;
       position: relative;
 
+      @include mx.light {
+        background-color: light.$color-primary-bg;
+        box-shadow: 0 4px 4px 0 color.adjust(light.$color-black, $alpha: -0.75);
+      }
+
       > svg {
         font-size: 110px;
-        color: vr.$color-primary;
+        color: dark.$color-primary;
+
+        @include mx.light {
+          color: light.$color-white;
+        }
       }
     }
 
     &__sep {
       width: 100%;
       height: 2px;
-
       background: linear-gradient(
         90deg,
         rgba(255, 255, 255, 0) 10%,
         rgba(238, 238, 238, 1) 50%,
         rgba(255, 255, 255, 0) 90%
       );
+
+      @include mx.light {
+        // Flipped line gradient colors to contrast beautifully on light themes
+        background: linear-gradient(
+          90deg,
+          rgba(0, 0, 0, 0) 10%,
+          rgba(0, 0, 0, 0.15) 50%,
+          rgba(0, 0, 0, 0) 90%
+        );
+      }
     }
 
     &__title {

@@ -1,4 +1,5 @@
-@use "../../../styles//abstracts//variables" as vr;
+@use "../../../styles//abstracts//variables" as dark;
+
 @use "../../../styles//abstracts//mixins" as mx;
 @use "sass:color";
 
@@ -10,7 +11,7 @@
   > * {
     border-radius: 15px;
     background-color: color.adjust(
-      vr.$color-primary-bg,
+      dark.$color-primary-bg,
       $alpha: -0.9,
       $lightness: 20%
     );
@@ -63,11 +64,11 @@
           position: absolute;
           right: 0;
           bottom: 0;
-          box-shadow: 0 0 5px 0 vr.$color-black;
+          box-shadow: 0 0 5px 0 dark.$color-black;
           height: 22px;
           width: 22px;
           border-radius: 100%;
-          background-color: color.adjust(vr.$color-gray, $lightness: -10%);
+          background-color: color.adjust(dark.$color-gray, $lightness: -10%);
           @include mx.flex-center;
           transition: all 200ms ease;
         }
@@ -87,7 +88,7 @@
         > span {
           font-size: 15px;
           font-weight: 700;
-          color: vr.$color-gray;
+          color: dark.$color-gray;
         }
       }
     }
@@ -97,16 +98,16 @@
         height: 66px;
         width: 157px;
         border-radius: 12px;
-        background-color: vr.$color-primary-bg;
+        background-color: dark.$color-primary-bg;
         transition: background-color 200ms ease;
         font-size: 16px;
         font-weight: 900;
-        text-shadow: 0px 3px 3px vr.$color-black;
+        text-shadow: 0px 3px 3px dark.$color-black;
         cursor: pointer;
-        box-shadow: 0 4px 4px 0 color.adjust(vr.$color-black, $alpha: -0.8);
+        box-shadow: 0 4px 4px 0 color.adjust(dark.$color-black, $alpha: -0.8);
 
         &:hover {
-          background-color: vr.$color-primary-bg-hover;
+          background-color: dark.$color-primary-bg-hover;
         }
       }
     }
@@ -125,7 +126,7 @@
       display: flex;
       justify-content: space-between;
       margin-top: 38px;
-      border-bottom: 1px solid vr.$color-gray;
+      border-bottom: 1px solid dark.$color-gray;
 
       &:last-of-type {
         border-bottom: none;
@@ -145,7 +146,7 @@
         > span {
           font-size: 20px;
           font-weight: 600;
-          color: vr.$color-gray;
+          color: dark.$color-gray;
         }
       }
 
@@ -154,7 +155,7 @@
           height: 50px;
           width: 170px;
           border-radius: 16px;
-          border: 1px solid vr.$color-white;
+          border: 1px solid dark.$color-white;
           @include mx.flex-center;
           gap: 5px;
           font-size: 13px;
@@ -166,7 +167,7 @@
           }
 
           &:hover {
-            background-color: color.adjust(vr.$color-white, $alpha: -0.95);
+            background-color: color.adjust(dark.$color-white, $alpha: -0.95);
           }
         }
       }

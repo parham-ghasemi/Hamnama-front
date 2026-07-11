@@ -1,10 +1,13 @@
-@use "../../styles/abstracts/variables" as vr;
+@use "../../styles/abstracts/variables" as dark;
+@use "../../styles/abstracts/variables.light" as light;
+@use "sass:color";
+@use "../../styles/abstracts/mixins" as mx;
 
 .header {
   z-index: 999;
   height: 90px;
   display: flex;
-  padding: 0px vr.$space-md;
+  padding: 0px dark.$space-md;
   justify-content: space-between;
   align-items: center;
   position: fixed;
@@ -15,8 +18,8 @@
   backdrop-filter: blur(15px);
 
   &__logo {
-    height: 56px; // Shrunk from 76px to fit the 90px header elegantly
-    width: auto; // Kept auto to prevent distortion, adjust width if needed
+    height: 56px;
+    width: auto;
     margin-right: 40px;
   }
 
@@ -24,37 +27,45 @@
     display: flex;
     align-items: center;
     justify-content: space-evenly;
-    gap: vr.$space-lg;
+    gap: dark.$space-lg;
 
     &__mode {
       display: flex;
       align-items: center;
       position: relative;
-      height: 46px; // Shrunk from 60px
+      height: 46px;
 
-      background-color: vr.$color-dark-gray;
+      background-color: dark.$color-dark-gray;
       border-radius: 999px;
-      box-shadow: vr.$shadow;
+      box-shadow: dark.$shadow;
+
+      @include mx.light {
+        background-color: light.$color-light-gray;
+        box-shadow: light.$shadow;
+      }
 
       &__slider {
         position: absolute;
         top: 0;
         left: 0;
 
-        width: 46px; // Shrunk from 60px
-        height: 46px; // Shrunk from 60px
+        width: 46px;
+        height: 46px;
 
-        border-radius: vr.$radius-circle;
-        background-color: lighten(vr.$color-dark-gray, 16);
+        border-radius: dark.$radius-circle;
+        background-color: lighten(dark.$color-dark-gray, 16);
 
         transition:
           transform 350ms cubic-bezier(0.22, 1, 0.36, 1),
           background-color 200ms ease;
 
+        @include mx.light {
+          background-color: light.$color-white;
+          box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
         &--dark {
-          transform: translateX(
-            40px
-          ); // Adjusted translation for smaller container
+          transform: translateX(40px);
         }
 
         &--light {
@@ -65,10 +76,10 @@
       &__icon {
         position: relative;
         z-index: 2;
-        font-size: 22px; // Scaled down slightly from 30px
+        font-size: 22px;
 
-        width: 43px; // Adjusted proportionally
-        height: 46px; // Shrunk from 60px
+        width: 43px;
+        height: 46px;
 
         display: flex;
         align-items: center;
@@ -90,29 +101,40 @@
     }
 
     &__watchbtn {
-      font-size: 18px; // Scaled down from 25px
+      font-size: 18px;
       font-weight: 700;
-      background: vr.$color-primary;
-      border-radius: vr.$radius-md;
+      background: dark.$color-primary;
+      border-radius: dark.$radius-md;
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: vr.$space-xs;
+      gap: dark.$space-xs;
       cursor: pointer;
       transition: background 200ms ease;
-      box-shadow: vr.$shadow;
+      box-shadow: dark.$shadow;
       flex-wrap: wrap;
-      height: 46px; // Shrunk from 60px
-      width: 160px; // Shrunk from 190px to maintain aspect ratio
+      height: 46px;
+      width: 160px;
+
+      @include mx.light {
+        background: light.$color-primary;
+        color: light.$color-white;
+        box-shadow: light.$shadow;
+      }
 
       &:hover {
-        background: vr.$color-primary-hover;
+        background: dark.$color-primary-hover;
+
+        @include mx.light {
+          background: light.$color-primary-hover;
+        }
       }
 
       &__Icon {
         transition: transform 200ms ease;
-        font-size: 20px; // Scaled down from 26px
+        font-size: 20px;
       }
+
       &:hover {
         .header__left__watchbtn__Icon {
           transform: translateX(2px) scale(1.1);
@@ -125,23 +147,33 @@
       align-items: center;
 
       &__profile {
-        height: 46px; // Changed from 100% to match button heights
-        background-color: vr.$color-dark-gray;
+        height: 46px;
+        background-color: dark.$color-dark-gray;
         display: flex;
         align-items: center;
-        gap: vr.$space-sm;
-        padding: 0 vr.$space-md; // Cleaned up vertical padding since height is fixed
-        border-radius: vr.$radius-md;
+        gap: dark.$space-sm;
+        padding: 0 dark.$space-md;
+        border-radius: dark.$radius-md;
         font-weight: 600;
-        box-shadow: vr.$shadow;
+        box-shadow: dark.$shadow;
+
+        @include mx.light {
+          background-color: light.$color-card-bg;
+          box-shadow: light.$shadow;
+        }
 
         &__photo {
-          background-color: vr.$color-light-gray;
-          color: vr.$color-gray;
-          border-radius: vr.$radius-circle;
-          width: 28px; // Scaled down from 32px
-          height: 28px; // Scaled down from 32px
+          background-color: dark.$color-light-gray;
+          color: dark.$color-gray;
+          border-radius: dark.$radius-circle;
+          width: 28px;
+          height: 28px;
           overflow: hidden;
+
+          @include mx.light {
+            background-color: light.$color-light-gray;
+            color: light.$color-gray;
+          }
 
           > svg {
             height: 100%;
@@ -152,22 +184,33 @@
       }
 
       &__loginbtn {
-        height: 46px; // Shrunk from 60px
-        width: 120px; // Shrunk from 124px
-        background: vr.$color-primary;
-        border-radius: vr.$radius-md;
+        height: 46px;
+        width: 120px;
+        background: dark.$color-primary;
+        border-radius: dark.$radius-md;
         display: flex;
         justify-content: center;
-        align-items: center; // Changed from align-content for better single-line alignment
-        gap: vr.$space-xs;
+        align-items: center;
+        gap: dark.$space-xs;
         cursor: pointer;
         transition: background 200ms ease;
-        box-shadow: vr.$shadow;
+        box-shadow: dark.$shadow;
         flex-wrap: wrap;
-        font-size: 18px; // Scaled down from 25px
+        font-size: 18px;
         font-weight: 700;
+
+        @include mx.light {
+          background: light.$color-primary;
+          color: light.$color-white;
+          box-shadow: light.$shadow;
+        }
+
         &:hover {
-          background: vr.$color-primary-hover;
+          background: dark.$color-primary-hover;
+
+          @include mx.light {
+            background: light.$color-primary-hover;
+          }
         }
       }
     }

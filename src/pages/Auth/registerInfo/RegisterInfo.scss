@@ -1,20 +1,21 @@
-@use "../../../styles/abstracts/variables" as vr;
+@use "../../../styles/abstracts/variables" as dark;
+
 @use "../../../styles/abstracts/mixins" as mx;
 @use "sass:color";
 
 .register-info {
   @include mx.flex-center;
   flex-direction: column;
-  gap: vr.$space-2xl;
+  gap: dark.$space-2xl;
 
   &__group {
     @include mx.flex-center;
     flex-direction: column;
-    gap: vr.$space-md;
+    gap: dark.$space-md;
   }
 
   &__label {
-    font-size: vr.$font-lg;
+    font-size: dark.$font-lg;
     font-weight: 700;
     text-align: center;
   }
@@ -22,7 +23,7 @@
   &__input-wrapper {
     position: relative;
     width: 400px;
-    padding: vr.$space-lg;
+    padding: dark.$space-lg;
 
     display: flex;
     align-items: center;
@@ -33,7 +34,7 @@
     position: absolute;
     inset: 0;
 
-    background-color: color.adjust(vr.$color-light-gray, $alpha: -0.8);
+    background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
 
     border-radius: 12px;
 
@@ -43,7 +44,7 @@
 
     &:focus {
       background-color: color.adjust(
-        vr.$color-light-gray,
+        dark.$color-light-gray,
         $lightness: 3%,
         $alpha: -0.8
       );
@@ -53,7 +54,7 @@
   &__icon,
   &__icon-btn {
     z-index: 2;
-    font-size: vr.$font-lg;
+    font-size: dark.$font-lg;
   }
 
   &__icon-btn {
@@ -63,43 +64,43 @@
   &__rules {
     display: flex;
     flex-direction: column;
-    gap: vr.$space-sm;
+    gap: dark.$space-sm;
 
-    color: vr.$color-red;
+    color: dark.$color-red;
     text-align: center;
   }
 
   &__submit-btn {
-    background: vr.$color-primary;
+    background: dark.$color-primary;
 
     width: 300px;
 
-    padding: vr.$space-md;
+    padding: dark.$space-md;
 
-    border-radius: vr.$radius-md;
+    border-radius: dark.$radius-md;
 
     cursor: pointer;
 
     font-weight: 700;
-    font-size: vr.$font-lg;
+    font-size: dark.$font-lg;
 
-    margin-top: vr.$space-lg;
+    margin-top: dark.$space-lg;
 
     &:hover {
-      background: vr.$color-primary-hover;
+      background: dark.$color-primary-hover;
     }
   }
 
   &__terms {
-    color: vr.$color-gray;
+    color: dark.$color-gray;
     text-align: center;
     max-width: 500px;
 
     > a {
-      color: vr.$color-primary;
+      color: dark.$color-primary;
 
       &:hover {
-        color: color.adjust(vr.$color-primary, $lightness: 5%);
+        color: color.adjust(dark.$color-primary, $lightness: 5%);
       }
     }
   }

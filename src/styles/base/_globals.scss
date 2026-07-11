@@ -1,5 +1,5 @@
-@use "../abstracts/variables" as vr;
+@use "../abstracts/variables" as dark;
 
 .color-primary {
-  color: vr.$color-primary;
+  color: dark.$color-primary;
 }

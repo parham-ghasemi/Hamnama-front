@@ -1,4 +1,5 @@
-@use "../../../styles/abstracts/variables" as vr;
+@use "../../../styles/abstracts/variables" as dark;
+@use "../../../styles/abstracts/variables.light" as light;
 @use "sass:color";
 @use "../../../styles/abstracts/mixins" as mx;
 
@@ -6,8 +7,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: vr.$space-lg;
-  margin-top: vr.$space-3xl;
+  gap: dark.$space-lg;
+  margin-top: dark.$space-3xl;
   position: relative;
 
   &__blob {
@@ -17,21 +18,11 @@
 
   &__item {
     width: 73%;
+
     &__trigger {
       height: 98px;
       font-size: 24px;
       font-weight: 600;
-      // $light-purple: color.adjust(
-      //   vr.$color-card-bg,
-      //   $alpha: -0.5,
-      //   $lightness: 7%
-      // );
-      // @include mx.glass-card(
-      //   $radius: 17px,
-      //   $blur: 20px,
-      //   $top: $light-purple,
-      //   $bottom: $light-purple
-      // );
       border-radius: 17px;
       background:
         linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
@@ -40,10 +31,15 @@
           rgba(0, 0, 0, 0.2) 0%,
           rgba(71, 0, 113, 0.02) 100%
         );
+
+      @include mx.light {
+        background: light.$color-card-bg;
+      }
+
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: vr.$space-xl vr.$space-xl;
+      padding: dark.$space-xl dark.$space-xl;
       cursor: pointer;
       position: relative;
       overflow: hidden;
@@ -56,10 +52,15 @@
         transform: translateY(-50%);
         width: 4px;
         height: 50px;
-        background-color: vr.$color-white;
+        background-color: dark.$color-white;
         border-radius: 10px 0 0 10px;
         transition: width ease 200ms;
+
+        @include mx.light {
+          background-color: light.$color-primary-bg;
+        }
       }
+
       &::after {
         content: "";
         position: absolute;
@@ -70,21 +71,13 @@
         opacity: 0;
         transition: opacity 150ms ease;
         pointer-events: none;
+
+        @include mx.light {
+          background: linear-gradient(rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.04));
+        }
       }
 
       &:hover {
-        // $light-purple-hover: color.adjust(
-        //   vr.$color-card-bg,
-        //   $alpha: -0.5,
-        //   $lightness: 10%
-        // );
-        // @include mx.glass-card(
-        //   $radius: 17px,
-        //   $blur: 20px,
-        //   $top: $light-purple-hover,
-        //   $bottom: $light-purple-hover
-        // );
-
         &::after {
           opacity: 1;
         }
@@ -96,11 +89,16 @@
           transform: translateY(-50%);
           width: 4px;
           height: 50px;
-          background-color: vr.$color-white;
+          background-color: dark.$color-white;
           border-radius: 10px 0 0 10px;
+
+          @include mx.light {
+            background-color: light.$color-primary-bg-hover;
+          }
         }
       }
     }
+
     &__trigger--show {
       border-radius: 17px 17px 0 0 !important;
     }
@@ -114,7 +112,7 @@
       // Keep background styles or padding safe inside an inner container
       & > div {
         min-height: 0;
-        padding: vr.$space-md vr.$space-xl vr.$space-md vr.$space-xl; /* Padding goes here! */
+        padding: dark.$space-md dark.$space-xl dark.$space-md dark.$space-xl; /* Padding goes here! */
         line-height: 200%;
         opacity: 0;
         transition: opacity ease 150ms;
@@ -123,19 +121,6 @@
 
     &__answer--show {
       grid-template-rows: 1fr; /* Animates smoothly to its exact content size */
-
-      // $light-purple: color.adjust(
-      //   vr.$color-card-bg,
-      //   $alpha: -0.5,
-      //   $lightness: 7%
-      // );
-      // @include mx.glass-card(
-      //   $radius: 0 0 vr.$radius-md vr.$radius-md,
-      //   $blur: 20px,
-      //   $top: $light-purple,
-      //   $bottom: $light-purple
-      // );
-
       border-radius: 0 0 17px 17px;
       background:
         linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
@@ -144,6 +129,10 @@
           rgba(0, 0, 0, 0.2) 0%,
           rgba(71, 0, 113, 0.02) 100%
         );
+
+      @include mx.light {
+        background: light.$color-card-bg;
+      }
 
       & > div {
         opacity: 1;

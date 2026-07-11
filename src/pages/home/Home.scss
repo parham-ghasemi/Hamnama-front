@@ -1,4 +1,6 @@
-@use "../../styles//abstracts//variables" as vr;
+@use "../../styles//abstracts//variables" as dark;
+@use "../../styles//abstracts//mixins" as mx;
+@use "../../styles//abstracts//variables.light" as light;
 @use "sass:color";
 
 .home-page {
@@ -10,6 +12,7 @@
     position: absolute;
     width: 100vw;
     height: 97vh;
+    max-height: 97vh;
     top: 0;
     left: 0;
     right: 0;
@@ -17,30 +20,64 @@
     flex-direction: column;
     align-items: center;
 
+    > .img {
+      height: 100%;
+      width: 100%;
+      > img {
+        position: absolute;
+        top: 0;
+        transition: opacity ease 200ms;
+        &.light {
+          opacity: 0;
+          height: 86vh;
+        }
+      }
+    }
+
+    &--light {
+      > .img > img.light {
+        opacity: 1;
+      }
+      > .img > img.dark {
+        opacity: 0;
+      }
+    }
+
     > h1 {
-      font-size: vr.$font-header;
+      font-size: dark.$font-header;
       font-weight: 700;
 
       // Typewriter animation
       overflow: hidden; /* Ensures the content is not revealed until the animation */
-      border-left: 0.15em solid vr.$color-primary; /* The typwriter cursor */
+      border-left: 0.15em solid dark.$color-primary; /* The typwriter cursor */
       white-space: nowrap; /* Keeps the content on a single line */
       margin: 0 auto; /* Gives that scrolling effect as the typing happens */
       letter-spacing: 0.1em; /* Adjust as needed */
       animation:
         typing 3.5s steps(40, end),
-        blink-caret 0.75s infinite;
+        blink-caret-dark 0.75s infinite;
 
       > span {
-        color: vr.$color-primary;
+        color: dark.$color-primary;
         font-weight: 800;
+      }
+
+      @include mx.light {
+        border-left: 0.15em solid light.$color-primary; /* The typwriter cursor */
+        animation:
+          typing 3.5s steps(40, end),
+          blink-caret-light 0.75s infinite;
+
+        > span {
+          color: light.$color-primary;
+        }
       }
     }
   }
 
   &__button-title {
     text-align: center;
-    font-size: vr.$font-lg;
+    font-size: dark.$font-lg;
     // margin-top: 16px;
     &::before {
       content: "";
@@ -54,21 +91,30 @@
     display: flex;
     justify-content: center;
     gap: 82px;
-    margin-top: vr.$space-4xl;
+    margin-top: dark.$space-4xl;
 
     > button {
-      background-color: vr.$color-primary-bg;
+      background-color: dark.$color-primary-bg;
       transition: background 150ms ease;
       font-size: 42px;
       font-weight: 600;
-      border-radius: vr.$radius-xl;
+      border-radius: dark.$radius-xl;
       cursor: pointer;
       height: 155px;
       width: 400px;
-      text-shadow: 0 4px 4px #00000067;
+      text-shadow: 0 4px 4px #00000067; // Assuming this stays standard, but hex alpha can be adjusted if needed
+
+      @include mx.light {
+        background-color: light.$color-primary-bg;
+        color: light.$color-white;
+      }
 
       &:hover {
-        background: vr.$color-primary-hover;
+        background: dark.$color-primary-hover;
+
+        @include mx.light {
+          background: light.$color-primary-hover;
+        }
       }
     }
   }
@@ -79,8 +125,12 @@
     font-weight: 700;
     margin: 130px 0;
     > span {
-      color: vr.$color-primary;
+      color: dark.$color-primary;
       font-weight: 800;
+
+      @include mx.light {
+        color: light.$color-primary;
+      }
     }
   }
 
@@ -89,10 +139,14 @@
     font-size: 66px;
     font-weight: 700;
     margin: 160px 0;
-    // margin-top: vr.$space-4xl * 1.5;
+    // margin-top: dark.$space-4xl * 1.5;
     > span {
-      color: vr.$color-primary;
+      color: dark.$color-primary;
       font-weight: 800;
+
+      @include mx.light {
+        color: light.$color-primary;
+      }
     }
   }
 
@@ -101,10 +155,14 @@
     font-size: 66px;
     font-weight: 700;
     margin: 122px 0;
-    // margin-top: vr.$space-4xl * 1.5;
+    // margin-top: dark.$space-4xl * 1.5;
     > span {
-      color: vr.$color-primary;
+      color: dark.$color-primary;
       font-weight: 800;
+
+      @include mx.light {
+        color: light.$color-primary;
+      }
     }
   }
 
@@ -117,14 +175,23 @@
 
   &__faq-subtitle {
     text-align: center;
-    font-size: vr.$font-md;
+    font-size: dark.$font-md;
     font-weight: 600;
-    margin-top: vr.$space-lg;
-    color: vr.$color-primary;
+    margin-top: dark.$space-lg;
+    color: dark.$color-primary;
     cursor: pointer;
     transition: color 150ms ease;
+
+    @include mx.light {
+      color: light.$color-primary;
+    }
+
     &:hover {
-      color: color.adjust(vr.$color-primary, $lightness: 10%);
+      color: color.adjust(dark.$color-primary, $lightness: 10%);
+
+      @include mx.light {
+        color: color.adjust(light.$color-primary, $lightness: 10%);
+      }
     }
   }
 }
@@ -139,13 +206,24 @@
   }
 }
 
-/* The typewriter cursor effect */
-@keyframes blink-caret {
+@keyframes blink-caret-dark {
   from,
   to {
     border-color: transparent;
   }
+
   50% {
-    border-color: vr.$color-primary;
+    border-color: dark.$color-primary;
+  }
+}
+
+@keyframes blink-caret-light {
+  from,
+  to {
+    border-color: transparent;
+  }
+
+  50% {
+    border-color: light.$color-primary;
   }
 }

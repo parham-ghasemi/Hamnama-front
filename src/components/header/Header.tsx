@@ -3,11 +3,11 @@ import './Header.scss';
 import { PiCaretRightBold, PiMoonStarsFill, PiSunFill, PiUserFill } from "react-icons/pi";
 import clsx from 'clsx';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTheme } from '../../context/ThemeContext';
 
 const Header = () => {
-  const [activeMode, setActiveMode] = useState('dark');
+  const { theme, setTheme, isLight } = useTheme();
   const [isLogedin, setIsLogedin] = useState(false);
-
   const nav = useNavigate();
 
   return (
@@ -38,15 +38,10 @@ const Header = () => {
         </div>
 
         <div className="header__left__mode">
-          <div className={clsx("header__left__mode__slider", activeMode === "light" ? "header__left__mode__slider--light" : "header__left__mode__slider--dark")} />
+          <div className={clsx("header__left__mode__slider", isLight ? "header__left__mode__slider--light" : "header__left__mode__slider--dark")} />
+          <div className="header__left__mode__icon" onClick={() => setTheme("dark")} > <PiMoonStarsFill /> </div>
 
-          <div className="header__left__mode__icon" onClick={() => setActiveMode("dark")} >
-            <PiMoonStarsFill />
-          </div>
-
-          <div className="header__left__mode__icon" onClick={() => setActiveMode("light")} >
-            <PiSunFill />
-          </div>
+          <div className="header__left__mode__icon" onClick={() => setTheme("light")} > <PiSunFill /> </div>
         </div>
       </div>
     </div>

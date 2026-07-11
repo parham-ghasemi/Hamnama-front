@@ -1,4 +1,5 @@
-@use "../../../../styles//abstracts//variables" as vr;
+@use "../../../../styles//abstracts//variables" as dark;
+
 @use "../../../../styles//abstracts//mixins" as mx;
 @use "sass:color";
 
@@ -15,7 +16,7 @@
       height: 50px;
       width: 50px;
       border-radius: 17px;
-      background-color: color.adjust(vr.$color-light-gray, $alpha: -0.66);
+      background-color: color.adjust(dark.$color-light-gray, $alpha: -0.66);
       display: block;
       @include mx.flex-center;
       font-size: 35px;
@@ -23,7 +24,7 @@
       transition: background-color 200ms ease;
 
       &:hover {
-        background-color: color.adjust(vr.$color-light-gray, $alpha: -0.6);
+        background-color: color.adjust(dark.$color-light-gray, $alpha: -0.6);
       }
     }
   }
@@ -76,8 +77,8 @@
       &.admin {
         align-self: flex-end;
         > p {
-          background-color: vr.$color-white;
-          color: vr.$color-black;
+          background-color: dark.$color-white;
+          color: dark.$color-black;
         }
       }
     }
@@ -106,11 +107,11 @@
     > textarea {
       width: 100%;
       height: 110px;
-      background-color: color.adjust(vr.$color-white, $alpha: -0.9);
-      border: 1px solid color.adjust(vr.$color-white, $alpha: -0.7);
+      background-color: color.adjust(dark.$color-white, $alpha: -0.9);
+      border: 1px solid color.adjust(dark.$color-white, $alpha: -0.7);
       border-radius: 17px;
       padding: 15px 24px 15px 15px;
-      color: vr.$color-white;
+      color: dark.$color-white;
       font-size: 16px;
       resize: none;
       outline: none;
@@ -130,7 +131,7 @@
       }
 
       &:focus {
-        border-color: color.adjust(vr.$color-white, $alpha: -0.4);
+        border-color: color.adjust(dark.$color-white, $alpha: -0.4);
       }
     }
 
@@ -149,19 +150,19 @@
         transition: background-color 200ms ease;
 
         &.send-btn {
-          background-color: vr.$color-white;
-          color: vr.$color-black;
+          background-color: dark.$color-white;
+          color: dark.$color-black;
           &:hover {
-            background-color: color.adjust(vr.$color-white, $alpha: -0.15);
+            background-color: color.adjust(dark.$color-white, $alpha: -0.15);
           }
         }
 
         &.cancel-btn {
           background-color: transparent;
-          color: vr.$color-white;
-          border: 1px solid color.adjust(vr.$color-white, $alpha: -0.6);
+          color: dark.$color-white;
+          border: 1px solid color.adjust(dark.$color-white, $alpha: -0.6);
           &:hover {
-            background-color: color.adjust(vr.$color-white, $alpha: -0.9);
+            background-color: color.adjust(dark.$color-white, $alpha: -0.9);
           }
         }
       }
@@ -187,7 +188,7 @@
     }
 
     > button {
-      background-color: color.adjust(vr.$color-white, $alpha: -0.58);
+      background-color: color.adjust(dark.$color-white, $alpha: -0.58);
       border-radius: 17px;
       font-size: 18px;
       font-weight: 700;
@@ -196,7 +197,7 @@
       cursor: pointer;
       transition: background-color 200ms ease;
       &:hover {
-        background-color: color.adjust(vr.$color-white, $alpha: -0.5);
+        background-color: color.adjust(dark.$color-white, $alpha: -0.5);
       }
     }
   }

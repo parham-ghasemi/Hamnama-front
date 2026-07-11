@@ -4,13 +4,28 @@ import FeatureCards from './featureCards/FeatureCards'
 import PlanCards from './planCards/PlanCards'
 import FeatureGrid from './featureGrid/FeatureGrid'
 import Faq from './faq/Faq'
+import { useTheme } from '../../context/ThemeContext'
+import clsx from 'clsx'
 
 const Home = () => {
+  const { isLight } = useTheme();
+
   return (
     <div className='home-page'>
 
-      <div className="home-page__hero">
-        <img src="/homepage/heroimg.png" alt="" />
+      <div className={clsx("home-page__hero", isLight && "home-page__hero--light")}>
+        <div className="img">
+          <img
+            src="/homepage/lightheroimg.png"
+            className='light'
+            alt=""
+          />
+          <img
+            src="/homepage/heroimg.png"
+            className='dark'
+            alt=""
+          />
+        </div>
 
         <h1>
           با <span>دوستان خود</span> همزمان فیلم ببینید!

@@ -15,42 +15,45 @@ import Tickets from "./pages/userDashboard/tickets/Tickets";
 import TicketChat from "./pages/userDashboard/tickets/ticketChat/TicketChat";
 import Leaderboard from "./pages/userDashboard/leaderboard/Leaderboard";
 import Join from "./pages/room/join/Join";
+import { ThemeProvider } from "./context/ThemeContext";
 
 const queryClient = new QueryClient({});
 
 function App() {
 
   return (
-    <div className="w-full min-h-screen font-fa cursor-default" dir="rtl">
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <ScrollToTop />
-          <Toaster position="top-right" />
-          <Routes>
+    <ThemeProvider>
+      <div className="w-full min-h-screen font-fa cursor-default" dir="rtl">
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <ScrollToTop />
+            <Toaster position="top-right" />
+            <Routes>
 
-            <Route path="join-room" element={<Join />} />
+              <Route path="join-room" element={<Join />} />
 
-            <Route path="user" element={<UserDashboardLayout />}>
-              <Route index element={<Navigate to={"info"} replace />} />
-              <Route path="info" element={<UserInfo />} />
-              <Route path="payments" element={<Payments />} />
-              <Route path="leaderboard" element={<Leaderboard />} />
-              <Route path="ticket" element={<Tickets />} />
-              <Route path="ticket/:id" element={<TicketChat />} />
-            </Route>
+              <Route path="user" element={<UserDashboardLayout />}>
+                <Route index element={<Navigate to={"info"} replace />} />
+                <Route path="info" element={<UserInfo />} />
+                <Route path="payments" element={<Payments />} />
+                <Route path="leaderboard" element={<Leaderboard />} />
+                <Route path="ticket" element={<Tickets />} />
+                <Route path="ticket/:id" element={<TicketChat />} />
+              </Route>
 
-            <Route element={<DesktopLayout />}>
-              <Route index element={<Home />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/plan-details" element={<PlanDetails />} />
-              <Route path="*" element={<p className="text-6xl font-black text-center my-60">THIS PAGE WAS NOT FOUND!</p>} />
-            </Route>
+              <Route element={<DesktopLayout />}>
+                <Route index element={<Home />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/plan-details" element={<PlanDetails />} />
+                <Route path="*" element={<p className="text-6xl font-black text-center my-60">THIS PAGE WAS NOT FOUND!</p>} />
+              </Route>
 
-          </Routes>
-        </BrowserRouter>
-        <ReactQueryDevtools buttonPosition="bottom-right" position="bottom" />
-      </QueryClientProvider>
-    </div>
+            </Routes>
+          </BrowserRouter>
+          <ReactQueryDevtools buttonPosition="bottom-right" position="bottom" />
+        </QueryClientProvider>
+      </div>
+    </ThemeProvider>
   )
 }
 

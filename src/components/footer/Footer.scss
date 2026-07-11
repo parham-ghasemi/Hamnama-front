@@ -1,32 +1,51 @@
-@use "../../styles/abstracts/variables" as vr;
+@use "../../styles/abstracts/variables" as dark;
+@use "../../styles/abstracts/variables.light" as light;
 @use "sass:color";
+@use "../../styles/abstracts/mixins" as mx;
 
 .footer {
   width: 90%;
   margin: 100px auto;
   margin-bottom: 0;
-  border-top: 1px solid color.adjust(vr.$color-white, $alpha: -0.5);
+  border-top: 1px solid color.adjust(dark.$color-white, $alpha: -0.5);
   padding: 50px 0;
   display: flex;
   justify-content: space-evenly;
 
+  @include mx.light {
+    border-top: 1px solid light.$color-light-gray;
+    border-bottom: 1px solid light.$color-light-gray;
+  }
+
   &__section-title {
     font-weight: 700;
-    font-size: vr.$font-md;
+    font-size: dark.$font-md;
   }
+
   &__quick,
   &__useful,
   &__contact {
     display: flex;
     flex-direction: column;
     gap: 30px;
+
     > li {
-      color: vr.$color-gray;
+      color: dark.$color-gray;
       cursor: pointer;
       transition: color ease 200ms;
+      font-size: 17px;
+      font-weight: 600;
+
+      @include mx.light {
+        color: light.$color-primary;
+      }
 
       &:hover {
-        color: vr.$color-light-gray;
+        color: dark.$color-primary-hover;
+
+        @include mx.light {
+          color: light.$color-primary-hover;
+        }
       }
     }
   }
@@ -34,7 +53,7 @@
   &__social {
     display: flex;
     flex-direction: column;
-    gap: vr.$space-md;
+    gap: dark.$space-md;
     height: 100%;
   }
 
@@ -42,15 +61,29 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: vr.$space-sm;
+    gap: dark.$space-sm;
 
     > svg {
-      background-color: vr.$color-gray;
-      color: vr.$color-black;
+      background-color: dark.$color-gray;
+      color: dark.$color-black;
       width: 50px;
       height: 50px;
-      padding: vr.$space-sm;
-      border-radius: vr.$radius-md;
+      padding: dark.$space-sm;
+      border-radius: dark.$radius-md;
+      transition: background-color 200ms ease;
+      cursor: pointer;
+
+      &:hover {
+        background-color: dark.$color-dark-gray;
+        @include mx.light {
+          background-color: light.$color-primary-bg-hover;
+        }
+      }
+
+      @include mx.light {
+        background-color: light.$color-primary-bg;
+        color: light.$color-white;
+      }
     }
   }
 }
@@ -58,8 +91,12 @@
 .footer-rights {
   margin: 0 auto;
   width: 90%;
-  font-size: vr.$font-sm;
-  border-top: 1px solid color.adjust(vr.$color-white, $alpha: -0.7);
+  font-size: dark.$font-sm;
+  border-top: 1px solid color.adjust(dark.$color-white, $alpha: -0.7);
   text-align: center;
-  padding: vr.$space-md;
+  padding: dark.$space-md;
+
+  @include mx.light {
+    border-top: 1px solid light.$color-light-gray;
+  }
 }

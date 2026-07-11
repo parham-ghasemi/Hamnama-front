@@ -1,8 +1,9 @@
-@use "../../../styles/abstracts/variables" as vr;
+@use "../../../styles/abstracts/variables" as dark;
+
 @use "../../../styles/abstracts/mixins" as mx;
 @use "sass:color";
 
-$row-odd-bg: color.adjust(vr.$color-light-gray, $alpha: -0.87);
+$row-odd-bg: color.adjust(dark.$color-light-gray, $alpha: -0.87);
 
 .user-leaderboard {
   @include mx.flex-center;
@@ -106,7 +107,7 @@ $row-odd-bg: color.adjust(vr.$color-light-gray, $alpha: -0.87);
           &__text {
             font-weight: 600;
             font-size: 16px;
-            color: color.adjust(vr.$color-dark-gray, $lightness: 20%);
+            color: color.adjust(dark.$color-dark-gray, $lightness: 20%);
           }
         }
       }

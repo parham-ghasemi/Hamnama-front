@@ -1,5 +1,6 @@
 @use "./breakpoints" as bp;
-@use "./variables" as vr;
+@use "./variables" as dark;
+@use "./variables.light" as light;
 
 @mixin flex-center {
   display: flex;
@@ -90,7 +91,12 @@
   }
 }
 
-// _mixins.scss
+@mixin light {
+  html.light & {
+    @content;
+  }
+}
+
 @mixin background-blob(
   $width,
   $height,
@@ -108,9 +114,13 @@
   left: $left;
 
   border-radius: 50%;
-  background: vr.$color-primary;
+  background: dark.$color-primary;
   opacity: 10%;
   filter: blur(120px); // Adjust the blur amount to match Figma's softness
   z-index: -1; // Sits safely behind the page content
   pointer-events: none; // Stops it from blocking clicks on buttons/links
+
+  @include light {
+    display: none;
+  }
 }

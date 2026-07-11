@@ -1,4 +1,5 @@
-@use "../../../styles//abstracts//variables" as vr;
+@use "../../../styles//abstracts//variables" as dark;
+
 @use "../../../styles//abstracts//mixins" as mx;
 @use "sass:color";
 
@@ -21,7 +22,7 @@
       width: 100%;
       height: 97px;
 
-      background-color: color.adjust(vr.$color-light-gray, $alpha: -0.75);
+      background-color: color.adjust(dark.$color-light-gray, $alpha: -0.75);
       border-radius: 17px;
 
       &__cell {
@@ -49,14 +50,14 @@
         width: 100%;
         height: 97px;
 
-        background-color: color.adjust(vr.$color-light-gray, $alpha: -0.87);
+        background-color: color.adjust(dark.$color-light-gray, $alpha: -0.87);
         border-radius: 17px;
 
         cursor: pointer;
         transition: 0.2s;
 
         &:hover {
-          background-color: color.adjust(vr.$color-light-gray, $alpha: -0.8);
+          background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
         }
 
         &__cell {
@@ -68,15 +69,15 @@
           font-weight: 700;
 
           &.green {
-            color: vr.$color-green;
+            color: dark.$color-green;
           }
 
           &.yellow {
-            color: vr.$color-yellow;
+            color: dark.$color-yellow;
           }
 
           &.red {
-            color: vr.$color-red;
+            color: dark.$color-red;
           }
 
           &.icon {
@@ -98,7 +99,7 @@
     border-radius: 250px;
     height: 62px;
     width: 239px;
-    background-color: color.adjust(vr.$color-white, $alpha: -0.68);
+    background-color: color.adjust(dark.$color-white, $alpha: -0.68);
     font-size: 18px;
     font-weight: 700;
     transition: background-color 200ms ease;
@@ -108,7 +109,7 @@
       width: 40px;
       border-radius: 50%;
       @include mx.flex-center;
-      background-color: color.adjust(vr.$color-light-gray, $alpha: -0.57);
+      background-color: color.adjust(dark.$color-light-gray, $alpha: -0.57);
       font-size: 27px;
       stroke-width: 8px;
       position: absolute;
@@ -116,7 +117,7 @@
     }
 
     &:hover {
-      background-color: color.adjust(vr.$color-white, $alpha: -0.6);
+      background-color: color.adjust(dark.$color-white, $alpha: -0.6);
     }
 
     border: none;
@@ -153,8 +154,8 @@
   &__modal-content {
     width: 550px;
     max-width: 90%;
-    background-color: color.adjust(vr.$color-dark-gray, $alpha: -0.6);
-    border: 1px solid color.adjust(vr.$color-white, $alpha: -0.8);
+    background-color: color.adjust(dark.$color-dark-gray, $alpha: -0.6);
+    border: 1px solid color.adjust(dark.$color-white, $alpha: -0.8);
     border-radius: 26px;
     padding: 30px;
     direction: rtl;
@@ -172,24 +173,24 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 25px;
-      border-bottom: 1px solid color.adjust(vr.$color-white, $alpha: -0.85);
+      border-bottom: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
       padding-bottom: 15px;
 
       > h3 {
         font-size: 20px;
         font-weight: 700;
-        color: vr.$color-white;
+        color: dark.$color-white;
       }
 
       .close-icon {
         font-size: 28px;
-        color: color.adjust(vr.$color-white, $alpha: -0.4);
+        color: color.adjust(dark.$color-white, $alpha: -0.4);
         cursor: pointer;
         transition: color 200ms ease;
         @include mx.flex-center;
 
         &:hover {
-          color: vr.$color-white;
+          color: dark.$color-white;
         }
       }
     }
@@ -207,23 +208,23 @@
         > label {
           font-size: 15px;
           font-weight: 700;
-          color: color.adjust(vr.$color-white, $alpha: -0.3);
+          color: color.adjust(dark.$color-white, $alpha: -0.3);
         }
 
         > input,
         > textarea {
           width: 100%;
-          background-color: color.adjust(vr.$color-white, $alpha: -0.93);
-          border: 1px solid color.adjust(vr.$color-white, $alpha: -0.75);
+          background-color: color.adjust(dark.$color-white, $alpha: -0.93);
+          border: 1px solid color.adjust(dark.$color-white, $alpha: -0.75);
           border-radius: 14px;
           padding: 14px;
-          color: vr.$color-white;
+          color: dark.$color-white;
           font-size: 16px;
           outline: none;
           transition: border-color 200ms ease;
 
           &:focus {
-            border-color: color.adjust(vr.$color-white, $alpha: -0.4);
+            border-color: color.adjust(dark.$color-white, $alpha: -0.4);
           }
         }
 
@@ -261,19 +262,19 @@
           border: none;
 
           &.submit-btn {
-            background-color: vr.$color-white;
-            color: vr.$color-black;
+            background-color: dark.$color-white;
+            color: dark.$color-black;
             &:hover {
-              background-color: color.adjust(vr.$color-white, $alpha: -0.15);
+              background-color: color.adjust(dark.$color-white, $alpha: -0.15);
             }
           }
 
           &.cancel-btn {
             background-color: transparent;
-            color: vr.$color-white;
-            border: 1px solid color.adjust(vr.$color-white, $alpha: -0.6);
+            color: dark.$color-white;
+            border: 1px solid color.adjust(dark.$color-white, $alpha: -0.6);
             &:hover {
-              background-color: color.adjust(vr.$color-white, $alpha: -0.9);
+              background-color: color.adjust(dark.$color-white, $alpha: -0.9);
             }
           }
         }
