@@ -1,5 +1,5 @@
 @use "../../../styles//abstracts//variables" as dark;
-
+@use "../../../styles/abstracts/variables.light" as light;
 @use "../../../styles//abstracts//mixins" as mx;
 @use "sass:color";
 
@@ -15,6 +15,11 @@
   );
   color: dark.$color-white;
   display: flex;
+
+  @include mx.light {
+    background: light.$color-bg;
+    color: light.$color-black;
+  }
 
   &__content {
     margin-top: 90px;
@@ -60,6 +65,10 @@
           flex-direction: column;
           justify-content: space-between;
 
+          @include mx.light {
+            background: light.$color-card-bg;
+          }
+
           &:first-of-type {
             grid-area: 1 / 1 / 2 / 2;
           }
@@ -71,6 +80,10 @@
             font-size: 22px;
             font-weight: 700;
             margin-top: 21px;
+
+            @include mx.light {
+              color: light.$color-black; // Label accents matching text rules
+            }
           }
 
           &__i {
@@ -78,6 +91,10 @@
             width: 181px;
             background-color: color.adjust(#5f4d6e, $alpha: -0.65);
             border-radius: 22px;
+
+            @include mx.light {
+              background-color: light.$color-primary-bg;
+            }
           }
 
           &__code {
@@ -97,6 +114,12 @@
             text-align: center;
             padding: 0 12px;
 
+            @include mx.light {
+              background-color: light.$color-light-gray;
+              color: light.$color-black;
+              border: 1px solid light.$color-light-gray;
+            }
+
             > span {
               position: absolute;
               left: 21px;
@@ -108,6 +131,11 @@
               width: 30px;
               border-radius: 7px;
               @include mx.flex-center;
+
+              @include mx.light {
+                color: light.$color-black;
+              }
+
               &:hover {
                 opacity: 1;
                 transform: translateY(-2px);
@@ -115,6 +143,11 @@
                   dark.$color-light-gray,
                   $alpha: -0.78
                 );
+
+                @include mx.light {
+                  background-color: light.$color-light-gray;
+                  color: light.$color-primary-hover;
+                }
               }
             }
           }
@@ -134,11 +167,20 @@
             cursor: pointer;
             transition: all 200ms ease;
 
+            @include mx.light {
+              background-color: light.$color-primary-bg;
+              color: light.$color-white; // White text nested inside primary-bg component container
+            }
+
             &:hover {
               background-color: color.adjust(
                 dark.$color-light-gray,
                 $alpha: -0.7
               );
+
+              @include mx.light {
+                background-color: light.$color-primary-bg-hover;
+              }
             }
           }
 
@@ -155,6 +197,11 @@
             position: relative;
             overflow: hidden;
 
+            @include mx.light {
+              background: light.$color-card-bg;
+              box-shadow: 0 4px 4px 0 light.$color-gray;
+            }
+
             &::before {
               content: "";
               position: absolute;
@@ -166,6 +213,10 @@
               );
               transition: opacity 300ms ease;
               z-index: 1;
+
+              @include mx.light {
+                display: none; // Discard raw overlays on light themes
+              }
             }
 
             &::after {
@@ -180,6 +231,10 @@
               opacity: 0;
               transition: opacity 300ms ease;
               z-index: 1;
+
+              @include mx.light {
+                display: none;
+              }
             }
 
             &:hover {
@@ -188,6 +243,10 @@
               }
               > span {
                 transform: scale(1.1);
+
+                @include mx.light {
+                  background-color: light.$color-primary-bg-hover;
+                }
               }
             }
 
@@ -199,6 +258,11 @@
             > p {
               font-size: 20px;
               font-weight: 700;
+
+              @include mx.light {
+                color: light.$color-primary;
+                font-weight: 900;
+              }
             }
 
             > span {
@@ -211,6 +275,12 @@
                 $alpha: -0.8
               );
               transition: transform 300ms ease;
+
+              @include mx.light {
+                background-color: light.$color-primary-bg;
+                color: light.$color-white; // White graphic inside custom primary background badge
+              }
+
               > svg {
                 font-size: 29px;
               }

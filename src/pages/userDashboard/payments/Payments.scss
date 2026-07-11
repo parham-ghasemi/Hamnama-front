@@ -1,5 +1,5 @@
 @use "../../../styles//abstracts//variables" as dark;
-
+@use "../../../styles/abstracts/variables.light" as light;
 @use "../../../styles//abstracts//mixins" as mx;
 @use "sass:color";
 
@@ -22,11 +22,20 @@
       height: 97px;
       width: 100%;
       border-radius: 17px;
+
+      @include mx.light {
+        background-color: light.$color-primary-bg;
+      }
+
       &__cell {
         width: 175px;
         font-weight: 700;
         font-size: 18px;
         text-align: center;
+
+        @include mx.light {
+          color: light.$color-white;
+        }
       }
     }
 
@@ -44,6 +53,11 @@
         width: 100%;
         border-radius: 17px;
 
+        @include mx.light {
+          background-color: light.$color-card-bg;
+          box-shadow: none; // Removed the light shadow here
+        }
+
         &__cell {
           @include mx.flex-center;
           flex-direction: column;
@@ -51,16 +65,31 @@
           font-weight: 700;
           font-size: 18px;
           text-align: center;
+
           &__text {
             font-weight: 600;
             font-size: 16px;
             color: color.adjust(dark.$color-dark-gray, $lightness: 20%);
+
+            @include mx.light {
+              color: light.$color-gray;
+            }
           }
+
           &.red {
             color: dark.$color-red;
+
+            @include mx.light {
+              color: light.$color-red;
+            }
           }
+
           &.green {
             color: dark.$color-green;
+
+            @include mx.light {
+              color: light.$color-green;
+            }
           }
         }
       }

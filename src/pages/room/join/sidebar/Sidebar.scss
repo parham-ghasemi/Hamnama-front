@@ -1,11 +1,11 @@
 @use "../../../../styles//abstracts//variables" as dark;
-
+@use "../../../../styles/abstracts/variables.light" as light;
 @use "../../../../styles//abstracts//mixins" as mx;
 @use "sass:color";
 
 .join-sidebar {
-  min-width: 236px;
-  max-width: 240px;
+  min-width: 250px;
+  max-width: 260px;
   height: 100vh;
   overflow-y: scroll;
   padding: 24px 8px;
@@ -16,20 +16,38 @@
   background-color: color.adjust(dark.$color-black, $alpha: -0.5);
   z-index: 2;
 
+  @include mx.light {
+    background-color: color.adjust(light.$color-dark-gray, $alpha: -0.6);
+    border-right: 1px solid light.$color-light-gray;
+  }
+
   // Reusing custom tiny scrollbar mechanics
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+
+  @include mx.light {
+    scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+  }
+
   &::-webkit-scrollbar {
     width: 3px;
   }
   &::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.3);
     border-radius: 10px;
+
+    @include mx.light {
+      background: rgba(0, 0, 0, 0.1);
+    }
   }
 
   > h4 {
     font-size: 18px;
     font-weight: 700;
+
+    @include mx.light {
+      color: light.$color-black;
+    }
   }
 
   > ul {
@@ -49,6 +67,10 @@
       position: relative;
       padding: 0 17px;
       overflow: hidden;
+
+      @include mx.light {
+        background-color: color.adjust(light.$color-dark-gray, $alpha: -0.7);
+      }
 
       > .join-sidebar__img {
         height: 35px;
@@ -70,18 +92,30 @@
           bottom: 0;
           background-color: color.adjust(dark.$color-green, $alpha: -0.5);
           border-radius: 100%;
+
+          @include mx.light {
+            background-color: light.$color-green;
+          }
         }
       }
 
       > p {
         font-size: 14px;
         font-weight: 700;
+
+        @include mx.light {
+          color: light.$color-white;
+        }
       }
 
       > .join-sidebar__icon {
         width: 24px;
         height: 24px;
         @include mx.flex-center;
+
+        @include mx.light {
+          color: light.$color-white; // Fallback for standalone icons to use primary text/icon color
+        }
       }
 
       &::before {
@@ -92,6 +126,10 @@
         height: 33px;
         border-radius: 7px 0 0 7px;
         background-color: dark.$color-white;
+
+        @include mx.light {
+          background-color: light.$color-primary; // Indicator light uses primary accent color
+        }
       }
     }
   }

@@ -1,12 +1,16 @@
 @use "../../../styles/abstracts/variables" as dark;
-
+@use "../../../styles/abstracts/variables.light" as light;
 @use "../../../styles/abstracts/mixins" as mx;
 @use "sass:color";
 
 .user-sidebar {
   width: 100%;
   height: 100%;
-  padding: 30px 0;
+  padding: 30px 11px;
+  @include mx.light {
+    // background-color: light.$color-gray;
+    background-color: color.adjust(light.$color-dark-gray, $alpha: -0.6);
+  }
 
   > ul {
     display: flex;
@@ -25,6 +29,11 @@
     overflow: hidden;
     z-index: 1;
 
+    @include mx.light {
+      border-radius: 9px;
+      color: light.$color-white;
+    }
+
     /* Right-side vertical indicator line */
     &::before {
       content: "";
@@ -36,30 +45,39 @@
       background-color: dark.$color-white;
       border-radius: 7px 0 0 7px;
       z-index: 99;
+
+      @include mx.light {
+        background-color: light.$color-white;
+        top: 7px;
+        bottom: 7px;
+      }
     }
 
-    /* Animated Gradient Background */
+    /* Solid/Gradient Transition Background Layer */
     &::after {
       content: "";
       position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: 0%; /* Hidden by default */
+      inset: 0;
+      width: 100%;
       background: linear-gradient(
         -90deg,
         rgba(0, 0, 0, 0) 0%,
         dark.$color-primary-bg 100%
       );
-      transition: width 250ms ease-out;
+      opacity: 0;
+      transition: opacity 250ms ease; // Switched to a clean fade transition
       z-index: -1;
+
+      @include mx.light {
+        background: light.$color-primary-bg; // Forces a solid color background
+      }
     }
 
-    /* Trigger background width on Hover AND Active state */
+    /* Trigger background fade on Hover AND Active state */
     &:hover,
     &.active {
       &::after {
-        width: 100%; /* Fully expanded gradient */
+        opacity: 1;
       }
     }
 
@@ -67,11 +85,17 @@
       font-weight: bold;
 
       &:hover {
-        background: linear-gradient(
-          -90deg,
-          rgba(0, 0, 0, 0) 0%,
-          dark.$color-primary-bg-hover 100%
-        );
+        &::after {
+          background: linear-gradient(
+            -90deg,
+            rgba(0, 0, 0, 0) 0%,
+            dark.$color-primary-bg-hover 100%
+          );
+
+          @include mx.light {
+            background: light.$color-primary-bg-hover; // Forces a solid color background on hover
+          }
+        }
       }
     }
   }
@@ -81,6 +105,10 @@
     width: 80%;
     height: 1px;
     margin: 30px auto;
+
+    @include mx.light {
+      background-color: light.$color-light-gray;
+    }
   }
 
   &__logout {
@@ -96,6 +124,11 @@
     overflow: hidden;
     z-index: 1;
 
+    @include mx.light {
+      border-radius: 9px;
+      color: light.$color-white;
+    }
+
     /* Right-side vertical indicator line */
     &::before {
       content: "";
@@ -107,31 +140,44 @@
       background-color: dark.$color-white;
       border-radius: 7px 0 0 7px;
       z-index: 99;
+
+      @include mx.light {
+        background-color: light.$color-white;
+        top: 7px;
+        bottom: 7px;
+      }
     }
 
-    /* Animated Gradient Background */
+    /* Solid/Gradient Transition Background Layer */
     &::after {
       content: "";
       position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: 0%; /* Hidden by default */
+      inset: 0;
+      width: 100%;
       background: linear-gradient(
         -90deg,
         rgba(0, 0, 0, 0) 0%,
         dark.$color-red 100%
       );
-      transition: width 250ms ease-out;
+      opacity: 0;
+      transition: opacity 250ms ease; // Switched to a clean fade transition
       z-index: -1;
+
+      @include mx.light {
+        background: light.$color-red; // Forces a solid color background
+      }
     }
 
-    /* Trigger background width on Hover AND Active state */
+    /* Trigger background fade on Hover state */
     &:hover {
-      // color: dark.$color-red;
       color: color.adjust(dark.$color-red, $lightness: 30%);
+
+      @include mx.light {
+        color: light.$color-white;
+      }
+
       &::after {
-        width: 100%; /* Fully expanded gradient */
+        opacity: 1;
       }
     }
   }

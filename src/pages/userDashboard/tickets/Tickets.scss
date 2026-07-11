@@ -1,5 +1,5 @@
 @use "../../../styles//abstracts//variables" as dark;
-
+@use "../../../styles/abstracts/variables.light" as light;
 @use "../../../styles//abstracts//mixins" as mx;
 @use "sass:color";
 
@@ -25,11 +25,19 @@
       background-color: color.adjust(dark.$color-light-gray, $alpha: -0.75);
       border-radius: 17px;
 
+      @include mx.light {
+        background-color: light.$color-primary-bg;
+      }
+
       &__cell {
         width: 175px;
         font-size: 18px;
         font-weight: 700;
         text-align: center;
+
+        @include mx.light {
+          color: light.$color-white;
+        }
 
         &.icon {
           width: 40px;
@@ -56,8 +64,19 @@
         cursor: pointer;
         transition: 0.2s;
 
+        @include mx.light {
+          background-color: light.$color-card-bg;
+        }
+
         &:hover {
           background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
+
+          @include mx.light {
+            background-color: color.adjust(
+              light.$color-card-bg,
+              $lightness: -4%
+            );
+          }
         }
 
         &__cell {
@@ -70,14 +89,26 @@
 
           &.green {
             color: dark.$color-green;
+
+            @include mx.light {
+              color: light.$color-green;
+            }
           }
 
           &.yellow {
             color: dark.$color-yellow;
+
+            @include mx.light {
+              color: light.$color-yellow;
+            }
           }
 
           &.red {
             color: dark.$color-red;
+
+            @include mx.light {
+              color: light.$color-red;
+            }
           }
 
           &.icon {
@@ -104,6 +135,11 @@
     font-weight: 700;
     transition: background-color 200ms ease;
 
+    @include mx.light {
+      background-color: light.$color-primary-bg;
+      color: light.$color-white;
+    }
+
     > span {
       height: 40px;
       width: 40px;
@@ -114,16 +150,26 @@
       stroke-width: 8px;
       position: absolute;
       left: 11px;
+
+      @include mx.light {
+        background-color: light.$color-primary-bg-hover;
+        color: light.$color-white;
+      }
     }
 
     &:hover {
       background-color: color.adjust(dark.$color-white, $alpha: -0.6);
+
+      @include mx.light {
+        background-color: light.$color-primary-bg-hover;
+      }
     }
 
     border: none;
     outline: none;
     cursor: pointer;
   }
+
   &__modal-overlay {
     position: fixed;
     top: 0;
@@ -135,10 +181,13 @@
     z-index: 999;
     @include mx.flex-center;
 
-    // Initial hidden state for animation
     opacity: 0;
     pointer-events: none;
     transition: opacity 300ms ease;
+
+    @include mx.light {
+      background-color: rgba(255, 255, 255, 0.6);
+    }
 
     &.is-active {
       opacity: 1;
@@ -161,12 +210,17 @@
     direction: rtl;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 
-    // Dynamic zoom-in transition entry
     transform: scale(0.9) translateY(20px);
     opacity: 0;
     transition:
       transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1),
       opacity 300ms ease;
+
+    @include mx.light {
+      background-color: light.$color-card-bg;
+      border: 1px solid light.$color-light-gray;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
 
     &__header {
       display: flex;
@@ -176,10 +230,18 @@
       border-bottom: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
       padding-bottom: 15px;
 
+      @include mx.light {
+        border-bottom: 1px solid light.$color-light-gray;
+      }
+
       > h3 {
         font-size: 20px;
         font-weight: 700;
         color: dark.$color-white;
+
+        @include mx.light {
+          color: light.$color-black;
+        }
       }
 
       .close-icon {
@@ -189,8 +251,16 @@
         transition: color 200ms ease;
         @include mx.flex-center;
 
+        @include mx.light {
+          color: light.$color-primary;
+        }
+
         &:hover {
           color: dark.$color-white;
+
+          @include mx.light {
+            color: light.$color-primary-hover;
+          }
         }
       }
     }
@@ -209,6 +279,10 @@
           font-size: 15px;
           font-weight: 700;
           color: color.adjust(dark.$color-white, $alpha: -0.3);
+
+          @include mx.light {
+            color: light.$color-black;
+          }
         }
 
         > input,
@@ -223,8 +297,18 @@
           outline: none;
           transition: border-color 200ms ease;
 
+          @include mx.light {
+            background-color: light.$color-white;
+            border: 1px solid light.$color-light-gray;
+            color: light.$color-black;
+          }
+
           &:focus {
             border-color: color.adjust(dark.$color-white, $alpha: -0.4);
+
+            @include mx.light {
+              border-color: light.$color-primary;
+            }
           }
         }
 
@@ -232,15 +316,23 @@
           height: 140px;
           resize: none;
 
-          // Reusing custom tiny scrollbar mechanics
           scrollbar-width: thin;
           scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+
+          @include mx.light {
+            scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+          }
+
           &::-webkit-scrollbar {
             width: 3px;
           }
           &::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.3);
             border-radius: 10px;
+
+            @include mx.light {
+              background: rgba(0, 0, 0, 0.1);
+            }
           }
         }
       }
@@ -264,8 +356,18 @@
           &.submit-btn {
             background-color: dark.$color-white;
             color: dark.$color-black;
+
+            @include mx.light {
+              background-color: light.$color-primary-bg;
+              color: light.$color-white;
+            }
+
             &:hover {
               background-color: color.adjust(dark.$color-white, $alpha: -0.15);
+
+              @include mx.light {
+                background-color: light.$color-primary-bg-hover;
+              }
             }
           }
 
@@ -273,8 +375,19 @@
             background-color: transparent;
             color: dark.$color-white;
             border: 1px solid color.adjust(dark.$color-white, $alpha: -0.6);
+
+            @include mx.light {
+              color: light.$color-primary;
+              border: 1px solid light.$color-light-gray;
+            }
+
             &:hover {
               background-color: color.adjust(dark.$color-white, $alpha: -0.9);
+
+              @include mx.light {
+                background-color: light.$color-light-gray;
+                color: light.$color-primary-hover;
+              }
             }
           }
         }

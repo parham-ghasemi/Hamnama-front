@@ -16,6 +16,9 @@
   top: 0;
   background-color: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(15px);
+  @include mx.light {
+    background-color: color.adjust(light.$color-dark-gray, $alpha: -0.6);
+  }
 
   &__logo {
     height: 56px;

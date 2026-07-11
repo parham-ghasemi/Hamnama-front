@@ -1,4 +1,6 @@
 @use "../../styles/abstracts/variables" as dark;
+@use "../../styles/abstracts/variables.light" as light;
+@use "../../styles/abstracts/mixins" as mx;
 
 .user-dashboard-layout {
   min-height: 100vh;
@@ -12,6 +14,14 @@
     rgba(15, 8, 38, 1) 100%
   );
   color: dark.$color-white;
+  transition:
+    background ease 300ms,
+    color ease 300ms;
+
+  @include mx.light {
+    background: light.$color-bg;
+    color: light.$color-black;
+  }
 
   &__content {
     flex: 1;

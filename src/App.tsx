@@ -16,6 +16,7 @@ import TicketChat from "./pages/userDashboard/tickets/ticketChat/TicketChat";
 import Leaderboard from "./pages/userDashboard/leaderboard/Leaderboard";
 import Join from "./pages/room/join/Join";
 import { ThemeProvider } from "./context/ThemeContext";
+import PlanUsers from "./pages/userDashboard/planUsers/PlanUsers";
 
 const queryClient = new QueryClient({});
 
@@ -37,6 +38,7 @@ function App() {
                 <Route path="info" element={<UserInfo />} />
                 <Route path="payments" element={<Payments />} />
                 <Route path="leaderboard" element={<Leaderboard />} />
+                <Route path="plan-users" element={<PlanUsers />} />
                 <Route path="ticket" element={<Tickets />} />
                 <Route path="ticket/:id" element={<TicketChat />} />
               </Route>
