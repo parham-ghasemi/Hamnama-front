@@ -6,10 +6,10 @@
 .otp-input {
   @include mx.flex-center;
   flex-direction: column;
-  gap: dark.$space-xl;
+  gap: 24px;
 
   &__title {
-    font-size: dark.$font-header;
+    font-size: 52px;
     font-weight: 700;
 
     @include mx.light {
@@ -18,7 +18,7 @@
   }
 
   &__subtitle {
-    font-size: dark.$font-lg;
+    font-size: 24px;
     color: dark.$color-gray;
 
     @include mx.light {
@@ -28,13 +28,13 @@
 
   &__content {
     display: flex;
-    gap: dark.$space-lg;
+    gap: 16px;
     align-items: center;
   }
 
   &__fields {
     display: flex;
-    gap: dark.$space-md;
+    gap: 12px;
     flex-direction: row-reverse;
   }
 
@@ -46,7 +46,7 @@
     border-radius: 12px;
 
     text-align: center;
-    font-size: dark.$font-xl;
+    font-size: 32px;
     font-weight: 700;
 
     outline: none;
@@ -97,7 +97,7 @@
     align-items: center;
     justify-content: center;
 
-    font-size: dark.$font-xl;
+    font-size: 32px;
 
     @include mx.light {
       color: light.$color-black;
@@ -140,15 +140,15 @@
   &__subBtn {
     background: dark.$color-primary;
     width: 300px;
-    padding: dark.$space-md;
-    border-radius: dark.$radius-md;
+    padding: 12px;
+    border-radius: 12px;
 
     cursor: pointer;
 
-    font-size: dark.$font-lg;
+    font-size: 24px;
     font-weight: 700;
 
-    margin-top: dark.$space-4xl;
+    margin-top: 52px;
 
     @include mx.light {
       background: light.$color-primary-bg;

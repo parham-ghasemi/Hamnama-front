@@ -5,8 +5,8 @@
 
 .home-feature-cards {
   @include mx.flex-center;
-  gap: dark.$space-3xl;
-  margin-top: dark.$space-2xl;
+  gap: 32px;
+  margin-top: 28px;
 
   &__card {
     transition: transform ease 400ms;
@@ -50,7 +50,7 @@
 
     @include mx.flex-center;
     flex-direction: column;
-    gap: dark.$space-xl;
+    gap: 24px;
 
     background:
       linear-gradient(rgba(72, 0, 113, 0.1), rgba(72, 0, 113, 0.1)),

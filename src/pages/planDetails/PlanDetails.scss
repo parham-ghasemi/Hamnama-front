@@ -6,17 +6,17 @@
 .plan-details {
   min-height: 90vh;
   @include mx.flex-center;
-  gap: dark.$space-2xl;
-  margin-top: dark.$space-4xl * 2;
+  gap: 28px;
+  margin-top: 52px * 2;
 
   &__card {
     @include mx.flex-center;
     flex-direction: column;
-    gap: dark.$space-lg;
+    gap: 16px;
     justify-content: space-evenly;
     background: dark.$color-card-bg;
     outline: dark.$card-outline;
-    border-radius: dark.$radius-lg;
+    border-radius: 16px;
     padding: 20px 0;
     width: 400px;
     height: 885px;
@@ -51,7 +51,7 @@
     }
 
     &__title {
-      font-size: dark.$font-2xl;
+      font-size: 38px;
       font-weight: 700;
       color: dark.$color-white;
 
@@ -62,11 +62,11 @@
 
     &__durations {
       @include mx.flex-center;
-      gap: dark.$space-lg;
+      gap: 16px;
 
       &__card {
         @include mx.flex-center;
-        gap: dark.$space-md;
+        gap: 12px;
         flex-direction: column;
         height: 99px;
         width: 85px;
@@ -108,7 +108,7 @@
           font-weight: 700;
         }
         > svg {
-          font-size: dark.$font-xl;
+          font-size: 32px;
         }
       }
     }
@@ -118,7 +118,7 @@
       border-radius: 20px;
       @include mx.flex-center;
       flex-direction: column;
-      padding: dark.$space-md;
+      padding: 12px;
       gap: 14px;
       width: 80%;
 
@@ -128,7 +128,7 @@
       }
 
       &__main {
-        font-size: dark.$font-3xl;
+        font-size: 42px;
         font-weight: 600;
         line-height: 100%;
       }
@@ -136,7 +136,7 @@
       &__discount {
         color: dark.$color-primary;
         display: flex;
-        gap: dark.$space-md;
+        gap: 12px;
 
         @include mx.light {
           color: light.$color-primary;
@@ -181,7 +181,7 @@
 
     &__features {
       display: flex;
-      gap: dark.$space-md;
+      gap: 12px;
       flex-direction: column;
 
       @include mx.light {
@@ -190,7 +190,7 @@
 
       > li {
         display: flex;
-        gap: dark.$space-lg;
+        gap: 16px;
 
         > svg {
           color: dark.$color-primary;

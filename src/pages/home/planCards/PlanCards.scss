@@ -7,8 +7,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: dark.$space-2xl;
-  margin-top: dark.$space-4xl * 2;
+  gap: 28px;
+  margin-top: 52px * 2;
   position: relative;
 
   &__card:nth-child(odd) {
@@ -177,8 +177,8 @@
         border-radius: 13px 13px 0 0;
         background-color: dark.$color-primary-bg;
         @include mx.flex-center;
-        gap: dark.$space-sm;
-        padding: 0 dark.$space-sm;
+        gap: 8px;
+        padding: 0 8px;
         height: 43px;
 
         @include mx.light {
@@ -206,7 +206,7 @@
         height: 100px;
         position: relative;
         justify-content: end;
-        padding: dark.$space-xs;
+        padding: 4px;
         border-radius: 17px;
         background-color: #ffffff1a;
 
@@ -246,7 +246,7 @@
       width: 235px;
       height: 72px;
       border-radius: 17px;
-      padding: dark.$space-sm;
+      padding: 8px;
       font-size: 37px;
       font-weight: 700;
       margin-top: 20px;

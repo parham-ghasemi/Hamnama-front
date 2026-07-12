@@ -6,16 +6,16 @@
 .register-info {
   @include mx.flex-center;
   flex-direction: column;
-  gap: dark.$space-2xl;
+  gap: 28px;
 
   &__group {
     @include mx.flex-center;
     flex-direction: column;
-    gap: dark.$space-md;
+    gap: 12px;
   }
 
   &__label {
-    font-size: dark.$font-lg;
+    font-size: 24px;
     font-weight: 700;
     text-align: center;
 
@@ -27,7 +27,7 @@
   &__input-wrapper {
     position: relative;
     width: 400px;
-    padding: dark.$space-lg;
+    padding: 16px;
 
     display: flex;
     align-items: center;
@@ -68,7 +68,7 @@
   &__icon,
   &__icon-btn {
     z-index: 2;
-    font-size: dark.$font-lg;
+    font-size: 24px;
 
     @include mx.light {
       color: light.$color-black;
@@ -88,7 +88,7 @@
   &__rules {
     display: flex;
     flex-direction: column;
-    gap: dark.$space-sm;
+    gap: 8px;
 
     color: dark.$color-red;
     text-align: center;
@@ -103,16 +103,16 @@
 
     width: 300px;
 
-    padding: dark.$space-md;
+    padding: 12px;
 
-    border-radius: dark.$radius-md;
+    border-radius: 12px;
 
     cursor: pointer;
 
     font-weight: 700;
-    font-size: dark.$font-lg;
+    font-size: 24px;
 
-    margin-top: dark.$space-lg;
+    margin-top: 16px;
 
     @include mx.light {
       background: light.$color-primary-bg;

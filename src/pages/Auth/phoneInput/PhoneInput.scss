@@ -6,10 +6,10 @@
 .auth-phone-input {
   @include mx.flex-center;
   flex-direction: column;
-  gap: dark.$space-xl;
+  gap: 24px;
 
   &__title {
-    font-size: dark.$font-header;
+    font-size: 52px;
     font-weight: 700;
 
     @include mx.light {
@@ -33,7 +33,7 @@
     }
   }
   &__subtitle {
-    font-size: dark.$font-lg;
+    font-size: 24px;
     color: dark.$color-gray;
 
     @include mx.light {
@@ -45,7 +45,7 @@
     background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
     text-align: center;
     border-radius: 12px;
-    padding: dark.$space-lg;
+    padding: 16px;
     width: 400px;
     outline: none;
 
@@ -79,12 +79,12 @@
   &__subBtn {
     background: dark.$color-primary;
     width: 300px;
-    padding: dark.$space-md;
-    border-radius: dark.$radius-md;
+    padding: 12px;
+    border-radius: 12px;
     cursor: pointer;
     font-weight: 700;
-    font-size: dark.$font-lg;
-    margin-top: dark.$space-4xl;
+    font-size: 24px;
+    margin-top: 52px;
 
     @include mx.light {
       background: light.$color-primary-bg;

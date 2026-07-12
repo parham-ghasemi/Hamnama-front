@@ -41,7 +41,7 @@
     display: flex;
     align-items: center;
     padding: 32px;
-    gap: dark.$space-md;
+    gap: 12px;
     transition: transform 400ms ease;
 
     &:hover {
@@ -64,7 +64,7 @@
       background-color: #48261f;
       border-radius: 7px;
 
-      font-size: dark.$font-xl;
+      font-size: 32px;
       transition: box-shadow 200ms ease;
       color: dark.$color-primary;
       position: relative;
@@ -101,7 +101,7 @@
       width: 80%;
       @include mx.flex-center;
       flex-direction: column;
-      gap: dark.$space-sm;
+      gap: 8px;
 
       &__title {
         font-weight: 900;

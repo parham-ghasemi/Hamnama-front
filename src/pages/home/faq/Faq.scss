@@ -7,8 +7,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: dark.$space-lg;
-  margin-top: dark.$space-3xl;
+  gap: 16px;
+  margin-top: 32px;
   position: relative;
 
   &__blob {
@@ -39,7 +39,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: dark.$space-xl dark.$space-xl;
+      padding: 24px 24px;
       cursor: pointer;
       position: relative;
       overflow: hidden;
@@ -112,7 +112,7 @@
       // Keep background styles or padding safe inside an inner container
       & > div {
         min-height: 0;
-        padding: dark.$space-md dark.$space-xl dark.$space-md dark.$space-xl; /* Padding goes here! */
+        padding: 12px 24px 12px 24px; /* Padding goes here! */
         line-height: 200%;
         opacity: 0;
         transition: opacity ease 150ms;
