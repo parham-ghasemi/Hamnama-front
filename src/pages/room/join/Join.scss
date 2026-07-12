@@ -29,9 +29,10 @@
     position: relative;
 
     &__main {
+      position: relative;
       &__blob {
         @include mx.background-blob(
-          $width: 100%,
+          $width: 90%,
           $height: 80%,
           $top: 50%,
           $left: 50%
@@ -51,7 +52,7 @@
         grid-row-gap: 19px;
 
         &__card {
-          width: 315px;
+          width: 378px; /* Width increased by 20% */
           height: 453px;
           border-radius: 17px;
           background: #7c401f;
@@ -82,7 +83,7 @@
             margin-top: 21px;
 
             @include mx.light {
-              color: light.$color-black; // Label accents matching text rules
+              color: light.$color-black;
             }
           }
 
@@ -169,7 +170,7 @@
 
             @include mx.light {
               background-color: light.$color-primary-bg;
-              color: light.$color-white; // White text nested inside primary-bg component container
+              color: light.$color-white;
             }
 
             &:hover {
@@ -202,20 +203,21 @@
               box-shadow: 0 4px 4px 0 light.$color-gray;
             }
 
+            /* Overlays Restored: Gradients aligned to 0deg to match top cards visually */
             &::before {
               content: "";
               position: absolute;
               inset: 0;
               background: linear-gradient(
-                -90deg,
-                rgba(124, 64, 31, 0.18) 0%,
-                rgba(255, 162, 113, 0.18) 100%
+                0deg,
+                rgba(124, 64, 31, 0.3) 0%,
+                rgba(255, 162, 113, 0.3) 100%
               );
               transition: opacity 300ms ease;
               z-index: 1;
 
               @include mx.light {
-                display: none; // Discard raw overlays on light themes
+                display: none;
               }
             }
 
@@ -278,7 +280,7 @@
 
               @include mx.light {
                 background-color: light.$color-primary-bg;
-                color: light.$color-white; // White graphic inside custom primary background badge
+                color: light.$color-white;
               }
 
               > svg {
