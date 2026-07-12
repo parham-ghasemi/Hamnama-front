@@ -1,24 +1,66 @@
-@use "../../../../styles//abstracts//variables" as dark;
+@use "../../../../styles/abstracts/variables" as dark;
 @use "../../../../styles/abstracts/variables.light" as light;
-@use "../../../../styles//abstracts//mixins" as mx;
+@use "../../../../styles/abstracts/mixins" as mx;
 @use "sass:color";
 
-.user-ticket-chat {
-  width: 100%;
-  height: calc(100vh - 150px);
+// --- NEW OVERLAY STYLES ---
+.ticket-chat-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms ease;
+
+  @include mx.light {
+    background-color: rgba(255, 255, 255, 0.6);
+  }
+
+  &.is-active {
+    opacity: 1;
+    pointer-events: all;
+
+    .user-ticket-chat-modal {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+.user-ticket-chat-modal {
+  width: 800px;
+  max-width: 95%;
+  height: 80vh; // Switched to vh for modal sizing
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 
-  // Card styles moved to the main container
   border: 1px solid color.adjust(dark.$color-white, $alpha: -0.9);
   border-radius: 26px;
   padding: 24px 26px;
-  background-color: color.adjust(dark.$color-white, $alpha: -0.95);
+  background-color: color.adjust(dark.$color-dark-gray, $alpha: -0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+  // Modal open animations
+  transform: scale(0.9) translateY(20px);
+  opacity: 0;
+  transition:
+    transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 300ms ease;
 
   @include mx.light {
-    background-color: color.adjust(light.$color-dark-gray, $alpha: -0.85);
+    background-color: light.$color-card-bg;
     border: 1px solid color.adjust(light.$color-gray, $alpha: -0.8);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   }
 
   // --- 1. HEADER STYLES ---
@@ -27,7 +69,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 0px 10px 20px 10px;
-    border-bottom: 1px solid color.adjust(dark.$color-white, $alpha: -0.85); // Added bottom line
+    border-bottom: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
 
     @include mx.light {
       border-bottom-color: color.adjust(light.$color-light-gray, $alpha: -0.5);
@@ -82,25 +124,22 @@
       }
     }
 
-    > .back-btn {
+    // Changed from .back-btn to .close-btn
+    > .close-btn {
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
       height: 44px;
-      padding: 0 16px 0 20px;
-      border-radius: 22px;
+      width: 44px;
+      border-radius: 50%;
       background-color: transparent;
       border: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
       color: color.adjust(dark.$color-white, $alpha: -0.2);
-      text-decoration: none;
-      font-size: 15px;
-      font-weight: 600;
-      transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
-      min-width: 100px;
+      cursor: pointer;
+      transition: all 300ms ease;
 
       svg {
-        font-size: 20px;
-        transition: transform 300ms ease;
+        font-size: 24px;
       }
 
       @include mx.light {
@@ -109,18 +148,14 @@
       }
 
       &:hover {
-        background-color: color.adjust(dark.$color-white, $alpha: -0.92);
+        background-color: color.adjust(dark.$color-red, $alpha: -0.7);
         color: dark.$color-white;
         border-color: transparent;
 
-        svg {
-          transform: translateX(4px);
-        }
-
         @include mx.light {
-          background-color: color.adjust(light.$color-primary, $alpha: -0.9);
-          color: light.$color-primary;
-          border-color: color.adjust(light.$color-primary, $alpha: -0.5);
+          background-color: color.adjust(dark.$color-red, $alpha: -0.1);
+          color: light.$color-white;
+          border-color: color.adjust(dark.$color-red, $alpha: -0.1);
         }
       }
     }
@@ -130,7 +165,7 @@
   &__body {
     min-height: 0;
     flex: 1;
-    padding: 20px 0; // Replaces previous gap margins to properly distance from new lines
+    padding: 20px 0;
 
     &__chat-container {
       display: flex;
@@ -167,7 +202,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        max-width: 750px;
+        max-width: 85%; // Adjusted for wider modal
         gap: 2px;
         font-size: 18px;
         font-weight: 700;
@@ -218,7 +253,7 @@
   // --- 3. FOOTER STYLES ---
   &__footer {
     padding-top: 20px;
-    border-top: 1px solid color.adjust(dark.$color-white, $alpha: -0.85); // Restored top line
+    border-top: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
     display: flex;
     flex-direction: column;
 

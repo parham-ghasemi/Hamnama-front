@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import './Tickets.scss';
-import { useNavigate } from 'react-router-dom';
 import { FiChevronLeft } from 'react-icons/fi';
 import { BsPlusLg } from 'react-icons/bs';
-import { IoCloseOutline } from 'react-icons/io5'; // Imported close icon
+import { IoCloseOutline } from 'react-icons/io5';
 import clsx from 'clsx';
+import TicketChat from './ticketChatModal/TicketChatModal';
 
 const TICKETS_DATA = [
   { id: '001', subject: 'مشکل در پرداخت', status: 'پاسخ داده شده', date: '1404/10/22' },
@@ -13,17 +13,17 @@ const TICKETS_DATA = [
 ];
 
 const Tickets = () => {
-  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [ticketSubject, setTicketSubject] = useState('');
   const [ticketDescription, setTicketDescription] = useState('');
 
+  // New state to control the chat modal
+  const [activeChatTicketId, setActiveChatTicketId] = useState<string | null>(null);
+
   const handleCreateTicket = (e: any) => {
     e.preventDefault();
-    // Handle submission logic here
     console.log("Submitting:", { ticketSubject, ticketDescription });
 
-    // Clear & close
     setTicketSubject('');
     setTicketDescription('');
     setIsModalOpen(false);
@@ -49,7 +49,8 @@ const Tickets = () => {
             <div
               key={ticket.id}
               className="user-tickets__list-container__body-wrapper__row"
-              onClick={() => navigate(`/user/ticket/${ticket.id}`)}
+              // Changed from navigate() to opening the modal
+              onClick={() => setActiveChatTicketId(ticket.id)}
             >
               <div className="user-tickets__list-container__body-wrapper__row__cell">{ticket.subject}</div>
               <div className="user-tickets__list-container__body-wrapper__row__cell">{ticket.id}</div>
@@ -71,7 +72,7 @@ const Tickets = () => {
         <span><BsPlusLg strokeWidth={1} /></span>
       </button>
 
-      {/* --- Modal Structure --- */}
+      {/* --- Create Ticket Modal Structure --- */}
       <div className={clsx('user-tickets__modal-overlay', { 'is-active': isModalOpen })} onClick={() => setIsModalOpen(false)}>
         <div className="user-tickets__modal-content" onClick={(e) => e.stopPropagation()}>
           <div className="user-tickets__modal-content__header">
@@ -110,6 +111,14 @@ const Tickets = () => {
           </form>
         </div>
       </div>
+
+      {/* --- Ticket Chat Modal Injection --- */}
+      <TicketChat
+        isOpen={!!activeChatTicketId}
+        onClose={() => setActiveChatTicketId(null)}
+        ticketId={activeChatTicketId}
+      />
+
     </div>
   );
 };

@@ -5,7 +5,8 @@
 
 .user-tickets {
   @include mx.flex-center;
-  align-items: start;
+  justify-content: start;
+  flex-direction: column;
   position: relative;
   height: 100%;
 
@@ -121,10 +122,8 @@
   }
 
   &__new-ticket {
-    position: fixed;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%);
+    position: sticky;
+    top: calc(100vh - 32px);
     @include mx.flex-center;
     gap: 18px;
     border-radius: 250px;
@@ -382,11 +381,11 @@
             }
 
             &:hover {
-              background-color: color.adjust(dark.$color-white, $alpha: -0.9);
+              background-color: color.adjust(dark.$color-red, $alpha: -0.7);
 
               @include mx.light {
-                background-color: light.$color-light-gray;
-                color: light.$color-primary-hover;
+                background-color: color.adjust(light.$color-red, $alpha: -0.2);
+                color: light.$color-white;
               }
             }
           }
