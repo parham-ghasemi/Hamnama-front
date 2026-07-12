@@ -48,22 +48,6 @@
 
     &:hover {
       transform: translateY(-20px);
-
-      .home-planCards__card__icon {
-        background-color: #ffffff0a;
-
-        @include mx.light {
-          background-color: light.$color-primary; // Forces background to stay fixed in light mode
-        }
-      }
-
-      .home-planCards__card__icon__glow {
-        opacity: 1;
-
-        @include mx.light {
-          opacity: 0;
-        }
-      }
     }
 
     &__icon {
@@ -87,28 +71,6 @@
 
         @include mx.light {
           color: light.$color-white; // Stays light.$color-white on hover naturally
-        }
-      }
-
-      &__glow {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 200%;
-        height: 200%;
-        transform: translate(-50%, -50%);
-        background: radial-gradient(
-          circle,
-          color.adjust(dark.$color-primary, $alpha: -0.6),
-          transparent 60%
-        );
-        opacity: 0;
-        transition: opacity 0.4s ease;
-        pointer-events: none;
-
-        @include mx.light {
-          display: none;
-          background: transparent;
         }
       }
     }
@@ -231,7 +193,7 @@
         }
 
         &__sub {
-          color: #ffffff30;
+          color: dark.$color-gray;
           font-size: 15.3px;
 
           @include mx.light {

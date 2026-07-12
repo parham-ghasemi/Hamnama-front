@@ -40,7 +40,6 @@ const PlanCards = () => {
         plans.map((plan, ind) => (
           <div className='home-planCards__card' key={`homeplancards-${ind}`}>
             <div className="home-planCards__card__icon">
-              <div className="home-planCards__card__icon__glow"></div>
               {plan.icon}
             </div>
 

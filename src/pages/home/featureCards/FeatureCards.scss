@@ -23,6 +23,24 @@
       }
     }
 
+    @include mx.flex-center;
+    flex-direction: column;
+    gap: 20.4px;
+
+    // background:
+    //   linear-gradient(rgba(72, 0, 113, 0.1), rgba(72, 0, 113, 0.1)),
+    //   linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1));
+    background: dark.$color-card-bg;
+    border-radius: 22px;
+    width: 221px;
+    height: 221px;
+    padding: 17px 0px;
+
+    @include mx.light {
+      background: light.$color-card-bg;
+      box-shadow: 0 4px 4px 0 color.adjust(light.$color-black, $alpha: -0.75);
+    }
+
     &__glow {
       position: absolute;
       top: 50%;
@@ -46,23 +64,6 @@
           transparent 60%
         );
       }
-    }
-
-    @include mx.flex-center;
-    flex-direction: column;
-    gap: 20.4px;
-
-    background:
-      linear-gradient(rgba(72, 0, 113, 0.1), rgba(72, 0, 113, 0.1)),
-      linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1));
-    border-radius: 22px;
-    width: 221px;
-    height: 221px;
-    padding: 17px 0px;
-
-    @include mx.light {
-      background: light.$color-card-bg;
-      box-shadow: 0 4px 4px 0 color.adjust(light.$color-black, $alpha: -0.75);
     }
 
     &__icon {
