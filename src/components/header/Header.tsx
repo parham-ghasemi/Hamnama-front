@@ -37,12 +37,30 @@ const Header = () => {
           )}
         </div>
 
-        <div className="header__left__mode">
-          <div className={clsx("header__left__mode__slider", isLight ? "header__left__mode__slider--light" : "header__left__mode__slider--dark")} />
-          <div className="header__left__mode__icon" onClick={() => setTheme("dark")} > <PiMoonStarsFill /> </div>
+        <button
+          className={clsx(
+            "header__left__theme-btn",
+            isLight && "header__left__theme-btn--light"
+          )}
+          onClick={() => setTheme(isLight ? "dark" : "light")}
+          aria-label="Toggle theme"
+        >
+          <PiMoonStarsFill
+            className={clsx(
+              "header__left__theme-btn__icon",
+              "header__left__theme-btn__icon--moon",
+              isLight && "is-hidden"
+            )}
+          />
 
-          <div className="header__left__mode__icon" onClick={() => setTheme("light")} > <PiSunFill /> </div>
-        </div>
+          <PiSunFill
+            className={clsx(
+              "header__left__theme-btn__icon",
+              "header__left__theme-btn__icon--sun",
+              isLight && "is-visible"
+            )}
+          />
+        </button>
       </div>
     </div>
   )
