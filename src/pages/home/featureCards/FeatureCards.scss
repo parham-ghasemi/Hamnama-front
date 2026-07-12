@@ -5,8 +5,8 @@
 
 .home-feature-cards {
   @include mx.flex-center;
-  gap: 32px;
-  margin-top: 28px;
+  gap: 27.2px;
+  margin-top: 23.8px;
 
   &__card {
     transition: transform ease 400ms;
@@ -50,15 +50,15 @@
 
     @include mx.flex-center;
     flex-direction: column;
-    gap: 24px;
+    gap: 20.4px;
 
     background:
       linear-gradient(rgba(72, 0, 113, 0.1), rgba(72, 0, 113, 0.1)),
       linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1));
     border-radius: 22px;
-    width: 260px;
-    height: 260px;
-    padding: 20px 0px;
+    width: 221px;
+    height: 221px;
+    padding: 17px 0px;
 
     @include mx.light {
       background: light.$color-card-bg;
@@ -69,7 +69,7 @@
       background-color: #5f4d6e59;
       border-radius: 20px;
       height: 100%;
-      width: 174px;
+      width: 147.9px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -81,7 +81,7 @@
       }
 
       > svg {
-        font-size: 110px;
+        font-size: 93.5px;
         color: dark.$color-primary;
 
         @include mx.light {
@@ -113,7 +113,7 @@
 
     &__title {
       font-weight: 800;
-      font-size: 25px;
+      font-size: 21.25px;
     }
   }
 }

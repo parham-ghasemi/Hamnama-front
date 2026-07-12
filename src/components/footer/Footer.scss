@@ -5,10 +5,10 @@
 
 .footer {
   width: 90%;
-  margin: 100px auto;
+  margin: 85px auto;
   margin-bottom: 0;
   border-top: 1px solid color.adjust(dark.$color-white, $alpha: -0.5);
-  padding: 50px 0;
+  padding: 42.5px 0;
   display: flex;
   justify-content: space-evenly;
 
@@ -19,7 +19,7 @@
 
   &__section-title {
     font-weight: 700;
-    font-size: 16px;
+    font-size: 13.6px;
   }
 
   &__quick,
@@ -27,13 +27,13 @@
   &__contact {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 25.5px;
 
     > li {
       color: dark.$color-gray;
       cursor: pointer;
       transition: color ease 200ms;
-      font-size: 17px;
+      font-size: 14.45px;
       font-weight: 600;
 
       @include mx.light {
@@ -53,7 +53,7 @@
   &__social {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10.2px;
     height: 100%;
   }
 
@@ -61,14 +61,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6.8px;
 
     > svg {
       background-color: dark.$color-gray;
       color: dark.$color-black;
-      width: 50px;
-      height: 50px;
-      padding: 8px;
+      width: 42.5px;
+      height: 42.5px;
+      padding: 6.8px;
       border-radius: 12px;
       transition: background-color 200ms ease;
       cursor: pointer;
@@ -91,10 +91,10 @@
 .footer-rights {
   margin: 0 auto;
   width: 90%;
-  font-size: 12px;
+  font-size: 10.2px;
   border-top: 1px solid color.adjust(dark.$color-white, $alpha: -0.7);
   text-align: center;
-  padding: 12px;
+  padding: 10.2px;
 
   @include mx.light {
     border-top: 1px solid light.$color-light-gray;

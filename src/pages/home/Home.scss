@@ -45,7 +45,7 @@
     }
 
     > h1 {
-      font-size: 52px;
+      font-size: 44.2px;
       font-weight: 700;
 
       // Typewriter animation
@@ -78,12 +78,12 @@
 
   &__button-title {
     text-align: center;
-    font-size: 24px;
-    // margin-top: 16px;
+    font-size: 20.4px;
+    // margin-top: 13.6px;
     &::before {
       content: "";
       height: 100vh;
-      width: 10px;
+      width: 8.5px;
       display: block;
     }
   }
@@ -91,18 +91,18 @@
   &__buttons {
     display: flex;
     justify-content: center;
-    gap: 82px;
-    margin-top: 52px;
+    gap: 69.7px;
+    margin-top: 44.2px;
 
     > button {
       background-color: dark.$color-primary-bg;
       transition: background 150ms ease;
-      font-size: 42px;
+      font-size: 35.7px;
       font-weight: 600;
       border-radius: 26px;
       cursor: pointer;
-      height: 155px;
-      width: 400px;
+      height: 131.75px;
+      width: 340px;
       text-shadow: 0 4px 4px #00000067; // Assuming this stays standard, but hex alpha can be adjusted if needed
 
       @include mx.light {
@@ -122,9 +122,9 @@
 
   &__steps-title {
     text-align: center;
-    font-size: 66px;
+    font-size: 56.1px;
     font-weight: 700;
-    margin: 130px 0;
+    margin: 110.5px 0;
     > span {
       color: dark.$color-primary;
       font-weight: 800;
@@ -137,10 +137,10 @@
 
   &__features-title {
     text-align: center;
-    font-size: 66px;
+    font-size: 56.1px;
     font-weight: 700;
-    margin: 160px 0;
-    // margin-top: 52px * 1.5;
+    margin: 136px 0;
+    // margin-top: 44.2px * 1.5;
     > span {
       color: dark.$color-primary;
       font-weight: 800;
@@ -153,10 +153,10 @@
 
   &__plans-title {
     text-align: center;
-    font-size: 66px;
+    font-size: 56.1px;
     font-weight: 700;
-    margin: 122px 0;
-    // margin-top: 52px * 1.5;
+    margin: 103.7px 0;
+    // margin-top: 44.2px * 1.5;
     > span {
       color: dark.$color-primary;
       font-weight: 800;
@@ -169,16 +169,16 @@
 
   &__faq-title {
     text-align: center;
-    font-size: 66px;
+    font-size: 56.1px;
     font-weight: 700;
-    margin-top: 122px;
+    margin-top: 103.7px;
   }
 
   &__faq-subtitle {
     text-align: center;
-    font-size: 16px;
+    font-size: 13.6px;
     font-weight: 600;
-    margin-top: 16px;
+    margin-top: 13.6px;
     color: dark.$color-primary;
     cursor: pointer;
     transition: color 150ms ease;

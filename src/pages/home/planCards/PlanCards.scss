@@ -7,8 +7,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 28px;
-  margin-top: 52px * 2;
+  gap: 23.8px;
+  margin-top: 44.2px * 2;
   position: relative;
 
   &__card:nth-child(odd) {
@@ -32,9 +32,9 @@
     position: relative;
 
     outline: dark.$card-outline;
-    padding: 20px 0;
-    width: 442px;
-    min-height: 680px;
+    padding: 17px 0;
+    width: 375.7px;
+    min-height: 578px;
     border-radius: 26px;
     background: dark.$color-card-bg;
 
@@ -70,8 +70,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 85px;
-      width: 85px;
+      height: 72.25px;
+      width: 72.25px;
       background-color: #ffffff1a;
       border-radius: 17px;
       position: relative;
@@ -82,7 +82,7 @@
       }
 
       > svg {
-        font-size: 48px;
+        font-size: 40.8px;
         color: dark.$color-primary;
 
         @include mx.light {
@@ -114,10 +114,10 @@
     }
 
     &__title {
-      font-size: 50px;
+      font-size: 42.5px;
       font-weight: 700;
       color: dark.$color-primary;
-      margin-top: 30px;
+      margin-top: 25.5px;
 
       @include mx.light {
         color: light.$color-primary;
@@ -125,9 +125,9 @@
     }
 
     &__desc {
-      font-size: 22px;
+      font-size: 18.7px;
       color: color.adjust(dark.$color-gray, $lightness: -20%);
-      margin-top: 7px;
+      margin-top: 5.95px;
 
       @include mx.light {
         color: color.adjust(light.$color-gray, $lightness: -20%);
@@ -137,7 +137,7 @@
     &__sep {
       width: 60%;
       height: 2px;
-      margin: 20px 0;
+      margin: 17px 0;
       position: relative;
 
       background: linear-gradient(
@@ -159,27 +159,27 @@
 
     &__users-title {
       font-weight: 600;
-      font-size: 32px;
+      font-size: 27.2px;
     }
 
     &__users {
       font-weight: 500;
-      font-size: 32px;
+      font-size: 27.2px;
     }
 
     &__price-container {
       @include mx.flex-center;
       flex-direction: column;
       width: 85%;
-      margin-top: 10px;
+      margin-top: 8.5px;
 
       &__discount {
         border-radius: 13px 13px 0 0;
         background-color: dark.$color-primary-bg;
         @include mx.flex-center;
-        gap: 8px;
-        padding: 0 8px;
-        height: 43px;
+        gap: 6.8px;
+        padding: 0 6.8px;
+        height: 36.55px;
 
         @include mx.light {
           background-color: light.$color-primary-bg;
@@ -189,12 +189,12 @@
         &__old-price {
           text-decoration: line-through;
           font-weight: 600;
-          font-size: 20px;
+          font-size: 17px;
         }
 
         &__discount-percent {
           @include mx.flex-center;
-          gap: 4px;
+          gap: 3.4px;
         }
       }
 
@@ -203,10 +203,10 @@
         align-items: center;
         flex-direction: column;
         width: 100%;
-        height: 100px;
+        height: 85px;
         position: relative;
         justify-content: end;
-        padding: 4px;
+        padding: 3.4px;
         border-radius: 17px;
         background-color: #ffffff1a;
 
@@ -215,24 +215,24 @@
         }
 
         &__main {
-          font-size: 46px;
+          font-size: 39.1px;
           font-weight: 600;
           position: absolute;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
           display: flex;
-          gap: 10px;
+          gap: 8.5px;
 
           span {
-            font-size: 16px;
+            font-size: 13.6px;
             display: block;
           }
         }
 
         &__sub {
           color: #ffffff30;
-          font-size: 18px;
+          font-size: 15.3px;
 
           @include mx.light {
             color: rgba(0, 0, 0, 0.35);
@@ -243,13 +243,13 @@
 
     &__buyBtn {
       background: dark.$color-primary-bg;
-      width: 235px;
-      height: 72px;
+      width: 199.75px;
+      height: 61.2px;
       border-radius: 17px;
-      padding: 8px;
-      font-size: 37px;
+      padding: 6.8px;
+      font-size: 31.45px;
       font-weight: 700;
-      margin-top: 20px;
+      margin-top: 17px;
       cursor: pointer;
       transition: background ease 200ms;
 
@@ -269,9 +269,9 @@
 
     &__more {
       color: dark.$color-primary;
-      margin-top: 20px;
+      margin-top: 17px;
       cursor: pointer;
-      font-size: 22px;
+      font-size: 18.7px;
       font-weight: 200;
 
       @include mx.light {

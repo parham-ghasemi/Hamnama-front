@@ -11,9 +11,9 @@
   grid-row-gap: 69px;
   position: relative;
 
-  width: 1265px;
+  width: 1075.25px;
   margin: 0 auto;
-  margin-top: 160px;
+  margin-top: 136px;
 
   &__blob {
     @include mx.background-blob(1600px, 600px, 50%, 50%, auto, auto);
@@ -22,8 +22,8 @@
 
   &__item {
     // 1. Strict Dimensions & Radius
-    width: 380px;
-    height: 113px;
+    width: 323px;
+    height: 96.05px;
     border-radius: 17px;
     background:
       linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
@@ -40,8 +40,8 @@
 
     display: flex;
     align-items: center;
-    padding: 32px;
-    gap: 12px;
+    padding: 27.2px;
+    gap: 10.2px;
     transition: transform 400ms ease;
 
     &:hover {
@@ -59,12 +59,12 @@
     &__right {
       @include mx.flex-center;
       // 3. Icon Background Customization
-      width: 56px;
-      height: 56px;
+      width: 47.6px;
+      height: 47.6px;
       background-color: #48261f;
       border-radius: 7px;
 
-      font-size: 32px;
+      font-size: 27.2px;
       transition: box-shadow 200ms ease;
       color: dark.$color-primary;
       position: relative;
@@ -101,11 +101,11 @@
       width: 80%;
       @include mx.flex-center;
       flex-direction: column;
-      gap: 8px;
+      gap: 6.8px;
 
       &__title {
         font-weight: 900;
-        font-size: 20px;
+        font-size: 17px;
         color: dark.$color-primary;
 
         @include mx.light {
@@ -114,7 +114,7 @@
       }
 
       &__desc {
-        font-size: 15px;
+        font-size: 12.75px;
         font-weight: 600;
       }
     }

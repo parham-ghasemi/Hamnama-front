@@ -7,8 +7,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  margin-top: 32px;
+  gap: 13.6px;
+  margin-top: 27.2px;
   position: relative;
 
   &__blob {
@@ -20,8 +20,8 @@
     width: 73%;
 
     &__trigger {
-      height: 98px;
-      font-size: 24px;
+      height: 83.3px;
+      font-size: 20.4px;
       font-weight: 600;
       border-radius: 17px;
       background:
@@ -39,7 +39,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 24px 24px;
+      padding: 20.4px 20.4px;
       cursor: pointer;
       position: relative;
       overflow: hidden;
@@ -50,8 +50,8 @@
         right: 0;
         top: 50%;
         transform: translateY(-50%);
-        width: 4px;
-        height: 50px;
+        width: 3.4px;
+        height: 42.5px;
         background-color: dark.$color-white;
         border-radius: 10px 0 0 10px;
         transition: width ease 200ms;
@@ -87,8 +87,8 @@
           right: 0;
           top: 50%;
           transform: translateY(-50%);
-          width: 4px;
-          height: 50px;
+          width: 3.4px;
+          height: 42.5px;
           background-color: dark.$color-white;
           border-radius: 10px 0 0 10px;
 
@@ -112,7 +112,7 @@
       // Keep background styles or padding safe inside an inner container
       & > div {
         min-height: 0;
-        padding: 12px 24px 12px 24px; /* Padding goes here! */
+        padding: 10.2px 20.4px 10.2px 20.4px; /* Padding goes here! */
         line-height: 200%;
         opacity: 0;
         transition: opacity ease 150ms;
