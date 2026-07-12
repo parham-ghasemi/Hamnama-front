@@ -29,15 +29,15 @@
     z-index: 0;
     width: 100vw;
     overflow: hidden;
-    margin-top: 90px;
+    margin-top: 76.5px;
     display: flex;
     justify-content: end;
 
     &__sidebar-container {
       width: 265px;
-      height: calc(100vh - 90px);
+      height: calc(100vh - 76.5px);
       position: fixed;
-      top: 90px;
+      top: 76.5px;
       right: 0;
     }
 

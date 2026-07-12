@@ -73,19 +73,24 @@
       }
     }
 
-    /* Trigger background fade on Hover AND Active state */
-    &:hover,
-    &.active {
+    /* Trigger lower background fade on Hover */
+    &:hover {
       &::after {
-        opacity: 1;
+        opacity: 0.6; // Adjust this value to your preferred hover opacity
       }
     }
 
+    /* Keep Active state fully opaque */
     &.active {
       font-weight: bold;
 
+      &::after {
+        opacity: 1;
+      }
+
       &:hover {
         &::after {
+          opacity: 1; // Ensures active item stays fully opaque even when hovered
           background: linear-gradient(
             -90deg,
             rgba(0, 0, 0, 0) 0%,
@@ -177,7 +182,7 @@
       }
 
       &::after {
-        opacity: 1;
+        opacity: 0.6; // Matched this to the normal item hover opacity for visual consistency
       }
     }
   }
