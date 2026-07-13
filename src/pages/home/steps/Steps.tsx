@@ -16,20 +16,20 @@ const Steps = () => {
         <span className='home-steps__right-bar__dot'></span>
       </div> */}
 
-      <div className={clsx("img", isLight && "img--light")}>
-        <img
-          src="/homepage/lightglowlights.png"
-          className='light'
-          alt=""
-        />
-        <img
-          src="/homepage/glowlights.png"
-          className='dark'
-          alt=""
-        />
-      </div>
 
       <ul className="home-steps__steps-container">
+        <div className={clsx("img", isLight && "img--light")}>
+          <img
+            src="/homepage/lightglowlights.png"
+            className='light'
+            alt=""
+          />
+          <img
+            src="/homepage/glowlights.png"
+            className='dark'
+            alt=""
+          />
+        </div>
         {
           steps.map((step, ind) => (
             <li key={`home-step-item-${ind}`}>
