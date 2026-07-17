@@ -1,13 +1,13 @@
-import { useState } from 'react';
 import './Header.scss';
 import { PiCaretRightBold, PiMoonStarsFill, PiSunFill, PiUserFill } from "react-icons/pi";
 import clsx from 'clsx';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 
 const Header = () => {
-  const { theme, setTheme, isLight } = useTheme();
-  const [isLogedin, setIsLogedin] = useState(false);
+  const { setTheme, isLight } = useTheme();
+  const { user, isAuthenticated } = useAuth(); // Get user and auth status from context
   const nav = useNavigate();
 
   return (
@@ -25,15 +25,18 @@ const Header = () => {
         </button>
 
         <div className="header__left__user">
-          {isLogedin ? (
-            <div className="header__left__user__profile" onClick={() => setIsLogedin(false)}>
-              <p className="header__left__user__profile__name">username</p>
+          {isAuthenticated ? (
+            <div className="header__left__user__profile" onClick={() => nav('/user/info')}>
+              <p className="header__left__user__profile__name">{user?.username}</p>
               <div className="header__left__user__profile__photo">
                 <PiUserFill />
               </div>
             </div>
           ) : (
-            <button className='header__left__user__loginbtn' onClick={() => setIsLogedin(true)}>ورود | ثبت نام</button>
+            // Navigates to the authentication page
+            <button className='header__left__user__loginbtn' onClick={() => nav('/auth')}>
+              ورود | ثبت نام
+            </button>
           )}
         </div>
 
@@ -66,4 +69,4 @@ const Header = () => {
   )
 }
 
-export default Header
+export default Header;

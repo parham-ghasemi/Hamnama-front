@@ -232,6 +232,7 @@
         border-radius: 12px;
         font-weight: 600;
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+        cursor: pointer;
 
         @include mx.light {
           background-color: light.$color-card-bg;
