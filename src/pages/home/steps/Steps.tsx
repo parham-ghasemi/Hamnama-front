@@ -1,12 +1,15 @@
 import clsx from 'clsx';
 import { useTheme } from '../../../context/ThemeContext';
 import './Steps.scss';
+import StepAnimation from './stepAnimation/StepAnimation';
 
 const Steps = () => {
   const steps = ['ساخت حساب کاربری', "ساخت اتاق سینما", "انتخاب فیلم و تماشا"]
   const { isLight } = useTheme();
   return (
     <div className='home-steps'>
+      <StepAnimation />
+
       <div className="home-steps__blob"></div>
       {/* 
       <div className="home-steps__right-bar">

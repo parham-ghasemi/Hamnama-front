@@ -18,13 +18,15 @@ import Join from "./pages/room/join/Join";
 import { ThemeProvider } from "./context/ThemeContext";
 import PlanUsers from "./pages/userDashboard/planUsers/PlanUsers";
 
+
 const queryClient = new QueryClient({});
+
 
 function App() {
 
   return (
     <ThemeProvider>
-      <div className="w-full min-h-screen font-fa cursor-default" dir="rtl">
+      <div className="w-full min-h-screen font-fa cursor-default" dir="rtl" >
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
             <ScrollToTop />
