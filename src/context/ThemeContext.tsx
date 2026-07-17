@@ -43,7 +43,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     // Clean up the transition class after it finishes
     const timer = setTimeout(() => {
       root.classList.remove("theme-transitioning");
-    }, 200);
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [theme]);
