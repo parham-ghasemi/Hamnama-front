@@ -140,7 +140,7 @@ $row-odd-bg: color.adjust(dark.$color-light-gray, $alpha: -0.87);
 
   &__blob {
     @include mx.background-blob(
-      $width: 100%,
+      $width: 90%,
       $height: 80%,
       $top: 50%,
       $left: 50%
