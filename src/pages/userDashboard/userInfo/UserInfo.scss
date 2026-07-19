@@ -116,7 +116,7 @@
         transition: background-color 200ms ease;
         font-size: 16px;
         font-weight: 900;
-        text-shadow: 0px 3px 3px dark.$color-black;
+        text-shadow: 0px 3px 3px color.adjust(dark.$color-black, $alpha: -0.6);
         cursor: pointer;
         box-shadow: 0 4px 4px 0 color.adjust(dark.$color-black, $alpha: -0.8);
 
