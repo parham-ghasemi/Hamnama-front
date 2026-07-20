@@ -1,0 +1,179 @@
+@use "../../../styles/abstracts/variables" as dark;
+@use "../../../styles/abstracts/variables.light" as light;
+@use "../../../styles/abstracts/mixins" as mx;
+@use "sass:color";
+
+.username-dropdown {
+  padding: 14px;
+  position: fixed;
+  top: 70px;
+  border-radius: 18px;
+  background-color: rgba(27, 23, 32, 1);
+  color: dark.$color-white;
+  backdrop-filter: blur(10px);
+  width: 300px;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+
+  // Animation base states (Hidden by default)
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none; // Prevents clicking when invisible
+  // Starts slightly higher on the Y axis for a slide-down effect
+  transform: translateX(90%) translateY(-15px);
+  transition:
+    opacity 250ms ease,
+    transform 250ms ease,
+    visibility 250ms ease;
+
+  // The class added when isOpen is true
+  &--open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    // Settles into its final position
+    transform: translateX(100%) translateY(0);
+  }
+
+  // Light Mode Base
+  @include mx.light {
+    background-color: light.$color-card-bg;
+    color: light.$color-black;
+    border: light.$card-outline;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+
+    > p {
+      font-size: 14px;
+      font-weight: 800;
+      color: dark.$color-primary;
+
+      @include mx.light {
+        color: light.$color-primary;
+      }
+    }
+
+    > button {
+      width: 100%;
+      height: 50px;
+      border-radius: 12px;
+      background-color: dark.$color-primary-bg;
+      transition: background-color 200ms ease;
+      color: dark.$color-white;
+      text-shadow: 0 4px 4px color.adjust(dark.$color-black, $alpha: -0.75);
+      cursor: pointer;
+
+      @include mx.light {
+        background-color: light.$color-primary-bg;
+        color: light.$color-white;
+        text-shadow: none;
+      }
+
+      &:hover {
+        background-color: dark.$color-primary-bg-hover;
+
+        @include mx.light {
+          background-color: light.$color-primary-bg-hover;
+        }
+      }
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-bottom: 1px solid color.adjust(dark.$color-white, $alpha: -0.5);
+
+    @include mx.light {
+      border-bottom: 1px solid
+        color.adjust(light.$color-light-gray, $alpha: -0.5);
+    }
+
+    &__username {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 22px 14px;
+      border-bottom: 1px solid color.adjust(dark.$color-white, $alpha: -0.5);
+
+      @include mx.light {
+        border-bottom: 1px solid
+          color.adjust(light.$color-light-gray, $alpha: -0.5);
+      }
+
+      > img {
+        height: 50px;
+        width: 50px;
+        border-radius: 100%;
+      }
+
+      > span {
+        font-size: 20px;
+        font-weight: 900;
+      }
+    }
+
+    > ul {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 22px 14px;
+      flex: 1;
+
+      > li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        font-weight: 900;
+        cursor: pointer;
+        transition: color 200ms ease;
+
+        &:hover {
+          color: dark.$color-primary;
+
+          @include mx.light {
+            color: light.$color-primary;
+          }
+        }
+
+        > svg {
+          font-size: 20px;
+        }
+      }
+    }
+  }
+
+  &__footer {
+    padding: 22px 14px;
+
+    &__exit {
+      cursor: pointer;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      transition: color 200ms ease;
+
+      &:hover {
+        color: dark.$color-red;
+
+        @include mx.light {
+          color: light.$color-red;
+        }
+      }
+
+      > svg {
+        font-size: 20px;
+      }
+    }
+  }
+}
