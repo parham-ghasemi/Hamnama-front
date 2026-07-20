@@ -1,12 +1,17 @@
 import './Sidebar.scss'
 import { useNavigate, useLocation } from "react-router-dom"
-import { toast } from 'sonner'; // Keep consistent with your existing toast library
+import { toast } from 'sonner';
 import { useAuth } from '../../../context/AuthContext';
 
-const Sidebar = () => {
+// Add props interface
+interface SidebarProps {
+  onClose?: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const nav = useNavigate()
-  const location = useLocation() // Get the current URL location object
-  const { logout } = useAuth() // Get the logout function from context
+  const location = useLocation()
+  const { logout } = useAuth()
 
   const items = [
     { text: "اطلاعات کاربر", link: "/user/info" },
@@ -17,9 +22,14 @@ const Sidebar = () => {
   ]
 
   const handleLogout = () => {
-    logout(); // Clears token from localStorage and resets global user state
+    logout();
     toast.success('با موفقیت از حساب کاربری خارج شدید');
-    nav('/'); // Redirect to home page
+    nav('/');
+  }
+
+  const handleNav = (link: string) => {
+    nav(link);
+    if (onClose) onClose(); // Close the mobile sidebar on navigation
   }
 
   return (
@@ -33,7 +43,7 @@ const Sidebar = () => {
               <li
                 key={`usersidebarind-${ind}`}
                 className={`user-sidebar__item ${isActive ? 'active' : ''}`}
-                onClick={() => nav(item.link)}
+                onClick={() => handleNav(item.link)}
               >
                 {item.text}
               </li>
@@ -44,7 +54,6 @@ const Sidebar = () => {
 
       <div className="user-sidebar__sep" />
 
-      {/* Added onClick handler for logout */}
       <div className="user-sidebar__logout" onClick={handleLogout}>
         خروج از حساب
       </div>
@@ -52,4 +61,4 @@ const Sidebar = () => {
   )
 }
 
-export default Sidebar
+export default Sidebar;

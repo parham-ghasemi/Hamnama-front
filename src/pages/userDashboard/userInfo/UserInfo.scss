@@ -1,6 +1,6 @@
-@use "../../../styles//abstracts//variables" as dark;
+@use "../../../styles/abstracts/variables" as dark;
 @use "../../../styles/abstracts/variables.light" as light;
-@use "../../../styles//abstracts//mixins" as mx;
+@use "../../../styles/abstracts/mixins" as mx;
 @use "sass:color";
 
 .user-info {
@@ -8,6 +8,15 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 47px 26px;
   position: relative;
+
+  @include mx.max-w(768px) {
+    gap: 20px;
+  }
+  @include mx.max-w(1094px) {
+    gap: 20px;
+    grid-template-columns: 1fr; // Stack into a single column on tablet
+    gap: 30px;
+  }
 
   > * {
     border-radius: 15px;
@@ -34,16 +43,29 @@
   }
 
   &__top-card {
-    grid-area: 1 / 1 / 2 / 3;
+    grid-column: 1 / -1; // Makes it always span full width regardless of column count
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 26px;
     height: 142px;
 
+    @include mx.max-w(768px) {
+      flex-direction: column;
+      align-items: flex-start;
+      height: auto;
+      padding: 24px;
+      gap: 24px;
+    }
+
     &__right {
       @include mx.flex-center;
       gap: 25px;
+
+      @include mx.max-w(768px) {
+        width: 100%;
+        justify-content: flex-start;
+      }
 
       &__img {
         height: 72px;
@@ -91,9 +113,17 @@
         align-items: center;
         gap: 5px;
 
+        @include mx.max-w(768px) {
+          align-items: flex-start;
+        }
+
         > p {
           font-size: 19px;
           font-weight: 700;
+
+          @include mx.max-w(768px) {
+            font-size: 17px;
+          }
         }
 
         > span {
@@ -109,6 +139,10 @@
     }
 
     &__left {
+      @include mx.max-w(768px) {
+        width: 100%;
+      }
+
       > button {
         height: 66px;
         width: 157px;
@@ -120,6 +154,11 @@
         text-shadow: 0px 3px 3px color.adjust(dark.$color-black, $alpha: -0.6);
         cursor: pointer;
         box-shadow: 0 4px 4px 0 color.adjust(dark.$color-black, $alpha: -0.8);
+
+        @include mx.max-w(768px) {
+          width: 100%;
+          height: 56px;
+        }
 
         @include mx.light {
           background-color: light.$color-primary-bg;
@@ -143,17 +182,35 @@
   &__chart-container {
     @include mx.flex-center;
     height: 450px;
+
+    @include mx.max-w(768px) {
+      height: 300px; // Reduce height for mobile
+    }
   }
 
   &__info-card {
     padding: 40px 26px;
 
+    @include mx.max-w(768px) {
+      padding: 24px;
+    }
+
     &__section {
       height: 100px;
       display: flex;
       justify-content: space-between;
+      align-items: center; // Added for better desktop centering
       margin-top: 38px;
       border-bottom: 1px solid dark.$color-gray;
+
+      @include mx.max-w(576px) {
+        flex-direction: column;
+        align-items: flex-start; // Stack items on small mobile
+        height: auto;
+        padding-bottom: 24px;
+        gap: 16px;
+        margin-top: 24px;
+      }
 
       @include mx.light {
         border-bottom: 1px solid light.$color-light-gray;
@@ -161,7 +218,11 @@
 
       &:last-of-type {
         border-bottom: none;
+        @include mx.max-w(576px) {
+          padding-bottom: 0;
+        }
       }
+
       &:first-of-type {
         margin-top: 0;
       }
@@ -174,12 +235,20 @@
         > p {
           font-weight: 900;
           font-size: 19px;
+
+          @include mx.max-w(768px) {
+            font-size: 17px;
+          }
         }
 
         > span {
           font-size: 20px;
           font-weight: 600;
           color: dark.$color-gray;
+
+          @include mx.max-w(768px) {
+            font-size: 17px;
+          }
 
           @include mx.light {
             color: light.$color-dark-gray;
@@ -188,6 +257,10 @@
       }
 
       &__left {
+        @include mx.max-w(576px) {
+          width: 100%;
+        }
+
         > button {
           height: 50px;
           width: 170px;
@@ -199,6 +272,14 @@
           font-weight: 900;
           cursor: pointer;
           transition: background-color 200ms ease;
+
+          @include mx.max-w(1100px) {
+            width: 150px;
+          }
+
+          @include mx.max-w(576px) {
+            width: 100%; // Full width edit buttons on small mobile
+          }
 
           @include mx.light {
             border: 1px solid light.$color-black;
@@ -226,7 +307,7 @@
   }
 }
 
-/* Add this to the bottom of UserInfo.scss */
+/* Modals */
 
 .edit-modal-overlay {
   position: fixed;
@@ -238,6 +319,7 @@
   z-index: 1000;
   @include mx.flex-center;
   backdrop-filter: blur(4px);
+  padding: 20px; // Add padding to prevent modal touching screen edges
 }
 
 .edit-modal {
@@ -254,6 +336,11 @@
   flex-direction: column;
   gap: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+  @include mx.max-w(480px) {
+    padding: 24px;
+    gap: 16px;
+  }
 
   @include mx.light {
     background-color: light.$color-card-bg;

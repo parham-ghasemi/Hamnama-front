@@ -1,45 +1,52 @@
 import './Header.scss';
-import { PiCaretRightBold, PiMoonStarsFill, PiSunFill, PiUserFill } from "react-icons/pi";
+import { PiCaretRightBold, PiMoonStarsFill, PiSunFill, PiUserFill, PiListBold } from "react-icons/pi";
 import clsx from 'clsx';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import UsernameDropdown from './usernameDropdown/UsernameDropdown';
 
-const Header: React.FC = () => {
+// Add the optional prop
+interface HeaderProps {
+  onMenuClick?: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const { setTheme, isLight } = useTheme();
   const { user, isAuthenticated } = useAuth();
   const nav = useNavigate();
+  const location = useLocation();
 
-  // Explicitly type state as boolean
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
-
-  // Type the reference specifically as an HTMLDivElement
   const profileRef = useRef<HTMLDivElement>(null);
 
+  // Check if we are inside the user dashboard
+  const isDashboard = location.pathname.startsWith('/user');
+
   useEffect(() => {
-    // Type the event as a standard DOM MouseEvent
     const handleClickOutside = (event: MouseEvent) => {
-      // event.target is an EventTarget, we need to cast it to Node for .contains()
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   return (
     <div className="header">
-
-      <Link to={`/`} className="header__logo">
-        <img src="/Logo.svg" alt="Logo" />
-      </Link>
+      {/* Wrapped Logo and Hamburger in a right-side container */}
+      <div className="header__right">
+        {isDashboard && (
+          <button className="header__hamburger" onClick={onMenuClick} aria-label="Open Sidebar">
+            <PiListBold />
+          </button>
+        )}
+        <Link to={`/`} className="header__logo">
+          <img src="/Logo.svg" alt="Logo" />
+        </Link>
+      </div>
 
       <div className="header__left">
         <button className="header__left__watchbtn" onClick={() => nav('/join-room')}>
@@ -62,7 +69,6 @@ const Header: React.FC = () => {
               </div>
               <div
                 className="header__left__user__profile__dropdown"
-                // Type the React MouseEvent to be strictly safe
                 onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
               >
                 <UsernameDropdown isOpen={isDropdownOpen} />
@@ -84,19 +90,10 @@ const Header: React.FC = () => {
           aria-label="Toggle theme"
         >
           <PiMoonStarsFill
-            className={clsx(
-              "header__left__theme-btn__icon",
-              "header__left__theme-btn__icon--moon",
-              isLight && "is-hidden"
-            )}
+            className={clsx("header__left__theme-btn__icon", "header__left__theme-btn__icon--moon", isLight && "is-hidden")}
           />
-
           <PiSunFill
-            className={clsx(
-              "header__left__theme-btn__icon",
-              "header__left__theme-btn__icon--sun",
-              isLight && "is-visible"
-            )}
+            className={clsx("header__left__theme-btn__icon", "header__left__theme-btn__icon--sun", isLight && "is-visible")}
           />
         </button>
       </div>

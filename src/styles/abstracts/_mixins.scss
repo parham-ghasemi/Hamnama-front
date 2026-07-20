@@ -8,14 +8,8 @@
   align-items: center;
 }
 
-@mixin mobile {
-  @media (max-width: bp.$mobile) {
-    @content;
-  }
-}
-
-@mixin tablet {
-  @media (max-width: bp.$tablet) {
+@mixin max-w($width) {
+  @media (max-width: $width) {
     @content;
   }
 }

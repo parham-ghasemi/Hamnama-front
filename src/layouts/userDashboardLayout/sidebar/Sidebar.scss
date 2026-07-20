@@ -12,6 +12,14 @@
     background-color: color.adjust(light.$color-dark-gray, $alpha: -0.6);
   }
 
+  @include mx.max-w(992px) {
+    background-color: #0a03219e;
+    backdrop-filter: blur(15px);
+    @include mx.light {
+      background-color: color.adjust(light.$color-dark-gray, $alpha: -0.6);
+    }
+  }
+
   > ul {
     display: flex;
     flex-direction: column;

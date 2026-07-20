@@ -23,7 +23,38 @@
   &__logo {
     height: 47.6px;
     width: auto;
-    margin-right: 34px;
+
+    // Remove margin-right since we use gap in __right now
+    @include mx.max-w(992px) {
+      height: 38px; // Slightly smaller on mobile
+    }
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__hamburger {
+    display: none; // Hidden on desktop
+    background: none;
+    border: none;
+    color: dark.$color-white;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0;
+    transition: color 200ms ease;
+
+    @include mx.light {
+      color: light.$color-black;
+    }
+
+    @include mx.max-w(992px) {
+      display: flex; // Visible on tablet/mobile
+      align-items: center;
+      justify-content: center;
+    }
   }
 
   &__left {
@@ -31,6 +62,10 @@
     align-items: center;
     justify-content: space-evenly;
     gap: 13.6px;
+
+    @include mx.max-w(768px) {
+      gap: 8px;
+    }
 
     &__theme-btn {
       position: relative;
@@ -192,6 +227,10 @@
       height: 39.1px;
       width: 136px;
 
+      @include mx.max-w(550px) {
+        display: none; // Hide "Start Watching" on very small screens to save space
+      }
+
       @include mx.light {
         background: light.$color-primary-bg;
         color: light.$color-white;
@@ -228,7 +267,7 @@
         display: flex;
         align-items: center;
         gap: 6.8px;
-        padding: 0 10.2px;
+        padding: 0 10px;
         border-radius: 12px;
         font-weight: 600;
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
@@ -237,6 +276,12 @@
         @include mx.light {
           background-color: light.$color-card-bg;
           box-shadow: light.$shadow;
+        }
+
+        @include mx.max-w(345px) {
+          &__name {
+            display: none; // Hide username on mobile, show only icon
+          }
         }
 
         &__photo {

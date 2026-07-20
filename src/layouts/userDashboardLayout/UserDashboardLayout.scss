@@ -6,8 +6,6 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  // background: dark.$color-bg;
-  background: #0c0517;
   background: linear-gradient(
     -90deg,
     rgba(12, 5, 23, 1) 0%,
@@ -33,18 +31,62 @@
     display: flex;
     justify-content: end;
 
+    // The dark overlay behind the sidebar on mobile
+    &__backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      top: 76.5px;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 9;
+      opacity: 0;
+      transition: opacity 300ms ease;
+
+      &.is-open {
+        display: block;
+        opacity: 1;
+      }
+
+      @include mx.max-w(992px) {
+        display: block;
+        pointer-events: none;
+        &.is-open {
+          pointer-events: auto;
+        }
+      }
+    }
+
     &__sidebar-container {
       width: 265px;
       height: calc(100vh - 76.5px);
       position: fixed;
       top: 76.5px;
       right: 0;
+      z-index: 10;
+      transition: transform 300ms ease;
+
+      @include mx.max-w(992px) {
+        transform: translateX(100%);
+
+        &.is-open {
+          transform: translateX(0);
+        }
+      }
     }
 
     &__page-container {
       width: calc(100% - 265px);
-      min-width: calc(100vh - 90px);
+      min-height: calc(
+        100vh - 90px
+      ); // Assuming this was intended to be viewport width or specific bounds
       padding: 26px;
+
+      @include mx.max-w(992px) {
+        width: 100%;
+        min-width: 100%;
+        padding: 16px;
+      }
     }
   }
 }
