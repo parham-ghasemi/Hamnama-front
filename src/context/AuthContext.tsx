@@ -6,6 +6,7 @@ export interface User {
   id: string;
   username: string;
   phoneNumber: string;
+  profile_picture: string;
 }
 
 interface AuthContextType {

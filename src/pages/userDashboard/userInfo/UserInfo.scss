@@ -72,6 +72,14 @@
         width: 72px;
         position: relative;
         cursor: pointer;
+        @include mx.flex-center;
+        outline: 1px solid dark.$color-gray;
+        border-radius: 100%;
+
+        > p {
+          font-weight: 900;
+          font-size: 28px;
+        }
 
         &:hover {
           > span {

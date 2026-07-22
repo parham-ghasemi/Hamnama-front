@@ -172,7 +172,11 @@ const UserInfo = () => {
       <div className="user-info__top-card">
         <div className="user-info__top-card__right">
           <div className="user-info__top-card__right__img">
-            <img src="/rodeocover.png" alt="profile image" />
+            {user?.profile_picture ? (
+              <img src={`${import.meta.env.VITE_BASE_URL}${user?.profile_picture}`} alt="profile image" />
+            ) : (<p>
+              {user?.username[0]}
+            </p>)}
             <span>
               <PiCameraLight />
             </span>
