@@ -1,7 +1,7 @@
 import { PiCaretDownBold } from 'react-icons/pi';
 import './Faq.scss';
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useEffect, useRef, useState, type Ref } from 'react';
 
 const Faq = () => {
   const questions = [
@@ -33,13 +33,61 @@ const Faq = () => {
     );
   };
 
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      itemRefs.current.forEach(item => {
+        if (!item) return;
+
+        const rect = item.getBoundingClientRect();
+
+        const closestX = Math.max(rect.left, Math.min(e.clientX, rect.right));
+        const closestY = Math.max(rect.top, Math.min(e.clientY, rect.bottom));
+
+        const dx = e.clientX - closestX;
+        const dy = e.clientY - closestY;
+
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        const radius = 120;
+
+        const opacity = 0.35 + 0.65 * Math.max(
+          0.35,
+          1 - Math.pow(distance / radius, 2)
+        );
+
+
+        if (distance < radius) {
+          item.style.setProperty("--mx", `${e.clientX - rect.left}px`);
+          item.style.setProperty("--my", `${e.clientY - rect.top}px`);
+
+          item.style.setProperty("--glow-opacity", `${opacity}`);
+        } else {
+          item.style.setProperty("--glow-opacity", "0");
+        }
+      });
+    };
+
+    window.addEventListener("mousemove", handler);
+
+    return () => window.removeEventListener("mousemove", handler);
+  }, []);
+
   return (
     <div className='home-faq'>
       <div className='home-faq__blob'></div>
 
       {
         questions.map((ques, ind) => (
-          <div className="home-faq__item" onClick={() => toggleShow(ind)} key={`homefaq-${ind}`}>
+          <div
+            className="home-faq__item"
+            onClick={() => toggleShow(ind)}
+            key={`homefaq-${ind}`}
+            // @ts-ignore
+            ref={(el) => (itemRefs.current[ind] = el)}
+          >
+            <div className="home-faq__glow" />
             <div className={clsx(show.indexOf(ind) >= 0 && 'home-faq__item__trigger--show', 'home-faq__item__trigger')}>
               {ques.q}
               <PiCaretDownBold />

@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 13.6px;
+  gap: 28px;
   margin-top: 27.2px;
   position: relative;
 
@@ -16,8 +16,45 @@
     transform: translate(-50%, -40%);
   }
 
+  &__glow {
+    position: absolute;
+    inset: -2px;
+    border-radius: 18px;
+
+    pointer-events: none;
+
+    opacity: var(--glow-opacity);
+
+    background: radial-gradient(
+      200px circle at var(--mx) var(--my),
+      rgba(255, 255, 255, 0.9),
+      rgba(255, 255, 255, 0.25) 25%,
+      transparent 70%
+    );
+
+    transition: opacity 0.15s linear;
+
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+
+    mask-composite: exclude;
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+
+    padding: 2px;
+  }
+
   &__item {
     width: 73%;
+    position: relative;
+    width: 73%;
+
+    --mx: 50%;
+    --my: 50%;
+    --glow-opacity: 0;
 
     &__trigger {
       height: 83.3px;
@@ -112,10 +149,12 @@
       // Keep background styles or padding safe inside an inner container
       & > div {
         min-height: 0;
-        padding: 10.2px 20.4px 10.2px 20.4px; /* Padding goes here! */
         line-height: 200%;
         opacity: 0;
-        transition: opacity ease 150ms;
+        padding: 0;
+        transition:
+          opacity ease 150ms,
+          padding ease 150ms;
       }
     }
 
@@ -136,6 +175,7 @@
 
       & > div {
         opacity: 1;
+        padding: 10.2px 20.4px 10.2px 20.4px; /* Padding goes here! */
       }
     }
   }
