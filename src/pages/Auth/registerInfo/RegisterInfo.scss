@@ -6,16 +6,17 @@
 .register-info {
   @include mx.flex-center;
   flex-direction: column;
-  gap: 28px;
+  gap: 37px; // 28px -> 37px
+  margin-top: 90px;
 
   &__group {
     @include mx.flex-center;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px; // 12px -> 16px
   }
 
   &__label {
-    font-size: 24px;
+    font-size: 32px; // 24px -> 32px
     font-weight: 700;
     text-align: center;
 
@@ -26,8 +27,8 @@
 
   &__input-wrapper {
     position: relative;
-    width: 400px;
-    padding: 16px;
+    width: 533px; // 400px -> 533px
+    padding: 21px; // 16px -> 21px
 
     display: flex;
     align-items: center;
@@ -40,7 +41,7 @@
 
     background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
 
-    border-radius: 12px;
+    border-radius: 16px; // 12px -> 16px
 
     text-align: center;
 
@@ -68,7 +69,7 @@
   &__icon,
   &__icon-btn {
     z-index: 2;
-    font-size: 24px;
+    font-size: 32px; // 24px -> 32px
 
     @include mx.light {
       color: light.$color-black;
@@ -80,7 +81,7 @@
 
     &:hover {
       @include mx.light {
-        color: light.$color-primary; // Using primary color rule for interactive triggers
+        color: light.$color-primary;
       }
     }
   }
@@ -88,7 +89,7 @@
   &__rules {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 11px; // 8px -> 11px
 
     color: dark.$color-red;
     text-align: center;
@@ -101,22 +102,22 @@
   &__submit-btn {
     background: dark.$color-primary;
 
-    width: 300px;
+    width: 400px; // 300px -> 400px
 
-    padding: 12px;
+    padding: 16px; // 12px -> 16px
 
-    border-radius: 12px;
+    border-radius: 16px; // 12px -> 16px
 
     cursor: pointer;
 
     font-weight: 700;
-    font-size: 24px;
+    font-size: 32px; // 24px -> 32px
 
-    margin-top: 16px;
+    margin-top: 21px; // 16px -> 21px
 
     @include mx.light {
       background: light.$color-primary-bg;
-      color: light.$color-white; // White text inside primary background component container
+      color: light.$color-white;
     }
 
     &:hover {
@@ -131,7 +132,7 @@
   &__terms {
     color: dark.$color-gray;
     text-align: center;
-    max-width: 500px;
+    max-width: 667px; // 500px -> 667px
 
     @include mx.light {
       color: light.$color-black;

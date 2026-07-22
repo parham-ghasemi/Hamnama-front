@@ -6,10 +6,11 @@
 .auth-phone-input {
   @include mx.flex-center;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px; // 24px -> 32px
+  margin-top: 90px;
 
   &__title {
-    font-size: 52px;
+    font-size: 69px; // 52px -> 69px
     font-weight: 700;
 
     @include mx.light {
@@ -32,8 +33,9 @@
       }
     }
   }
+
   &__subtitle {
-    font-size: 24px;
+    font-size: 32px; // 24px -> 32px
     color: dark.$color-gray;
 
     @include mx.light {
@@ -44,10 +46,12 @@
   &__input {
     background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
     text-align: center;
-    border-radius: 12px;
-    padding: 16px;
-    width: 400px;
+    border-radius: 16px; // 12px -> 16px
+    padding: 21px; // 16px -> 21px
+    width: 533px; // 400px -> 533px
     outline: none;
+    font-size: 24px;
+    font-weight: 700;
 
     @include mx.light {
       background-color: light.$color-white;
@@ -78,17 +82,17 @@
 
   &__subBtn {
     background: dark.$color-primary;
-    width: 300px;
-    padding: 12px;
-    border-radius: 12px;
+    width: 400px; // 300px -> 400px
+    padding: 16px; // 12px -> 16px
+    border-radius: 16px; // 12px -> 16px
     cursor: pointer;
     font-weight: 700;
-    font-size: 24px;
-    margin-top: 52px;
+    font-size: 32px; // 24px -> 32px
+    margin-top: 69px; // 52px -> 69px
 
     @include mx.light {
       background: light.$color-primary-bg;
-      color: light.$color-white; // White text inside primary background component container
+      color: light.$color-white;
     }
 
     &:hover {
