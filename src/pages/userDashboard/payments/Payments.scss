@@ -15,6 +15,10 @@
     flex-direction: column;
     gap: 23px;
 
+    @include mx.max-w(768px) {
+      gap: 16px;
+    }
+
     &__header {
       @include mx.flex-center;
       background-color: color.adjust(dark.$color-light-gray, $alpha: -0.75);
@@ -25,6 +29,11 @@
 
       @include mx.light {
         background-color: light.$color-primary-bg;
+      }
+
+      // Hide table header on mobile
+      @include mx.max-w(768px) {
+        display: none;
       }
 
       &__cell {
@@ -45,6 +54,10 @@
       flex-direction: column;
       gap: 17px;
 
+      @include mx.max-w(768px) {
+        gap: 14px;
+      }
+
       &__row {
         @include mx.flex-center;
         justify-content: space-evenly;
@@ -55,7 +68,17 @@
 
         @include mx.light {
           background-color: light.$color-card-bg;
-          box-shadow: none; // Removed the light shadow here
+          box-shadow: none;
+        }
+
+        // Card Transformation on Mobile
+        @include mx.max-w(768px) {
+          flex-direction: column;
+          align-items: stretch;
+          height: auto;
+          padding: 18px 20px;
+          gap: 12px;
+          border-radius: 20px;
         }
 
         &__cell {
@@ -89,6 +112,92 @@
 
             @include mx.light {
               color: light.$color-green;
+            }
+          }
+
+          // Responsive Cell Adjustments
+          @include mx.max-w(768px) {
+            width: 100%;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 15px;
+
+            &::before {
+              color: color.adjust(dark.$color-white, $alpha: -0.4);
+              font-size: 14px;
+              font-weight: 500;
+
+              @include mx.light {
+                color: light.$color-gray;
+              }
+            }
+
+            // Inline subtitle/currency alignment
+            &__text {
+              font-size: 13px;
+              margin-right: 4px;
+            }
+          }
+
+          // Mobile Row Labels using nth-child
+          &:nth-child(1) {
+            // Amount
+            @include mx.max-w(768px) {
+              font-size: 17px;
+              font-weight: 800;
+              padding-bottom: 8px;
+              border-bottom: 1px dashed
+                color.adjust(dark.$color-white, $alpha: -0.85);
+
+              @include mx.light {
+                border-bottom-color: color.adjust(
+                  light.$color-light-gray,
+                  $alpha: -0.5
+                );
+              }
+
+              &::before {
+                content: "مبلغ پرداخت:";
+                font-size: 15px;
+                font-weight: 700;
+              }
+            }
+          }
+
+          &:nth-child(2) {
+            // Status
+            @include mx.max-w(768px) {
+              &::before {
+                content: "وضعیت:";
+              }
+            }
+          }
+
+          &:nth-child(3) {
+            // Date
+            @include mx.max-w(768px) {
+              &::before {
+                content: "تاریخ:";
+              }
+            }
+          }
+
+          &:nth-child(4) {
+            // Tracking ID
+            @include mx.max-w(768px) {
+              &::before {
+                content: "شماره پیگیری:";
+              }
+            }
+          }
+
+          &:nth-child(5) {
+            // Payment Method
+            @include mx.max-w(768px) {
+              &::before {
+                content: "نوع پرداخت:";
+              }
             }
           }
         }
