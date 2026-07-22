@@ -65,7 +65,13 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             >
               <p className="header__left__user__profile__name">{user?.username}</p>
               <div className="header__left__user__profile__photo">
-                <PiUserFill />
+                {
+                  user?.profile_picture ? (
+                    <img src={`${import.meta.env.VITE_BASE_URL}${user?.profile_picture}`} alt="profile picture" />
+                  ) : (
+                    <PiUserFill />
+                  )
+                }
               </div>
               <div
                 className="header__left__user__profile__dropdown"

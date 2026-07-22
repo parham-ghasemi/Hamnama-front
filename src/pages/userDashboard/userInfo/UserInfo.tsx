@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PiCameraLight } from 'react-icons/pi';
 import { IoPencilSharp, IoClose } from 'react-icons/io5';
 import { toast } from 'sonner';
@@ -8,7 +8,6 @@ import './UserInfo.scss';
 import { userApi } from '../../../apiCalls/userApi';
 
 // --- Sub-components for Modals --- //
-
 const UpdateUsernameForm = ({ onClose }: { onClose: () => void }) => {
   const { user, fetchUser } = useAuth();
   const [username, setUsername] = useState(user?.username || '');
@@ -153,11 +152,89 @@ const UpdatePhoneForm = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
+// --- NEW: Profile Picture Form --- //
+const UpdateProfilePictureForm = ({ onClose }: { onClose: () => void }) => {
+  const { user, fetchUser } = useAuth();
+  const [file, setFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!file) return;
+
+    try {
+      await userApi.uploadProfilePicture(file);
+      await fetchUser();
+      toast.success('عکس پروفایل با موفقیت آپلود شد');
+      onClose();
+    } catch (error) {
+      if (error instanceof AxiosError && error.response) {
+        toast.error(error.response.data || 'خطا در آپلود عکس');
+      }
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await userApi.removeProfilePicture();
+      await fetchUser();
+      toast.success('عکس پروفایل با موفقیت حذف شد');
+      onClose();
+    } catch (error) {
+      if (error instanceof AxiosError && error.response) {
+        toast.error(error.response.data || 'خطا در حذف عکس');
+      }
+    }
+  };
+
+  return (
+    <form onSubmit={handleUpload} className="edit-modal__form">
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+      />
+
+      <button
+        type="button"
+        className="secondary-btn"
+        onClick={() => fileInputRef.current?.click()}
+      >
+        {file ? file.name : 'انتخاب عکس جدید'}
+      </button>
+
+      {file && <button type="submit">آپلود عکس</button>}
+
+      {user?.profile_picture && !file && (
+        <button
+          type="button"
+          className="secondary-btn"
+          onClick={handleDelete}
+          style={{ borderColor: 'rgba(239, 68, 68, 0.6)', color: '#ef4444' }} // Light red styling for delete
+        >
+          حذف عکس فعلی
+        </button>
+      )}
+    </form>
+  );
+};
+
 // --- Main Component --- //
 
 const UserInfo = () => {
   const { user } = useAuth();
-  const [editingField, setEditingField] = useState<'username' | 'phone' | 'password' | null>(null);
+
+  // Expanded to include 'profilePicture'
+  const [editingField, setEditingField] = useState<'username' | 'phone' | 'password' | 'profilePicture' | null>(null);
+  const [isModalActive, setIsModalActive] = useState(false);
 
   const sections = [
     { key: 'username', label: 'نام کاربری', value: user?.username },
@@ -165,18 +242,38 @@ const UserInfo = () => {
     { key: 'password', label: 'رمز عبور', value: '•••••••••••••' },
   ];
 
+  const handleOpenModal = (field: 'username' | 'phone' | 'password' | 'profilePicture') => {
+    setEditingField(field);
+    setTimeout(() => setIsModalActive(true), 10);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalActive(false);
+    setTimeout(() => setEditingField(null), 300);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isModalActive) handleCloseModal();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isModalActive]);
+
   return (
     <div className="user-info">
       <div className="user-info__blob" />
 
       <div className="user-info__top-card">
         <div className="user-info__top-card__right">
-          <div className="user-info__top-card__right__img">
+          <div className="user-info__top-card__right__img" onClick={() => handleOpenModal('profilePicture')}>
             {user?.profile_picture ? (
               <img src={`${import.meta.env.VITE_BASE_URL}${user?.profile_picture}`} alt="profile image" />
-            ) : (<p>
-              {user?.username[0]}
-            </p>)}
+            ) : (
+              <p>{user?.username?.[0]}</p>
+            )}
+
+            {/* Added onClick and pointer cursor to trigger the modal */}
             <span>
               <PiCameraLight />
             </span>
@@ -201,7 +298,7 @@ const UserInfo = () => {
             </div>
 
             <div className="user-info__info-card__section__left">
-              <button onClick={() => setEditingField(item.key as any)}>
+              <button onClick={() => handleOpenModal(item.key as any)}>
                 <IoPencilSharp />
                 ویرایش {item.label}
               </button>
@@ -212,9 +309,11 @@ const UserInfo = () => {
 
       <div className="user-info__chart-container">LINE CHART</div>
 
-      {/* Modal Overlay */}
       {editingField && (
-        <div className="edit-modal-overlay" onClick={() => setEditingField(null)}>
+        <div
+          className={`edit-modal-overlay ${isModalActive ? 'is-active' : ''}`}
+          onClick={handleCloseModal}
+        >
           <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
             <div className="edit-modal__header">
               <h3>
@@ -223,16 +322,19 @@ const UserInfo = () => {
                   ? 'نام کاربری'
                   : editingField === 'phone'
                     ? 'شماره موبایل'
-                    : 'رمز عبور'}
+                    : editingField === 'profilePicture'
+                      ? 'عکس پروفایل'
+                      : 'رمز عبور'}
               </h3>
-              <button className="edit-modal__close" onClick={() => setEditingField(null)}>
+              <button className="edit-modal__close" onClick={handleCloseModal}>
                 <IoClose />
               </button>
             </div>
 
-            {editingField === 'username' && <UpdateUsernameForm onClose={() => setEditingField(null)} />}
-            {editingField === 'password' && <UpdatePasswordForm onClose={() => setEditingField(null)} />}
-            {editingField === 'phone' && <UpdatePhoneForm onClose={() => setEditingField(null)} />}
+            {editingField === 'username' && <UpdateUsernameForm onClose={handleCloseModal} />}
+            {editingField === 'password' && <UpdatePasswordForm onClose={handleCloseModal} />}
+            {editingField === 'phone' && <UpdatePhoneForm onClose={handleCloseModal} />}
+            {editingField === 'profilePicture' && <UpdateProfilePictureForm onClose={handleCloseModal} />}
           </div>
         </div>
       )}

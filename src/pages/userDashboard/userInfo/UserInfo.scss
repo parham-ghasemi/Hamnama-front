@@ -324,46 +324,75 @@
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
   z-index: 1000;
-  @include mx.flex-center;
-  backdrop-filter: blur(4px);
-  padding: 20px; // Add padding to prevent modal touching screen edges
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+
+  // Animation states
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms ease;
+
+  @include mx.light {
+    background-color: rgba(255, 255, 255, 0.6);
+  }
+
+  &.is-active {
+    opacity: 1;
+    pointer-events: all;
+
+    .edit-modal {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+  }
 }
 
 .edit-modal {
   width: 100%;
-  max-width: 400px;
-  background-color: color.adjust(
-    dark.$color-primary-bg,
-    $alpha: -0.1,
-    $lightness: 5%
-  );
-  border-radius: 20px;
-  padding: 30px;
+  max-width: 450px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 
-  @include mx.max-w(480px) {
-    padding: 24px;
-    gap: 16px;
-  }
+  border: 1px solid color.adjust(dark.$color-white, $alpha: -0.9);
+  border-radius: 26px;
+  padding: 24px 26px;
+  background-color: color.adjust(dark.$color-dark-gray, $alpha: -0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+  // Modal open animations
+  transform: scale(0.9) translateY(20px);
+  opacity: 0;
+  transition:
+    transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 300ms ease;
 
   @include mx.light {
     background-color: light.$color-card-bg;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid color.adjust(light.$color-gray, $alpha: -0.8);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   }
 
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
+
+    @include mx.light {
+      border-bottom-color: color.adjust(light.$color-light-gray, $alpha: -0.5);
+    }
 
     h3 {
-      font-size: 18px;
-      font-weight: 900;
+      font-size: 24px;
+      font-weight: 700;
       color: dark.$color-white;
+      margin: 0;
 
       @include mx.light {
         color: light.$color-black;
@@ -372,25 +401,47 @@
   }
 
   &__close {
-    background: transparent;
-    border: none;
-    font-size: 24px;
-    color: dark.$color-white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    width: 44px;
+    border-radius: 50%;
+    background-color: transparent;
+    border: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
+    color: color.adjust(dark.$color-white, $alpha: -0.2);
     cursor: pointer;
+    transition: all 300ms ease;
+    font-size: 24px;
 
     @include mx.light {
-      color: light.$color-black;
+      color: light.$color-dark-gray;
+      border-color: color.adjust(light.$color-dark-gray, $alpha: -0.5);
+    }
+
+    &:hover {
+      background-color: color.adjust(dark.$color-red, $alpha: -0.7);
+      color: dark.$color-white;
+      border-color: transparent;
+
+      @include mx.light {
+        background-color: color.adjust(dark.$color-red, $alpha: -0.1);
+        color: light.$color-white;
+        border-color: color.adjust(dark.$color-red, $alpha: -0.1);
+      }
     }
   }
 
   &__subtitle {
     font-size: 14px;
-    color: dark.$color-gray;
+    font-weight: 500;
+    color: color.adjust(dark.$color-white, $alpha: -0.4);
     text-align: center;
+    margin-top: -5px;
     margin-bottom: 10px;
 
     @include mx.light {
-      color: light.$color-dark-gray;
+      color: light.$color-gray;
     }
   }
 
@@ -402,40 +453,44 @@
     input {
       width: 100%;
       height: 50px;
-      border-radius: 12px;
-      background-color: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      outline: none;
+      background-color: color.adjust(dark.$color-white, $alpha: -0.9);
+      border: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
+      border-radius: 17px;
       padding: 0 15px;
       color: dark.$color-white;
       font-family: inherit;
-      outline: none;
-      transition: border-color 0.2s;
+      font-size: 16px;
+      transition:
+        background-color 200ms ease,
+        border-color 200ms ease;
 
       &:focus {
-        border-color: dark.$color-primary-bg;
+        background-color: color.adjust(dark.$color-white, $alpha: -0.88);
       }
 
       @include mx.light {
-        background-color: light.$color-light-gray;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        color: light.$color-black;
+        background-color: light.$color-card-bg;
+        border: 1px solid light.$color-light-gray;
+        color: light.$color-gray;
 
         &:focus {
-          border-color: light.$color-primary-bg;
+          border-color: light.$color-primary;
         }
       }
     }
 
     button {
-      height: 50px;
-      border-radius: 12px;
-      background-color: dark.$color-primary-bg;
-      color: dark.$color-black;
-      font-weight: 900;
-      font-size: 15px;
+      height: 51px;
+      border-radius: 17px;
+      font-size: 16px;
+      font-weight: 700;
       cursor: pointer;
       border: none;
-      transition: background-color 0.2s;
+      transition: background-color 200ms ease;
+
+      background-color: color.adjust(dark.$color-white, $alpha: -0.58);
+      color: dark.$color-white;
 
       @include mx.light {
         background-color: light.$color-primary-bg;
@@ -443,21 +498,32 @@
       }
 
       &:hover {
-        background-color: dark.$color-primary-bg-hover;
+        background-color: color.adjust(dark.$color-white, $alpha: -0.5);
 
         @include mx.light {
           background-color: light.$color-primary-bg-hover;
         }
       }
 
+      // Replaces previous secondary button styles to match the target cancel button
       &.secondary-btn {
         background-color: transparent;
-        border: 1px solid dark.$color-primary-bg;
-        color: dark.$color-primary-bg;
+        color: dark.$color-white;
+        border: 1px solid color.adjust(dark.$color-white, $alpha: -0.6);
 
         @include mx.light {
-          border: 1px solid light.$color-primary-bg;
-          color: light.$color-primary-bg;
+          color: light.$color-primary;
+          border: 1px solid light.$color-light-gray;
+          background-color: transparent;
+        }
+
+        &:hover {
+          background-color: color.adjust(dark.$color-red, $alpha: -0.7);
+
+          @include mx.light {
+            background-color: color.adjust(dark.$color-red, $alpha: -0.1);
+            color: light.$color-white;
+          }
         }
       }
     }

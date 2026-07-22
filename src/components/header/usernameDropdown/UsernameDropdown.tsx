@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import clsx from 'clsx'; // <-- Make sure to import clsx
 import './UsernameDropdown.scss';
+import { PiUserFill } from 'react-icons/pi';
 
 // Accept isOpen as a prop
 const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
@@ -32,7 +33,15 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
 
       <div className='username-dropdown__body'>
         <div className='username-dropdown__body__username'>
-          <img src="/rodeocover.png" alt="profile picture" />
+          <div className='username-dropdown__body__username__photo'>
+            {
+              user?.profile_picture ? (
+                <img src={`${import.meta.env.VITE_BASE_URL}${user?.profile_picture}`} alt="profile picture" />
+              ) : (
+                <PiUserFill />
+              )
+            }
+          </div>
           <span>
             {user?.username}
           </span>

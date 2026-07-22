@@ -14,4 +14,21 @@ export const userApi = {
   // Step 2: Submit OTP to confirm
   confirmPhoneUpdate: (phone: string, code: string) =>
     api.patch('/users/me/phone', { phone, code }),
+
+  // --- Profile Picture Endpoints --- //
+
+  uploadProfilePicture: (file: File) => {
+    const formData = new FormData();
+    // Note: 'file' is the standard field name, but change it if your Go backend expects something else (e.g. 'image' or 'profile_picture')
+    formData.append('file', file);
+
+    return api.post('/users/me/profile-picture', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+
+  removeProfilePicture: () =>
+    api.delete('/users/me/profile-picture'),
 };
