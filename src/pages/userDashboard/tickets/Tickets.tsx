@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // <-- Imported useNavigate
 import './Tickets.scss';
 import { FiChevronLeft } from 'react-icons/fi';
 import { BsPlusLg } from 'react-icons/bs';
@@ -13,11 +14,12 @@ const TICKETS_DATA = [
 ];
 
 const Tickets = () => {
+  const navigate = useNavigate(); // <-- Initialized navigation
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [ticketSubject, setTicketSubject] = useState('');
   const [ticketDescription, setTicketDescription] = useState('');
 
-  // New state to control the chat modal
   const [activeChatTicketId, setActiveChatTicketId] = useState<string | null>(null);
 
   const handleCreateTicket = (e: any) => {
@@ -29,12 +31,21 @@ const Tickets = () => {
     setIsModalOpen(false);
   };
 
+  // Check window size on click, route to page on mobile, modal on desktop
+  const handleTicketClick = (ticketId: string) => {
+    if (window.innerWidth <= 768) {
+      navigate(`/user/ticket/${ticketId}`);
+    } else {
+      setActiveChatTicketId(ticketId);
+    }
+  };
+
   return (
     <div className="user-tickets">
       <div className="user-tickets__blob" />
 
       <div className="user-tickets__list-container">
-        {/* Header */}
+        {/* Header (Hidden on Mobile via SCSS) */}
         <div className="user-tickets__list-container__header">
           <div className="user-tickets__list-container__header__cell">موضوع</div>
           <div className="user-tickets__list-container__header__cell">شماره تیکت</div>
@@ -49,8 +60,7 @@ const Tickets = () => {
             <div
               key={ticket.id}
               className="user-tickets__list-container__body-wrapper__row"
-              // Changed from navigate() to opening the modal
-              onClick={() => setActiveChatTicketId(ticket.id)}
+              onClick={() => handleTicketClick(ticket.id)}
             >
               <div className="user-tickets__list-container__body-wrapper__row__cell">{ticket.subject}</div>
               <div className="user-tickets__list-container__body-wrapper__row__cell">{ticket.id}</div>

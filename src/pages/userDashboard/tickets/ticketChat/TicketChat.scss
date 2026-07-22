@@ -21,16 +21,29 @@
     border: 1px solid color.adjust(light.$color-gray, $alpha: -0.8);
   }
 
+  // Mobile container adjustments
+  @include mx.max-w(768px) {
+    height: calc(100vh - 100px);
+    padding: 16px 14px;
+    border-radius: 18px;
+  }
+
   // --- 1. HEADER STYLES ---
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0px 10px 20px 10px;
-    border-bottom: 1px solid color.adjust(dark.$color-white, $alpha: -0.85); // Added bottom line
+    border-bottom: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
 
     @include mx.light {
       border-bottom-color: color.adjust(light.$color-light-gray, $alpha: -0.5);
+    }
+
+    @include mx.max-w(768px) {
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 0 4px 14px 4px;
     }
 
     > .subject {
@@ -42,12 +55,22 @@
       @include mx.light {
         color: light.$color-black;
       }
+
+      @include mx.max-w(768px) {
+        font-size: 18px;
+        width: 100%;
+        order: 1;
+      }
     }
 
     > .left {
       display: flex;
       flex-direction: column;
       gap: 3px;
+
+      @include mx.max-w(768px) {
+        order: 2;
+      }
 
       > .id {
         font-size: 16px;
@@ -58,6 +81,11 @@
 
         @include mx.light {
           color: light.$color-dark-gray;
+        }
+
+        @include mx.max-w(768px) {
+          font-size: 13px;
+          min-width: auto;
         }
 
         > span {
@@ -78,6 +106,11 @@
 
         @include mx.light {
           color: light.$color-gray;
+        }
+
+        @include mx.max-w(768px) {
+          font-size: 12px;
+          min-width: auto;
         }
       }
     }
@@ -108,6 +141,18 @@
         border-color: color.adjust(light.$color-dark-gray, $alpha: -0.5);
       }
 
+      @include mx.max-w(768px) {
+        order: 3;
+        height: 36px;
+        padding: 0 12px;
+        font-size: 13px;
+        min-width: auto;
+
+        svg {
+          font-size: 16px;
+        }
+      }
+
       &:hover {
         background-color: color.adjust(dark.$color-white, $alpha: -0.92);
         color: dark.$color-white;
@@ -130,7 +175,11 @@
   &__body {
     min-height: 0;
     flex: 1;
-    padding: 20px 0; // Replaces previous gap margins to properly distance from new lines
+    padding: 20px 0;
+
+    @include mx.max-w(768px) {
+      padding: 12px 0;
+    }
 
     &__chat-container {
       display: flex;
@@ -163,26 +212,57 @@
         }
       }
 
+      @include mx.max-w(768px) {
+        gap: 14px;
+        padding-left: 4px;
+        padding-right: 4px;
+      }
+
       &__message {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        max-width: 750px;
-        gap: 2px;
+        align-items: flex-start;
+        max-width: 80%;
+        gap: 4px;
         font-size: 18px;
         font-weight: 700;
 
+        @include mx.max-w(768px) {
+          max-width: 90%;
+        }
+
+        > span {
+          font-size: 14px;
+          font-weight: 600;
+          color: color.adjust(dark.$color-white, $alpha: -0.4);
+
+          @include mx.light {
+            color: light.$color-gray;
+          }
+
+          @include mx.max-w(768px) {
+            font-size: 12px;
+          }
+        }
+
         > p {
-          min-height: 100px;
-          border-radius: 26px;
-          padding: 24px 12px;
-          text-align: center;
-          font-size: 18px;
-          font-weight: 700;
+          border-radius: 20px;
+          padding: 18px 20px;
+          text-align: right;
+          font-size: 16px;
+          font-weight: 500;
+          line-height: 1.7;
           margin: 0;
+
+          @include mx.max-w(768px) {
+            padding: 12px 14px;
+            font-size: 14px;
+            border-radius: 16px;
+          }
         }
 
         &.user {
+          align-self: flex-start;
           > p {
             background-color: color.adjust(
               dark.$color-primary-bg,
@@ -195,8 +275,10 @@
             }
           }
         }
+
         &.admin {
           align-self: flex-end;
+          align-items: flex-end;
           > p {
             background-color: dark.$color-white;
             color: dark.$color-black;
@@ -218,12 +300,16 @@
   // --- 3. FOOTER STYLES ---
   &__footer {
     padding-top: 20px;
-    border-top: 1px solid color.adjust(dark.$color-white, $alpha: -0.85); // Restored top line
+    border-top: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
     display: flex;
     flex-direction: column;
 
     @include mx.light {
       border-top-color: color.adjust(light.$color-light-gray, $alpha: -0.5);
+    }
+
+    @include mx.max-w(768px) {
+      padding-top: 14px;
     }
   }
 
@@ -266,8 +352,15 @@
       @include mx.light {
         background-color: light.$color-card-bg;
         border: 1px solid light.$color-light-gray;
-        color: light.$color-gray;
+        color: light.$color-black;
         scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+      }
+
+      @include mx.max-w(768px) {
+        height: 90px;
+        padding: 12px 14px;
+        font-size: 14px;
+        border-radius: 14px;
       }
 
       &::-webkit-scrollbar {
@@ -298,6 +391,10 @@
       justify-content: flex-end;
       gap: 15px;
 
+      @include mx.max-w(768px) {
+        gap: 10px;
+      }
+
       > button {
         height: 45px;
         width: 130px;
@@ -306,6 +403,15 @@
         font-weight: 700;
         cursor: pointer;
         transition: background-color 200ms ease;
+        border: none;
+
+        @include mx.max-w(768px) {
+          flex: 1;
+          width: auto;
+          height: 40px;
+          font-size: 14px;
+          border-radius: 10px;
+        }
 
         &.send-btn {
           background-color: dark.$color-white;
@@ -356,6 +462,11 @@
       opacity 250ms ease,
       margin 300ms ease;
 
+    @include mx.max-w(768px) {
+      gap: 10px;
+      width: 100%;
+    }
+
     &.is-hidden {
       max-height: 0;
       opacity: 0;
@@ -378,7 +489,16 @@
         background-color: light.$color-primary-bg;
         color: light.$color-white;
       }
+
+      @include mx.max-w(768px) {
+        flex: 1;
+        width: 100%;
+        height: 44px;
+        font-size: 15px;
+        border-radius: 12px;
+      }
     }
+
     &__answer {
       &:hover {
         background-color: color.adjust(dark.$color-white, $alpha: -0.5);
@@ -387,6 +507,7 @@
         }
       }
     }
+
     &__close {
       &:hover {
         background-color: color.adjust(dark.$color-red, $alpha: -0.3);

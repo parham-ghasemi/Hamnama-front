@@ -1,6 +1,6 @@
-@use "../../../styles//abstracts//variables" as dark;
+@use "../../../styles/abstracts/variables" as dark;
 @use "../../../styles/abstracts/variables.light" as light;
-@use "../../../styles//abstracts//mixins" as mx;
+@use "../../../styles/abstracts/mixins" as mx;
 @use "sass:color";
 
 .user-tickets {
@@ -28,6 +28,11 @@
 
       @include mx.light {
         background-color: light.$color-primary-bg;
+      }
+
+      // Hide the table-style header on mobile
+      @include mx.max-w(768px) {
+        display: none;
       }
 
       &__cell {
@@ -80,6 +85,16 @@
           }
         }
 
+        // Stack into cards on mobile
+        @include mx.max-w(768px) {
+          flex-direction: column;
+          align-items: flex-start;
+          height: auto;
+          padding: 20px;
+          gap: 12px;
+          position: relative;
+        }
+
         &__cell {
           @include mx.flex-center;
 
@@ -88,25 +103,76 @@
           font-size: 18px;
           font-weight: 700;
 
+          // Responsive Cell styles
+          @include mx.max-w(768px) {
+            width: 100%;
+            justify-content: flex-start;
+            font-size: 15px;
+
+            // Add labels for mobile view
+            &::before {
+              color: color.adjust(dark.$color-white, $alpha: -0.4);
+              margin-left: 8px;
+              font-size: 14px;
+              display: none; // Hidden by default, shown per-cell below
+
+              @include mx.light {
+                color: light.$color-gray;
+              }
+            }
+          }
+
+          // Specific cell handling for mobile
+          &:nth-child(1) {
+            // Subject
+            @include mx.max-w(768px) {
+              font-size: 18px;
+              font-weight: 900;
+              margin-bottom: 5px;
+            }
+          }
+          &:nth-child(2) {
+            // ID
+            @include mx.max-w(768px) {
+              &::before {
+                content: "شماره تیکت:";
+                display: inline-block;
+              }
+            }
+          }
+          &:nth-child(3) {
+            // Status
+            @include mx.max-w(768px) {
+              &::before {
+                content: "وضعیت:";
+                display: inline-block;
+              }
+            }
+          }
+          &:nth-child(4) {
+            // Date
+            @include mx.max-w(768px) {
+              &::before {
+                content: "تاریخ:";
+                display: inline-block;
+              }
+            }
+          }
+
           &.green {
             color: dark.$color-green;
-
             @include mx.light {
               color: light.$color-green;
             }
           }
-
           &.yellow {
             color: dark.$color-yellow;
-
             @include mx.light {
               color: light.$color-yellow;
             }
           }
-
           &.red {
             color: dark.$color-red;
-
             @include mx.light {
               color: light.$color-red;
             }
@@ -115,6 +181,15 @@
           &.icon {
             width: 40px;
             font-size: 40px;
+
+            @include mx.max-w(768px) {
+              position: absolute;
+              left: 15px;
+              top: 50%;
+              transform: translateY(-50%);
+              width: auto;
+              font-size: 30px;
+            }
           }
         }
       }
@@ -133,10 +208,19 @@
     font-size: 18px;
     font-weight: 700;
     transition: background-color 200ms ease;
+    border: none;
+    outline: none;
+    cursor: pointer;
 
     @include mx.light {
       background-color: light.$color-primary-bg;
       color: light.$color-white;
+    }
+
+    // Full width on mobile
+    @include mx.max-w(768px) {
+      width: calc(100% - 40px); // accounting for screen padding
+      font-size: 16px;
     }
 
     > span {
@@ -163,10 +247,6 @@
         background-color: light.$color-primary-bg-hover;
       }
     }
-
-    border: none;
-    outline: none;
-    cursor: pointer;
   }
 
   &__modal-overlay {
@@ -221,7 +301,13 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
     }
 
+    // Slight padding reduction on mobile
+    @include mx.max-w(768px) {
+      padding: 24px;
+    }
+
     &__header {
+      // (Rest remains identical to your code)
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -265,6 +351,7 @@
     }
 
     &__form {
+      // (Rest remains identical to your code)
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -314,7 +401,6 @@
         > textarea {
           height: 140px;
           resize: none;
-
           scrollbar-width: thin;
           scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 
