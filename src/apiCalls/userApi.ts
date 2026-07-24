@@ -16,10 +16,8 @@ export const userApi = {
     api.patch('/users/me/phone', { phone, code }),
 
   // --- Profile Picture Endpoints --- //
-
   uploadProfilePicture: (file: File) => {
     const formData = new FormData();
-    // Note: 'file' is the standard field name, but change it if your Go backend expects something else (e.g. 'image' or 'profile_picture')
     formData.append('file', file);
 
     return api.post('/users/me/profile-picture', formData, {
@@ -31,4 +29,23 @@ export const userApi = {
 
   removeProfilePicture: () =>
     api.delete('/users/me/profile-picture'),
+
+  // --- Ticket Endpoints --- //
+  createTicket: (data: { subject: string; message: string }) =>
+    api.post('/tickets', data),
+
+  getTickets: () =>
+    api.get('/tickets'),
+
+  getTicket: (id: string) =>
+    api.get(`/tickets/${id}`),
+
+  sendTicketMessage: (id: string, message: string) =>
+    api.post(`/tickets/${id}/messages`, { message }),
+
+  closeTicket: (id: string) =>
+    api.post(`/tickets/${id}/close`),
+
+  reopenTicket: (id: string) =>
+    api.post(`/tickets/${id}/reopen`),
 };
