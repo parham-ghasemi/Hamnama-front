@@ -18,6 +18,7 @@ import Join from "./pages/room/join/Join";
 import { ThemeProvider } from "./context/ThemeContext";
 import PlanUsers from "./pages/userDashboard/planUsers/PlanUsers";
 import { AuthProvider } from "./context/AuthContext";
+import RoomPage from "./pages/room/roomPage/RoomPage";
 
 
 const queryClient = new QueryClient({});
@@ -53,6 +54,8 @@ function App() {
                   <Route path="/plan-details" element={<PlanDetails />} />
                   <Route path="*" element={<p className="text-6xl font-black text-center my-60">THIS PAGE WAS NOT FOUND!</p>} />
                 </Route>
+
+                <Route path="/room/:id" element={<RoomPage />} />
 
               </Routes>
             </BrowserRouter>
