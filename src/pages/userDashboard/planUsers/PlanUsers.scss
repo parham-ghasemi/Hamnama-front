@@ -1,4 +1,235 @@
-@use "../../../styles//abstracts//variables" as dark;
+@use "../../../styles/abstracts/variables" as dark;
 @use "../../../styles/abstracts/variables.light" as light;
-@use "../../../styles//abstracts//mixins" as mx;
+@use "../../../styles/abstracts/mixins" as mx;
 @use "sass:color";
+
+.plan-users {
+  @include mx.flex-center;
+  min-height: 100%;
+  width: 100%;
+  padding: 24px 16px;
+
+  &__cards {
+    @include mx.flex-center;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 689px;
+    gap: 32px;
+
+    @include mx.max-w(768px) {
+      gap: 20px;
+    }
+
+    @include mx.max-w(480px) {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+    }
+
+    &__card {
+      border-radius: 17px;
+      background-color: color.adjust(dark.$color-light-gray, $alpha: -0.94);
+      height: 271px;
+      width: 196px;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition:
+        transform ease 200ms,
+        box-shadow ease 200ms;
+
+      @include mx.light {
+        background-color: light.$color-card-bg;
+        outline: light.$card-outline;
+        box-shadow: 0 3px 6px 0 color.adjust(light.$color-black, $alpha: -0.92);
+      }
+
+      // Responsive adjustments for mobile devices
+      @include mx.max-w(480px) {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 16px;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      &__user-info {
+        @include mx.flex-center;
+        flex-direction: column;
+        gap: 12px;
+
+        @include mx.max-w(480px) {
+          flex-direction: row;
+          gap: 12px;
+        }
+
+        > img {
+          height: 60px;
+          width: 60px;
+          border-radius: 100%;
+          object-fit: cover;
+
+          @include mx.max-w(480px) {
+            height: 48px;
+            width: 48px;
+          }
+        }
+
+        > p {
+          font-size: 28px;
+          font-weight: 800;
+          height: 60px;
+          width: 60px;
+          background-color: dark.$color-light-gray;
+          color: dark.$color-dark-gray;
+          border-radius: 100%;
+          @include mx.flex-center;
+
+          @include mx.light {
+            background-color: color.adjust(light.$color-gray, $alpha: -0.85);
+            color: light.$color-black;
+          }
+
+          @include mx.max-w(480px) {
+            height: 48px;
+            width: 48px;
+            font-size: 22px;
+          }
+        }
+
+        > span {
+          font-size: 16px;
+          font-weight: 700;
+
+          @include mx.light {
+            color: light.$color-black;
+          }
+
+          @include mx.max-w(480px) {
+            font-size: 15px;
+          }
+        }
+      }
+
+      &__since {
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        padding: 12px 0;
+        flex: 1;
+
+        @include mx.light {
+          color: light.$color-gray;
+        }
+
+        @include mx.max-w(480px) {
+          padding: 0;
+          text-align: right;
+          font-size: 11px;
+        }
+      }
+
+      &__kick {
+        background-color: color.adjust(#ce1d1d, $alpha: -0.52);
+        border-radius: 6px;
+        padding: 8px 12px;
+        width: 111px;
+        font-size: 11px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: background-color ease 200ms;
+
+        @include mx.light {
+          background-color: color.adjust(#ce1d1d, $alpha: -0.82);
+          color: #be1212;
+        }
+
+        &:hover {
+          background-color: color.adjust(#ce1d1d, $alpha: -0.32);
+
+          @include mx.light {
+            background-color: color.adjust(#ce1d1d, $alpha: -0.72);
+          }
+        }
+
+        @include mx.max-w(480px) {
+          width: auto;
+          white-space: nowrap;
+        }
+      }
+
+      &__add-icon {
+        height: 61px;
+        width: 61px;
+        background-color: color.adjust(#611168, $alpha: -0.7);
+        border-radius: 100%;
+        @include mx.flex-center;
+        font-size: 28px;
+        transition:
+          background-color ease 200ms,
+          transform ease 200ms;
+
+        @include mx.light {
+          background-color: color.adjust(light.$color-primary, $alpha: -0.85);
+          color: light.$color-primary;
+        }
+
+        @include mx.max-w(480px) {
+          height: 42px;
+          width: 42px;
+          font-size: 20px;
+        }
+      }
+
+      &__add-text {
+        font-size: 14px;
+        font-weight: 700;
+        margin-top: 24px;
+
+        @include mx.light {
+          color: light.$color-black;
+        }
+
+        @include mx.max-w(480px) {
+          margin-top: 0;
+        }
+      }
+
+      &--add {
+        transition: background-color ease 200ms;
+        cursor: pointer;
+
+        @include mx.max-w(480px) {
+          justify-content: center;
+          gap: 12px;
+          min-height: 68px;
+        }
+
+        &:hover {
+          background-color: color.adjust(dark.$color-light-gray, $alpha: -0.9);
+
+          @include mx.light {
+            background-color: rgba(0, 0, 0, 0.03);
+          }
+
+          .plan-users__cards__card__add-icon {
+            transform: scale(1.08);
+            background-color: color.adjust(#611168, $alpha: -0.6);
+
+            @include mx.light {
+              background-color: color.adjust(
+                light.$color-primary,
+                $alpha: -0.75
+              );
+            }
+          }
+        }
+      }
+    }
+  }
+}
