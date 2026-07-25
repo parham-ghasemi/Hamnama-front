@@ -30,6 +30,10 @@ export const userApi = {
   removeProfilePicture: () =>
     api.delete('/users/me/profile-picture'),
 
+  // --- Watch History Endpoints --- //
+  getWatchHistory: () => api.get("/users/me/watch-stats"),
+
+
   // --- Ticket Endpoints --- //
   createTicket: (data: { subject: string; message: string }) =>
     api.post('/tickets', data),
