@@ -9,12 +9,16 @@ import { useState } from 'react';
 import SettingsModal from './settingsModal/SettingsModal';
 import UsersModal from './usersModal/UsersModal';
 import MediaTypeModal from './mediaTypeModal/MediaTypeModal';
+import ArchiveModal from './archiveModal/ArchiveModal';
+import VideoPlayer from './videoPlayer.tsx/VideoPlayer';
 
 const RoomPage = () => {
   const [settingsModalOpen, setSettingsModalOpen] = useState<boolean>(false)
   const [usersModalOpen, setUsersModalOpen] = useState<boolean>(false)
   const [mediaTypeModalOpen, setMediaTypeModalOpen] = useState<boolean>(false)
   const [archiveModalOpen, setArchiveModalOpen] = useState<boolean>(false)
+  const [currentQuality, setCurrentQuality] = useState('1080')
+  const [link, setLink] = useState("")
 
   const currentUserId = 1;
   const messageBlocks = [
@@ -94,6 +98,7 @@ const RoomPage = () => {
     setSettingsModalOpen(false)
     setUsersModalOpen(false)
     setMediaTypeModalOpen(false)
+    setArchiveModalOpen(false)
   }
 
   return (
@@ -138,11 +143,13 @@ const RoomPage = () => {
       <div className='room-page__main'>
         <div className='room-page__main__top'>
           <button className='room-page__main__top__submit'>ثبت</button>
-          <input type="text" placeholder='لینک مورد نظر را وارد کنید .' dir='ltr' />
+          <input type="text" placeholder='لینک مورد نظر را وارد کنید .' dir='ltr' onChange={(e) => setLink(e.target.value)} value={link} />
           <button className='room-page__main__top__choose' onClick={() => setMediaTypeModalOpen(true)}>انتخاب حالت پخش</button>
         </div>
 
-        <div className='room-page__main__player'></div>
+        <div className='room-page__main__player'>
+          <VideoPlayer src={link} quality={currentQuality} />
+        </div>
       </div>
 
       <div className='room-page__chat-container'>
@@ -190,7 +197,7 @@ const RoomPage = () => {
 
 
       {/* MODAL */}
-      <div className={clsx("room-page__modal-overlay", settingsModalOpen || usersModalOpen || mediaTypeModalOpen ? "is-active" : "")} onClick={closeModals}>
+      <div className={clsx("room-page__modal-overlay", settingsModalOpen || usersModalOpen || mediaTypeModalOpen || archiveModalOpen ? "is-active" : "")} onClick={closeModals}>
         <div className="room-page__modal-overlay__modal" onClick={(e) => e.stopPropagation()}>
           <SettingsModal isOpen={settingsModalOpen} />
         </div>
@@ -201,6 +208,10 @@ const RoomPage = () => {
 
         <div className="room-page__modal-overlay__modal" onClick={(e) => e.stopPropagation()}>
           <MediaTypeModal isOpen={mediaTypeModalOpen} closeModal={() => setMediaTypeModalOpen(false)} openArchive={() => setArchiveModalOpen(true)} />
+        </div>
+
+        <div className="room-page__modal-overlay__modal" onClick={(e) => e.stopPropagation()}>
+          <ArchiveModal isOpen={archiveModalOpen} closeModal={() => setArchiveModalOpen(false)} setLink={setLink} setQuality={setCurrentQuality} />
         </div>
       </div>
     </div>
