@@ -1,0 +1,103 @@
+@use "../../../../styles//abstracts//variables" as dark;
+@use "../../../../styles/abstracts/variables.light" as light;
+@use "../../../../styles//abstracts//mixins" as mx;
+@use "sass:color";
+
+.media-type-modal {
+  width: 1045px;
+  border-radius: 26px;
+  background-color: rgba(46, 22, 76, 0.08);
+  opacity: 0;
+  transition: opacity ease 200ms;
+  overflow: hidden;
+  &.open {
+    opacity: 1;
+  }
+
+  &__head {
+    width: 100%;
+    height: 162px;
+    background-color: #400456;
+    @include mx.flex-center;
+    gap: 9px;
+
+    > span {
+      font-size: 31px;
+      font-weight: 800;
+    }
+
+    > svg {
+      font-size: 49px;
+    }
+  }
+
+  &__body {
+    padding: 62px 27px;
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #1e1b219d;
+    gap: 58px 88px;
+    align-items: center;
+    justify-content: center;
+
+    &__card {
+      background-color: rgba($color: #595959, $alpha: 0.27);
+      border-radius: 26px;
+      height: 222px;
+      width: 285px;
+      box-shadow: 0 4px 4px 0 color.adjust(#000000, $alpha: -0.6);
+      @include mx.flex-center;
+      flex-direction: column;
+      gap: 17px;
+      cursor: pointer;
+      transition:
+        transform 300ms ease,
+        box-shadow 300ms ease;
+
+      &:hover {
+        transform: translateY(4px);
+        box-shadow: none;
+
+        > span {
+          transform: translateY(4px);
+          box-shadow: none;
+        }
+      }
+
+      &:first-of-type {
+        > span {
+          background: linear-gradient(135deg, #002879 -10%, #00ffff 100%);
+        }
+      }
+      &:nth-of-type(2) {
+        > span {
+          background: linear-gradient(135deg, #c800ff -10%, #832493 100%);
+        }
+      }
+      &:last-of-type {
+        > span {
+          background: linear-gradient(135deg, #00fffb -20%, #ff00ff 100%);
+        }
+      }
+
+      > span {
+        height: 99px;
+        width: 125px;
+        border-radius: 17px;
+        box-shadow: 0 4px 4px 0 color.adjust(#000000, $alpha: -0.6);
+        @include mx.flex-center;
+        transition:
+          transform 250ms ease,
+          box-shadow 250ms ease;
+        > svg {
+          color: white;
+          font-size: 99px;
+        }
+      }
+      > p {
+        font-size: 28px;
+        font-weight: 700;
+      }
+    }
+  }
+}

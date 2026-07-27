@@ -1,19 +1,22 @@
 import { AiTwotoneSetting } from 'react-icons/ai';
 import './RoomPage.scss';
-import { BsFillShareFill, BsMicFill } from 'react-icons/bs';
+import { BsFillPeopleFill, BsFillShareFill, BsMicFill } from 'react-icons/bs';
 import { IoChatbubblesSharp, IoExitOutline } from 'react-icons/io5';
 import { FaArrowRight } from "react-icons/fa6";
 import { TbSticker } from "react-icons/tb";
-
-
 import clsx from 'clsx';
 import { useState } from 'react';
+import SettingsModal from './settingsModal/SettingsModal';
+import UsersModal from './usersModal/UsersModal';
+import MediaTypeModal from './mediaTypeModal/MediaTypeModal';
 
 const RoomPage = () => {
   const [settingsModalOpen, setSettingsModalOpen] = useState<boolean>(false)
+  const [usersModalOpen, setUsersModalOpen] = useState<boolean>(false)
+  const [mediaTypeModalOpen, setMediaTypeModalOpen] = useState<boolean>(false)
+  const [archiveModalOpen, setArchiveModalOpen] = useState<boolean>(false)
 
   const currentUserId = 1;
-
   const messageBlocks = [
     {
       from: {
@@ -56,6 +59,42 @@ const RoomPage = () => {
       ]
     },
   ]
+  interface User {
+    id: number,
+    pfp: string,
+    name: string,
+    connectionStatus: "good" | "medium" | "bad",
+    isRoomAdmin: boolean
+  }
+  const users = [
+    {
+      id: 1,
+      pfp: "/rodeocover.png",
+      name: "mamad",
+      connectionStatus: "good",
+      isRoomAdmin: true
+    },
+    {
+      id: 2,
+      pfp: "/rodeocover.png",
+      name: "mamad",
+      connectionStatus: "medium",
+      isRoomAdmin: true
+    },
+    {
+      id: 2,
+      pfp: "/rodeocover.png",
+      name: "mamad",
+      connectionStatus: "bad",
+      isRoomAdmin: false
+    },
+  ] as User[]
+
+  const closeModals = () => {
+    setSettingsModalOpen(false)
+    setUsersModalOpen(false)
+    setMediaTypeModalOpen(false)
+  }
 
   return (
     <div className='room-page'>
@@ -72,6 +111,13 @@ const RoomPage = () => {
             <BsMicFill />
           </button>
           <span>میکروفون</span>
+        </div>
+
+        <div className='room-page__side-bar__item'>
+          <button className='room-page__side-bar__microphone' onClick={() => setUsersModalOpen(true)}>
+            <BsFillPeopleFill />
+          </button>
+          <span>کاربران</span>
         </div>
 
         <div className='room-page__side-bar__item'>
@@ -93,7 +139,7 @@ const RoomPage = () => {
         <div className='room-page__main__top'>
           <button className='room-page__main__top__submit'>ثبت</button>
           <input type="text" placeholder='لینک مورد نظر را وارد کنید .' dir='ltr' />
-          <button className='room-page__main__top__choose'>حالت پخش</button>
+          <button className='room-page__main__top__choose' onClick={() => setMediaTypeModalOpen(true)}>انتخاب حالت پخش</button>
         </div>
 
         <div className='room-page__main__player'></div>
@@ -144,16 +190,19 @@ const RoomPage = () => {
 
 
       {/* MODAL */}
-      {/* <div className={clsx("room-page__modal-overlay", settingsModalOpen && "is-active")}>
-        <div className="room-page__modal-overlay__modal">
-          <div className="room-page__modal-overlay__modal__head">
-            <span>تنظیمات</span>
-            <AiTwotoneSetting />
-          </div>
-
-
+      <div className={clsx("room-page__modal-overlay", settingsModalOpen || usersModalOpen || mediaTypeModalOpen ? "is-active" : "")} onClick={closeModals}>
+        <div className="room-page__modal-overlay__modal" onClick={(e) => e.stopPropagation()}>
+          <SettingsModal isOpen={settingsModalOpen} />
         </div>
-      </div> */}
+
+        <div className="room-page__modal-overlay__modal" onClick={(e) => e.stopPropagation()}>
+          <UsersModal isOpen={usersModalOpen} users={users} />
+        </div>
+
+        <div className="room-page__modal-overlay__modal" onClick={(e) => e.stopPropagation()}>
+          <MediaTypeModal isOpen={mediaTypeModalOpen} closeModal={() => setMediaTypeModalOpen(false)} openArchive={() => setArchiveModalOpen(true)} />
+        </div>
+      </div>
     </div>
   )
 }

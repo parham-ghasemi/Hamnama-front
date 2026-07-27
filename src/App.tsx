@@ -59,7 +59,7 @@ function App() {
 
               </Routes>
             </BrowserRouter>
-            <ReactQueryDevtools buttonPosition="bottom-right" position="bottom" />
+            {/* <ReactQueryDevtools buttonPosition="bottom-right" position="bottom" /> */}
           </QueryClientProvider>
         </div>
       </AuthProvider>

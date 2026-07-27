@@ -1,0 +1,249 @@
+@use "../../../../styles//abstracts//variables" as dark;
+@use "../../../../styles/abstracts/variables.light" as light;
+@use "../../../../styles//abstracts//mixins" as mx;
+@use "sass:color";
+
+.room-users-modal {
+  width: 1300px;
+  border-radius: 26px;
+  background-color: rgba(46, 22, 76, 0.08);
+  opacity: 0;
+  transition: opacity ease 200ms;
+  overflow: hidden;
+  &.open {
+    opacity: 1;
+  }
+
+  &__head {
+    width: 100%;
+    height: 162px;
+    background-color: #381538;
+    @include mx.flex-center;
+    gap: 9px;
+
+    > span {
+      font-size: 31px;
+      font-weight: 800;
+    }
+
+    > svg {
+      font-size: 49px;
+    }
+  }
+
+  &__body {
+    padding: 71px 108px;
+    @include mx.flex-center;
+    gap: 93px;
+    background-color: #1e1b219d;
+
+    &__card {
+      background-color: color.adjust(dark.$color-light-gray, $alpha: -0.94);
+      border-radius: 17px;
+      min-height: 271px;
+      width: 201px;
+      padding: 17px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+
+      &__profile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+
+        > img {
+          height: 71px;
+          width: 71px;
+          border-radius: 100%;
+        }
+        > p {
+          font-size: 18px;
+          font-weight: 800;
+        }
+      }
+
+      &__body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        gap: 7px;
+
+        &__role {
+          cursor: pointer;
+
+          &.open {
+            .room-users-modal__body__card__body__role__trigger {
+              border-radius: 7px 7px 0 0;
+              > span {
+                border-radius: 7px 7px 0 0;
+              }
+            }
+            .room-users-modal__body__card__body__role__drop-down {
+              opacity: 1 !important;
+              transform: translateY(0);
+
+              &:hover {
+                opacity: 0.9;
+              }
+            }
+          }
+
+          &__trigger {
+            display: flex;
+            border-radius: 7px;
+            width: 120px;
+            height: 26px;
+            align-items: center;
+            justify-content: space-between;
+            padding-left: 6px;
+            background-color: dark.$color-dark-gray;
+            transition:
+              opacity 200ms ease,
+              border-radius 200ms ease;
+
+            &.current {
+              background-color: rgba(91, 38, 91, 0.25);
+              > svg {
+                opacity: 0;
+              }
+
+              & ~ .room-users-modal__body__card__body__role__drop-down {
+                opacity: 0;
+              }
+            }
+
+            &:hover {
+              opacity: 0.9;
+            }
+
+            > span {
+              background-color: #371527;
+              border-radius: 7px;
+              height: 26px;
+              width: 26px;
+              @include mx.flex-center;
+              > svg {
+                font-size: 17px;
+              }
+            }
+            > p {
+              font-size: 11px;
+              font-weight: 600;
+              width: 74px;
+              text-align: center;
+            }
+            > svg {
+              width: 10px;
+            }
+          }
+
+          &__drop-down {
+            display: flex;
+            border-radius: 0 0 7px 7px;
+            width: 120px;
+            align-items: center;
+            justify-content: space-between;
+            padding-left: 6px;
+            background-color: dark.$color-dark-gray;
+            transition:
+              opacity 200ms ease,
+              transform 200ms ease;
+            opacity: 0;
+            transform: translateY(-10px);
+
+            > span {
+              background-color: #371527;
+              border-radius: 0 0 7px 7px;
+              height: 26px;
+              width: 26px;
+              @include mx.flex-center;
+              > svg {
+                font-size: 17px;
+              }
+            }
+            > p {
+              font-size: 11px;
+              font-weight: 600;
+              width: 74px;
+              text-align: center;
+            }
+          }
+        }
+
+        &__connection {
+          width: 119px;
+          height: 26px;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          border-radius: 7px;
+
+          > span {
+            height: 26px;
+            width: 26px;
+            border-radius: 7px;
+            @include mx.flex-center;
+            > svg {
+              font-size: 18px;
+            }
+          }
+          > p {
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            width: calc(100% - 26px);
+          }
+
+          &.good {
+            background-color: rgba(0, 255, 55, 0.1);
+            > span {
+              background-color: #00850b;
+            }
+          }
+          &.medium {
+            background-color: rgba(255, 213, 0, 0.1);
+            > span {
+              background-color: #c2a200;
+            }
+          }
+          &.bad {
+            background-color: rgba(255, 0, 0, 0.2);
+            > span {
+              background-color: #8d0000;
+            }
+          }
+        }
+      }
+
+      &__foot {
+        height: 25px;
+        width: 95px;
+        border-radius: 5px;
+        @include mx.flex-center;
+        font-size: 12px;
+        font-weight: 600;
+        background-color: #982f2f;
+        cursor: pointer;
+        transition: opacity 200ms ease;
+
+        &:hover {
+          opacity: 0.9;
+        }
+
+        &.current {
+          font-size: 14px;
+          background-color: color.adjust(dark.$color-white, $alpha: -0.9);
+          cursor: default;
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+}

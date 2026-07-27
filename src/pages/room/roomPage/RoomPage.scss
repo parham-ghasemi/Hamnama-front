@@ -235,6 +235,10 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
       }
       > button {
         cursor: pointer;
+        transition: opacity 200ms ease;
+        &:hover {
+          opacity: 0.8;
+        }
       }
 
       &__submit {
@@ -258,7 +262,7 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
         height: 55px;
         width: 130px;
         border-radius: 8px;
-        font-size: 19px;
+        font-size: 14px;
         font-weight: 700;
       }
     }
@@ -279,6 +283,7 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
     align-items: center;
     flex-direction: column;
     gap: 23px;
+    border-radius: 26px;
 
     &__item {
       display: flex;
@@ -337,11 +342,13 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
     &.is-active {
       opacity: 1;
       pointer-events: all;
+    }
 
-      .user-tickets__modal-content {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-      }
+    &__modal {
+      position: absolute;
+      top: 50%;
+      right: 50%;
+      transform: translate(50%, -50%);
     }
   }
 }
