@@ -3,8 +3,11 @@ import Header from '../../../components/header/Header';
 import './Join.scss';
 import Sidebar from './sidebar/Sidebar';
 import { IoCopyOutline } from 'react-icons/io5';
+import CreateRoomModal from './createRoomModal/CreateRoomModal';
+import { useState } from 'react';
 
 const Join = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div className='join-page'>
       <Header />
@@ -43,13 +46,18 @@ const Join = () => {
               <button className="join-page__content__main__cards__card__enter">پیوستن</button>
             </div>
 
-            <div className="join-page__content__main__cards__card--create">
+            <div className="join-page__content__main__cards__card--create" onClick={() => setIsModalOpen(true)}>
               <p>ساخت اتاق شخصی</p>
               <span><BsPlusLg strokeWidth={1} /></span>
             </div>
           </div>
         </div>
       </div>
+
+      <CreateRoomModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   )
 }

@@ -1,0 +1,229 @@
+@use "../../../../styles/abstracts/variables" as dark;
+@use "../../../../styles/abstracts/variables.light" as light;
+@use "../../../../styles/abstracts/mixins" as mx;
+@use "sass:color";
+
+.create-room-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms ease;
+
+  @include mx.light {
+    background-color: rgba(255, 255, 255, 0.6);
+  }
+
+  &.is-active {
+    opacity: 1;
+    pointer-events: all;
+
+    .create-room-modal {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+.create-room-modal {
+  width: 500px;
+  max-width: 95%;
+  display: flex;
+  flex-direction: column;
+
+  border: 1px solid color.adjust(dark.$color-white, $alpha: -0.9);
+  border-radius: 26px;
+  padding: 24px 26px;
+  background-color: color.adjust(dark.$color-dark-gray, $alpha: -0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+  transform: scale(0.9) translateY(20px);
+  opacity: 0;
+  transition:
+    transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 300ms ease;
+
+  @include mx.light {
+    background-color: light.$color-card-bg;
+    border: 1px solid color.adjust(light.$color-gray, $alpha: -0.8);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    border-bottom: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
+
+    @include mx.light {
+      border-bottom-color: color.adjust(light.$color-light-gray, $alpha: -0.5);
+    }
+
+    h3 {
+      font-size: 22px;
+      font-weight: 700;
+      color: dark.$color-white;
+      margin: 0;
+
+      @include mx.light {
+        color: light.$color-black;
+      }
+    }
+
+    button {
+      background: transparent;
+      border: none;
+      color: color.adjust(dark.$color-white, $alpha: -0.4);
+      font-size: 24px;
+      cursor: pointer;
+      transition: color 200ms ease;
+
+      @include mx.light {
+        color: light.$color-gray;
+      }
+
+      &:hover {
+        color: dark.$color-white;
+        @include mx.light {
+          color: light.$color-black;
+        }
+      }
+    }
+  }
+
+  &__body {
+    padding: 24px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      label {
+        font-size: 16px;
+        font-weight: 700;
+        color: dark.$color-white;
+
+        @include mx.light {
+          color: light.$color-black;
+        }
+      }
+
+      .toggle-group {
+        display: flex;
+        gap: 12px;
+        background-color: color.adjust(dark.$color-white, $alpha: -0.95);
+        padding: 6px;
+        border-radius: 12px;
+
+        @include mx.light {
+          background-color: light.$color-light-gray;
+        }
+
+        button {
+          flex: 1;
+          padding: 12px;
+          border-radius: 8px;
+          border: none;
+          background: transparent;
+          color: color.adjust(dark.$color-white, $alpha: -0.4);
+          font-weight: 700;
+          font-size: 15px;
+          cursor: pointer;
+          transition: all 200ms ease;
+
+          @include mx.light {
+            color: light.$color-gray;
+          }
+
+          &.active {
+            background-color: color.adjust(
+              dark.$color-light-gray,
+              $alpha: -0.7
+            );
+            color: dark.$color-white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+            @include mx.light {
+              background-color: light.$color-white;
+              color: light.$color-black;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
+
+    @include mx.light {
+      border-top-color: color.adjust(light.$color-light-gray, $alpha: -0.5);
+    }
+
+    button {
+      height: 45px;
+      padding: 0 24px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 200ms ease;
+
+      &.cancel-btn {
+        background-color: transparent;
+        color: dark.$color-white;
+        border: 1px solid color.adjust(dark.$color-white, $alpha: -0.6);
+
+        @include mx.light {
+          color: light.$color-primary;
+          border-color: light.$color-light-gray;
+        }
+
+        &:hover {
+          background-color: color.adjust(dark.$color-red, $alpha: -0.8);
+        }
+      }
+
+      &.create-btn {
+        background-color: dark.$color-white;
+        color: dark.$color-black;
+        border: none;
+
+        @include mx.light {
+          background-color: light.$color-primary-bg;
+          color: light.$color-white;
+        }
+
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(255, 255, 255, 0.1);
+
+          @include mx.light {
+            box-shadow: 0 6px 16px rgba(light.$color-primary-bg, 0.3);
+          }
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}

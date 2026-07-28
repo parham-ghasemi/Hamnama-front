@@ -328,7 +328,7 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
     height: 100vh;
     background-color: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(8px);
-    z-index: 999;
+    z-index: 500;
     @include mx.flex-center;
 
     opacity: 0;
@@ -342,6 +342,9 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
     &.is-active {
       opacity: 1;
       pointer-events: all;
+      .room-page__modal-overlay__modal {
+        z-index: 9999;
+      }
     }
 
     &__modal {

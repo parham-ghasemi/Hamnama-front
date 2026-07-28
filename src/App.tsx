@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/home/Home"
 import ScrollToTop from "./components/ScrollToTop";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import DesktopLayout from "./layouts/mainLayout/MainLayout";
 import Auth from "./pages/Auth/Auth";
 import PlanDetails from "./pages/planDetails/PlanDetails";
@@ -19,6 +18,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import PlanUsers from "./pages/userDashboard/planUsers/PlanUsers";
 import { AuthProvider } from "./context/AuthContext";
 import RoomPage from "./pages/room/roomPage/RoomPage";
+import { RoomProvider } from "./context/RoomContext";
 
 
 const queryClient = new QueryClient({});
@@ -36,7 +36,6 @@ function App() {
               <Toaster position="top-right" />
               <Routes>
 
-                <Route path="join-room" element={<Join />} />
 
                 <Route path="user" element={<UserDashboardLayout />}>
                   <Route index element={<Navigate to={"info"} replace />} />
@@ -55,6 +54,7 @@ function App() {
                   <Route path="*" element={<p className="text-6xl font-black text-center my-60">THIS PAGE WAS NOT FOUND!</p>} />
                 </Route>
 
+                <Route path="join-room" element={<Join />} />
                 <Route path="/room/:id" element={<RoomPage />} />
 
               </Routes>

@@ -1,12 +1,26 @@
-import clsx from 'clsx'
-import './SettingsModal.scss'
-import { AiTwotoneSetting, AiTwotoneThunderbolt } from 'react-icons/ai'
-import { IoLockClosed, IoLockOpen, IoSunnySharp } from 'react-icons/io5'
-import { BsMoonFill } from 'react-icons/bs'
+import clsx from "clsx";
+import "./SettingsModal.scss";
+import { AiTwotoneSetting, AiTwotoneThunderbolt } from "react-icons/ai";
+import { IoLockClosed, IoLockOpen, IoSunnySharp } from "react-icons/io5";
+import { BsMoonFill } from "react-icons/bs";
 
-const SettingsModal = ({ isOpen }: { isOpen: boolean }) => {
+const SettingsModal = ({
+  isOpen,
+  isPublic,
+  mediaControlPermission,
+  playbackTime,
+  currentlyPlaying,
+  createdAt,
+}: {
+  isOpen: boolean;
+  isPublic: boolean;
+  mediaControlPermission: "admin" | "everyone";
+  playbackTime: number;
+  currentlyPlaying?: string | null;
+  createdAt: string;
+}) => {
   return (
-    <div className={clsx('room-settings-modal', isOpen && "open")}>
+    <div className={clsx("room-settings-modal", isOpen && "open")}>
       <div className="room-settings-modal__head">
         <span>تنظیمات</span>
         <AiTwotoneSetting />
@@ -16,11 +30,11 @@ const SettingsModal = ({ isOpen }: { isOpen: boolean }) => {
         <div className="room-settings-modal__body__row">
           <h5>وضعیت اتاق</h5>
           <div className="room-settings-modal__body__row__items room-settings-modal__body__row__items--2">
-            <div className="room-settings-modal__body__row__items__item">
+            <div className={clsx("room-settings-modal__body__row__items__item", !isPublic && "active")}>
               <IoLockClosed />
               <span>خصوصی</span>
             </div>
-            <div className="room-settings-modal__body__row__items__item">
+            <div className={clsx("room-settings-modal__body__row__items__item", isPublic && "active")}>
               <IoLockOpen />
               <span>عمومی</span>
             </div>
@@ -30,11 +44,21 @@ const SettingsModal = ({ isOpen }: { isOpen: boolean }) => {
         <div className="room-settings-modal__body__row">
           <h5>دسترسی کنترل اتاق</h5>
           <div className="room-settings-modal__body__row__items room-settings-modal__body__row__items--2">
-            <div className="room-settings-modal__body__row__items__item">
+            <div
+              className={clsx(
+                "room-settings-modal__body__row__items__item",
+                mediaControlPermission === "admin" && "active",
+              )}
+            >
               <IoLockClosed />
               <span>فقط مدیران</span>
             </div>
-            <div className="room-settings-modal__body__row__items__item">
+            <div
+              className={clsx(
+                "room-settings-modal__body__row__items__item",
+                mediaControlPermission === "everyone" && "active",
+              )}
+            >
               <IoLockOpen />
               <span>همه کاربران</span>
             </div>
@@ -42,7 +66,7 @@ const SettingsModal = ({ isOpen }: { isOpen: boolean }) => {
         </div>
 
         <div className="room-settings-modal__body__row">
-          <h5>حالت پس زمینه </h5>
+          <h5>حالت پس زمینه</h5>
           <div className="room-settings-modal__body__row__items room-settings-modal__body__row__items--3">
             <div className="room-settings-modal__body__row__items__item">
               <BsMoonFill />
@@ -60,7 +84,7 @@ const SettingsModal = ({ isOpen }: { isOpen: boolean }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SettingsModal
+export default SettingsModal;
