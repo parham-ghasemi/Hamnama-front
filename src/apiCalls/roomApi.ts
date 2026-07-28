@@ -49,3 +49,11 @@ export async function sendRoomMessage(roomId: string, content: string) {
 export async function leaveRoom(roomId: string) {
   await api.post(`/rooms/${roomId}/leave`);
 }
+
+interface JoinRoomResponse {
+  id: string
+}
+export async function joinRoom(code: number) {
+  const { data } = await api.post<JoinRoomResponse>(`/rooms/join`, { code });
+  return data
+}

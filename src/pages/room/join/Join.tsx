@@ -1,13 +1,24 @@
-import { BsPlusLg } from 'react-icons/bs';
+import { BsJournalMedical, BsPlusLg } from 'react-icons/bs';
 import Header from '../../../components/header/Header';
 import './Join.scss';
 import Sidebar from './sidebar/Sidebar';
 import { IoCopyOutline } from 'react-icons/io5';
 import CreateRoomModal from './createRoomModal/CreateRoomModal';
 import { useState } from 'react';
+import { joinRoom } from '../../../apiCalls/roomApi';
+import { useNavigate } from 'react-router-dom';
+
 
 const Join = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [code, setCode] = useState<number | string>("")
+  const nav = useNavigate()
+
+  const handleJoin = async () => {
+    const data = await joinRoom(Number(code))
+    nav(`/room/${data.id}`)
+  }
+
   return (
     <div className='join-page'>
       <Header />
@@ -41,9 +52,9 @@ const Join = () => {
 
               <div className="join-page__content__main__cards__card__i"></div>
 
-              <input className="join-page__content__main__cards__card__code" type='text' placeholder='کد اتاق' />
+              <input className="join-page__content__main__cards__card__code" type='text' placeholder='کد اتاق' value={code} onChange={(e) => setCode(e.target.value)} />
 
-              <button className="join-page__content__main__cards__card__enter">پیوستن</button>
+              <button className="join-page__content__main__cards__card__enter" onClick={handleJoin}>پیوستن</button>
             </div>
 
             <div className="join-page__content__main__cards__card--create" onClick={() => setIsModalOpen(true)}>
