@@ -6,9 +6,11 @@ import FeatureGrid from './featureGrid/FeatureGrid'
 import Faq from './faq/Faq'
 import { useTheme } from '../../context/ThemeContext'
 import clsx from 'clsx'
+import { useNavigate } from 'react-router-dom'
 
 const Home = () => {
   const { isLight } = useTheme();
+  const nav = useNavigate();
 
   return (
     <div className='home-page'>
@@ -35,8 +37,8 @@ const Home = () => {
       <h2 className='home-page__button-title'>اتاق سینمایی بسازید و در کنار هم فیلم تماشا کنید.</h2>
 
       <div className="home-page__buttons">
-        <button className='home-page__buttons__subs'>خرید اشتراک</button>
-        <button className='home-page__buttons__watch'>شروع به تماشا</button>
+        <button className='home-page__buttons__subs' onClick={() => nav('/plan-details')}>خرید اشتراک</button>
+        <button className='home-page__buttons__watch' onClick={() => nav('/join-room')}>شروع به تماشا</button>
       </div>
 
       <h2 className='home-page__steps-title'> 3 قدم تا <span>فیلم دیدن</span> کنار یکدیگر!</h2>

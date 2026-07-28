@@ -11,14 +11,6 @@ const Steps = () => {
       <StepAnimation />
 
       <div className="home-steps__blob"></div>
-      {/* 
-      <div className="home-steps__right-bar">
-        <span className='home-steps__right-bar__white-bar'></span>
-        <span className='home-steps__right-bar__dot'></span>
-        <span className='home-steps__right-bar__dot'></span>
-        <span className='home-steps__right-bar__dot'></span>
-      </div> */}
-
 
       <ul className="home-steps__steps-container">
         <div className={clsx("img", isLight && "img--light")}>

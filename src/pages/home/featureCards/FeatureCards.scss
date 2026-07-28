@@ -7,11 +7,25 @@
   @include mx.flex-center;
   gap: 27.2px;
   margin-top: 23.8px;
+  padding: 0 16px;
+
+  @include mx.max-w(1024px) {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  @include mx.max-w(768px) {
+    gap: 16px;
+  }
+
+  @include mx.max-w(480px) {
+    gap: 12px;
+  }
 
   &__card {
-    transition: transform ease 400ms;
-    position:
-      relative,
+    position: relative;
+    transition:
+      transform ease 400ms,
       box-shadow ease 300ms;
     overflow: hidden;
 
@@ -27,18 +41,39 @@
     flex-direction: column;
     gap: 20.4px;
 
-    // background:
-    //   linear-gradient(rgba(72, 0, 113, 0.1), rgba(72, 0, 113, 0.1)),
-    //   linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1));
     background: dark.$color-card-bg;
     border-radius: 22px;
     width: 221px;
     height: 221px;
     padding: 17px 0px;
+    box-sizing: border-box;
 
     @include mx.light {
       background: light.$color-card-bg;
       box-shadow: 0 4px 4px 0 color.adjust(light.$color-black, $alpha: -0.75);
+    }
+
+    @include mx.max-w(1024px) {
+      width: 200px;
+      height: 200px;
+      gap: 16px;
+    }
+
+    @include mx.max-w(768px) {
+      width: 160px;
+      height: 160px;
+      padding: 12px 0px;
+      border-radius: 18px;
+      gap: 12px;
+    }
+
+    @include mx.max-w(480px) {
+      width: calc(50% - 6px);
+      max-width: 155px;
+      height: 145px;
+      padding: 10px 0px;
+      border-radius: 14px;
+      gap: 10px;
     }
 
     &__glow {
@@ -88,6 +123,32 @@
         @include mx.light {
           color: light.$color-white;
         }
+
+        @include mx.max-w(1024px) {
+          font-size: 80px;
+        }
+
+        @include mx.max-w(768px) {
+          font-size: 60px;
+        }
+
+        @include mx.max-w(480px) {
+          font-size: 46px;
+        }
+      }
+
+      @include mx.max-w(1024px) {
+        width: 130px;
+      }
+
+      @include mx.max-w(768px) {
+        width: 105px;
+        border-radius: 14px;
+      }
+
+      @include mx.max-w(480px) {
+        width: 78%;
+        border-radius: 10px;
       }
     }
 
@@ -102,7 +163,6 @@
       );
 
       @include mx.light {
-        // Flipped line gradient colors to contrast beautifully on light themes
         background: linear-gradient(
           90deg,
           rgba(0, 0, 0, 0) 10%,
@@ -115,6 +175,21 @@
     &__title {
       font-weight: 800;
       font-size: 21.25px;
+      text-align: center;
+      padding: 0 4px;
+
+      @include mx.max-w(1024px) {
+        font-size: 18px;
+      }
+
+      @include mx.max-w(768px) {
+        font-size: 15px;
+      }
+
+      @include mx.max-w(480px) {
+        font-size: 13px;
+        font-weight: 700;
+      }
     }
   }
 }

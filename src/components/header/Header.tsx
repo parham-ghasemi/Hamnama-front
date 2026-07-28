@@ -7,7 +7,6 @@ import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import UsernameDropdown from './usernameDropdown/UsernameDropdown';
 
-// Add the optional prop
 interface HeaderProps {
   onMenuClick?: () => void;
 }
@@ -35,23 +34,31 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   }, []);
 
   return (
-    <div className="header">
-      {/* Wrapped Logo and Hamburger in a right-side container */}
+    <header className="header">
+      {/* Right side: Hamburger (if dashboard) + Logo */}
       <div className="header__right">
         {isDashboard && (
-          <button className="header__hamburger" onClick={onMenuClick} aria-label="Open Sidebar">
+          <button
+            className="header__hamburger"
+            onClick={onMenuClick}
+            aria-label="Open Navigation Menu"
+          >
             <PiListBold />
           </button>
         )}
-        <Link to={`/`} className="header__logo">
+        <Link to="/" className="header__logo" aria-label="Home">
           <img src="/Logo.svg" alt="Logo" />
         </Link>
       </div>
 
+      {/* Left side: Actions & User Menu */}
       <div className="header__left">
-        <button className="header__left__watchbtn" onClick={() => nav('/join-room')}>
-          <PiCaretRightBold className='header__left__watchbtn__Icon' style={{ strokeWidth: 10 }} />
-          <p className='header__left_watchbtn__text'>
+        <button
+          className="header__left__watchbtn"
+          onClick={() => nav('/join-room')}
+        >
+          <PiCaretRightBold className="header__left__watchbtn__Icon" style={{ strokeWidth: 10 }} />
+          <p className="header__left__watchbtn__text">
             شروع به تماشا
           </p>
         </button>
@@ -65,13 +72,11 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             >
               <p className="header__left__user__profile__name">{user?.username}</p>
               <div className="header__left__user__profile__photo">
-                {
-                  user?.profile_picture ? (
-                    <img src={`${import.meta.env.VITE_BASE_URL}${user?.profile_picture}`} alt="profile picture" />
-                  ) : (
-                    <PiUserFill />
-                  )
-                }
+                {user?.profile_picture ? (
+                  <img src={`${import.meta.env.VITE_BASE_URL}${user?.profile_picture}`} alt="profile picture" />
+                ) : (
+                  <PiUserFill />
+                )}
               </div>
               <div
                 className="header__left__user__profile__dropdown"
@@ -81,7 +86,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               </div>
             </div>
           ) : (
-            <button className='header__left__user__loginbtn' onClick={() => nav('/auth')}>
+            <button className="header__left__user__loginbtn" onClick={() => nav('/auth')}>
               ورود | ثبت نام
             </button>
           )}
@@ -103,8 +108,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           />
         </button>
       </div>
-    </div>
-  )
-}
+    </header>
+  );
+};
 
 export default Header;

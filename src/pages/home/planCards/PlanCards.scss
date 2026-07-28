@@ -10,33 +10,65 @@
   gap: 23.8px;
   margin-top: 44.2px * 2;
   position: relative;
+  padding: 0 16px;
+
+  @include mx.max-w(1024px) {
+    gap: 16px;
+    margin-top: 60px;
+  }
+
+  @include mx.max-w(768px) {
+    flex-direction: column;
+    gap: 36px;
+    margin-top: 40px;
+  }
 
   &__card:nth-child(odd) {
     transform: translateY(-50px);
+
     &:hover {
       transform: translateY(-60px);
     }
+
+    @include mx.max-w(1024px) {
+      transform: translateY(-20px);
+
+      &:hover {
+        transform: translateY(-30px);
+      }
+    }
+
+    // Reset staggered elevation when stacked vertically on tablets and mobile
+    @include mx.max-w(768px) {
+      transform: none;
+
+      &:hover {
+        transform: translateY(-8px);
+      }
+    }
   }
 
-  // &__blob-bottom {
-  //   @include mx.background-blob(600px, 400px, 60%, -5%, auto, auto);
-  // }
   &__blob-top {
     @include mx.background-blob(900px, 600px, -70%, auto, auto, -10%);
+
+    @include mx.max-w(768px) {
+      display: none; // Prevent horizontal scrollbar on mobile
+    }
   }
 
   &__card {
     @include mx.flex-center;
     flex-direction: column;
-    // justify-content: space-between;
     position: relative;
 
     outline: dark.$card-outline;
     padding: 17px 0;
     width: 375.7px;
+    max-width: 100%;
     min-height: 578px;
     border-radius: 26px;
     background: dark.$color-card-bg;
+    box-sizing: border-box;
 
     transition: transform 300ms ease;
 
@@ -48,6 +80,30 @@
 
     &:hover {
       transform: translateY(-20px);
+
+      @include mx.max-w(768px) {
+        transform: translateY(-8px);
+      }
+    }
+
+    @include mx.max-w(1024px) {
+      width: 300px;
+      min-height: 520px;
+      padding: 16px 0;
+      border-radius: 22px;
+    }
+
+    @include mx.max-w(768px) {
+      width: 100%;
+      max-width: 360px;
+      min-height: auto;
+      padding: 24px 16px;
+    }
+
+    @include mx.max-w(480px) {
+      max-width: 320px;
+      padding: 20px 12px;
+      border-radius: 18px;
     }
 
     &__icon {
@@ -70,8 +126,18 @@
         color: dark.$color-primary;
 
         @include mx.light {
-          color: light.$color-white; // Stays light.$color-white on hover naturally
+          color: light.$color-white;
         }
+
+        @include mx.max-w(768px) {
+          font-size: 32px;
+        }
+      }
+
+      @include mx.max-w(768px) {
+        height: 60px;
+        width: 60px;
+        border-radius: 14px;
       }
     }
 
@@ -84,6 +150,20 @@
       @include mx.light {
         color: light.$color-primary;
       }
+
+      @include mx.max-w(1024px) {
+        font-size: 32px;
+        margin-top: 18px;
+      }
+
+      @include mx.max-w(768px) {
+        font-size: 28px;
+        margin-top: 16px;
+      }
+
+      @include mx.max-w(480px) {
+        font-size: 24px;
+      }
     }
 
     &__desc {
@@ -93,6 +173,14 @@
 
       @include mx.light {
         color: color.adjust(light.$color-gray, $lightness: -20%);
+      }
+
+      @include mx.max-w(1024px) {
+        font-size: 16px;
+      }
+
+      @include mx.max-w(480px) {
+        font-size: 14px;
       }
     }
 
@@ -117,16 +205,36 @@
           rgba(0, 0, 0, 0) 90%
         );
       }
+
+      @include mx.max-w(768px) {
+        margin: 12px 0;
+      }
     }
 
     &__users-title {
       font-weight: 600;
       font-size: 27.2px;
+
+      @include mx.max-w(1024px) {
+        font-size: 22px;
+      }
+
+      @include mx.max-w(480px) {
+        font-size: 18px;
+      }
     }
 
     &__users {
       font-weight: 500;
       font-size: 27.2px;
+
+      @include mx.max-w(1024px) {
+        font-size: 22px;
+      }
+
+      @include mx.max-w(480px) {
+        font-size: 18px;
+      }
     }
 
     &__price-container {
@@ -148,15 +256,27 @@
           color: light.$color-white;
         }
 
+        @include mx.max-w(768px) {
+          height: 30px;
+        }
+
         &__old-price {
           text-decoration: line-through;
           font-weight: 600;
           font-size: 17px;
+
+          @include mx.max-w(768px) {
+            font-size: 14px;
+          }
         }
 
         &__discount-percent {
           @include mx.flex-center;
           gap: 3.4px;
+
+          @include mx.max-w(768px) {
+            font-size: 13px;
+          }
         }
       }
 
@@ -176,6 +296,14 @@
           background-color: rgba(0, 0, 0, 0.05);
         }
 
+        @include mx.max-w(1024px) {
+          height: 75px;
+        }
+
+        @include mx.max-w(480px) {
+          height: 65px;
+        }
+
         &__main {
           font-size: 39.1px;
           font-weight: 600;
@@ -185,10 +313,27 @@
           transform: translate(-50%, -50%);
           display: flex;
           gap: 8.5px;
+          white-space: nowrap;
+          text-wrap: pretty;
+          align-items: center;
 
           span {
             font-size: 13.6px;
             display: block;
+
+            @include mx.max-w(480px) {
+              font-size: 11px;
+            }
+          }
+
+          @include mx.max-w(1024px) {
+            font-size: 30px;
+            gap: 6px;
+          }
+
+          @include mx.max-w(480px) {
+            font-size: 24px;
+            gap: 4px;
           }
         }
 
@@ -199,6 +344,14 @@
           @include mx.light {
             color: rgba(0, 0, 0, 0.35);
           }
+
+          @include mx.max-w(1024px) {
+            font-size: 13px;
+          }
+
+          @include mx.max-w(480px) {
+            font-size: 11px;
+          }
         }
       }
     }
@@ -206,6 +359,7 @@
     &__buyBtn {
       background: dark.$color-primary-bg;
       width: 199.75px;
+      max-width: 80%;
       height: 61.2px;
       border-radius: 17px;
       padding: 6.8px;
@@ -227,6 +381,19 @@
           background: light.$color-primary-bg-hover;
         }
       }
+
+      @include mx.max-w(1024px) {
+        height: 50px;
+        font-size: 24px;
+        border-radius: 14px;
+      }
+
+      @include mx.max-w(480px) {
+        height: 44px;
+        font-size: 20px;
+        border-radius: 12px;
+        margin-top: 12px;
+      }
     }
 
     &__more {
@@ -246,6 +413,16 @@
         @include mx.light {
           color: light.$color-primary-hover;
         }
+      }
+
+      @include mx.max-w(1024px) {
+        font-size: 16px;
+        margin-top: 14px;
+      }
+
+      @include mx.max-w(480px) {
+        font-size: 14px;
+        margin-top: 10px;
       }
     }
   }

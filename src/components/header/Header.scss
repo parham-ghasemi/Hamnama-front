@@ -1,93 +1,295 @@
 @use "../../styles/abstracts/variables" as dark;
 @use "../../styles/abstracts/variables.light" as light;
-@use "sass:color";
 @use "../../styles/abstracts/mixins" as mx;
+@use "sass:color";
 
 .header {
   z-index: 999;
   height: 76.5px;
   display: flex;
-  padding: 0px 62px;
+  padding: 0 62px;
   justify-content: space-between;
   align-items: center;
   position: fixed;
   right: 0;
   left: 0;
   top: 0;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  box-sizing: border-box;
+
   @include mx.light {
     background-color: color.adjust(light.$color-dark-gray, $alpha: -0.6);
   }
 
-  @include mx.max-w(992px) {
-    padding: 0px 24px;
+  @include mx.max-w(1024px) {
+    padding: 0 32px;
   }
 
-  &__logo {
-    height: 47.6px;
-    width: auto;
+  @include mx.max-w(768px) {
+    padding: 0 16px;
+    height: 64px;
+  }
 
-    // Remove margin-right since we use gap in __right now
-    @include mx.max-w(992px) {
-      height: 38px; // Slightly smaller on mobile
-    }
+  @include mx.max-w(480px) {
+    padding: 0 12px;
   }
 
   &__right {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
+  }
+
+  &__logo {
+    height: 44px;
+    width: auto;
+    display: flex;
+    align-items: center;
+
+    > img {
+      height: 100%;
+      width: auto;
+      object-fit: contain;
+    }
+
+    @include mx.max-w(768px) {
+      height: 34px;
+    }
   }
 
   &__hamburger {
-    display: none; // Hidden on desktop
-    background: none;
+    display: none;
+    background: transparent;
     border: none;
     color: dark.$color-white;
-    font-size: 28px;
+    font-size: 26px;
     cursor: pointer;
     padding: 0;
-    transition: color 200ms ease;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    @include mx.flex-center;
+    transition:
+      background 200ms ease,
+      color 200ms ease;
 
     @include mx.light {
       color: light.$color-black;
     }
 
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+
+      @include mx.light {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+    }
+
     @include mx.max-w(992px) {
-      display: flex; // Visible on tablet/mobile
-      align-items: center;
-      justify-content: center;
+      display: flex;
     }
   }
 
   &__left {
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
-    gap: 13.6px;
+    gap: 12px;
 
     @include mx.max-w(768px) {
       gap: 8px;
     }
 
-    &__theme-btn {
-      position: relative;
-
-      width: 39.1px;
-      height: 39.1px;
-
+    // --- Watch Button ---
+    &__watchbtn {
+      font-size: 14.5px;
+      font-weight: 700;
+      background: dark.$color-primary-bg;
+      color: dark.$color-white;
+      border: none;
+      border-radius: 12px;
       display: flex;
       justify-content: center;
       align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition:
+        background 200ms ease,
+        transform 150ms ease;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
+      height: 39.1px;
+      padding: 0 16px;
+      white-space: nowrap;
+      user-select: none;
 
+      @include mx.light {
+        background: light.$color-primary-bg;
+        color: light.$color-white;
+        box-shadow: light.$shadow;
+      }
+
+      &:hover {
+        background: dark.$color-primary-bg-hover;
+
+        @include mx.light {
+          background: light.$color-primary-bg-hover;
+        }
+
+        .header__left__watchbtn__Icon {
+          transform: translateX(-2px) scale(1.1); // RTL-friendly direction
+        }
+      }
+
+      &:active {
+        transform: scale(0.97);
+      }
+
+      &__Icon {
+        transition: transform 200ms ease;
+        font-size: 16px;
+        flex-shrink: 0;
+      }
+
+      &__text {
+        margin: 0;
+      }
+
+      @include mx.max-w(640px) {
+        display: none; // Hide on mobile to give room for profile & theme buttons
+      }
+    }
+
+    // --- User Profile / Login Section ---
+    &__user {
+      display: flex;
+      align-items: center;
+
+      &__profile {
+        height: 39.1px;
+        background-color: dark.$color-dark-gray;
+        color: dark.$color-white;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 12px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
+        cursor: pointer;
+        position: relative;
+        user-select: none;
+        transition: background 200ms ease;
+
+        @include mx.light {
+          background-color: light.$color-card-bg;
+          color: light.$color-black;
+          box-shadow: light.$shadow;
+        }
+
+        &__name {
+          margin: 0;
+          white-space: nowrap;
+          max-width: 120px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+
+          @include mx.max-w(576px) {
+            display: none; // Show avatar only on mobile
+          }
+        }
+
+        &__photo {
+          background-color: dark.$color-light-gray;
+          color: dark.$color-gray;
+          border-radius: 100%;
+          width: 26px;
+          height: 26px;
+          overflow: hidden;
+          flex-shrink: 0;
+          @include mx.flex-center;
+
+          @include mx.light {
+            background-color: light.$color-light-gray;
+            color: light.$color-gray;
+          }
+
+          > img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          > svg {
+            height: 80%;
+            width: 80%;
+            transform: translateY(2px);
+          }
+        }
+
+        &__dropdown {
+          position: absolute;
+          top: calc(100% + 8px);
+          left: 0;
+          z-index: 1000;
+        }
+      }
+
+      &__loginbtn {
+        height: 39.1px;
+        padding: 0 16px;
+        background: dark.$color-primary-bg;
+        color: dark.$color-white;
+        border: none;
+        border-radius: 12px;
+        @include mx.flex-center;
+        cursor: pointer;
+        transition:
+          background 200ms ease,
+          transform 150ms ease;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
+        font-size: 14px;
+        font-weight: 700;
+        white-space: nowrap;
+
+        @include mx.light {
+          background: light.$color-primary-bg;
+          color: light.$color-white;
+          box-shadow: light.$shadow;
+        }
+
+        &:hover {
+          background: dark.$color-primary-bg-hover;
+
+          @include mx.light {
+            background: light.$color-primary-bg-hover;
+          }
+        }
+
+        &:active {
+          transform: scale(0.97);
+        }
+
+        @include mx.max-w(400px) {
+          padding: 0 10px;
+          font-size: 13px;
+        }
+      }
+    }
+
+    // --- Dark/Light Theme Toggle ---
+    &__theme-btn {
+      position: relative;
+      width: 39.1px;
+      height: 39.1px;
+      flex-shrink: 0;
+      @include mx.flex-center;
       border: none;
       outline: none;
       cursor: pointer;
       overflow: hidden;
-
       border-radius: 12px;
-
       background:
         linear-gradient(
           180deg,
@@ -99,7 +301,6 @@
       box-shadow:
         0 10px 24px rgba(0, 0, 0, 0.18),
         inset 0 1px rgba(255, 255, 255, 0.06);
-
       transition:
         background 300ms ease,
         transform 220ms ease,
@@ -109,21 +310,18 @@
         content: "";
         position: absolute;
         inset: -50%;
-
         background: linear-gradient(
           120deg,
           transparent,
           rgba(255, 255, 255, 0.18),
           transparent
         );
-
         transform: translateX(-180%) rotate(20deg);
         transition: transform 700ms ease;
       }
 
       &:hover {
         transform: translateY(-2px);
-
         box-shadow:
           0 16px 34px rgba(0, 0, 0, 0.28),
           inset 0 1px rgba(255, 255, 255, 0.1);
@@ -153,9 +351,7 @@
 
       &__icon {
         position: absolute;
-
-        font-size: 20.4px;
-
+        font-size: 20px;
         transition:
           opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
           transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -199,144 +395,6 @@
           opacity: 1;
           transform: rotate(0deg) scale(1);
           filter: blur(0) drop-shadow(0 0 10px rgba(246, 181, 23, 0.45));
-        }
-      }
-    }
-
-    @keyframes themeSpin {
-      0% {
-        opacity: 0;
-        transform: rotate(-90deg) scale(0.6);
-      }
-
-      100% {
-        opacity: 1;
-        transform: rotate(0) scale(1);
-      }
-    }
-
-    &__watchbtn {
-      font-size: 15.3px;
-      font-weight: 700;
-      background: dark.$color-primary-bg;
-      border-radius: 12px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 3.4px;
-      cursor: pointer;
-      transition: background 200ms ease;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
-      flex-wrap: wrap;
-      height: 39.1px;
-      width: 136px;
-
-      @include mx.max-w(550px) {
-        display: none; // Hide "Start Watching" on very small screens to save space
-      }
-
-      @include mx.light {
-        background: light.$color-primary-bg;
-        color: light.$color-white;
-        box-shadow: light.$shadow;
-      }
-
-      &:hover {
-        background: dark.$color-primary-bg-hover;
-
-        @include mx.light {
-          background: light.$color-primary-bg-hover;
-        }
-      }
-
-      &__Icon {
-        transition: transform 200ms ease;
-        font-size: 17px;
-      }
-
-      &:hover {
-        .header__left__watchbtn__Icon {
-          transform: translateX(2px) scale(1.1);
-        }
-      }
-    }
-
-    &__user {
-      display: flex;
-      align-items: center;
-
-      &__profile {
-        height: 39.1px;
-        background-color: dark.$color-dark-gray;
-        display: flex;
-        align-items: center;
-        gap: 6.8px;
-        padding: 0 10px;
-        border-radius: 12px;
-        font-weight: 600;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
-        cursor: pointer;
-
-        @include mx.light {
-          background-color: light.$color-card-bg;
-          box-shadow: light.$shadow;
-        }
-
-        @include mx.max-w(345px) {
-          &__name {
-            display: none; // Hide username on mobile, show only icon
-          }
-        }
-
-        &__photo {
-          background-color: dark.$color-light-gray;
-          color: dark.$color-gray;
-          border-radius: 100%;
-          width: 23.8px;
-          height: 23.8px;
-          overflow: hidden;
-
-          @include mx.light {
-            background-color: light.$color-light-gray;
-            color: light.$color-gray;
-          }
-
-          > svg {
-            height: 100%;
-            width: 100%;
-            transform: translateY(4px);
-          }
-        }
-      }
-
-      &__loginbtn {
-        height: 39.1px;
-        width: 102px;
-        background: dark.$color-primary-bg;
-        border-radius: 12px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 3.4px;
-        cursor: pointer;
-        transition: background 200ms ease;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
-        flex-wrap: wrap;
-        font-size: 15.3px;
-        font-weight: 700;
-
-        @include mx.light {
-          background: light.$color-primary-bg;
-          color: light.$color-white;
-          box-shadow: light.$shadow;
-        }
-
-        &:hover {
-          background: dark.$color-primary-bg-hover;
-
-          @include mx.light {
-            background: light.$color-primary-bg-hover;
-          }
         }
       }
     }

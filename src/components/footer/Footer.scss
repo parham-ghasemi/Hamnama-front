@@ -3,23 +3,55 @@
 @use "sass:color";
 @use "../../styles/abstracts/mixins" as mx;
 
+.footer-container {
+  width: 100%;
+}
+
 .footer {
   width: 90%;
-  margin: 85px auto;
-  margin-bottom: 0;
+  max-width: 1200px;
+  margin: 85px auto 0;
   border-top: 1px solid color.adjust(dark.$color-white, $alpha: -0.5);
   padding: 42.5px 0;
   display: flex;
   justify-content: space-evenly;
+  gap: 32px;
 
   @include mx.light {
     border-top: 1px solid light.$color-light-gray;
     border-bottom: 1px solid light.$color-light-gray;
   }
 
+  @include mx.max-w(1024px) {
+    margin-top: 60px;
+    padding: 36px 0;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  @include mx.max-w(768px) {
+    margin-top: 48px;
+    padding: 32px 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px 20px;
+  }
+
+  @include mx.max-w(480px) {
+    margin-top: 36px;
+    padding: 24px 0;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    text-align: center;
+  }
+
   &__section-title {
     font-weight: 700;
     font-size: 13.6px;
+
+    @include mx.max-w(768px) {
+      font-size: 14px;
+    }
   }
 
   &__quick,
@@ -28,6 +60,13 @@
     display: flex;
     flex-direction: column;
     gap: 25.5px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+
+    @include mx.max-w(768px) {
+      gap: 16px;
+    }
 
     > li {
       color: dark.$color-gray;
@@ -47,34 +86,49 @@
           color: light.$color-primary-hover;
         }
       }
+
+      @include mx.max-w(768px) {
+        font-size: 13.5px;
+      }
     }
   }
 
   &__social {
     display: flex;
     flex-direction: column;
-    gap: 10.2px;
-    height: 100%;
+    gap: 12px;
+
+    @include mx.max-w(480px) {
+      align-items: center;
+    }
   }
 
   &__social-links {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 6.8px;
+    justify-content: flex-start;
+    gap: 10px;
+
+    @include mx.max-w(480px) {
+      justify-content: center;
+    }
 
     > svg {
       background-color: dark.$color-gray;
       color: dark.$color-black;
       width: 42.5px;
       height: 42.5px;
-      padding: 6.8px;
+      padding: 8px;
       border-radius: 12px;
-      transition: background-color 200ms ease;
+      transition:
+        background-color 200ms ease,
+        transform 200ms ease;
       cursor: pointer;
 
       &:hover {
         background-color: dark.$color-dark-gray;
+        transform: translateY(-2px);
+
         @include mx.light {
           background-color: light.$color-primary-bg-hover;
         }
@@ -84,6 +138,12 @@
         background-color: light.$color-primary-bg;
         color: light.$color-white;
       }
+
+      @include mx.max-w(768px) {
+        width: 38px;
+        height: 38px;
+        padding: 7px;
+      }
     }
   }
 }
@@ -91,12 +151,25 @@
 .footer-rights {
   margin: 0 auto;
   width: 90%;
-  font-size: 10.2px;
+  max-width: 1200px;
+  font-size: 11px;
   border-top: 1px solid color.adjust(dark.$color-white, $alpha: -0.7);
   text-align: center;
-  padding: 10.2px;
+  padding: 16px 10px;
+  color: dark.$color-gray;
 
   @include mx.light {
     border-top: 1px solid light.$color-light-gray;
+    color: light.$color-primary;
+  }
+
+  @include mx.max-w(768px) {
+    font-size: 10.5px;
+    padding: 14px 10px;
+  }
+
+  @include mx.max-w(480px) {
+    font-size: 10px;
+    padding: 12px 10px;
   }
 }

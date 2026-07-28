@@ -1,9 +1,10 @@
-@use "../../../styles//abstracts//variables" as dark;
+@use "../../../styles/abstracts/variables" as dark;
 @use "../../../styles/abstracts/variables.light" as light;
-@use "../../../styles//abstracts//mixins" as mx;
+@use "../../../styles/abstracts/mixins" as mx;
 @use "sass:color";
 
 .join-page {
+  min-height: 100vh;
   max-height: 100vh;
   overflow: hidden;
   width: 100vw;
@@ -21,6 +22,14 @@
     color: light.$color-black;
   }
 
+  // Allow scrolling when content height exceeds viewport on smaller screens
+  @include mx.max-w(1024px) {
+    max-height: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 32px;
+  }
+
   &__content {
     margin-top: 76.5px;
     display: flex;
@@ -28,8 +37,22 @@
     width: 100%;
     position: relative;
 
+    @include mx.max-w(1024px) {
+      margin-top: 64px;
+      gap: 16px;
+    }
+
+    @include mx.max-w(768px) {
+      margin-top: 60px;
+    }
+
     &__main {
       position: relative;
+      @include mx.flex-center;
+      width: 100%;
+      padding: 20px 16px;
+      box-sizing: border-box;
+
       &__blob {
         @include mx.background-blob(
           $width: 90%,
@@ -39,20 +62,36 @@
         );
         transform: translate(-50%, -50%);
         z-index: 0;
+
+        @include mx.max-w(768px) {
+          display: none; // Hide ambient blob on mobile to avoid overflow and performance lag
+        }
       }
 
-      @include mx.flex-center;
-      width: 100%;
       &__cards {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: auto auto;
-
         grid-column-gap: 49px;
         grid-row-gap: 19px;
+        z-index: 1;
+
+        @include mx.max-w(1200px) {
+          grid-column-gap: 24px;
+          grid-row-gap: 16px;
+        }
+
+        @include mx.max-w(768px) {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto;
+          grid-row-gap: 20px;
+          width: 100%;
+          max-width: 400px;
+        }
 
         &__card {
-          width: 378px; /* Width increased by 20% */
+          width: 378px;
+          max-width: 100%;
           height: 453px;
           border-radius: 17px;
           background: #7c401f;
@@ -65,16 +104,36 @@
           @include mx.flex-center;
           flex-direction: column;
           justify-content: space-between;
+          box-sizing: border-box;
 
           @include mx.light {
             background: light.$color-card-bg;
           }
 
+          @include mx.max-w(1200px) {
+            width: 320px;
+            height: 420px;
+          }
+
+          @include mx.max-w(768px) {
+            width: 100%;
+            height: 390px;
+          }
+
           &:first-of-type {
             grid-area: 1 / 1 / 2 / 2;
+
+            @include mx.max-w(768px) {
+              grid-area: auto;
+            }
           }
+
           &:nth-of-type(2) {
             grid-area: 1 / 2 / 2 / 3;
+
+            @include mx.max-w(768px) {
+              grid-area: auto;
+            }
           }
 
           > h4 {
@@ -84,6 +143,11 @@
 
             @include mx.light {
               color: light.$color-black;
+            }
+
+            @include mx.max-w(768px) {
+              font-size: 19px;
+              margin-top: 12px;
             }
           }
 
@@ -95,6 +159,11 @@
 
             @include mx.light {
               background-color: light.$color-primary-bg;
+            }
+
+            @include mx.max-w(768px) {
+              height: 150px;
+              width: 145px;
             }
           }
 
@@ -114,11 +183,17 @@
             outline: none;
             text-align: center;
             padding: 0 12px;
+            box-sizing: border-box;
 
             @include mx.light {
               background-color: light.$color-light-gray;
               color: light.$color-black;
               border: 1px solid light.$color-light-gray;
+            }
+
+            @include mx.max-w(768px) {
+              height: 56px;
+              font-size: 16px;
             }
 
             > span {
@@ -135,6 +210,11 @@
 
               @include mx.light {
                 color: light.$color-black;
+              }
+
+              @include mx.max-w(768px) {
+                left: 14px;
+                font-size: 20px;
               }
 
               &:hover {
@@ -173,6 +253,11 @@
               color: light.$color-white;
             }
 
+            @include mx.max-w(768px) {
+              height: 56px;
+              font-size: 16px;
+            }
+
             &:hover {
               background-color: color.adjust(
                 dark.$color-light-gray,
@@ -194,16 +279,21 @@
             justify-content: space-between;
             grid-area: 2 / 1 / 3 / 3;
             cursor: pointer;
-
             position: relative;
             overflow: hidden;
+            box-sizing: border-box;
 
             @include mx.light {
               background: light.$color-card-bg;
               box-shadow: 0 4px 4px 0 light.$color-gray;
             }
 
-            /* Overlays Restored: Gradients aligned to 0deg to match top cards visually */
+            @include mx.max-w(768px) {
+              grid-area: auto;
+              height: 80px;
+              padding: 16px 20px;
+            }
+
             &::before {
               content: "";
               position: absolute;
@@ -265,6 +355,10 @@
                 color: light.$color-primary;
                 font-weight: 900;
               }
+
+              @include mx.max-w(768px) {
+                font-size: 16px;
+              }
             }
 
             > span {
@@ -283,8 +377,17 @@
                 color: light.$color-white;
               }
 
+              @include mx.max-w(768px) {
+                height: 36px;
+                width: 36px;
+              }
+
               > svg {
                 font-size: 29px;
+
+                @include mx.max-w(768px) {
+                  font-size: 22px;
+                }
               }
             }
           }

@@ -1,6 +1,7 @@
 @use "../../../styles/abstracts/variables" as dark;
 @use "../../../styles/abstracts/variables.light" as light;
 @use "../../../styles/abstracts/mixins" as mx;
+@use "sass:color";
 
 .home-steps {
   display: flex;
@@ -10,62 +11,26 @@
   height: 646px;
   position: relative;
 
+  // Hides the StepAnimation component on tablet & mobile screens
+  > *:first-child {
+    @include mx.max-w(1024px) {
+      display: none;
+    }
+  }
+
+  @include mx.max-w(1024px) {
+    height: auto;
+    padding: 40px 16px;
+  }
+
   &__blob {
     @include mx.background-blob(1400px, 400px, 50%, 50%, auto, auto);
     transform: translate(50%, -50%);
+
+    @include mx.max-w(768px) {
+      @include mx.background-blob(300px, 300px, 50%, 50%, auto, auto);
+    }
   }
-
-  // &__right-bar {
-  //   height: 100%;
-  //   display: flex;
-  //   justify-content: space-evenly;
-  //   flex-direction: column;
-  //   align-items: center;
-  //   position: relative;
-
-  //   &__white-bar {
-  //     position: absolute;
-  //     top: 0;
-  //     bottom: 0;
-  //     height: 100%;
-  //     width: 1px;
-  //     background: #ffffff;
-  //     background: linear-gradient(
-  //       0deg,
-  //       rgba(255, 255, 255, 0) 0%,
-  //       rgba(255, 255, 255, 1) 25%,
-  //       rgba(255, 255, 255, 1) 75%,
-  //       rgba(255, 255, 255, 0) 100%
-  //     );
-  //     z-index: 0;
-
-  //     @include mx.light {
-  //       background: #000000;
-  //       background: linear-gradient(
-  //         0deg,
-  //         rgba(0, 0, 0, 0) 0%,
-  //         rgba(0, 0, 0, 1) 25%,
-  //         rgba(0, 0, 0, 1) 75%,
-  //         rgba(0, 0, 0, 0) 100%
-  //       );
-  //     }
-  //   }
-
-  //   &__dot {
-  //     z-index: 1;
-  //     height: 8.5px;
-  //     width: 8.5px;
-  //     background-color: #ffa400; // Hardcoded accent color; keeping consistent unless you want it changed
-  //     border-radius: 100%;
-  //     box-shadow: 0px 0px 200px 50px dark.$color-primary;
-  //     animation: light-blink 800ms infinite;
-
-  //     @include mx.light {
-  //       background-color: #aa71a1;
-  //       box-shadow: 0px 0px 200px 50px light.$color-primary;
-  //     }
-  //   }
-  // }
 
   &__steps-container {
     display: flex;
@@ -73,12 +38,34 @@
     justify-content: center;
     gap: 42.5px;
     position: relative;
+    width: 100%;
+    max-width: 654.5px;
+
+    @include mx.max-w(768px) {
+      gap: 24px;
+    }
+
+    @include mx.max-w(480px) {
+      gap: 16px;
+    }
 
     > .img {
       position: absolute;
       right: -400px;
       height: 528.7px;
       width: 528.7px;
+      pointer-events: none;
+
+      @include mx.max-w(1280px) {
+        right: -200px;
+        width: 380px;
+        height: 380px;
+        opacity: 0.6;
+      }
+
+      @include mx.max-w(1024px) {
+        display: none; // Hidden on smaller devices to prevent horizontal scrollbar
+      }
 
       > img {
         height: 100% !important;
@@ -111,12 +98,32 @@
       justify-content: space-between;
       align-items: center;
       padding: 10.2px 27.2px;
-      width: 654.5px;
+      width: 100%;
+      max-width: 654.5px;
       height: 93.5px;
+      box-sizing: border-box;
 
       @include mx.light {
         background-color: light.$color-primary-bg;
         color: light.$color-white;
+      }
+
+      @include mx.max-w(1024px) {
+        height: 80px;
+        padding: 10px 20px;
+        border-radius: 20px;
+      }
+
+      @include mx.max-w(768px) {
+        height: 68px;
+        padding: 8px 16px;
+        border-radius: 16px;
+      }
+
+      @include mx.max-w(480px) {
+        height: 56px;
+        padding: 8px 12px;
+        border-radius: 12px;
       }
 
       > span {
@@ -126,6 +133,7 @@
         width: 44.2px;
         text-align: right;
         display: flex;
+        align-items: center;
         gap: 14.45px;
         color: dark.$color-white;
 
@@ -143,6 +151,36 @@
           @include mx.light {
             background-color: light.$color-white;
           }
+
+          @include mx.max-w(1024px) {
+            height: 38px;
+          }
+
+          @include mx.max-w(768px) {
+            height: 28px;
+          }
+
+          @include mx.max-w(480px) {
+            height: 20px;
+          }
+        }
+
+        @include mx.max-w(1024px) {
+          font-size: 38px;
+          width: 36px;
+          gap: 12px;
+        }
+
+        @include mx.max-w(768px) {
+          font-size: 28px;
+          width: 28px;
+          gap: 10px;
+        }
+
+        @include mx.max-w(480px) {
+          font-size: 20px;
+          width: 22px;
+          gap: 8px;
         }
       }
 
@@ -151,7 +189,19 @@
         font-weight: 700;
         text-align: center;
         width: 100%;
-        text-shadow: 0 4px 4px #00000067; // Optional: can adjust text-shadow opacity/color for light theme if needed
+        text-shadow: 0 4px 4px #00000067;
+
+        @include mx.max-w(1024px) {
+          font-size: 26px;
+        }
+
+        @include mx.max-w(768px) {
+          font-size: 20px;
+        }
+
+        @include mx.max-w(480px) {
+          font-size: 15px;
+        }
       }
     }
   }

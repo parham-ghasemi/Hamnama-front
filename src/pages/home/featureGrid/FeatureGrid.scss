@@ -6,25 +6,48 @@
 .home-feature-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  grid-column-gap: 63px;
-  grid-row-gap: 69px;
+  gap: 69px 63px;
   position: relative;
 
-  width: 1075.25px;
-  margin: 0 auto;
-  margin-top: 136px;
+  width: 100%;
+  max-width: 1075.25px;
+  margin: 136px auto 0;
+  padding: 0 20px;
+  box-sizing: border-box;
+
+  @include mx.max-w(1200px) {
+    gap: 40px 30px;
+    margin-top: 90px;
+  }
+
+  @include mx.max-w(1024px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px 20px;
+    margin-top: 70px;
+  }
+
+  @include mx.max-w(640px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 40px;
+    max-width: 440px;
+  }
 
   &__blob {
     @include mx.background-blob(1600px, 600px, 50%, 50%, auto, auto);
     transform: translate(50%, -50%);
+
+    @include mx.max-w(768px) {
+      display: none; // Prevent horizontal scrollbar on mobile
+    }
   }
 
   &__item {
-    // 1. Strict Dimensions & Radius
-    width: 323px;
-    height: 96.05px;
+    width: 100%;
+    min-height: 96px;
+    height: auto;
     border-radius: 17px;
+    box-sizing: border-box;
     background:
       linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
       linear-gradient(
@@ -40,27 +63,41 @@
 
     display: flex;
     align-items: center;
-    padding: 27.2px;
-    gap: 10.2px;
+    padding: 20px 24px;
+    gap: 14px;
     transition: transform 400ms ease;
 
     &:hover {
       transform: translateY(-10px);
 
+      @include mx.max-w(768px) {
+        transform: translateY(-4px);
+      }
+
       .home-feature-grid__item__right__glow {
         opacity: 1;
 
         @include mx.light {
-          opacity: 0; // Turns off glow layer visibility on hover in light mode
+          opacity: 0;
         }
       }
     }
 
+    @include mx.max-w(1024px) {
+      padding: 18px 20px;
+    }
+
+    @include mx.max-w(480px) {
+      padding: 14px 16px;
+      gap: 12px;
+      border-radius: 14px;
+    }
+
     &__right {
       @include mx.flex-center;
-      // 3. Icon Background Customization
       width: 47.6px;
       height: 47.6px;
+      flex-shrink: 0; // Ensures icon container doesn't shrink on smaller screens
       background-color: #48261f;
       border-radius: 7px;
 
@@ -72,6 +109,12 @@
       @include mx.light {
         background-color: light.$color-light-gray;
         color: light.$color-primary;
+      }
+
+      @include mx.max-w(480px) {
+        width: 42px;
+        height: 42px;
+        font-size: 22px;
       }
 
       &__glow {
@@ -91,15 +134,15 @@
         pointer-events: none;
 
         @include mx.light {
-          display: none; // Completely drops the asset node in light mode
+          display: none;
           background: transparent;
         }
       }
     }
 
     &__left {
-      width: 80%;
-      @include mx.flex-center;
+      flex: 1;
+      display: flex;
       flex-direction: column;
       gap: 6.8px;
 
@@ -111,11 +154,19 @@
         @include mx.light {
           color: light.$color-primary;
         }
+
+        @include mx.max-w(480px) {
+          font-size: 15px;
+        }
       }
 
       &__desc {
         font-size: 12.75px;
         font-weight: 600;
+
+        @include mx.max-w(480px) {
+          font-size: 11.5px;
+        }
       }
     }
   }

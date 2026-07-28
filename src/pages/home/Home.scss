@@ -7,6 +7,7 @@
   width: 100%;
   min-height: 100vh;
   position: relative;
+  overflow-x: hidden;
 
   &__hero {
     position: absolute;
@@ -19,41 +20,61 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    @include mx.max-w(768px) {
+      height: 350px;
+      max-height: 350px;
+    }
+    // @include mx.max-w(768px) {
+    //   height: 300px;
+    //   max-height: 300px;
+    // }
 
     > .img {
       height: 100%;
       width: 100%;
+
       > img {
         position: absolute;
         top: 0;
+        width: 100%;
+        object-fit: cover;
         transition: opacity ease 300ms !important;
+
+        @include mx.max-w(768px) {
+          top: 50px;
+        }
 
         &.light {
           opacity: 0;
           height: 86vh;
-        }
-      }
-    }
 
-    &--light {
-      > .img > img.light {
-        opacity: 1;
-      }
-      > .img > img.dark {
-        opacity: 0;
+          @include mx.max-w(768px) {
+            height: 285px;
+            max-height: 285px;
+          }
+        }
+
+        &.dark {
+          @include mx.max-w(768px) {
+            height: 285px;
+            max-height: 285px;
+          }
+        }
       }
     }
 
     > h1 {
       font-size: 45px;
       font-weight: 700;
+      max-width: 660px;
+      text-align: center;
 
       // Typewriter animation
-      overflow: hidden; /* Ensures the content is not revealed until the animation */
-      border-left: 0.15em solid dark.$color-primary; /* The typwriter cursor */
-      white-space: nowrap; /* Keeps the content on a single line */
-      margin: 0 auto; /* Gives that scrolling effect as the typing happens */
-      letter-spacing: 0.1em; /* Adjust as needed */
+      overflow: hidden; /* Ensures content is not revealed until animation */
+      border-left: 0.15em solid dark.$color-primary; /* Typewriter cursor */
+      white-space: nowrap; /* Keeps content on a single line */
+      margin: 0 auto;
+      letter-spacing: 0.1em;
       animation:
         typing 3.5s steps(40, end),
         blink-caret-dark 0.75s infinite;
@@ -64,7 +85,7 @@
       }
 
       @include mx.light {
-        border-left: 0.15em solid light.$color-primary; /* The typwriter cursor */
+        border-left: 0.15em solid light.$color-primary;
         animation:
           typing 3.5s steps(40, end),
           blink-caret-light 0.75s infinite;
@@ -73,18 +94,47 @@
           color: light.$color-primary;
         }
       }
+
+      @include mx.max-w(1024px) {
+        font-size: 34px;
+        max-width: 520px;
+      }
+
+      @include mx.max-w(768px) {
+        font-size: 24px;
+        max-width: 90%;
+        letter-spacing: 0.05em;
+      }
+
+      @include mx.max-w(480px) {
+        font-size: 18px;
+        border-left-width: 0.1em;
+      }
     }
   }
 
   &__button-title {
     text-align: center;
     font-size: 20.4px;
-    // margin-top: 13.6px;
+    padding: 0 16px;
+
     &::before {
       content: "";
       height: 100vh;
       width: 8.5px;
       display: block;
+
+      @include mx.max-w(768px) {
+        height: 400px;
+      }
+    }
+
+    @include mx.max-w(768px) {
+      font-size: 18px;
+    }
+
+    @include mx.max-w(480px) {
+      font-size: 15px;
     }
   }
 
@@ -93,17 +143,31 @@
     justify-content: center;
     gap: 69.7px;
     margin-top: 44.2px;
+    padding: 0 16px;
+
+    @include mx.max-w(1024px) {
+      gap: 32px;
+    }
+
+    @include mx.max-w(768px) {
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin-top: 28px;
+    }
 
     > button {
       background-color: dark.$color-primary-bg;
-      transition: background 150ms ease;
+      transition:
+        background 150ms ease,
+        transform 150ms ease;
       font-size: 35.7px;
       font-weight: 600;
       border-radius: 26px;
       cursor: pointer;
       height: 131.75px;
       width: 340px;
-      text-shadow: 0 4px 4px #00000067; // Assuming this stays standard, but hex alpha can be adjusted if needed
+      text-shadow: 0 4px 4px #00000067;
 
       @include mx.light {
         background-color: light.$color-primary-bg;
@@ -117,6 +181,27 @@
           background: light.$color-primary-bg-hover;
         }
       }
+
+      @include mx.max-w(1024px) {
+        width: 260px;
+        height: 95px;
+        font-size: 26px;
+        border-radius: 20px;
+      }
+
+      @include mx.max-w(768px) {
+        width: 100%;
+        max-width: 320px;
+        height: 70px;
+        font-size: 22px;
+        border-radius: 16px;
+      }
+
+      @include mx.max-w(480px) {
+        max-width: 280px;
+        height: 56px;
+        font-size: 18px;
+      }
     }
   }
 
@@ -125,6 +210,8 @@
     font-size: 45px;
     font-weight: 700;
     margin-top: 110.5px;
+    padding: 0 16px;
+
     > span {
       color: dark.$color-primary;
       font-weight: 800;
@@ -132,6 +219,21 @@
       @include mx.light {
         color: light.$color-primary;
       }
+    }
+
+    @include mx.max-w(1024px) {
+      font-size: 36px;
+      margin-top: 80px;
+    }
+
+    @include mx.max-w(768px) {
+      font-size: 28px;
+      margin-top: 60px;
+    }
+
+    @include mx.max-w(480px) {
+      font-size: 22px;
+      margin-top: 40px;
     }
   }
 
@@ -140,7 +242,8 @@
     font-size: 45px;
     font-weight: 700;
     margin-bottom: 104px;
-    // margin-top: 44.2px * 1.5;
+    padding: 0 16px;
+
     > span {
       color: dark.$color-primary;
       font-weight: 800;
@@ -148,6 +251,21 @@
       @include mx.light {
         color: light.$color-primary;
       }
+    }
+
+    @include mx.max-w(1024px) {
+      font-size: 36px;
+      margin-bottom: 70px;
+    }
+
+    @include mx.max-w(768px) {
+      font-size: 28px;
+      margin-bottom: 50px;
+    }
+
+    @include mx.max-w(480px) {
+      font-size: 22px;
+      margin-bottom: 35px;
     }
   }
 
@@ -156,7 +274,8 @@
     font-size: 45px;
     font-weight: 700;
     margin: 103.7px 0;
-    // margin-top: 44.2px * 1.5;
+    padding: 0 16px;
+
     > span {
       color: dark.$color-primary;
       font-weight: 800;
@@ -165,6 +284,21 @@
         color: light.$color-primary;
       }
     }
+
+    @include mx.max-w(1024px) {
+      font-size: 36px;
+      margin: 70px 0;
+    }
+
+    @include mx.max-w(768px) {
+      font-size: 28px;
+      margin: 50px 0;
+    }
+
+    @include mx.max-w(480px) {
+      font-size: 22px;
+      margin: 35px 0;
+    }
   }
 
   &__faq-title {
@@ -172,6 +306,22 @@
     font-size: 45px;
     font-weight: 700;
     margin-top: 103.7px;
+    padding: 0 16px;
+
+    @include mx.max-w(1024px) {
+      font-size: 36px;
+      margin-top: 70px;
+    }
+
+    @include mx.max-w(768px) {
+      font-size: 28px;
+      margin-top: 50px;
+    }
+
+    @include mx.max-w(480px) {
+      font-size: 22px;
+      margin-top: 35px;
+    }
   }
 
   &__faq-subtitle {
@@ -179,6 +329,7 @@
     font-size: 13.6px;
     font-weight: 600;
     margin-top: 13.6px;
+    padding: 0 16px;
     color: dark.$color-primary;
     cursor: pointer;
     transition: color 150ms ease;
@@ -194,6 +345,11 @@
         color: color.adjust(light.$color-primary, $lightness: 10%);
       }
     }
+
+    @include mx.max-w(480px) {
+      font-size: 12px;
+      margin-top: 8px;
+    }
   }
 }
 
@@ -203,7 +359,7 @@
     width: 0;
   }
   to {
-    width: 50%;
+    width: 100%;
   }
 }
 
