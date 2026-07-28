@@ -14,11 +14,19 @@
   transform: translateX(-400px);
 
   @include mx.max-w(1903px) {
-    transform: translateX(-300px);
+    transform: translateX(-200px);
   }
 
-  @include mx.max-w(1703px) {
-    transform: translateX(-200px);
+  @include mx.max-w(2423px) {
+    transform: translateX(-250px);
+  }
+
+  @include mx.max-w(2155px) {
+    transform: translateX(-100px);
+  }
+
+  @include mx.max-w(1603px) {
+    transform: translateX(-100px);
   }
 
   &__glow {
