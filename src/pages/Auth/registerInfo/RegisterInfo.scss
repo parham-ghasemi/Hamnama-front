@@ -38,6 +38,8 @@
   &__input {
     position: absolute;
     inset: 0;
+    font-size: 20px;
+    font-weight: 700;
 
     background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
 

@@ -232,6 +232,7 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
         border-radius: 8px;
         padding: 0 21px;
         outline: none;
+        text-align: center;
       }
       > button {
         cursor: pointer;
@@ -244,8 +245,8 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
       &__submit {
         background: linear-gradient(
           230deg,
-          color.adjust(#dd00ff, $whiteness: 10%) 0%,
-          color.adjust(#0d061e, $whiteness: 10%) 100%
+          color.adjust(#750f8f, $whiteness: 10%) 0%,
+          color.adjust(#3a124c, $whiteness: 10%) 100%
         );
         height: 55px;
         width: 82px;
@@ -256,8 +257,8 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
       &__choose {
         background: linear-gradient(
           230deg,
-          color.adjust(#dd00ff, $whiteness: 10%) 0%,
-          color.adjust(#0d061e, $whiteness: 10%) 100%
+          color.adjust(#75108f, $whiteness: 10%) 0%,
+          color.adjust(#3a124c, $whiteness: 10%) 100%
         );
         height: 55px;
         width: 130px;

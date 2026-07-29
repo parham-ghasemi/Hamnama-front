@@ -427,7 +427,7 @@ const RoomPage = () => {
 
           <input
             type="text"
-            placeholder="لینک مورد نظر را وارد کنید ."
+            placeholder="لینک مورد نظر را وارد کنید "
             dir="ltr"
             onChange={(e) => setLink(e.target.value)}
             value={link}
