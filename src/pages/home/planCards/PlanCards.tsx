@@ -1,4 +1,4 @@
-import { PiCaretDownFill, PiHeartFill, PiUserFill, PiUsersFill } from 'react-icons/pi';
+import { PiCaretDownFill, PiHeartFill } from 'react-icons/pi';
 import './PlanCards.scss';
 import { BsPeopleFill, BsPersonFill } from 'react-icons/bs';
 import { Link } from 'react-router-dom';

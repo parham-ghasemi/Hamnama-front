@@ -1,4 +1,4 @@
-import { BsJournalMedical, BsPlusLg } from 'react-icons/bs';
+import { BsPlusLg } from 'react-icons/bs';
 import Header from '../../../components/header/Header';
 import './Join.scss';
 import Sidebar from './sidebar/Sidebar';

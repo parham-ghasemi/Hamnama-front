@@ -1,4 +1,4 @@
-import { PiArchiveFill, PiChatsCircleFill, PiClockFill, PiDevicesFill, PiFilmReelFill, PiFilmStripBold, PiFolderOpenFill, PiHexagonFill, PiMusicNotesFill } from 'react-icons/pi';
+import { PiArchiveFill, PiChatsCircleFill, PiClockFill, PiDevicesFill, PiFilmReelFill, PiFilmStripBold, PiFolderOpenFill, PiHexagonFill } from 'react-icons/pi';
 import './FeatureGrid.scss';
 import { BsMusicPlayerFill } from 'react-icons/bs';
 

@@ -17,10 +17,7 @@ type AuthStep = 'phone' | 'password' | 'otp' | 'register';
 const Auth = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState<AuthStep>('phone');
-
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
-  const [otp, setOtp] = useState('');
 
   // Stores the temporary token returned by validate-otp for new users
   const [verificationToken, setVerificationToken] = useState('');
@@ -60,8 +57,6 @@ const Auth = () => {
   };
 
   const handlePasswordSubmit = async (passwordValue: string) => {
-    setPassword(passwordValue);
-
     try {
       const { data } = await api.post('/auth/login-password', {
         phone: phoneNumber,
@@ -93,7 +88,6 @@ const Auth = () => {
   };
 
   const handleOtpSubmit = async (code: string) => {
-    setOtp(code);
 
     try {
       if (isExistingUser) {
@@ -155,8 +149,6 @@ const Auth = () => {
 
   const handleChangePhone = () => {
     setPhoneNumber('');
-    setPassword('');
-    setOtp('');
     setVerificationToken('');
     setIsExistingUser(null);
     setStep('phone');

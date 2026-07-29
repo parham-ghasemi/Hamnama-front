@@ -1,7 +1,7 @@
 import { PiCaretDownBold } from 'react-icons/pi';
 import './Faq.scss';
 import clsx from 'clsx';
-import { useEffect, useRef, useState, type Ref } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const Faq = () => {
   const questions = [

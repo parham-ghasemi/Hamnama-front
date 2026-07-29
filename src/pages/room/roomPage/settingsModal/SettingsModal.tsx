@@ -8,9 +8,6 @@ const SettingsModal = ({
   isOpen,
   isPublic,
   mediaControlPermission,
-  playbackTime,
-  currentlyPlaying,
-  createdAt,
 }: {
   isOpen: boolean;
   isPublic: boolean;

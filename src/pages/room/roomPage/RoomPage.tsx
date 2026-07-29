@@ -303,7 +303,7 @@ const RoomPage = () => {
 
   const sendMessageMutation = useMutation({
     mutationFn: (content: string) => sendRoomMessage(roomId!, content),
-    onSuccess: (message) => {
+    onSuccess: () => {
       setMessageText("");
     },
   });

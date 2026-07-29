@@ -14,7 +14,7 @@ import Tickets from "./pages/userDashboard/tickets/Tickets";
 import TicketChat from "./pages/userDashboard/tickets/ticketChat/TicketChat";
 import Leaderboard from "./pages/userDashboard/leaderboard/Leaderboard";
 import Join from "./pages/room/join/Join";
-import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import { useTheme } from "./context/ThemeContext";
 import PlanUsers from "./pages/userDashboard/planUsers/PlanUsers";
 import { AuthProvider } from "./context/AuthContext";
 import RoomPage from "./pages/room/roomPage/RoomPage";
