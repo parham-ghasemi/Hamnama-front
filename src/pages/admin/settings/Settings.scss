@@ -1,0 +1,134 @@
+@use "../../../styles/abstracts/variables" as dark;
+@use "../../../styles/abstracts/variables.light" as light;
+@use "../../../styles/abstracts/mixins" as mx;
+
+.admin-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  &__hero {
+    @include mx.glass-card(24px, 14px);
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    @include mx.max-w(768px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &__eyebrow {
+      font-size: 13px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: dark.$color-gray;
+      margin-bottom: 6px;
+    }
+
+    &__title {
+      font-size: 28px;
+      font-weight: 900;
+      margin: 0;
+      color: dark.$color-white;
+
+      @include mx.light {
+        color: light.$color-black;
+      }
+    }
+
+    &__pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(208, 78, 47, 0.16);
+      font-size: 13px;
+      font-weight: 700;
+    }
+  }
+
+  &__section {
+    @include mx.glass-card(24px, 12px);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+
+      &__title {
+        font-size: 20px;
+        font-weight: 800;
+        color: dark.$color-white;
+        margin: 0 0 6px;
+
+        @include mx.light {
+          color: light.$color-black;
+        }
+      }
+
+      &__subtitle {
+        font-size: 13px;
+        color: dark.$color-gray;
+      }
+    }
+
+    &__icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(208, 78, 47, 0.16);
+      display: grid;
+      place-items: center;
+      color: dark.$color-primary;
+    }
+
+    &__form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        color: dark.$color-white;
+        font-weight: 700;
+      }
+
+      input {
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        background: rgba(255, 255, 255, 0.05);
+        color: dark.$color-white;
+        border-radius: 12px;
+        padding: 10px 12px;
+        font: inherit;
+        outline: 0;
+      }
+
+      button {
+        align-self: flex-start;
+        border: 0;
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-weight: 800;
+        cursor: pointer;
+        background: dark.$color-primary-bg;
+        color: dark.$color-white;
+      }
+    }
+
+    &__status {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: dark.$color-green;
+      font-weight: 700;
+    }
+  }
+}

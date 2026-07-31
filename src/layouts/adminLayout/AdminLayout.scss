@@ -1,0 +1,120 @@
+@use "../../styles/abstracts/variables" as dark;
+@use "../../styles/abstracts/variables.light" as light;
+@use "../../styles/abstracts/mixins" as mx;
+
+.admin-layout {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 32px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      circle at top left,
+      rgba(208, 78, 47, 0.18),
+      transparent 40%
+    );
+  }
+
+  &__shell {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 24px;
+    padding: 24px;
+
+    @include mx.max-w(1094px) {
+      grid-template-columns: 1fr;
+      padding: 16px;
+    }
+
+    &__sidebar {
+      @include mx.glass-card(24px, 14px);
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      min-height: calc(100vh - 140px);
+
+      @include mx.max-w(1094px) {
+        min-height: auto;
+      }
+
+      &__brand {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+
+        p {
+          font-size: 22px;
+          font-weight: 900;
+          color: dark.$color-white;
+
+          @include mx.light {
+            color: light.$color-black;
+          }
+        }
+
+        span {
+          font-size: 13px;
+          color: dark.$color-gray;
+
+          @include mx.light {
+            color: light.$color-gray;
+          }
+        }
+      }
+
+      &__nav {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        &__item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 13px 14px;
+          border-radius: 14px;
+          color: dark.$color-white;
+          font-weight: 700;
+          transition: all 200ms ease;
+          text-decoration: none;
+
+          @include mx.light {
+            color: light.$color-black;
+          }
+
+          &:hover {
+            background: rgba(208, 78, 47, 0.16);
+            transform: translateX(-2px);
+          }
+
+          &.is-active {
+            background: linear-gradient(
+              135deg,
+              rgba(208, 78, 47, 0.28),
+              rgba(208, 78, 47, 0.1)
+            );
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+          }
+        }
+      }
+    }
+
+    &__content {
+      min-width: 0;
+
+      &__inner {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+    }
+  }
+}

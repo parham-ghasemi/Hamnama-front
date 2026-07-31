@@ -1,0 +1,151 @@
+@use "../../../styles/abstracts/variables" as dark;
+@use "../../../styles/abstracts/variables.light" as light;
+@use "../../../styles/abstracts/mixins" as mx;
+
+.admin-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  &__hero {
+    @include mx.glass-card(24px, 14px);
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    @include mx.max-w(768px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &__eyebrow {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.24em;
+      color: dark.$color-gray;
+      margin-bottom: 6px;
+    }
+
+    &__title {
+      font-size: 28px;
+      font-weight: 900;
+      color: dark.$color-white;
+      margin: 0;
+
+      @include mx.light {
+        color: light.$color-black;
+      }
+    }
+
+    &__pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(208, 78, 47, 0.18);
+      color: dark.$color-white;
+      font-size: 13px;
+      font-weight: 700;
+
+      @include mx.light {
+        color: light.$color-black;
+      }
+    }
+  }
+
+  &__stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+
+    @include mx.max-w(1094px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include mx.max-w(640px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__stat-card {
+    @include mx.glass-card(20px, 12px);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 138px;
+
+    &__title {
+      color: dark.$color-gray;
+      font-size: 13px;
+      margin: 0;
+    }
+
+    &__value {
+      font-size: 24px;
+      font-weight: 900;
+      color: dark.$color-white;
+      margin: 0;
+
+      @include mx.light {
+        color: light.$color-black;
+      }
+    }
+
+    &__subtitle {
+      color: dark.$color-light-gray;
+      font-size: 13px;
+    }
+  }
+
+  &__charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+
+    @include mx.max-w(1094px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__chart-card {
+    @include mx.glass-card(24px, 12px);
+    padding: 20px;
+    min-height: 360px;
+
+    &__header {
+      margin-bottom: 14px;
+    }
+
+    &__title {
+      font-size: 18px;
+      font-weight: 800;
+      color: dark.$color-white;
+      margin: 0 0 4px;
+
+      @include mx.light {
+        color: light.$color-black;
+      }
+    }
+
+    &__subtitle {
+      font-size: 13px;
+      color: dark.$color-gray;
+    }
+
+    &__chart {
+      height: 280px;
+      width: 100%;
+    }
+  }
+
+  &__loading,
+  &__empty {
+    @include mx.glass-card(24px, 12px);
+    min-height: 280px;
+    display: grid;
+    place-items: center;
+    color: dark.$color-white;
+    font-weight: 700;
+  }
+}

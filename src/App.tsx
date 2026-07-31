@@ -18,7 +18,9 @@ import { useTheme } from "./context/ThemeContext";
 import PlanUsers from "./pages/userDashboard/planUsers/PlanUsers";
 import { AuthProvider } from "./context/AuthContext";
 import RoomPage from "./pages/room/roomPage/RoomPage";
-
+import AdminLayout from "./layouts/adminLayout/AdminLayout";
+import AdminRoute from "./components/adminRoute/AdminRoute";
+import { AdminDashboard, AdminTickets, AdminUsers, AdminRooms, AdminSettings } from "./pages/admin";
 
 const queryClient = new QueryClient({});
 
@@ -51,6 +53,15 @@ function App() {
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/plan-details" element={<PlanDetails />} />
                 <Route path="*" element={<p className="text-6xl font-black text-center my-60">THIS PAGE WAS NOT FOUND!</p>} />
+              </Route>
+
+              <Route path="admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+                <Route index element={<Navigate to="dashboard" replace />} />
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="tickets" element={<AdminTickets />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="rooms" element={<AdminRooms />} />
+                <Route path="settings" element={<AdminSettings />} />
               </Route>
 
               <Route path="join-room" element={<Join />} />

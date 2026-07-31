@@ -1,0 +1,36 @@
+@use "../../styles/abstracts/variables" as dark;
+@use "../../styles/abstracts/variables.light" as light;
+@use "../../styles/abstracts/mixins" as mx;
+
+.admin-route {
+  &__loading {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    gap: 16px;
+    color: dark.$color-white;
+
+    @include mx.light {
+      color: light.$color-black;
+    }
+
+    &__spinner {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      border-top-color: dark.$color-primary;
+      animation: admin-spin 0.8s linear infinite;
+
+      @include mx.light {
+        border-top-color: light.$color-primary;
+      }
+    }
+  }
+}
+
+@keyframes admin-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
