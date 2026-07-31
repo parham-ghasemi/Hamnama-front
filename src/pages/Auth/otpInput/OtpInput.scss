@@ -6,11 +6,32 @@
 .otp-input {
   @include mx.flex-center;
   flex-direction: column;
-  gap: 32px; // 24px -> 32px
+  gap: 32px;
+  width: 100%;
+  padding: 0 24px;
+  box-sizing: border-box;
+
+  @include mx.max-w(768px) {
+    gap: 24px;
+  }
+  @include mx.max-w(480px) {
+    gap: 16px;
+  }
 
   &__title {
-    font-size: 69px; // 52px -> 69px
+    font-size: 69px;
     font-weight: 700;
+    text-align: center;
+
+    @include mx.max-w(1024px) {
+      font-size: 52px;
+    }
+    @include mx.max-w(768px) {
+      font-size: 36px;
+    }
+    @include mx.max-w(480px) {
+      font-size: 28px;
+    }
 
     @include mx.light {
       color: light.$color-black;
@@ -18,8 +39,19 @@
   }
 
   &__subtitle {
-    font-size: 32px; // 24px -> 32px
+    font-size: 32px;
     color: dark.$color-gray;
+    text-align: center;
+
+    @include mx.max-w(1024px) {
+      font-size: 24px;
+    }
+    @include mx.max-w(768px) {
+      font-size: 20px;
+    }
+    @include mx.max-w(480px) {
+      font-size: 16px;
+    }
 
     @include mx.light {
       color: light.$color-black;
@@ -28,28 +60,64 @@
 
   &__content {
     display: flex;
-    gap: 21px; // 16px -> 21px
+    gap: 21px;
     align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    @include mx.max-w(768px) {
+      gap: 16px;
+    }
+    @include mx.max-w(480px) {
+      gap: 12px;
+      flex-wrap: wrap; // Wraps timer below inputs on ultra-tiny screens if needed
+    }
   }
 
   &__fields {
     display: flex;
-    gap: 16px; // 12px -> 16px
+    gap: 16px;
     flex-direction: row-reverse;
+
+    @include mx.max-w(768px) {
+      gap: 12px;
+    }
+    @include mx.max-w(480px) {
+      gap: 8px;
+    }
   }
 
   &__field {
-    width: 96px; // 72px -> 96px
-    height: 96px; // 72px -> 96px
-
+    width: 96px;
+    height: 96px;
     background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
-    border-radius: 16px; // 12px -> 16px
-
+    border-radius: 16px;
     text-align: center;
-    font-size: 43px; // 32px -> 43px
+    font-size: 43px;
     font-weight: 700;
-
     outline: none;
+    box-sizing: border-box;
+
+    @include mx.max-w(768px) {
+      width: 72px;
+      height: 72px;
+      font-size: 32px;
+      border-radius: 12px;
+    }
+
+    @include mx.max-w(480px) {
+      width: 52px;
+      height: 56px;
+      font-size: 24px;
+      border-radius: 10px;
+    }
+
+    // Safety net for very narrow phones (e.g. 320px width)
+    @include mx.max-w(350px) {
+      width: 44px;
+      height: 48px;
+      font-size: 20px;
+    }
 
     @include mx.light {
       background-color: light.$color-white;
@@ -71,16 +139,34 @@
   }
 
   &__timer {
-    width: 96px; // 72px -> 96px
-    height: 96px; // 72px -> 96px
-
+    width: 96px;
+    height: 96px;
     background: dark.$color-card-bg;
-    border-radius: 16px; // 12px -> 16px
-
+    border-radius: 16px;
     @include mx.flex-center;
-
-    font-size: 27px; // 20px -> 27px
+    font-size: 27px;
     font-weight: 700;
+    box-sizing: border-box;
+
+    @include mx.max-w(768px) {
+      width: 72px;
+      height: 72px;
+      font-size: 20px;
+      border-radius: 12px;
+    }
+
+    @include mx.max-w(480px) {
+      width: 56px;
+      height: 56px;
+      font-size: 16px;
+      border-radius: 10px;
+    }
+
+    @include mx.max-w(350px) {
+      width: 48px;
+      height: 48px;
+      font-size: 14px;
+    }
 
     @include mx.light {
       background: light.$color-card-bg;
@@ -91,13 +177,19 @@
 
   &__resend {
     background: transparent;
+    border: none; // Resets default browser button borders
     cursor: pointer;
-
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 43px;
 
-    font-size: 43px; // 32px -> 43px
+    @include mx.max-w(768px) {
+      font-size: 32px;
+    }
+    @include mx.max-w(480px) {
+      font-size: 24px;
+    }
 
     @include mx.light {
       color: light.$color-black;
@@ -115,6 +207,12 @@
   &__change-phone {
     color: dark.$color-primary;
     cursor: pointer;
+    text-align: center;
+    font-size: 18px;
+
+    @include mx.max-w(480px) {
+      font-size: 16px;
+    }
 
     @include mx.light {
       color: light.$color-primary;
@@ -131,6 +229,11 @@
 
   &__error {
     color: dark.$color-red;
+    text-align: center;
+
+    @include mx.max-w(480px) {
+      font-size: 14px;
+    }
 
     @include mx.light {
       color: light.$color-red;
@@ -139,16 +242,30 @@
 
   &__subBtn {
     background: dark.$color-primary;
-    width: 400px; // 300px -> 400px
-    padding: 16px; // 12px -> 16px
-    border-radius: 16px; // 12px -> 16px
-
+    width: 100%;
+    max-width: 400px;
+    padding: 16px;
+    border-radius: 16px;
     cursor: pointer;
-
-    font-size: 32px; // 24px -> 32px
+    font-size: 32px;
     font-weight: 700;
+    margin-top: 69px;
 
-    margin-top: 69px; // 52px -> 69px
+    @include mx.max-w(1024px) {
+      margin-top: 52px;
+    }
+
+    @include mx.max-w(768px) {
+      font-size: 24px;
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 40px;
+    }
+
+    @include mx.max-w(480px) {
+      font-size: 20px;
+      margin-top: 32px;
+    }
 
     @include mx.light {
       background: light.$color-primary-bg;

@@ -1,20 +1,27 @@
 import './PlanDetails.scss';
-import { PiCalendarMinus, PiCaretDownFill, PiCheckCircleFill, PiHeartFill, PiUserFill, PiUsersFill } from 'react-icons/pi';
+import {
+  PiCalendarMinus,
+  PiCaretDownFill,
+  PiCheckCircleFill,
+  PiHeartFill,
+  PiUserFill,
+  PiUsersFill
+} from 'react-icons/pi';
 
 const PlanDetails = () => {
   const plans = [
     {
-      icon: <PiUsersFill />,
-      title: 'پلن گروهی',
-      price: 110000,
+      icon: <PiUserFill />,
+      title: 'پلن تک نفره',
       durations: ["۱ ماهه", "۳ ماهه", "٦ ماهه"],
+      price: 110000,
       discount: { percent: 15, newPrice: 79000, daysLeft: 30 },
       features: [
-        ' تماشای همزمان فیلم به صورت همزمان .',
-        ' تماشای همزمان فیلم به صورت همزمان .',
-        ' تماشای همزمان فیلم به صورت همزمان .',
-        ' تماشای همزمان فیلم به صورت همزمان .',
-        ' تماشای همزمان فیلم به صورت همزمان .',
+        'تماشای همزمان فیلم به صورت همزمان.',
+        'تماشای همزمان فیلم به صورت همزمان.',
+        'تماشای همزمان فیلم به صورت همزمان.',
+        'تماشای همزمان فیلم به صورت همزمان.',
+        'تماشای همزمان فیلم به صورت همزمان.',
       ]
     },
     {
@@ -24,25 +31,25 @@ const PlanDetails = () => {
       price: 110000,
       discount: { percent: 15, newPrice: 79000, daysLeft: 30 },
       features: [
-        ' تماشای همزمان فیلم به صورت همزمان .',
-        ' تماشای همزمان فیلم به صورت همزمان .',
-        ' تماشای همزمان فیلم به صورت همزمان .',
-        ' تماشای همزمان فیلم به صورت همزمان .',
-        ' تماشای همزمان فیلم به صورت همزمان .',
+        'تماشای همزمان فیلم به صورت همزمان.',
+        'تماشای همزمان فیلم به صورت همزمان.',
+        'تماشای همزمان فیلم به صورت همزمان.',
+        'تماشای همزمان فیلم به صورت همزمان.',
+        'تماشای همزمان فیلم به صورت همزمان.',
       ]
     },
     {
-      icon: <PiUserFill />,
-      title: 'پلن تک نفره',
-      durations: ["۱ ماهه", "۳ ماهه", "٦ ماهه"],
+      icon: <PiUsersFill />,
+      title: 'پلن گروهی',
       price: 110000,
+      durations: ["۱ ماهه", "۳ ماهه", "٦ ماهه"],
       discount: { percent: 15, newPrice: 79000, daysLeft: 30 },
       features: [
-        ' تماشای همزمان فیلم به صورت همزمان .',
-        ' تماشای همزمان فیلم به صورت همزمان .',
-        ' تماشای همزمان فیلم به صورت همزمان .',
-        ' تماشای همزمان فیلم به صورت همزمان .',
-        ' تماشای همزمان فیلم به صورت همزمان .',
+        'تماشای همزمان فیلم به صورت همزمان.',
+        'تماشای همزمان فیلم به صورت همزمان.',
+        'تماشای همزمان فیلم به صورت همزمان.',
+        'تماشای همزمان فیلم به صورت همزمان.',
+        'تماشای همزمان فیلم به صورت همزمان.',
       ]
     },
   ]
@@ -60,8 +67,11 @@ const PlanDetails = () => {
 
             <div className='plan-details__card__durations'>
               {
-                plan.durations.map((dur, ind) => (
-                  <div className='plan-details__card__durations__card plan-details__card__durations__card--selected' key={`duration-mont-${ind}`}>
+                plan.durations.map((dur, index) => (
+                  <div
+                    className={`plan-details__card__durations__card ${index === 0 ? 'plan-details__card__durations__card--selected' : ''}`}
+                    key={`duration-mont-${index}`}
+                  >
                     <span>{dur}</span>
                     <PiCalendarMinus />
                   </div>
@@ -74,18 +84,19 @@ const PlanDetails = () => {
                 plan.discount && (
                   <div className='plan-details__card__current-price__discount'>
                     <div className="plan-details__card__current-price__discount__old-price">
-                      {plan.price}
+                      {plan.price.toLocaleString('fa-IR')}
                     </div>
 
                     <div className="plan-details__card__current-price__discount__discount-percent">
                       <PiCaretDownFill />
-                      {`${plan.discount.percent}%`}
+                      {`${plan.discount.percent.toLocaleString('fa-IR')}%`}
                     </div>
                   </div>
                 )
               }
               <p className='plan-details__card__current-price__main'>
-                {plan.discount ? plan.discount.newPrice.toLocaleString().replace(',', "،") : plan.price}
+                {plan.discount ? plan.discount.newPrice.toLocaleString('fa-IR') : plan.price.toLocaleString('fa-IR')}
+                <span className="plan-details__card__current-price__currency"> تومان</span>
               </p>
             </div>
 
@@ -95,10 +106,10 @@ const PlanDetails = () => {
 
             <ul className='plan-details__card__features'>
               {
-                plan.features.map((feat, ind) => (
-                  <li key={`planfeatureinplansrom-${ind}`}>
-                    <PiCheckCircleFill />
-                    {feat}
+                plan.features.map((feat, index) => (
+                  <li key={`planfeatureinplansrom-${index}`}>
+                    <PiCheckCircleFill className="plan-details__card__features__icon" />
+                    <span>{feat}</span>
                   </li>
                 ))
               }

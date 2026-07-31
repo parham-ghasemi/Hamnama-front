@@ -38,6 +38,7 @@ const LoginPassword = ({
         <input
           placeholder='رمز عبور'
           type={showPassword ? 'text' : 'password'}
+          dir='ltr' // Keeps password cursor behavior predictable
           className='login-password__input'
           value={password}
           onChange={(e) => {

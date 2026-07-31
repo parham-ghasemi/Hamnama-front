@@ -6,19 +6,46 @@
 .register-info {
   @include mx.flex-center;
   flex-direction: column;
-  gap: 37px; // 28px -> 37px
+  gap: 37px;
   margin-top: 90px;
+  width: 100%;
+  padding: 0 24px;
+  box-sizing: border-box;
+
+  @include mx.max-w(768px) {
+    gap: 24px;
+    margin-top: 60px;
+  }
+  @include mx.max-w(480px) {
+    gap: 16px;
+    margin-top: 40px;
+  }
 
   &__group {
     @include mx.flex-center;
     flex-direction: column;
-    gap: 16px; // 12px -> 16px
+    gap: 16px;
+    width: 100%; // Allows group to span out and match the max-width of inner items
+
+    @include mx.max-w(480px) {
+      gap: 12px;
+    }
   }
 
   &__label {
-    font-size: 32px; // 24px -> 32px
+    font-size: 32px;
     font-weight: 700;
     text-align: center;
+
+    @include mx.max-w(1024px) {
+      font-size: 24px;
+    }
+    @include mx.max-w(768px) {
+      font-size: 20px;
+    }
+    @include mx.max-w(480px) {
+      font-size: 16px;
+    }
 
     @include mx.light {
       color: light.$color-black;
@@ -27,12 +54,20 @@
 
   &__input-wrapper {
     position: relative;
-    width: 533px; // 400px -> 533px
-    padding: 21px; // 16px -> 21px
-
+    width: 100%;
+    max-width: 533px;
+    padding: 21px;
     display: flex;
     align-items: center;
     justify-content: left;
+    box-sizing: border-box;
+
+    @include mx.max-w(768px) {
+      padding: 16px;
+    }
+    @include mx.max-w(480px) {
+      padding: 12px;
+    }
   }
 
   &__input {
@@ -40,14 +75,21 @@
     inset: 0;
     font-size: 20px;
     font-weight: 700;
-
     background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
-
-    border-radius: 16px; // 12px -> 16px
-
+    border-radius: 16px;
     text-align: center;
-
     outline: none;
+    width: 100%;
+    box-sizing: border-box; // Keeps borders inside the container
+
+    @include mx.max-w(768px) {
+      font-size: 18px;
+      border-radius: 12px;
+    }
+
+    @include mx.max-w(480px) {
+      font-size: 16px;
+    }
 
     @include mx.light {
       background-color: light.$color-white;
@@ -71,7 +113,14 @@
   &__icon,
   &__icon-btn {
     z-index: 2;
-    font-size: 32px; // 24px -> 32px
+    font-size: 32px;
+
+    @include mx.max-w(768px) {
+      font-size: 28px;
+    }
+    @include mx.max-w(480px) {
+      font-size: 24px;
+    }
 
     @include mx.light {
       color: light.$color-black;
@@ -80,6 +129,12 @@
 
   &__icon-btn {
     cursor: pointer;
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px; // Increases the touchable hit area slightly
 
     &:hover {
       @include mx.light {
@@ -91,10 +146,18 @@
   &__rules {
     display: flex;
     flex-direction: column;
-    gap: 11px; // 8px -> 11px
-
+    gap: 11px;
     color: dark.$color-red;
     text-align: center;
+
+    @include mx.max-w(768px) {
+      gap: 8px;
+      font-size: 14px;
+    }
+    @include mx.max-w(480px) {
+      gap: 6px;
+      font-size: 12px;
+    }
 
     @include mx.light {
       color: light.$color-red;
@@ -103,19 +166,29 @@
 
   &__submit-btn {
     background: dark.$color-primary;
-
-    width: 400px; // 300px -> 400px
-
-    padding: 16px; // 12px -> 16px
-
-    border-radius: 16px; // 12px -> 16px
-
+    width: 100%;
+    max-width: 400px;
+    padding: 16px;
+    border-radius: 16px;
     cursor: pointer;
-
     font-weight: 700;
-    font-size: 32px; // 24px -> 32px
+    font-size: 32px;
+    margin-top: 21px;
 
-    margin-top: 21px; // 16px -> 21px
+    @include mx.max-w(1024px) {
+      font-size: 28px;
+    }
+
+    @include mx.max-w(768px) {
+      font-size: 24px;
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    @include mx.max-w(480px) {
+      font-size: 20px;
+      margin-top: 16px;
+    }
 
     @include mx.light {
       background: light.$color-primary-bg;
@@ -134,7 +207,16 @@
   &__terms {
     color: dark.$color-gray;
     text-align: center;
-    max-width: 667px; // 500px -> 667px
+    width: 100%;
+    max-width: 667px;
+    line-height: 1.5;
+
+    @include mx.max-w(768px) {
+      font-size: 14px;
+    }
+    @include mx.max-w(480px) {
+      font-size: 12px;
+    }
 
     @include mx.light {
       color: light.$color-black;

@@ -1,17 +1,41 @@
-@use "../../../styles//abstracts//variables" as dark;
+@use "../../../styles/abstracts/variables" as dark;
 @use "../../../styles/abstracts/variables.light" as light;
-@use "../../../styles//abstracts//mixins" as mx;
+@use "../../../styles/abstracts/mixins" as mx;
 @use "sass:color";
 
 .auth-phone-input {
   @include mx.flex-center;
   flex-direction: column;
-  gap: 32px; // 24px -> 32px
+  gap: 32px;
   margin-top: 90px;
+  width: 100%;
+  padding: 0 24px; // Prevents content from touching edges on small screens
+  box-sizing: border-box;
+
+  @include mx.max-w(768px) {
+    margin-top: 60px;
+    gap: 24px;
+  }
+
+  @include mx.max-w(480px) {
+    margin-top: 40px;
+    gap: 16px;
+  }
 
   &__title {
-    font-size: 69px; // 52px -> 69px
+    font-size: 69px;
     font-weight: 700;
+    text-align: center; // Ensures text stays centered when it wraps
+
+    @include mx.max-w(1024px) {
+      font-size: 52px;
+    }
+    @include mx.max-w(768px) {
+      font-size: 36px;
+    }
+    @include mx.max-w(480px) {
+      font-size: 28px;
+    }
 
     @include mx.light {
       color: light.$color-black;
@@ -35,8 +59,19 @@
   }
 
   &__subtitle {
-    font-size: 32px; // 24px -> 32px
+    font-size: 32px;
     color: dark.$color-gray;
+    text-align: center;
+
+    @include mx.max-w(1024px) {
+      font-size: 24px;
+    }
+    @include mx.max-w(768px) {
+      font-size: 20px;
+    }
+    @include mx.max-w(480px) {
+      font-size: 16px;
+    }
 
     @include mx.light {
       color: light.$color-black;
@@ -46,12 +81,25 @@
   &__input {
     background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
     text-align: center;
-    border-radius: 16px; // 12px -> 16px
-    padding: 21px; // 16px -> 21px
-    width: 533px; // 400px -> 533px
+    border-radius: 16px;
+    padding: 21px;
+    width: 100%; // Lets the input shrink on small screens
+    max-width: 533px; // Keeps your original large size on desktop
+    box-sizing: border-box;
     outline: none;
     font-size: 24px;
     font-weight: 700;
+
+    @include mx.max-w(768px) {
+      padding: 16px;
+      font-size: 20px;
+      border-radius: 12px;
+    }
+
+    @include mx.max-w(480px) {
+      padding: 12px;
+      font-size: 18px;
+    }
 
     @include mx.light {
       background-color: light.$color-white;
@@ -74,6 +122,11 @@
 
   &__error {
     color: dark.$color-red;
+    text-align: center;
+
+    @include mx.max-w(480px) {
+      font-size: 14px;
+    }
 
     @include mx.light {
       color: light.$color-red;
@@ -82,13 +135,30 @@
 
   &__subBtn {
     background: dark.$color-primary;
-    width: 400px; // 300px -> 400px
-    padding: 16px; // 12px -> 16px
-    border-radius: 16px; // 12px -> 16px
+    width: 100%;
+    max-width: 400px;
+    padding: 16px;
+    border-radius: 16px;
     cursor: pointer;
     font-weight: 700;
-    font-size: 32px; // 24px -> 32px
-    margin-top: 69px; // 52px -> 69px
+    font-size: 32px;
+    margin-top: 69px;
+
+    @include mx.max-w(1024px) {
+      margin-top: 52px;
+    }
+
+    @include mx.max-w(768px) {
+      font-size: 24px;
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 40px;
+    }
+
+    @include mx.max-w(480px) {
+      font-size: 20px;
+      margin-top: 32px;
+    }
 
     @include mx.light {
       background: light.$color-primary-bg;

@@ -19,14 +19,10 @@ const RegisterInfo = ({
 }: RegisterInfoProps) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [repeatPassword, setRepeatPassword] =
-    useState('');
+  const [repeatPassword, setRepeatPassword] = useState('');
 
-  const [showPassword, setShowPassword] =
-    useState(false);
-
-  const [showRepeatPassword, setShowRepeatPassword] =
-    useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
   const handleSubmit = () => {
     onSubmit({
@@ -47,10 +43,9 @@ const RegisterInfo = ({
 
           <input
             type="text"
+            dir="ltr" // Ensures english characters/numbers type predictably
             value={username}
-            onChange={(e) =>
-              setUsername(e.target.value)
-            }
+            onChange={(e) => setUsername(e.target.value)}
             className="register-info__input"
           />
         </div>
@@ -65,25 +60,16 @@ const RegisterInfo = ({
           <button
             type="button"
             className="register-info__icon-btn"
-            onClick={() =>
-              setShowPassword((prev) => !prev)
-            }
+            onClick={() => setShowPassword((prev) => !prev)}
           >
-            {showPassword ? (
-              <PiEyeSlashBold />
-            ) : (
-              <PiEyeBold />
-            )}
+            {showPassword ? <PiEyeSlashBold /> : <PiEyeBold />}
           </button>
 
           <input
-            type={
-              showPassword ? 'text' : 'password'
-            }
+            type={showPassword ? 'text' : 'password'}
+            dir="ltr" // Prevents password cursor jumping
             value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
+            onChange={(e) => setPassword(e.target.value)}
             className="register-info__input"
           />
         </div>
@@ -98,50 +84,25 @@ const RegisterInfo = ({
           <button
             type="button"
             className="register-info__icon-btn"
-            onClick={() =>
-              setShowRepeatPassword(
-                (prev) => !prev
-              )
-            }
+            onClick={() => setShowRepeatPassword((prev) => !prev)}
           >
-            {showRepeatPassword ? (
-              <PiEyeSlashBold />
-            ) : (
-              <PiEyeBold />
-            )}
+            {showRepeatPassword ? <PiEyeSlashBold /> : <PiEyeBold />}
           </button>
 
           <input
-            type={
-              showRepeatPassword
-                ? 'text'
-                : 'password'
-            }
+            type={showRepeatPassword ? 'text' : 'password'}
+            dir="ltr" // Prevents password cursor jumping
             value={repeatPassword}
-            onChange={(e) =>
-              setRepeatPassword(
-                e.target.value
-              )
-            }
+            onChange={(e) => setRepeatPassword(e.target.value)}
             className="register-info__input"
           />
         </div>
       </div>
 
       <div className="register-info__rules">
-        <p>
-          رمز عبور شامل حروف انگلیسی و عدد باشد
-        </p>
-
-        <p>
-          رمز عبور باید حداقل بیش از پنج کاراکتر
-          باشد
-        </p>
-
-        <p>
-          رمز عبور باید حداقل یک حرف بزرگ داشته
-          باشد
-        </p>
+        <p>رمز عبور شامل حروف انگلیسی و عدد باشد</p>
+        <p>رمز عبور باید حداقل بیش از پنج کاراکتر باشد</p>
+        <p>رمز عبور باید حداقل یک حرف بزرگ داشته باشد</p>
       </div>
 
       <button

@@ -1,30 +1,45 @@
-@use "../../styles//abstracts//variables" as dark;
+@use "../../styles/abstracts/variables" as dark;
 @use "../../styles/abstracts/variables.light" as light;
-@use "../../styles//abstracts//mixins" as mx;
+@use "../../styles/abstracts/mixins" as mx;
 @use "sass:color";
 
 .plan-details {
   min-height: 90vh;
   @include mx.flex-center;
+  flex-wrap: wrap; // Allows cards to wrap to the next line on smaller screens
   gap: 28px;
-  margin-top: 52px * 2;
+  margin-top: 104px; // 52px * 2
+  padding: 0 24px;
+  box-sizing: border-box;
+
+  @include mx.max-w(768px) {
+    margin-top: 90px;
+    gap: 24px;
+  }
 
   &__card {
-    @include mx.flex-center;
+    display: flex;
+    align-items: center;
     flex-direction: column;
-    gap: 16px;
-    justify-content: space-evenly;
+    gap: 24px; // 16px -> 24px for breathing room without a fixed height
     background: dark.$color-card-bg;
     outline: dark.$card-outline;
     border-radius: 16px;
-    padding: 20px 0;
-    width: 400px;
-    height: 885px;
+    padding: 40px 20px;
+    width: 100%;
+    max-width: 400px;
+    height: auto; // Removed fixed 885px height
+    box-sizing: border-box;
+    transition: transform 0.2s ease;
 
     @include mx.light {
       outline: light.$card-outline;
       background: light.$color-card-bg;
       box-shadow: 0 3px 4px 0 color.adjust(light.$color-black, $alpha: -0.75);
+    }
+
+    &:hover {
+      transform: translateY(-5px); // Nice subtle hover effect
     }
 
     &__icon {
@@ -36,6 +51,12 @@
       align-items: center;
       justify-content: center;
 
+      @include mx.max-w(768px) {
+        height: 75px;
+        width: 75px;
+        border-radius: 16px;
+      }
+
       @include mx.light {
         background-color: light.$color-primary;
       }
@@ -43,6 +64,10 @@
       > svg {
         font-size: 60px;
         color: dark.$color-primary;
+
+        @include mx.max-w(768px) {
+          font-size: 45px;
+        }
 
         @include mx.light {
           color: light.$color-white;
@@ -54,6 +79,11 @@
       font-size: 38px;
       font-weight: 700;
       color: dark.$color-white;
+      text-align: center;
+
+      @include mx.max-w(768px) {
+        font-size: 28px;
+      }
 
       @include mx.light {
         color: light.$color-primary;
@@ -63,16 +93,27 @@
     &__durations {
       @include mx.flex-center;
       gap: 16px;
+      width: 100%;
+
+      @include mx.max-w(480px) {
+        gap: 10px;
+      }
 
       &__card {
         @include mx.flex-center;
         gap: 12px;
         flex-direction: column;
         height: 99px;
-        width: 85px;
+        flex: 1; // Allows cards to distribute width evenly
+        max-width: 100px;
         background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
         cursor: pointer;
         border-radius: 12px;
+        transition: background 0.2s ease;
+
+        @include mx.max-w(768px) {
+          height: 85px;
+        }
 
         @include mx.light {
           background-color: rgba(0, 0, 0, 0.05);
@@ -88,6 +129,7 @@
 
           @include mx.light {
             background-color: light.$color-primary-bg-hover;
+            color: light.$color-white; // Added text color change on hover for light theme
           }
         }
 
@@ -106,9 +148,19 @@
 
         > span {
           font-weight: 700;
+          font-size: 16px;
+
+          @include mx.max-w(768px) {
+            font-size: 14px;
+          }
         }
+
         > svg {
           font-size: 32px;
+
+          @include mx.max-w(768px) {
+            font-size: 26px;
+          }
         }
       }
     }
@@ -118,9 +170,10 @@
       border-radius: 20px;
       @include mx.flex-center;
       flex-direction: column;
-      padding: 12px;
+      padding: 16px 12px;
       gap: 14px;
-      width: 80%;
+      width: 100%;
+      box-sizing: border-box;
 
       @include mx.light {
         background-color: rgba(0, 0, 0, 0.05);
@@ -131,12 +184,33 @@
         font-size: 42px;
         font-weight: 600;
         line-height: 100%;
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+
+        @include mx.max-w(768px) {
+          font-size: 32px;
+        }
+      }
+
+      &__currency {
+        font-size: 18px; // Smaller text for "تومان"
+        font-weight: 400;
+
+        @include mx.max-w(768px) {
+          font-size: 16px;
+        }
       }
 
       &__discount {
         color: dark.$color-primary;
         display: flex;
         gap: 12px;
+        font-size: 18px;
+
+        @include mx.max-w(768px) {
+          font-size: 16px;
+        }
 
         @include mx.light {
           color: light.$color-primary;
@@ -144,26 +218,47 @@
 
         &__old-price {
           text-decoration: line-through;
+          opacity: 0.8;
+
           &::after {
             content: " تومان";
           }
         }
+
         &__discount-percent {
           display: flex;
           align-items: center;
+          background: rgba(
+            dark.$color-primary,
+            0.2
+          ); // Optional: creates a badge effect
+          padding: 2px 8px;
+          border-radius: 8px;
+
+          @include mx.light {
+            background: rgba(light.$color-primary, 0.15);
+          }
         }
       }
     }
 
     &__buyBtn {
       height: 67px;
-      width: 252px;
+      width: 100%;
+      max-width: 252px;
       border-radius: 18px;
       font-size: 35px;
       font-weight: 700;
       background-color: dark.$color-primary-bg;
       cursor: pointer;
       transition: background ease 200ms;
+      margin: 8px 0;
+
+      @include mx.max-w(768px) {
+        height: 56px;
+        font-size: 26px;
+        border-radius: 14px;
+      }
 
       @include mx.light {
         background-color: light.$color-primary-bg;
@@ -181,8 +276,10 @@
 
     &__features {
       display: flex;
-      gap: 12px;
+      gap: 16px;
       flex-direction: column;
+      width: 100%;
+      margin-top: 8px;
 
       @include mx.light {
         color: light.$color-black;
@@ -190,14 +287,24 @@
 
       > li {
         display: flex;
-        gap: 16px;
+        align-items: flex-start; // Better for multi-line text
+        gap: 12px;
+        font-size: 16px;
+        line-height: 1.5;
 
-        > svg {
-          color: dark.$color-primary;
+        @include mx.max-w(768px) {
+          font-size: 14px;
+        }
+      }
 
-          @include mx.light {
-            color: light.$color-primary;
-          }
+      &__icon {
+        color: dark.$color-primary;
+        font-size: 22px; // Fixed size to prevent shrinking
+        flex-shrink: 0; // Prevents icon from squishing if text wraps
+        margin-top: 2px; // visually aligns icon with first line of text
+
+        @include mx.light {
+          color: light.$color-primary;
         }
       }
     }

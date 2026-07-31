@@ -25,7 +25,7 @@ const OtpInput = ({
     if (timeLeft <= 0) return;
 
     const interval = setInterval(() => {
-      setTimeLeft(prev => prev - 1);
+      setTimeLeft((prev) => prev - 1);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -50,18 +50,12 @@ const OtpInput = ({
     e: React.KeyboardEvent<HTMLInputElement>,
     index: number
   ) => {
-    if (
-      e.key === 'Backspace' &&
-      !otp[index] &&
-      index > 0
-    ) {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
   };
 
-  const handlePaste = (
-    e: React.ClipboardEvent<HTMLInputElement>
-  ) => {
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
 
     const pasted = e.clipboardData
@@ -106,9 +100,7 @@ const OtpInput = ({
 
   return (
     <div className='otp-input'>
-      <h1 className='otp-input__title'>
-        تایید شماره موبایل
-      </h1>
+      <h1 className='otp-input__title'>تایید شماره موبایل</h1>
 
       <h2 className='otp-input__subtitle'>
         کد چهار رقمی ارسال شده به شماره "{maskedPhone}" را وارد کنید
@@ -116,20 +108,19 @@ const OtpInput = ({
 
       <div className='otp-input__content'>
         <div className='otp-input__fields'>
-
           {otp.map((digit, index) => (
             <input
               key={index}
-              ref={el => {
+              ref={(el) => {
                 inputRefs.current[index] = el;
               }}
               type='text'
+              inputMode='numeric' // Forces number pad on mobile
+              dir='ltr'           // Guarantees proper LTR digit entry
               maxLength={1}
               value={digit}
-              onChange={e =>
-                handleChange(e.target.value, index)
-              }
-              onKeyDown={e => handleKeyDown(e, index)}
+              onChange={(e) => handleChange(e.target.value, index)}
+              onKeyDown={(e) => handleKeyDown(e, index)}
               onPaste={handlePaste}
               className='otp-input__field'
             />
@@ -151,23 +142,13 @@ const OtpInput = ({
         </div>
       </div>
 
-      <p
-        className='otp-input__change-phone'
-        onClick={onChangePhone}
-      >
+      <p className='otp-input__change-phone' onClick={onChangePhone}>
         تغییر شماره موبایل
       </p>
 
-      {error && (
-        <p className='otp-input__error'>
-          {error}
-        </p>
-      )}
+      {error && <p className='otp-input__error'>{error}</p>}
 
-      <button
-        className='otp-input__subBtn'
-        onClick={handleSubmit}
-      >
+      <button className='otp-input__subBtn' onClick={handleSubmit}>
         تایید
       </button>
     </div>

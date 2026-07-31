@@ -20,7 +20,6 @@ const PhoneInput = ({ setPhoneNumber }: { setPhoneNumber: (num: string) => void 
     }
 
     setError('');
-
     setPhoneNumber(number);
   };
 
@@ -37,6 +36,8 @@ const PhoneInput = ({ setPhoneNumber }: { setPhoneNumber: (num: string) => void 
       <input
         placeholder='۰۹XXXXXXXXX'
         type='text'
+        inputMode='numeric' // Opens the number pad on mobile devices
+        dir='ltr' // Ensures LTR typing in RTL layouts
         className='auth-phone-input__input'
         value={number}
         onChange={(e) => {
