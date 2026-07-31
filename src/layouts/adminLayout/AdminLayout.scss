@@ -3,10 +3,36 @@
 @use "../../styles/abstracts/mixins" as mx;
 
 .admin-layout {
+  --layout-surface: #0000001b;
+  --layout-border: rgba(255, 255, 255, 0.1);
+  --layout-text: #{dark.$color-white};
+  --layout-muted: #{dark.$color-gray};
+  --layout-primary: #{dark.$color-primary};
+  --layout-hover: rgba(255, 255, 255, 0.04);
+  --layout-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  --layout-page-bg: linear-gradient(
+    -90deg,
+    rgba(12, 5, 23, 1) 0%,
+    rgba(15, 8, 38, 1) 100%
+  );
+
   min-height: 100vh;
   position: relative;
   overflow: hidden;
   padding-bottom: 32px;
+  background: var(--layout-page-bg);
+  color: var(--layout-text);
+
+  @include mx.light {
+    --layout-surface: #{light.$color-white};
+    --layout-border: rgba(0, 0, 0, 0.08);
+    --layout-text: #{light.$color-black};
+    --layout-muted: #{light.$color-dark-gray};
+    --layout-primary: #{light.$color-primary};
+    --layout-hover: rgba(0, 0, 0, 0.03);
+    --layout-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --layout-page-bg: #{light.$color-bg};
+  }
 
   &::before {
     content: "";
@@ -15,106 +41,131 @@
     pointer-events: none;
     background: radial-gradient(
       circle at top left,
-      rgba(208, 78, 47, 0.18),
-      transparent 40%
+      color-mix(in srgb, var(--layout-primary) 16%, transparent),
+      transparent 42%
     );
+
+    @include mx.light {
+      opacity: 0.35;
+    }
   }
 
   &__shell {
+    position: relative;
+    z-index: 1;
     display: grid;
-    grid-template-columns: 280px minmax(0, 1fr);
+    grid-template-columns: 260px minmax(0, 1fr);
     gap: 24px;
     padding: 24px;
+    margin-top: 76.5px;
 
     @include mx.max-w(1094px) {
       grid-template-columns: 1fr;
       padding: 16px;
+      gap: 16px;
+    }
+  }
+
+  &__sidebar {
+    padding: 22px 16px;
+    border-radius: 16px;
+    background: var(--layout-surface);
+    border: 1px solid var(--layout-border);
+    box-shadow: var(--layout-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-height: calc(100vh - 140px);
+    position: sticky;
+    top: 24px;
+    align-self: start;
+
+    @include mx.max-w(1094px) {
+      min-height: auto;
+      position: relative;
+      top: 0;
+    }
+  }
+
+  &__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 4px 8px 16px;
+    border-bottom: 1px solid var(--layout-border);
+
+    p {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--layout-text);
     }
 
-    &__sidebar {
-      @include mx.glass-card(24px, 14px);
-      padding: 24px 20px;
+    span {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--layout-muted);
+      letter-spacing: 0.04em;
+    }
+  }
+
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &__item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      color: var(--layout-muted);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition:
+        background 160ms ease,
+        color 160ms ease,
+        border-color 160ms ease;
+
+      svg {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        opacity: 0.85;
+      }
+
+      &:hover {
+        color: var(--layout-text);
+        background: var(--layout-hover);
+      }
+
+      &.is-active {
+        color: var(--layout-primary);
+        background: color-mix(in srgb, var(--layout-primary) 12%, transparent);
+        border-color: color-mix(
+          in srgb,
+          var(--layout-primary) 22%,
+          transparent
+        );
+
+        svg {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  &__content {
+    min-width: 0;
+
+    &__inner {
       display: flex;
       flex-direction: column;
       gap: 24px;
-      min-height: calc(100vh - 140px);
-
-      @include mx.max-w(1094px) {
-        min-height: auto;
-      }
-
-      &__brand {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-
-        p {
-          font-size: 22px;
-          font-weight: 900;
-          color: dark.$color-white;
-
-          @include mx.light {
-            color: light.$color-black;
-          }
-        }
-
-        span {
-          font-size: 13px;
-          color: dark.$color-gray;
-
-          @include mx.light {
-            color: light.$color-gray;
-          }
-        }
-      }
-
-      &__nav {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-
-        &__item {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 13px 14px;
-          border-radius: 14px;
-          color: dark.$color-white;
-          font-weight: 700;
-          transition: all 200ms ease;
-          text-decoration: none;
-
-          @include mx.light {
-            color: light.$color-black;
-          }
-
-          &:hover {
-            background: rgba(208, 78, 47, 0.16);
-            transform: translateX(-2px);
-          }
-
-          &.is-active {
-            background: linear-gradient(
-              135deg,
-              rgba(208, 78, 47, 0.28),
-              rgba(208, 78, 47, 0.1)
-            );
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
-          }
-        }
-      }
-    }
-
-    &__content {
-      min-width: 0;
-
-      &__inner {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-      }
     }
   }
 }

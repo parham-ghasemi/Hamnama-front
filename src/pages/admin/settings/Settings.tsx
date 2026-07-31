@@ -18,7 +18,7 @@ const Settings = () => {
       const response = await adminApi.triggerArchiveScrape(archiveUrl.trim());
       setJobId(response.data.job_id);
       toast.success('عملیات آرشیو آغاز شد');
-    } catch (error) {
+    } catch {
       toast.error('آغاز عملیات آرشیو با مشکل مواجه شد');
     } finally {
       setIsSubmitting(false);
@@ -27,47 +27,62 @@ const Settings = () => {
 
   return (
     <section className="admin-settings">
-      <div className="admin-settings__hero">
+      <header className="admin-settings__header">
         <div>
-          <p className="admin-settings__hero__eyebrow">تنظیمات</p>
-          <h1 className="admin-settings__hero__title">مدیریت وبسایت</h1>
+          <p className="admin-settings__eyebrow">تنظیمات</p>
+          <h1 className="admin-settings__title">مدیریت وبسایت</h1>
         </div>
-        <div className="admin-settings__hero__pill">آرشیو و منابع</div>
-      </div>
+        <span className="admin-settings__pill">آرشیو و منابع</span>
+      </header>
 
-      <div className="admin-settings__section">
-        <div className="admin-settings__section__header">
+      <div className="admin-settings__card">
+        <div className="admin-settings__card__head">
           <div>
-            <p className="admin-settings__section__header__title">مدیریت آرشیو</p>
-            <span className="admin-settings__section__header__subtitle">درخواست اجرای اسکرپینگ برای یک منبع جدید</span>
+            <p className="admin-settings__card__title">مدیریت آرشیو</p>
+            <span className="admin-settings__card__subtitle">
+              درخواست اجرای اسکرپینگ برای یک منبع جدید
+            </span>
           </div>
         </div>
 
-        <form className="admin-settings__section__form" onSubmit={handleSubmit}>
+        <form className="admin-settings__form" onSubmit={handleSubmit}>
           <label>
-            آدرس صفحه یا منبع
-            <input value={archiveUrl} onChange={(event) => setArchiveUrl(event.target.value)} placeholder="https://example.com" />
+            <span>آدرس صفحه یا منبع</span>
+            <input
+              value={archiveUrl}
+              onChange={(event) => setArchiveUrl(event.target.value)}
+              placeholder="https://example.com"
+              dir="ltr"
+            />
           </label>
-          <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'در حال ارسال...' : 'شروع پردازش'}
+          <button
+            type="submit"
+            className="admin-settings__submit"
+            disabled={isSubmitting || !archiveUrl.trim()}
+          >
+            {isSubmitting ? 'در حال ارسال…' : 'شروع پردازش'}
           </button>
         </form>
 
         {jobId ? (
-          <div className="admin-settings__section__status">
-            <FiCheckCircle />
-            <p>شناسه کار: {jobId}</p>
+          <div className="admin-settings__status">
+            <FiCheckCircle aria-hidden />
+            <p>
+              شناسه کار: <code>{jobId}</code>
+            </p>
           </div>
         ) : null}
       </div>
 
-      <div className="admin-settings__section">
-        <div className="admin-settings__section__header">
+      <div className="admin-settings__card admin-settings__card--muted">
+        <div className="admin-settings__card__head">
           <div>
-            <p className="admin-settings__section__header__title">بخش‌های آینده</p>
-            <span className="admin-settings__section__header__subtitle">ساختار آماده برای افزودن تنظیمات بیشتر</span>
+            <p className="admin-settings__card__title">بخش‌های آینده</p>
+            <span className="admin-settings__card__subtitle">
+              ساختار آماده برای افزودن تنظیمات بیشتر
+            </span>
           </div>
-          <div className="admin-settings__section__icon">
+          <div className="admin-settings__card__icon">
             <FiArchive />
           </div>
         </div>

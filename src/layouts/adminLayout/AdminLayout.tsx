@@ -1,5 +1,11 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { FiLayout, FiMessageSquare, FiUsers, FiMonitor, FiSettings } from 'react-icons/fi';
+import {
+  FiLayout,
+  FiMessageSquare,
+  FiUsers,
+  FiMonitor,
+  FiSettings,
+} from 'react-icons/fi';
 import Header from '../../components/header/Header';
 import './AdminLayout.scss';
 
@@ -17,24 +23,30 @@ const AdminLayout = () => {
       <Header />
 
       <div className="admin-layout__shell">
-        <aside className="admin-layout__shell__sidebar">
-          <div className="admin-layout__shell__sidebar__brand">
+        <aside className="admin-layout__sidebar">
+          <div className="admin-layout__brand">
             <p>پنل مدیریت</p>
             <span>hamnama</span>
           </div>
 
-          <nav className="admin-layout__shell__sidebar__nav">
+          <nav className="admin-layout__nav">
             {navItems.map(({ to, label, icon: Icon }) => (
-              <NavLink key={to} to={to} className={({ isActive }) => `admin-layout__shell__sidebar__nav__item ${isActive ? 'is-active' : ''}`}>
-                <Icon />
+              <NavLink
+                key={to}
+                to={to}
+                className={({ isActive }) =>
+                  `admin-layout__nav__item ${isActive ? 'is-active' : ''}`
+                }
+              >
+                <Icon aria-hidden />
                 <span>{label}</span>
               </NavLink>
             ))}
           </nav>
         </aside>
 
-        <main className="admin-layout__shell__content">
-          <div className="admin-layout__shell__content__inner">
+        <main className="admin-layout__content">
+          <div className="admin-layout__content__inner">
             <Outlet />
           </div>
         </main>

@@ -2,150 +2,321 @@
 @use "../../../styles/abstracts/variables.light" as light;
 @use "../../../styles/abstracts/mixins" as mx;
 
+// ── Shared tokens (resolved via light mixin) ──────────────────────────────
+.admin-dashboard {
+  --dash-bg: transparent;
+  --dash-surface: #0000001b;
+  --dash-border: rgba(255, 255, 255, 0.1);
+  --dash-text: #{dark.$color-white};
+  --dash-muted: #{dark.$color-gray};
+  --dash-subtle: #{dark.$color-light-gray};
+  --dash-primary: #{dark.$color-primary};
+  --dash-green: #{dark.$color-green};
+  --dash-tooltip-bg: #1a1a1a;
+  --dash-dropdown-bg: #1c1c1c;
+  --dash-dropdown-hover: rgba(255, 255, 255, 0.06);
+  --dash-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+
+  @include mx.light {
+    --dash-surface: #{light.$color-white};
+    --dash-border: rgba(0, 0, 0, 0.08);
+    --dash-text: #{light.$color-black};
+    --dash-muted: #{light.$color-dark-gray};
+    --dash-subtle: #{light.$color-gray};
+    --dash-primary: #{light.$color-primary};
+    --dash-green: #{light.$color-green};
+    --dash-tooltip-bg: #fff;
+    --dash-dropdown-bg: #fff;
+    --dash-dropdown-hover: rgba(0, 0, 0, 0.04);
+    --dash-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+}
+
+// ── Layout ────────────────────────────────────────────────────────────────
 .admin-dashboard {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 28px;
+  color: var(--dash-text);
 
-  &__hero {
-    @include mx.glass-card(24px, 14px);
-    padding: 24px 28px;
+  &__header {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
     gap: 16px;
-
-    @include mx.max-w(768px) {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    &__eyebrow {
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.24em;
-      color: dark.$color-gray;
-      margin-bottom: 6px;
-    }
-
-    &__title {
-      font-size: 28px;
-      font-weight: 900;
-      color: dark.$color-white;
-      margin: 0;
-
-      @include mx.light {
-        color: light.$color-black;
-      }
-    }
-
-    &__pill {
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(208, 78, 47, 0.18);
-      color: dark.$color-white;
-      font-size: 13px;
-      font-weight: 700;
-
-      @include mx.light {
-        color: light.$color-black;
-      }
-    }
+    flex-wrap: wrap;
   }
 
-  &__stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px;
+  &__eyebrow {
+    margin: 0 0 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dash-muted);
+  }
 
-    @include mx.max-w(1094px) {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  &__title {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--dash-text);
+  }
+
+  // ── Metric cards ──────────────────────────────────────────────────────
+  &__metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
 
     @include mx.max-w(640px) {
       grid-template-columns: 1fr;
     }
   }
 
-  &__stat-card {
-    @include mx.glass-card(20px, 12px);
-    padding: 20px;
+  &__metric {
+    position: relative;
+    padding: 22px 24px;
+    border-radius: 16px;
+    background: var(--dash-surface);
+    border: 1px solid var(--dash-border);
+    box-shadow: var(--dash-shadow);
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    min-height: 138px;
+    gap: 12px;
+    min-height: 140px;
+    transition: border-color 200ms ease;
+
+    &__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
 
     &__title {
-      color: dark.$color-gray;
-      font-size: 13px;
       margin: 0;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--dash-muted);
     }
 
     &__value {
-      font-size: 24px;
-      font-weight: 900;
-      color: dark.$color-white;
       margin: 0;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--dash-text);
+    }
 
-      @include mx.light {
-        color: light.$color-black;
+    &__hint {
+      font-size: 12px;
+      color: var(--dash-subtle);
+    }
+
+    &--primary {
+      border-color: color-mix(
+        in srgb,
+        var(--dash-primary) 28%,
+        var(--dash-border)
+      );
+
+      .admin-dashboard__metric__value {
+        color: var(--dash-primary);
       }
     }
 
-    &__subtitle {
-      color: dark.$color-light-gray;
-      font-size: 13px;
+    &--green {
+      border-color: color-mix(
+        in srgb,
+        var(--dash-green) 28%,
+        var(--dash-border)
+      );
+
+      .admin-dashboard__metric__value {
+        color: var(--dash-green);
+      }
     }
   }
 
-  &__charts-grid {
+  // ── Charts ────────────────────────────────────────────────────────────
+  &__charts {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
 
-    @include mx.max-w(1094px) {
+    @include mx.max-w(980px) {
       grid-template-columns: 1fr;
     }
   }
 
-  &__chart-card {
-    @include mx.glass-card(24px, 12px);
-    padding: 20px;
-    min-height: 360px;
+  &__chart {
+    padding: 20px 22px 16px;
+    border-radius: 16px;
+    background: var(--dash-surface);
+    border: 1px solid var(--dash-border);
+    box-shadow: var(--dash-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 340px;
 
-    &__header {
-      margin-bottom: 14px;
+    &__head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
     }
 
     &__title {
-      font-size: 18px;
-      font-weight: 800;
-      color: dark.$color-white;
       margin: 0 0 4px;
-
-      @include mx.light {
-        color: light.$color-black;
-      }
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--dash-text);
     }
 
     &__subtitle {
-      font-size: 13px;
-      color: dark.$color-gray;
+      font-size: 12px;
+      color: var(--dash-muted);
     }
 
-    &__chart {
-      height: 280px;
-      width: 100%;
+    &__body {
+      flex: 1;
+      min-height: 260px;
+      color: var(--dash-muted); // axis tick color via currentColor
     }
   }
 
+  // ── States ────────────────────────────────────────────────────────────
   &__loading,
   &__empty {
-    @include mx.glass-card(24px, 12px);
-    min-height: 280px;
+    min-height: 240px;
     display: grid;
     place-items: center;
-    color: dark.$color-white;
-    font-weight: 700;
+    border-radius: 16px;
+    background: var(--dash-surface);
+    border: 1px solid var(--dash-border);
+    color: var(--dash-muted);
+    font-weight: 600;
+    font-size: 14px;
+    text-align: center;
+    padding: 24px;
+  }
+}
+
+// ── Custom dropdown ───────────────────────────────────────────────────────
+.admin-dash-dropdown {
+  position: relative;
+
+  &__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--dash-border);
+    background: transparent;
+    color: var(--dash-text);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 0;
+    transition:
+      background 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease;
+
+    &:hover {
+      background: var(--dash-dropdown-hover);
+      border-color: color-mix(
+        in srgb,
+        var(--dash-text) 18%,
+        var(--dash-border)
+      );
+    }
+
+    &:focus-visible {
+      outline: 2px solid
+        color-mix(in srgb, var(--dash-primary) 50%, transparent);
+      outline-offset: 2px;
+    }
+  }
+
+  &__chevron {
+    flex-shrink: 0;
+    opacity: 0.7;
+    transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  &.is-open &__chevron {
+    transform: rotate(180deg);
+  }
+
+  &__menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    inset-inline-end: 0;
+    min-width: 148px;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    border-radius: 12px;
+    background: var(--dash-dropdown-bg);
+    border: 1px solid var(--dash-border);
+    box-shadow:
+      0 12px 28px rgba(0, 0, 0, 0.28),
+      0 0 0 1px rgba(255, 255, 255, 0.03);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px) scale(0.98);
+    transform-origin: top right;
+    transition:
+      opacity 180ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 180ms;
+    z-index: 999;
+
+    @include mx.light {
+      box-shadow:
+        0 12px 28px rgba(0, 0, 0, 0.12),
+        0 0 0 1px rgba(0, 0, 0, 0.04);
+    }
+  }
+
+  &.is-open &__menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
+
+  &__option {
+    display: block;
+    width: 100%;
+    padding: 9px 12px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--dash-text);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: start;
+    cursor: pointer;
+    transition:
+      background 140ms ease,
+      color 140ms ease;
+
+    &:hover {
+      background: var(--dash-dropdown-hover);
+    }
+
+    &.is-active {
+      color: var(--dash-primary);
+      font-weight: 700;
+      background: color-mix(in srgb, var(--dash-primary) 12%, transparent);
+    }
   }
 }
