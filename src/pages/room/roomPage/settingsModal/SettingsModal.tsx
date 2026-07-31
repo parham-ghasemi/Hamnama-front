@@ -3,7 +3,7 @@ import "./SettingsModal.scss";
 import { AiTwotoneSetting, AiTwotoneThunderbolt } from "react-icons/ai";
 import { IoLockClosed, IoLockOpen, IoSunnySharp } from "react-icons/io5";
 import { BsMoonFill } from "react-icons/bs";
-import { useTheme, type Theme } from "../../../../context/ThemeContext";
+import { useState } from "react";
 
 const SettingsModal = ({
   isOpen,
@@ -17,10 +17,13 @@ const SettingsModal = ({
   currentlyPlaying?: string | null;
   createdAt: string;
 }) => {
-  const { theme, setTheme } = useTheme();
 
-  const handleThemeSelect = (nextTheme: Theme) => {
-    setTheme(nextTheme);
+  const [theme, setTheme] = useState('default')
+
+  const handleThemeSelect = (nextTheme: string) => {
+    const roomContainer = document.querySelector('.room-page');
+    roomContainer?.setAttribute('data-theme', nextTheme)
+    setTheme(nextTheme)
   };
 
   return (
