@@ -1,31 +1,4 @@
-@use "../../../styles//abstracts//variables" as dark;
-@use "../../../styles/abstracts/variables.light" as light;
-@use "../../../styles//abstracts//mixins" as mx;
-@use "sass:color";
-
-$background: linear-gradient(
-  -90deg,
-  rgba(12, 5, 23, 1) 0%,
-  rgba(15, 8, 38, 1) 100%
-);
-$chat-background: rgba(255, 255, 255, 0.03);
-$text: #dddddd;
-$component-bg: linear-gradient(
-  180deg,
-  rgba(221, 0, 255, 0.1) 0%,
-  rgba(15, 8, 38, 0.1) 100%
-);
-$outgoing-message-background: rgba(255, 255, 255, 0.15);
-$incoming-message-background:
-  linear-gradient(
-    104deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(82, 82, 82, 0.1) 100%
-  ),
-  rgba(191, 0, 255, 0.15);
-$messages-footer: rgba(217, 217, 217, 0.06);
-$send-btn-bg: #271244;
-$send-input-bg: rgba(20, 0, 40, 0.5);
+@use "../../../styles/abstracts/mixins" as mx;
 
 .room-page {
   height: 100vh;
@@ -33,8 +6,8 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
   display: flex;
   justify-content: space-evenly;
   padding: 24px 21px;
-  background: $background;
-  color: $text;
+  background: var(--bg-main);
+  color: var(--text-primary);
   gap: 20px;
   position: relative;
 
@@ -43,7 +16,7 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
     max-width: 345px;
     height: 100%;
     border-radius: 27px;
-    background: $chat-background;
+    background: var(--chat-container-bg);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -51,18 +24,18 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
     &__head {
       width: 100%;
       height: 110px;
-      background: $component-bg;
+      background: var(--component-bg);
       @include mx.flex-center;
-      border-bottom: 1px solid color.adjust($text, $alpha: -0.9);
+      border-bottom: 1px solid var(--border-subtle);
 
       > p {
         font-size: 22px;
         font-weight: 800;
-        color: color.adjust($text, $alpha: -0.55);
+        color: var(--text-muted);
       }
       > span {
         font-size: 35px;
-        color: color.adjust($text, $alpha: -0.55);
+        color: var(--text-muted);
       }
     }
 
@@ -93,7 +66,7 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
           padding: 8px 7px 8px 10px;
           display: flex;
           flex-direction: column;
-          background: $incoming-message-background;
+          background: var(--msg-in-bg);
           gap: 3px;
           border-radius: 0px 12px 12px 0px;
 
@@ -128,7 +101,7 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
         .room-page__chat-container__message-block__messages {
           align-items: start;
           &__message {
-            background: $outgoing-message-background;
+            background: var(--msg-out-bg);
             border-radius: 12px 0 0 12px;
 
             &:first-of-type {
@@ -145,7 +118,7 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
     &__foot {
       height: 90px;
       width: 100%;
-      background: $messages-footer;
+      background: var(--chat-foot-bg);
       @include mx.flex-center;
       gap: 16px;
 
@@ -154,21 +127,21 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
         @include mx.flex-center;
         width: 44px;
         height: 44px;
-        background: $send-btn-bg;
+        background: var(--send-btn-bg);
         border-radius: 100%;
-        outline: 1px solid $chat-background;
+        outline: 1px solid var(--chat-container-bg);
         cursor: pointer;
       }
 
       &__input {
-        border: 1px solid #3a3a3c;
+        border: 1px solid var(--border-input);
         height: 50px;
         width: 213px;
         border-radius: 999px;
         overflow: hidden;
         display: flex;
         align-items: center;
-        background: $send-input-bg;
+        background: var(--send-input-bg);
 
         > textarea {
           height: 100%;
@@ -177,22 +150,14 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
           border: none;
           padding: 10px 0px;
           scrollbar-width: thin;
-          scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-
-          @include mx.light {
-            scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
-          }
+          scrollbar-color: var(--scrollbar-thumb) transparent;
 
           &::-webkit-scrollbar {
             width: 3px;
           }
           &::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
+            background: var(--scrollbar-thumb);
             border-radius: 10px;
-
-            @include mx.light {
-              background: rgba(0, 0, 0, 0.1);
-            }
           }
         }
 
@@ -203,7 +168,7 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
           @include mx.flex-center;
           > svg {
             font-size: 24px;
-            color: #7f7f7f;
+            color: var(--icon-color);
             opacity: 1;
           }
         }
@@ -221,12 +186,12 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
       width: 100%;
       height: 110px;
       border-radius: 26px;
-      background: $component-bg;
+      background: var(--component-bg);
       @include mx.flex-center;
       gap: 26px;
 
       > input {
-        border: 1px solid color.adjust($text, $alpha: -0.75);
+        border: 1px solid var(--border-main-input);
         width: 543px;
         height: 60px;
         border-radius: 8px;
@@ -243,11 +208,7 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
       }
 
       &__submit {
-        background: linear-gradient(
-          230deg,
-          color.adjust(#750f8f, $whiteness: 10%) 0%,
-          color.adjust(#3a124c, $whiteness: 10%) 100%
-        );
+        background: var(--btn-submit-bg);
         height: 55px;
         width: 82px;
         border-radius: 8px;
@@ -255,11 +216,7 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
         font-weight: 700;
       }
       &__choose {
-        background: linear-gradient(
-          230deg,
-          color.adjust(#75108f, $whiteness: 10%) 0%,
-          color.adjust(#3a124c, $whiteness: 10%) 100%
-        );
+        background: var(--btn-submit-bg);
         height: 55px;
         width: 130px;
         border-radius: 8px;
@@ -278,7 +235,7 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
   &__side-bar {
     width: 66px;
     height: 100%;
-    background: $component-bg;
+    background: var(--component-bg);
     padding: 24px 9px;
     display: flex;
     align-items: center;
@@ -295,21 +252,21 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
       > button {
         height: 48px;
         width: 48px;
-        background: rgb(131, 131, 131, 0.25);
+        background: var(--sidebar-btn-bg);
         border-radius: 20px;
-        color: #b4b4b4;
+        color: var(--icon-sidebar);
         @include mx.flex-center;
         font-size: 25px;
         cursor: pointer;
         transition: background 200ms ease;
         &:hover {
-          background: rgb(131, 131, 131, 0.4);
+          background: var(--sidebar-btn-hover);
         }
       }
       &__settings {
         > svg {
           > path {
-            fill: #b4b4b4;
+            fill: var(--icon-sidebar);
           }
         }
       }
@@ -327,7 +284,7 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: var(--modal-overlay-bg);
     backdrop-filter: blur(8px);
     z-index: 500;
     @include mx.flex-center;
@@ -335,10 +292,6 @@ $send-input-bg: rgba(20, 0, 40, 0.5);
     opacity: 0;
     pointer-events: none;
     transition: opacity 300ms ease;
-
-    @include mx.light {
-      background-color: rgba(255, 255, 255, 0.6);
-    }
 
     &.is-active {
       opacity: 1;

@@ -1,0 +1,190 @@
+@use "sass:color";
+/* =========================================
+   Global Themes (CSS Variables)
+========================================= */
+
+.room-page,
+.room-page[data-theme="dark"] {
+  /* Base & Main Page */
+  --bg-main: linear-gradient(
+    -90deg,
+    rgba(12, 5, 23, 1) 0%,
+    rgba(15, 8, 38, 1) 100%
+  );
+  --text-primary: #dddddd;
+  --text-muted: rgba(221, 221, 221, 0.45);
+  --border-subtle: rgba(221, 221, 221, 0.1);
+  --border-input: #3a3a3c;
+  --border-main-input: rgba(221, 221, 221, 0.25);
+  --icon-color: #7f7f7f;
+  --icon-sidebar: #b4b4b4;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.3);
+  --modal-overlay-bg: rgba(0, 0, 0, 0.6);
+
+  /* Chat Component */
+  --chat-container-bg: rgba(255, 255, 255, 0.03);
+  --component-bg: linear-gradient(
+    180deg,
+    rgba(221, 0, 255, 0.1) 0%,
+    rgba(15, 8, 38, 0.1) 100%
+  );
+  --msg-in-bg:
+    linear-gradient(
+      104deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(82, 82, 82, 0.1) 100%
+    ),
+    rgba(191, 0, 255, 0.15);
+  --msg-out-bg: rgba(255, 255, 255, 0.15);
+  --chat-foot-bg: rgba(217, 217, 217, 0.06);
+  --send-btn-bg: #271244;
+  --send-input-bg: rgba(20, 0, 40, 0.5);
+  --btn-submit-bg: linear-gradient(230deg, #8b18a8 0%, #441559 100%);
+  --sidebar-btn-bg: rgba(131, 131, 131, 0.25);
+  --sidebar-btn-hover: rgba(131, 131, 131, 0.4);
+
+  /* Users Modal */
+  --modal-bg: rgba(46, 22, 76, 0.08);
+  --modal-head-bg: #381538;
+  --modal-body-bg: rgba(30, 27, 33, 0.62);
+  --user-card-bg: rgba(210, 210, 210, 0.06);
+  --role-trigger-bg: #2a2a2a;
+  --role-trigger-current-bg: rgba(91, 38, 91, 0.25);
+  --role-icon-bg: #371527;
+  --conn-good-bg: rgba(0, 255, 55, 0.1);
+  --conn-good-icon: #00850b;
+  --conn-med-bg: rgba(255, 213, 0, 0.1);
+  --conn-med-icon: #c2a200;
+  --conn-bad-bg: rgba(255, 0, 0, 0.2);
+  --conn-bad-icon: #8d0000;
+  --kick-btn-bg: #982f2f;
+  --kick-btn-current-bg: rgba(255, 255, 255, 0.1);
+
+  /* Settings Modal */
+  --set-row-border: #888888;
+  --set-item-1: #72006a;
+  --set-item-2: #381538;
+  --set-item-3: #343434;
+  --set-item-4: #2d112d;
+  --set-item-5: #6b5e55;
+
+  /* Media Modal */
+  --media-head-bg: #400456;
+  --media-card-bg: rgba(89, 89, 89, 0.27);
+  --media-shadow: rgba(0, 0, 0, 0.4);
+  --media-grad-1: linear-gradient(135deg, #002879 -10%, #00ffff 100%);
+  --media-grad-2: linear-gradient(135deg, #c800ff -10%, #832493 100%);
+  --media-grad-3: linear-gradient(135deg, #00fffb -20%, #ff00ff 100%);
+
+  /* Archive Modal */
+  --arc-bg: #170d24;
+  --arc-border: rgba(255, 255, 255, 0.08);
+  --arc-shadow: rgba(0, 0, 0, 0.5);
+  --arc-head-bg: linear-gradient(135deg, #400456 0%, #220230 100%);
+  --arc-accent: #d880ff;
+  --arc-btn-close: rgba(255, 255, 255, 0.1);
+  --arc-btn-close-hover: rgba(255, 255, 255, 0.2);
+  --arc-scrollbar: rgba(255, 255, 255, 0.15);
+  --arc-text-icon: #a092b0;
+  --arc-input-bg: rgba(255, 255, 255, 0.05);
+  --arc-input-border: rgba(255, 255, 255, 0.1);
+  --arc-input-border-focus: #d880ff;
+  --arc-text-placeholder: #7d6f8f;
+  --arc-card-bg: rgba(255, 255, 255, 0.03);
+  --arc-card-border: rgba(255, 255, 255, 0.05);
+  --arc-card-hover-border: rgba(216, 128, 255, 0.4);
+  --arc-poster-fallback: #25163a;
+  --arc-rating-bg: rgba(0, 0, 0, 0.75);
+  --arc-rating-text: #ffc107;
+  --arc-type-text: #9d8db0;
+  --arc-badge-type-bg: rgba(216, 128, 255, 0.15);
+  --arc-badge-rating-bg: rgba(255, 193, 7, 0.15);
+  --arc-votes-text: #8c7d9e;
+  --arc-tag-bg: rgba(255, 255, 255, 0.06);
+  --arc-tag-text: #cbbcdb;
+  --arc-desc-text: #b7a9cc;
+  --arc-version-bg: rgba(255, 255, 255, 0.04);
+  --arc-version-border: rgba(255, 255, 255, 0.06);
+  --arc-badge-season-bg: #391c59;
+  --arc-badge-season-text: #e0b0ff;
+  --arc-badge-qual-bg: #1c3b59;
+  --arc-badge-qual-text: #80c2ff;
+  --arc-badge-sub-bg: #1c5938;
+  --arc-badge-sub-text: #80ffb6;
+  --arc-btn-select-bg: #d880ff;
+  --arc-btn-select-text: #170d24;
+  --arc-btn-select-hover: #e59dff;
+}
+
+/* ================== LIGHT THEME ================== */
+.room-page[data-theme="light"] {
+  --bg-main: linear-gradient(-90deg, #c8c8c8 0%, #e7e7e7 100%);
+  --text-primary: #fff;
+  --text-muted: #ffffff;
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-input: rgba(127, 127, 127, 0.7);
+  --border-main-input: rgba(255, 255, 255, 0.7);
+  --icon-color: #7f7f7f;
+  --icon-sidebar: #683d60;
+  --scrollbar-thumb: rgba(0, 0, 0, 0.2);
+  --modal-overlay-bg: rgba(107, 107, 107, 0.351);
+
+  --chat-container-bg: #7e7e7e;
+  // --component-bg: linear-gradient(
+  //   0deg,
+  //   rgba(255, 255, 255, 0.23) 0%,
+  //   rgba(16, 16, 16, 0.23) 100%
+  // );
+  --component-bg: #7e7e7e;
+
+  --msg-in-bg:
+    linear-gradient(
+      -60deg,
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(83, 83, 83, 0.5) 100%
+    ),
+    rgb(255, 255, 255, 0.5);
+  --msg-out-bg: rgb(255, 255, 255, 0.15);
+  --chat-foot-bg: rgb(11, 11, 11, 0.35);
+  --send-btn-bg: #5e3760;
+  --send-input-bg: rgba(85, 85, 85, 0.5);
+  --btn-submit-bg: #683d60;
+  --sidebar-btn-bg: #c6c6c6;
+  --sidebar-btn-hover: #c6c6c6a5;
+
+  --modal-bg: #d2d2d2;
+  --modal-text: #111;
+  --modal-head-bg: #683d60;
+  --modal-body-bg: #d2d2d2;
+  --user-card-bg: #fff;
+  --role-trigger-bg: #b5b5b5;
+  --role-trigger-current-bg: rgba(104, 61, 96, 0.5);
+  --role-icon-bg: #683d68;
+
+  --media-head-bg: #683d68;
+  --media-card-bg: rgba(255, 255, 255, 0.6);
+  --media-shadow: rgba(0, 0, 0, 0.1);
+
+  --arc-bg: #f8f9fa;
+  --arc-border: rgba(0, 0, 0, 0.08);
+  --arc-shadow: rgba(0, 0, 0, 0.15);
+  --arc-head-bg: linear-gradient(135deg, #c55ce3 0%, #996fb3 100%);
+  --arc-accent: #8b18a8;
+  --arc-btn-close: rgba(0, 0, 0, 0.1);
+  --arc-btn-close-hover: rgba(0, 0, 0, 0.2);
+  --arc-text-icon: #5a5a5a;
+  --arc-input-bg: rgba(0, 0, 0, 0.05);
+  --arc-input-border: rgba(0, 0, 0, 0.1);
+  --arc-input-border-focus: #8b18a8;
+  --arc-text-placeholder: #888888;
+  --arc-card-bg: rgba(255, 255, 255, 1);
+  --arc-card-border: rgba(0, 0, 0, 0.05);
+  --arc-card-hover-border: rgba(139, 24, 168, 0.4);
+  --arc-poster-fallback: #e0e0e0;
+  --arc-desc-text: #4a4a4a;
+  --arc-version-bg: rgba(0, 0, 0, 0.02);
+  --arc-version-border: rgba(0, 0, 0, 0.06);
+  --arc-btn-select-bg: #c55ce3;
+  --arc-btn-select-text: #ffffff;
+  --arc-btn-select-hover: #b445d4;
+}

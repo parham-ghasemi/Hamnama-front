@@ -30,7 +30,13 @@ const UsersModal = ({ isOpen, users }: { isOpen: boolean; users: UserRow[] }) =>
         {users.map((user, ind) => (
           <div className="room-users-modal__body__card" key={user.userId}>
             <div className="room-users-modal__body__card__profile">
-              <img src={`${import.meta.env.VITE_BASE_URL}${user?.avatar}`} alt={user.name} />
+              {
+                user.avatar ? (
+                  <img src={`${import.meta.env.VITE_BASE_URL}${user?.avatar}`} alt={user.name} />
+                ) : (
+                  <span>{user.name[0]}</span>
+                )
+              }
               <div>
                 <p>{user.isCurrentUser ? "شما" : user.name}</p>
               </div>

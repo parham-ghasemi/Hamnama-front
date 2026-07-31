@@ -1,12 +1,9 @@
-@use "../../../../styles//abstracts//variables" as dark;
-@use "../../../../styles/abstracts/variables.light" as light;
-@use "../../../../styles//abstracts//mixins" as mx;
-@use "sass:color";
+@use "../../../../styles/abstracts/mixins" as mx;
 
 .room-users-modal {
   width: 1300px;
   border-radius: 26px;
-  background-color: rgba(46, 22, 76, 0.08);
+  background-color: var(--modal-bg);
   opacity: 0;
   transition: opacity ease 200ms;
   overflow: hidden;
@@ -17,7 +14,7 @@
   &__head {
     width: 100%;
     height: 162px;
-    background-color: #381538;
+    background-color: var(--modal-head-bg);
     @include mx.flex-center;
     gap: 9px;
 
@@ -35,10 +32,11 @@
     padding: 71px 108px;
     @include mx.flex-center;
     gap: 93px;
-    background-color: #1e1b219d;
+    background-color: var(--modal-body-bg);
+    color: var(--modal-text);
 
     &__card {
-      background-color: color.adjust(dark.$color-light-gray, $alpha: -0.94);
+      background-color: var(--user-card-bg);
       border-radius: 17px;
       min-height: 271px;
       width: 201px;
@@ -59,6 +57,15 @@
           height: 71px;
           width: 71px;
           border-radius: 100%;
+        }
+        > span {
+          height: 71px;
+          width: 71px;
+          border-radius: 100%;
+          @include mx.flex-center;
+          background-color: var(--icon-color);
+          font-size: 26px;
+          font-weight: 900;
         }
         > p {
           font-size: 18px;
@@ -101,13 +108,13 @@
             align-items: center;
             justify-content: space-between;
             padding-left: 6px;
-            background-color: dark.$color-dark-gray;
+            background-color: var(--role-trigger-bg);
             transition:
               opacity 200ms ease,
               border-radius 200ms ease;
 
             &.current {
-              background-color: rgba(91, 38, 91, 0.25);
+              background-color: var(--role-trigger-current-bg);
               > svg {
                 opacity: 0;
               }
@@ -122,7 +129,7 @@
             }
 
             > span {
-              background-color: #371527;
+              background-color: var(--role-icon-bg);
               border-radius: 7px;
               height: 26px;
               width: 26px;
@@ -149,7 +156,7 @@
             align-items: center;
             justify-content: space-between;
             padding-left: 6px;
-            background-color: dark.$color-dark-gray;
+            background-color: var(--role-trigger-bg);
             transition:
               opacity 200ms ease,
               transform 200ms ease;
@@ -157,7 +164,7 @@
             transform: translateY(-10px);
 
             > span {
-              background-color: #371527;
+              background-color: var(--role-icon-bg);
               border-radius: 0 0 7px 7px;
               height: 26px;
               width: 26px;
@@ -200,21 +207,21 @@
           }
 
           &.good {
-            background-color: rgba(0, 255, 55, 0.1);
+            background-color: var(--conn-good-bg);
             > span {
-              background-color: #00850b;
+              background-color: var(--conn-good-icon);
             }
           }
           &.medium {
-            background-color: rgba(255, 213, 0, 0.1);
+            background-color: var(--conn-med-bg);
             > span {
-              background-color: #c2a200;
+              background-color: var(--conn-med-icon);
             }
           }
           &.bad {
-            background-color: rgba(255, 0, 0, 0.2);
+            background-color: var(--conn-bad-bg);
             > span {
-              background-color: #8d0000;
+              background-color: var(--conn-bad-icon);
             }
           }
         }
@@ -227,7 +234,7 @@
         @include mx.flex-center;
         font-size: 12px;
         font-weight: 600;
-        background-color: #982f2f;
+        background-color: var(--kick-btn-bg);
         cursor: pointer;
         transition: opacity 200ms ease;
 
@@ -237,7 +244,7 @@
 
         &.current {
           font-size: 14px;
-          background-color: color.adjust(dark.$color-white, $alpha: -0.9);
+          background-color: var(--kick-btn-current-bg);
           cursor: default;
           &:hover {
             opacity: 1;

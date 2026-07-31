@@ -1,4 +1,5 @@
 import './RoomPage.scss'
+import './themse/Themes.scss'
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
@@ -82,6 +83,8 @@ function buildWsUrl(baseUrl: string, roomId: string, token?: string) {
 }
 
 const RoomPage = () => {
+  const roomContainer = document.querySelector('.room-page');
+  roomContainer?.setAttribute('data-theme', 'light')
   const { id: roomId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -91,7 +94,7 @@ const RoomPage = () => {
   const [mediaTypeModalOpen, setMediaTypeModalOpen] = useState(false);
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
 
-  const [currentQuality, setCurrentQuality] = useState("1080");
+  const [currentQuality, setCurrentQuality] = useState("quality");
   const [link, setLink] = useState("");
   const [messageText, setMessageText] = useState("");
   const [roomState, setRoomState] = useState<RoomResponse | null>(null);
@@ -496,13 +499,19 @@ const RoomPage = () => {
                 </div>
               </div>
 
-              <img
-                src={message.sender_avatar}
-                alt={message.sender_name}
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = "/rodeocover.png";
-                }}
-              />
+              {
+                message.sender_avatar ? (
+                  <img
+                    src={message.sender_avatar}
+                    alt={message.sender_name}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = "/rodeocover.png";
+                    }}
+                  />
+                ) : (
+                  <span>{message.sender_name[0]}</span>
+                )
+              }
             </div>
           ))}
         </div>

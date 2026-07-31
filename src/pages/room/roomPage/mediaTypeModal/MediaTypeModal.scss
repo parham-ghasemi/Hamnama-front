@@ -1,12 +1,9 @@
-@use "../../../../styles//abstracts//variables" as dark;
-@use "../../../../styles/abstracts/variables.light" as light;
-@use "../../../../styles//abstracts//mixins" as mx;
-@use "sass:color";
+@use "../../../../styles/abstracts/mixins" as mx;
 
 .media-type-modal {
   width: 1045px;
   border-radius: 26px;
-  background-color: rgba(46, 22, 76, 0.08);
+  background-color: var(--modal-bg);
   opacity: 0;
   transition: opacity ease 200ms;
   overflow: hidden;
@@ -17,7 +14,7 @@
   &__head {
     width: 100%;
     height: 162px;
-    background-color: #400456;
+    background-color: var(--media-head-bg);
     @include mx.flex-center;
     gap: 9px;
 
@@ -33,19 +30,20 @@
 
   &__body {
     padding: 62px 27px;
+    color: var(--modal-text);
     display: flex;
     flex-wrap: wrap;
-    background-color: #1e1b219d;
+    background-color: var(--modal-body-bg);
     gap: 58px 88px;
     align-items: center;
     justify-content: center;
 
     &__card {
-      background-color: rgba($color: #595959, $alpha: 0.27);
+      background-color: var(--media-card-bg);
       border-radius: 26px;
       height: 222px;
       width: 285px;
-      box-shadow: 0 4px 4px 0 color.adjust(#000000, $alpha: -0.6);
+      box-shadow: 0 4px 4px 0 var(--media-shadow);
       @include mx.flex-center;
       flex-direction: column;
       gap: 17px;
@@ -66,17 +64,17 @@
 
       &:first-of-type {
         > span {
-          background: linear-gradient(135deg, #002879 -10%, #00ffff 100%);
+          background: var(--media-grad-1);
         }
       }
       &:nth-of-type(2) {
         > span {
-          background: linear-gradient(135deg, #c800ff -10%, #832493 100%);
+          background: var(--media-grad-2);
         }
       }
       &:last-of-type {
         > span {
-          background: linear-gradient(135deg, #00fffb -20%, #ff00ff 100%);
+          background: var(--media-grad-3);
         }
       }
 
@@ -84,13 +82,13 @@
         height: 99px;
         width: 125px;
         border-radius: 17px;
-        box-shadow: 0 4px 4px 0 color.adjust(#000000, $alpha: -0.6);
+        box-shadow: 0 4px 4px 0 var(--media-shadow);
         @include mx.flex-center;
         transition:
           transform 250ms ease,
           box-shadow 250ms ease;
         > svg {
-          color: white;
+          color: white; /* typically SVG inner paths can stay white */
           font-size: 99px;
         }
       }
