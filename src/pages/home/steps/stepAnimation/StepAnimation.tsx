@@ -37,7 +37,7 @@ const StepAnimation = () => {
         // @ts-ignore
         .to(step, {
           opacity: 0.3,
-          duration: 0.2,
+          duration: 0.1,
         }, "<+0.25");
     });
   }, { scope: container });

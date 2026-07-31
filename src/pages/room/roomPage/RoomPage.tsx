@@ -5,7 +5,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import clsx from "clsx";
 import { AiTwotoneSetting } from "react-icons/ai";
-import { BsFillPeopleFill, BsFillShareFill, BsMicFill } from "react-icons/bs";
+import { BsFillPeopleFill, BsFillShareFill, BsMicFill, BsMicMuteFill } from "react-icons/bs";
 import { IoChatbubblesSharp, IoExitOutline } from "react-icons/io5";
 import { FaArrowRight } from "react-icons/fa6";
 import { TbSticker } from "react-icons/tb";
@@ -83,8 +83,6 @@ function buildWsUrl(baseUrl: string, roomId: string, token?: string) {
 }
 
 const RoomPage = () => {
-  const roomContainer = document.querySelector('.room-page');
-  roomContainer?.setAttribute('data-theme', 'light')
   const { id: roomId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -93,6 +91,7 @@ const RoomPage = () => {
   const [usersModalOpen, setUsersModalOpen] = useState(false);
   const [mediaTypeModalOpen, setMediaTypeModalOpen] = useState(false);
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
   const [currentQuality, setCurrentQuality] = useState("quality");
   const [link, setLink] = useState("");
@@ -101,8 +100,13 @@ const RoomPage = () => {
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [isMicMuted, setIsMicMuted] = useState(false);
+  const [inviteCopied, setInviteCopied] = useState(false);
+  const [screenShareStream, setScreenShareStream] = useState<MediaStream | null>(null);
+  const [screenShareError, setScreenShareError] = useState<string | null>(null);
   const [connectionStatuses, setConnectionStatuses] = useState<Record<string, ConnectionStatus>>({});
   const currentTimeRef = useRef(0);
+  const screenVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const socketRef = useRef<WebSocket | null>(null);
   const syncIntervalRef = useRef<number | null>(null);
@@ -127,6 +131,18 @@ const RoomPage = () => {
 
     setConnectionStatuses(statuses);
   }, [roomQuery.data]);
+
+  useEffect(() => {
+    if (screenVideoRef.current && screenShareStream) {
+      screenVideoRef.current.srcObject = screenShareStream;
+    }
+  }, [screenShareStream]);
+
+  useEffect(() => {
+    return () => {
+      screenShareStream?.getTracks().forEach((track) => track.stop());
+    };
+  }, [screenShareStream]);
 
   const groupedMessages = useMemo(() => {
     const messages = roomState?.messages ?? [];
@@ -324,6 +340,7 @@ const RoomPage = () => {
     setUsersModalOpen(false);
     setMediaTypeModalOpen(false);
     setArchiveModalOpen(false);
+    setInviteModalOpen(false);
   };
 
   const emitPlayback = (action: "play" | "pause" | "seek" | "sync" | "load", nextTime: number, nextSrc?: string) => {
@@ -365,6 +382,41 @@ const RoomPage = () => {
     setCurrentTime(0);
   };
 
+  const handleShareScreen = async () => {
+    try {
+      setScreenShareError(null);
+      setMediaTypeModalOpen(false);
+
+      if (!navigator.mediaDevices?.getDisplayMedia) {
+        throw new Error("این مرورگر از اشتراک‌گذاری صفحه پشتیبانی نمی‌کند.");
+      }
+
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+      setScreenShareStream(stream);
+    } catch (error) {
+      setScreenShareError(error instanceof Error ? error.message : "امکان شروع اشتراک‌گذاری صفحه وجود ندارد.");
+      console.error("Screen share error:", error);
+    }
+  };
+
+  const stopScreenShare = () => {
+    screenShareStream?.getTracks().forEach((track) => track.stop());
+    setScreenShareStream(null);
+    setScreenShareError(null);
+  };
+
+  const handleCopyInviteCode = async () => {
+    if (!roomId) return;
+
+    try {
+      await navigator.clipboard.writeText(roomId);
+      setInviteCopied(true);
+      window.setTimeout(() => setInviteCopied(false), 1500);
+    } catch (error) {
+      console.error("Copy invite code failed", error);
+    }
+  };
+
   if (roomQuery.isLoading) {
     return <div className="room-page">در حال دریافت اطلاعات اتاق...</div>;
   }
@@ -394,8 +446,8 @@ const RoomPage = () => {
         </div>
 
         <div className="room-page__side-bar__item">
-          <button className="room-page__side-bar__microphone">
-            <BsMicFill />
+          <button className="room-page__side-bar__microphone" onClick={() => setIsMicMuted((prev) => !prev)}>
+            {isMicMuted ? <BsMicMuteFill /> : <BsMicFill />}
           </button>
           <span>میکروفون</span>
         </div>
@@ -408,7 +460,7 @@ const RoomPage = () => {
         </div>
 
         <div className="room-page__side-bar__item">
-          <button className="room-page__side-bar__share">
+          <button className="room-page__side-bar__share" onClick={() => setInviteModalOpen(true)}>
             <BsFillShareFill />
           </button>
           <span>دعوت</span>
@@ -442,29 +494,38 @@ const RoomPage = () => {
         </div>
 
         <div className="room-page__main__player">
-          <VideoPlayer
-            src={link}
-            quality={currentQuality}
-            isPlaying={isPlaying}
-            currentTime={currentTime}
-            onPlayRequest={() => {
-              setIsPlaying(true);
-              emitPlayback("play", currentTime);
-            }}
-
-            onPauseRequest={() => {
-              setIsPlaying(false);
-              emitPlayback("pause", currentTime);
-            }}
-            onSeekRequest={(t) => {
-              setCurrentTime(t);
-              emitPlayback("seek", t);
-            }}
-            onLocalTimeUpdate={(t) => {
-              setCurrentTime(t);
-              currentTimeRef.current = t;
-            }}
-          />
+          {screenShareStream ? (
+            <div className="room-page__main__player__screen-share">
+              <video ref={screenVideoRef} autoPlay playsInline muted className="room-page__main__player__screen-share__video" />
+              <div className="room-page__main__player__screen-share__actions">
+                <button onClick={stopScreenShare}>توقف اشتراک‌گذاری</button>
+                {screenShareError && <p>{screenShareError}</p>}
+              </div>
+            </div>
+          ) : (
+            <VideoPlayer
+              src={link}
+              quality={currentQuality}
+              isPlaying={isPlaying}
+              currentTime={currentTime}
+              onPlayRequest={() => {
+                setIsPlaying(true);
+                emitPlayback("play", currentTime);
+              }}
+              onPauseRequest={() => {
+                setIsPlaying(false);
+                emitPlayback("pause", currentTime);
+              }}
+              onSeekRequest={(t) => {
+                setCurrentTime(t);
+                emitPlayback("seek", t);
+              }}
+              onLocalTimeUpdate={(t) => {
+                setCurrentTime(t);
+                currentTimeRef.current = t;
+              }}
+            />
+          )}
         </div>
       </div>
 
@@ -500,16 +561,18 @@ const RoomPage = () => {
               </div>
 
               {
-                message.sender_avatar ? (
-                  <img
-                    src={message.sender_avatar}
-                    alt={message.sender_name}
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = "/rodeocover.png";
-                    }}
-                  />
-                ) : (
-                  <span>{message.sender_name[0]}</span>
+                message.sender_id !== user?.id && (
+                  message.sender_avatar ? (
+                    <img
+                      src={message.sender_avatar}
+                      alt={message.sender_name}
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "/rodeocover.png";
+                      }}
+                    />
+                  ) : (
+                    <span>{message.sender_name[0]}</span>
+                  )
                 )
               }
             </div>
@@ -539,7 +602,7 @@ const RoomPage = () => {
         </div>
       </div>
 
-      <div className={clsx("room-page__modal-overlay", settingsModalOpen || usersModalOpen || mediaTypeModalOpen || archiveModalOpen ? "is-active" : "",)} onClick={closeModals} >
+      <div className={clsx("room-page__modal-overlay", settingsModalOpen || usersModalOpen || mediaTypeModalOpen || archiveModalOpen || inviteModalOpen ? "is-active" : "",)} onClick={closeModals} >
         {settingsModalOpen && (
           <div className="room-page__modal-overlay__modal" onClick={(e) => e.stopPropagation()}>
             <SettingsModal
@@ -565,6 +628,7 @@ const RoomPage = () => {
               isOpen={mediaTypeModalOpen}
               closeModal={() => setMediaTypeModalOpen(false)}
               openArchive={() => setArchiveModalOpen(true)}
+              onShareScreen={handleShareScreen}
             />
           </div>
         )}
@@ -577,6 +641,23 @@ const RoomPage = () => {
               setLink={setLink}
               setQuality={setCurrentQuality}
             />
+          </div>
+        )}
+        {inviteModalOpen && (
+          <div className="room-page__modal-overlay__modal room-page__modal-overlay__modal--invite" onClick={(e) => e.stopPropagation()}>
+            <div className="room-page__invite-modal">
+              <div className="room-page__invite-modal__head">
+                <span>دعوت به اتاق</span>
+                <BsFillShareFill />
+              </div>
+              <div className="room-page__invite-modal__body">
+                <p>کد اتاق را با دیگران به اشتراک بگذارید.</p>
+                <div className="room-page__invite-modal__body__code">
+                  <span>{roomId}</span>
+                  <button onClick={handleCopyInviteCode}>{inviteCopied ? "کپی شد" : "کپی"}</button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

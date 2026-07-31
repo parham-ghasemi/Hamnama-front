@@ -12,8 +12,9 @@
   position: relative;
 
   &__chat-container {
-    min-width: 305px;
-    max-width: 345px;
+    // min-width: 305px;
+    // max-width: 345px;
+    width: 345px;
     height: 100%;
     border-radius: 27px;
     background: var(--chat-container-bg);
@@ -42,6 +43,26 @@
     &__chat-main {
       padding: 32px 11px;
       flex: 1;
+      max-height: calc(100% - 200px);
+      overflow-y: scroll;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+
+      @include mx.light {
+        scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+      }
+
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+
+        @include mx.light {
+          background: rgba(0, 0, 0, 0.1);
+        }
+      }
     }
 
     &__message-block {
@@ -74,6 +95,7 @@
             font-size: 14px;
             font-weight: 600;
             width: 100%;
+            line-break: anywhere;
           }
           &__time {
             font-size: 8px;

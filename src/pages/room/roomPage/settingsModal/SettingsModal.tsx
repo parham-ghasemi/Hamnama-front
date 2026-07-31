@@ -3,6 +3,7 @@ import "./SettingsModal.scss";
 import { AiTwotoneSetting, AiTwotoneThunderbolt } from "react-icons/ai";
 import { IoLockClosed, IoLockOpen, IoSunnySharp } from "react-icons/io5";
 import { BsMoonFill } from "react-icons/bs";
+import { useTheme, type Theme } from "../../../../context/ThemeContext";
 
 const SettingsModal = ({
   isOpen,
@@ -16,6 +17,12 @@ const SettingsModal = ({
   currentlyPlaying?: string | null;
   createdAt: string;
 }) => {
+  const { theme, setTheme } = useTheme();
+
+  const handleThemeSelect = (nextTheme: Theme) => {
+    setTheme(nextTheme);
+  };
+
   return (
     <div className={clsx("room-settings-modal", isOpen && "open")}>
       <div className="room-settings-modal__head">
@@ -65,18 +72,30 @@ const SettingsModal = ({
         <div className="room-settings-modal__body__row">
           <h5>حالت پس زمینه</h5>
           <div className="room-settings-modal__body__row__items room-settings-modal__body__row__items--3">
-            <div className="room-settings-modal__body__row__items__item">
+            <button
+              type="button"
+              className={clsx("room-settings-modal__body__row__items__item", theme === "dark" && "active")}
+              onClick={() => handleThemeSelect("dark")}
+            >
               <BsMoonFill />
               <span>تیره</span>
-            </div>
-            <div className="room-settings-modal__body__row__items__item">
+            </button>
+            <button
+              type="button"
+              className={clsx("room-settings-modal__body__row__items__item", theme === "default" && "active")}
+              onClick={() => handleThemeSelect("default")}
+            >
               <AiTwotoneThunderbolt />
               <span>پیش فرض</span>
-            </div>
-            <div className="room-settings-modal__body__row__items__item">
+            </button>
+            <button
+              type="button"
+              className={clsx("room-settings-modal__body__row__items__item", theme === "light" && "active")}
+              onClick={() => handleThemeSelect("light")}
+            >
               <IoSunnySharp />
               <span>روشن</span>
-            </div>
+            </button>
           </div>
         </div>
       </div>

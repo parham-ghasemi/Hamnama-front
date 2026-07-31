@@ -4,10 +4,15 @@ import { BsDisplay, BsLink45Deg } from "react-icons/bs"
 import { IoOptionsOutline, IoTvOutline } from "react-icons/io5"
 import { TbArchiveFilled } from 'react-icons/tb';
 
-const MediaTypeModal = ({ openArchive, isOpen, closeModal }: { isOpen: boolean, openArchive: () => void, closeModal: () => void }) => {
+const MediaTypeModal = ({ openArchive, isOpen, closeModal, onShareScreen }: { isOpen: boolean, openArchive: () => void, closeModal: () => void, onShareScreen: () => void }) => {
   const handleOpenArchive = () => {
     closeModal()
     openArchive()
+  }
+
+  const handleShareScreen = () => {
+    closeModal()
+    onShareScreen()
   }
 
   return (
@@ -29,7 +34,7 @@ const MediaTypeModal = ({ openArchive, isOpen, closeModal }: { isOpen: boolean, 
           <p>آرشیو فیلم و سریال</p>
         </div>
 
-        <div className="media-type-modal__body__card">
+        <div className="media-type-modal__body__card" onClick={handleShareScreen}>
           <span><IoTvOutline /></span>
           <p>اشتراک گذاری صفحه</p>
         </div>
