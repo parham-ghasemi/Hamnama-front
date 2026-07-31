@@ -52,8 +52,12 @@ const Join = () => {
 
               <div className="join-page__content__main__cards__card__i"></div>
 
-              <input className="join-page__content__main__cards__card__code" type='text' placeholder='کد اتاق' value={code} onChange={(e) => setCode(e.target.value)} />
-
+              <div className="join-page__content__main__cards__card__code__wrapper">
+                <input className="join-page__content__main__cards__card__code" type='text' placeholder='کد اتاق' value={code} onChange={(e) => setCode(e.target.value)} maxLength={6} />
+                <span onClick={() => navigator.clipboard.writeText(String(code))}>
+                  <IoCopyOutline />
+                </span>
+              </div>
               <button className="join-page__content__main__cards__card__enter" onClick={handleJoin}>پیوستن</button>
             </div>
 

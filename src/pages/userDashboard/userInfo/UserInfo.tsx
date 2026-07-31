@@ -23,7 +23,7 @@ interface WatchHistoryItem {
   hours_watched: number;
 }
 
-type TimeframeOption = 'all_time' | 'past_month' | 'past_year';
+type TimeframeOption = 'all_time' | 'past_month' | 'past_year' | 'past_week';
 
 // --- Helper: Fill missing dates with 0 --- //
 const processChartData = (history?: WatchHistoryItem[]) => {
@@ -291,6 +291,7 @@ const UpdateProfilePictureForm = ({ onClose }: { onClose: () => void }) => {
 };
 
 const TIMEFRAME_OPTIONS = [
+  { value: 'past_week', label: 'هفته گذشته' },
   { value: 'past_month', label: 'ماه گذشته' },
   { value: 'past_year', label: 'سال گذشته' },
   { value: 'all_time', label: 'کل زمان‌ها' },
@@ -350,6 +351,12 @@ const UserInfo = () => {
 
     return history.filter((item: WatchHistoryItem) => {
       const date = new Date(item.watch_date);
+
+      if (timeframe === 'past_week') {
+        const lastMonth = new Date();
+        lastMonth.setDate(now.getDate() - 7);
+        return date >= lastMonth;
+      }
 
       if (timeframe === 'past_month') {
         const lastMonth = new Date();

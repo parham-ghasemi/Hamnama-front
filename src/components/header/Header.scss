@@ -16,7 +16,6 @@
   top: 0;
   background-color: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
   box-sizing: border-box;
 
   @include mx.light {

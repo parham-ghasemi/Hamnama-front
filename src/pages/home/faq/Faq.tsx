@@ -50,9 +50,9 @@ const Faq = () => {
 
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        const radius = 120;
+        const radius = 190;
 
-        const opacity = 0.35 + 0.65 * Math.max(
+        const opacity = 0.15 + 0.65 * Math.max(
           0.35,
           1 - Math.pow(distance / radius, 2)
         );

@@ -62,6 +62,14 @@
         }
       }
     }
+    &--light {
+      > .img > img.light {
+        opacity: 1;
+      }
+      > .img > img.dark {
+        opacity: 0;
+      }
+    }
 
     > h1 {
       font-size: 45px;
