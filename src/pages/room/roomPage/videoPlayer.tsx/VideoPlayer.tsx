@@ -315,7 +315,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 <button
                   onClick={() => handleSeekBy(10)}
                   title="Fast Forward 10s"
-                  className="p-1.5 rounded-full hover:bg-white/20 transition-colors text-gray-200 hover:text-white"
+                  className="p-1.5 rounded-full hover:bg-white/20 transition-colors text-gray-200 hover:text-white sm:block hidden"
                 >
                   <RotateCw className="w-4 h-4" />
                 </button>
@@ -362,7 +362,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 </div>
               </div>
 
-              <div className="text-xs tracking-wider text-gray-300 font-mono bg-black/30 px-2.5 py-1 rounded-md border border-white/5 backdrop-blur-sm">
+              <div className="text-xs tracking-wider text-gray-300 font-mono bg-black/30 px-2.5 py-1 rounded-md border border-white/5 backdrop-blur-sm sm:block hidden">
                 {formatTime(time)} / {formatTime(duration)}
               </div>
 
@@ -374,7 +374,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 <button
                   onClick={togglePip}
                   title="Picture in Picture"
-                  className={`p-1.5 rounded-full hover:bg-white/20 transition-colors ${isPip ? "text-red-400" : "text-gray-200 hover:text-white"
+                  className={`p-1.5 rounded-full hover:bg-white/20 transition-colors sm:block hidden ${isPip ? "text-red-400" : "text-gray-200 hover:text-white"
                     }`}
                 >
                   <PictureInPicture2 className="w-4 h-4" />

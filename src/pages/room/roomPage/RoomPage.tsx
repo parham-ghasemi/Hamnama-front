@@ -508,6 +508,7 @@ const RoomPage = () => {
               quality={currentQuality}
               isPlaying={isPlaying}
               currentTime={currentTime}
+              className='flex-1! h-full! mb-0 mt-auto ml-auto mr-auto'
               onPlayRequest={() => {
                 setIsPlaying(true);
                 emitPlayback("play", currentTime);
@@ -560,21 +561,18 @@ const RoomPage = () => {
                 </div>
               </div>
 
-              {
-                message.sender_id !== user?.id && (
-                  message.sender_avatar ? (
-                    <img
-                      src={message.sender_avatar}
-                      alt={message.sender_name}
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = "/rodeocover.png";
-                      }}
-                    />
-                  ) : (
-                    <span>{message.sender_name[0]}</span>
-                  )
-                )
-              }
+              {message.sender_id !== user?.id &&
+                (message.sender_avatar ? (
+                  <img
+                    src={message.sender_avatar}
+                    alt={message.sender_name}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = "/rodeocover.png";
+                    }}
+                  />
+                ) : (
+                  <span>{message.sender_name[0]}</span>
+                ))}
             </div>
           ))}
         </div>
