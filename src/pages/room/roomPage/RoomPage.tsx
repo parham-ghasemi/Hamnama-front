@@ -161,7 +161,7 @@ const RoomPage = () => {
     if (!roomId || !user?.id) return;
 
     const token = localStorage.getItem("token") ?? undefined;
-    const socket = new WebSocket(buildWsUrl(import.meta.env.VITE_BASE_URL, roomId, token));
+    const socket = new WebSocket(buildWsUrl(import.meta.env.VITE_WS_BASE_URL, roomId, token));
     socketRef.current = socket;
 
     socket.onopen = () => console.log("WS OPEN");
