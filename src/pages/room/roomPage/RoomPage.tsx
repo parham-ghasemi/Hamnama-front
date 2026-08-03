@@ -25,6 +25,7 @@ import {
   type RoomResponse,
 } from "../../../apiCalls/roomApi";
 import { useAuth } from "../../../context/AuthContext";
+import AnimatedParticle from '../../../components/animatedParticle/AnimatedParticle';
 
 type SocketEvent =
   | {
@@ -93,6 +94,7 @@ const RoomPage = () => {
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [reactionDrawerOpen, setReactionDrawerOpen] = useState(false);
+  const [particles, setParticles] = useState<ParticleData[]>([]);
 
   const [currentQuality, setCurrentQuality] = useState("quality");
   const [link, setLink] = useState("");
@@ -108,6 +110,41 @@ const RoomPage = () => {
   const [connectionStatuses, setConnectionStatuses] = useState<Record<string, ConnectionStatus>>({});
   const currentTimeRef = useRef(0);
   const screenVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  // ========== Start Reaction Particles ===========
+
+  let particleIdCounter = 0;
+  interface ParticleData {
+    id: number;
+    emoji: string;
+    x: number;
+    y: number;
+  }
+  const handleReactionClick = (e: React.MouseEvent<HTMLButtonElement>, emoji: string) => {
+    // Get the exact center of the button relative to the viewport
+    const rect = e.currentTarget.getBoundingClientRect();
+    const startX = rect.left + rect.width / 2;
+    const startY = rect.top + rect.height / 2;
+
+    // Generate 20 new particles
+    const newParticles: ParticleData[] = Array.from({ length: 20 }).map(() => ({
+      id: particleIdCounter++,
+      emoji: emoji,
+      x: startX,
+      y: startY,
+    }));
+
+    // Add them to the existing state
+    setParticles((prev) => [...prev, ...newParticles]);
+  };
+
+  const removeParticle = (idToRemove: number) => {
+    // Clean up the particle from state once GSAP finishes animating it
+    setParticles((prev) => prev.filter((p) => p.id !== idToRemove));
+  };
+
+  // ========== End Reaction Particles ===========
+
 
   const socketRef = useRef<WebSocket | null>(null);
   const syncIntervalRef = useRef<number | null>(null);
@@ -436,6 +473,8 @@ const RoomPage = () => {
     connectionStatus: connectionStatuses[member.user_id] ?? "good",
   }));
 
+
+
   return (
     <div className="room-page">
       <div className="room-page__side-bar">
@@ -476,21 +515,32 @@ const RoomPage = () => {
 
         <div className={clsx("room-page__side-bar__reaction", reactionDrawerOpen && "open")}>
           <div className="room-page__side-bar__reaction__drawer">
-            <span>
+            <button onClick={(e) => handleReactionClick(e, "😭")}>
               😭
-            </span>
-            <span>
+            </button>
+            <button onClick={(e) => handleReactionClick(e, "😂")}>
               😂
-            </span>
-            <span>
+            </button>
+            <button onClick={(e) => handleReactionClick(e, "❤️")}>
               ❤️
-            </span>
-            <span>
+            </button>
+            <button onClick={(e) => handleReactionClick(e, "😍")}>
               😍
-            </span>
-            <span>
+            </button>
+            <button onClick={(e) => handleReactionClick(e, "🔥")}>
               🔥
-            </span>
+            </button>
+
+            {particles.map((p) => (
+              <AnimatedParticle
+                key={p.id}
+                emoji={p.emoji}
+                x={p.x}
+                y={p.y}
+                onFinish={() => removeParticle(p.id)}
+              />
+            ))}
+
           </div>
 
           <button className="room-page__side-bar__reaction__trigger" onClick={() => setReactionDrawerOpen((prev) => !prev)}>
