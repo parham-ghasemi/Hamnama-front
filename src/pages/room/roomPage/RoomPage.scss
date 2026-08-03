@@ -1117,3 +1117,165 @@
     }
   }
 }
+
+// INVITE MODAL
+
+.room-page__invite-modal {
+  width: 550px; /* Smaller width since it only contains text and a code block */
+  max-width: 95%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 26px;
+  background-color: var(--modal-bg);
+  opacity: 0;
+  transition: opacity ease 200ms;
+  overflow: hidden;
+  margin: 0 auto;
+
+  @include mx.max-w(768px) {
+    border-radius: 18px;
+  }
+
+  &.open {
+    opacity: 1;
+  }
+
+  &__head {
+    width: 100%;
+    height: 120px;
+    flex-shrink: 0;
+    background-color: var(--modal-head-bg);
+    color: var(--text-primary);
+    @include mx.flex-center;
+    gap: 12px;
+    margin: 0 auto;
+
+    @include mx.max-w(768px) {
+      height: 100px;
+      gap: 10px;
+    }
+
+    @include mx.max-w(480px) {
+      height: 80px;
+      gap: 8px;
+    }
+
+    > span {
+      font-size: 28px;
+      font-weight: 800;
+
+      @include mx.max-w(768px) {
+        font-size: 24px;
+      }
+
+      @include mx.max-w(480px) {
+        font-size: 20px;
+      }
+    }
+
+    > svg {
+      font-size: 42px;
+
+      @include mx.max-w(768px) {
+        font-size: 34px;
+      }
+
+      @include mx.max-w(480px) {
+        font-size: 28px;
+      }
+    }
+  }
+
+  &__body {
+    padding: 50px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    background-color: var(--modal-body-bg);
+    color: var(--text-primary);
+
+    @include mx.max-w(768px) {
+      padding: 40px 30px;
+      gap: 25px;
+    }
+
+    @include mx.max-w(480px) {
+      padding: 30px 20px;
+      gap: 20px;
+    }
+
+    > p {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-align: center;
+
+      @include mx.max-w(480px) {
+        font-size: 15px;
+      }
+    }
+
+    &__code {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: var(
+        --user-card-bg
+      ); /* Mirrors the style of user cards */
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 10px 10px 10px 25px; /* Creates space around the inner button */
+      gap: 15px;
+
+      @include mx.max-w(480px) {
+        flex-direction: column;
+        padding: 20px;
+        border-radius: 14px;
+      }
+
+      > span {
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        color: var(--modal-text);
+        user-select: all; /* Allows users to double-click and easily select the whole code */
+
+        @include mx.max-w(480px) {
+          font-size: 22px;
+          letter-spacing: 2px;
+        }
+      }
+
+      > button {
+        background: var(--btn-submit-bg);
+        color: var(--text-primary);
+        border: none;
+        border-radius: 10px;
+        padding: 14px 35px;
+        font-size: 16px;
+        font-weight: 800;
+        cursor: pointer;
+        transition:
+          opacity 200ms ease,
+          transform 100ms ease;
+
+        &:hover {
+          opacity: 0.9;
+        }
+
+        &:active {
+          transform: scale(0.96); /* Subtle click effect */
+        }
+
+        @include mx.max-w(480px) {
+          width: 100%;
+          padding: 12px;
+          font-size: 15px;
+        }
+      }
+    }
+  }
+}

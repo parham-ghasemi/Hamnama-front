@@ -444,10 +444,10 @@ const RoomPage = () => {
   };
 
   const handleCopyInviteCode = async () => {
-    if (!roomId) return;
+    if (!roomId || !roomState) return;
 
     try {
-      await navigator.clipboard.writeText(roomId);
+      await navigator.clipboard.writeText(roomState.code.toString());
       setInviteCopied(true);
       window.setTimeout(() => setInviteCopied(false), 1500);
     } catch (error) {
@@ -718,9 +718,10 @@ const RoomPage = () => {
             />
           </div>
         )}
+
         {inviteModalOpen && (
           <div className="room-page__modal-overlay__modal room-page__modal-overlay__modal--invite" onClick={(e) => e.stopPropagation()}>
-            <div className="room-page__invite-modal">
+            <div className={clsx("room-page__invite-modal", inviteModalOpen && "open")}>
               <div className="room-page__invite-modal__head">
                 <span>دعوت به اتاق</span>
                 <BsFillShareFill />
@@ -728,7 +729,7 @@ const RoomPage = () => {
               <div className="room-page__invite-modal__body">
                 <p>کد اتاق را با دیگران به اشتراک بگذارید.</p>
                 <div className="room-page__invite-modal__body__code">
-                  <span>{roomId}</span>
+                  <span>{roomState.code}</span>
                   <button onClick={handleCopyInviteCode}>{inviteCopied ? "کپی شد" : "کپی"}</button>
                 </div>
               </div>
