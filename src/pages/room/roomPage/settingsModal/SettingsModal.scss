@@ -2,11 +2,18 @@
 
 .room-settings-modal {
   width: 400px;
+  max-width: 95%; /* Ensures the modal doesn't overflow on small mobile screens */
   border-radius: 26px;
   background-color: var(--modal-bg);
   opacity: 0;
   transition: opacity ease 200ms;
   overflow: hidden;
+  margin: 0 auto;
+
+  @include mx.max-w(480px) {
+    border-radius: 18px;
+  }
+
   &.open {
     opacity: 1;
   }
@@ -18,13 +25,25 @@
     @include mx.flex-center;
     gap: 9px;
 
+    @include mx.max-w(480px) {
+      height: 100px;
+    }
+
     > span {
       font-size: 31px;
       font-weight: 800;
+
+      @include mx.max-w(480px) {
+        font-size: 24px;
+      }
     }
 
     > svg {
       font-size: 49px;
+
+      @include mx.max-w(480px) {
+        font-size: 36px;
+      }
     }
   }
 
@@ -35,6 +54,11 @@
     background-color: var(--modal-body-bg);
     gap: 32px;
 
+    @include mx.max-w(480px) {
+      padding: 20px 16px;
+      gap: 24px;
+    }
+
     &__row {
       > h5 {
         font-size: 24px;
@@ -43,6 +67,12 @@
         gap: 10px;
         margin-bottom: 16px;
         color: var(--modal-text);
+        align-items: center; /* Aligns text perfectly with the pseudo-element */
+
+        @include mx.max-w(480px) {
+          font-size: 18px;
+          margin-bottom: 12px;
+        }
 
         &::before {
           content: "";
@@ -51,18 +81,32 @@
           border-radius: 7px 0 0 7px;
           background-color: var(--set-row-border);
           display: block;
+
+          @include mx.max-w(480px) {
+            height: 28px;
+          }
         }
       }
 
       &__items {
         display: flex;
         justify-content: space-between;
+
         &--2 {
           gap: 28px;
+
+          @include mx.max-w(480px) {
+            gap: 12px;
+          }
 
           .room-settings-modal__body__row__items__item {
             font-size: 24px;
             font-weight: 900;
+
+            @include mx.max-w(480px) {
+              font-size: 16px;
+            }
+
             &:first-of-type {
               background-color: var(--set-item-1);
             }
@@ -74,9 +118,19 @@
         &--3 {
           gap: 17px;
 
+          @include mx.max-w(480px) {
+            gap: 8px; /* Tighter gap so all 3 buttons fit on mobile */
+          }
+
           .room-settings-modal__body__row__items__item {
             font-size: 20px;
             font-weight: 500;
+
+            @include mx.max-w(480px) {
+              font-size: 13px; /* Smaller font to accommodate narrower columns */
+              padding: 0 4px;
+            }
+
             &:first-of-type {
               background-color: var(--set-item-3);
             }
@@ -99,6 +153,21 @@
           gap: 20px;
           cursor: pointer;
           transition: opacity 200ms ease;
+
+          /* Resets (Since some of your items are <button> tags and others are <div> tags) */
+          border: none;
+          color: inherit;
+          font-family: inherit;
+
+          @include mx.max-w(480px) {
+            height: 80px;
+            gap: 10px;
+            border-radius: 10px;
+
+            svg {
+              font-size: 24px; /* Ensure icons shrink nicely on mobile */
+            }
+          }
 
           &:hover {
             opacity: 0.9;

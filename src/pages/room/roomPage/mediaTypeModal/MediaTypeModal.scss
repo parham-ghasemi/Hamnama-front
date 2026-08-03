@@ -2,11 +2,17 @@
 
 .media-type-modal {
   width: 1045px;
+  max-width: 95%; /* Ensures it never overflows the viewport */
   border-radius: 26px;
   background-color: var(--modal-bg);
   opacity: 0;
   transition: opacity ease 200ms;
   overflow: hidden;
+
+  @include mx.max-w(768px) {
+    border-radius: 16px;
+  }
+
   &.open {
     opacity: 1;
   }
@@ -18,13 +24,38 @@
     @include mx.flex-center;
     gap: 9px;
 
+    @include mx.max-w(768px) {
+      height: 100px;
+      gap: 6px;
+    }
+
+    @include mx.max-w(480px) {
+      height: 80px;
+    }
+
     > span {
       font-size: 31px;
       font-weight: 800;
+
+      @include mx.max-w(768px) {
+        font-size: 22px;
+      }
+
+      @include mx.max-w(480px) {
+        font-size: 18px;
+      }
     }
 
     > svg {
       font-size: 49px;
+
+      @include mx.max-w(768px) {
+        font-size: 36px;
+      }
+
+      @include mx.max-w(480px) {
+        font-size: 26px;
+      }
     }
   }
 
@@ -37,6 +68,22 @@
     gap: 58px 88px;
     align-items: center;
     justify-content: center;
+
+    @include mx.max-w(1080px) {
+      gap: 32px 40px;
+      padding: 48px 24px;
+    }
+
+    @include mx.max-w(768px) {
+      gap: 24px;
+      padding: 32px 16px;
+    }
+
+    @include mx.max-w(480px) {
+      flex-direction: column; /* Stack cards vertically on phones */
+      gap: 16px;
+      padding: 24px 16px;
+    }
 
     &__card {
       background-color: var(--media-card-bg);
@@ -51,6 +98,26 @@
       transition:
         transform 300ms ease,
         box-shadow 300ms ease;
+
+      @include mx.max-w(1080px) {
+        width: 240px;
+        height: 190px;
+      }
+
+      @include mx.max-w(768px) {
+        width: 200px;
+        height: 170px;
+        border-radius: 18px;
+        gap: 12px;
+      }
+
+      @include mx.max-w(480px) {
+        width: 100%;
+        height: 90px;
+        flex-direction: row; /* Change to horizontal layout for better mobile UX */
+        justify-content: flex-start;
+        padding: 0 20px;
+      }
 
       &:hover {
         transform: translateY(4px);
@@ -87,14 +154,57 @@
         transition:
           transform 250ms ease,
           box-shadow 250ms ease;
+
+        @include mx.max-w(1080px) {
+          width: 100px;
+          height: 80px;
+        }
+
+        @include mx.max-w(768px) {
+          width: 80px;
+          height: 65px;
+          border-radius: 12px;
+        }
+
+        @include mx.max-w(480px) {
+          width: 60px;
+          height: 50px;
+          border-radius: 10px;
+        }
+
         > svg {
-          color: white; /* typically SVG inner paths can stay white */
+          color: white;
           font-size: 99px;
+
+          @include mx.max-w(1080px) {
+            font-size: 75px;
+          }
+
+          @include mx.max-w(768px) {
+            font-size: 50px;
+          }
+
+          @include mx.max-w(480px) {
+            font-size: 35px;
+          }
         }
       }
+
       > p {
         font-size: 28px;
         font-weight: 700;
+
+        @include mx.max-w(1080px) {
+          font-size: 22px;
+        }
+
+        @include mx.max-w(768px) {
+          font-size: 18px;
+        }
+
+        @include mx.max-w(480px) {
+          font-size: 16px;
+        }
       }
     }
   }

@@ -2,11 +2,21 @@
 
 .room-users-modal {
   width: 1300px;
+  max-width: 95%; /* Responsive width limit */
+  max-height: 90vh; /* Keeps it inside viewport on small screens */
+  display: flex;
+  flex-direction: column;
   border-radius: 26px;
   background-color: var(--modal-bg);
   opacity: 0;
   transition: opacity ease 200ms;
   overflow: hidden;
+  margin: 0 auto;
+
+  @include mx.max-w(768px) {
+    border-radius: 18px;
+  }
+
   &.open {
     opacity: 1;
   }
@@ -14,26 +24,74 @@
   &__head {
     width: 100%;
     height: 162px;
+    flex-shrink: 0; /* Prevents header from shrinking when body scrolls */
     background-color: var(--modal-head-bg);
     @include mx.flex-center;
     gap: 9px;
 
+    @include mx.max-w(1080px) {
+      height: 120px;
+    }
+
+    @include mx.max-w(768px) {
+      height: 100px;
+      gap: 6px;
+    }
+
+    @include mx.max-w(480px) {
+      height: 80px;
+    }
+
     > span {
       font-size: 31px;
       font-weight: 800;
+
+      @include mx.max-w(768px) {
+        font-size: 24px;
+      }
+
+      @include mx.max-w(480px) {
+        font-size: 20px;
+      }
     }
 
     > svg {
       font-size: 49px;
+
+      @include mx.max-w(768px) {
+        font-size: 38px;
+      }
+
+      @include mx.max-w(480px) {
+        font-size: 30px;
+      }
     }
   }
 
   &__body {
     padding: 71px 108px;
     @include mx.flex-center;
+    flex-wrap: wrap; /* CRITICAL: Allows cards to stack in rows */
+    overflow-y: auto; /* CRITICAL: Allows scrolling if there are many users */
+    align-content: flex-start; /* Ensures items start from the top when wrapping */
     gap: 93px;
     background-color: var(--modal-body-bg);
     color: var(--modal-text);
+
+    @include mx.max-w(1200px) {
+      padding: 50px 60px;
+      gap: 50px;
+    }
+
+    @include mx.max-w(768px) {
+      padding: 30px 20px;
+      gap: 25px;
+    }
+
+    @include mx.max-w(480px) {
+      padding: 20px 10px;
+      gap: 15px;
+    }
 
     &__card {
       background-color: var(--user-card-bg);
@@ -46,6 +104,18 @@
       align-items: center;
       justify-content: space-between;
 
+      @include mx.max-w(768px) {
+        width: 180px;
+        min-height: 250px;
+        border-radius: 14px;
+      }
+
+      @include mx.max-w(480px) {
+        width: 155px; /* Ensures 2 cards fit side-by-side easily on phone screens */
+        min-height: 235px;
+        padding: 12px;
+      }
+
       &__profile {
         display: flex;
         flex-direction: column;
@@ -57,6 +127,11 @@
           height: 71px;
           width: 71px;
           border-radius: 100%;
+
+          @include mx.max-w(480px) {
+            height: 60px;
+            width: 60px;
+          }
         }
         > span {
           height: 71px;
@@ -66,10 +141,20 @@
           background-color: var(--icon-color);
           font-size: 26px;
           font-weight: 900;
+
+          @include mx.max-w(480px) {
+            height: 60px;
+            width: 60px;
+            font-size: 22px;
+          }
         }
         > p {
           font-size: 18px;
           font-weight: 800;
+
+          @include mx.max-w(480px) {
+            font-size: 16px;
+          }
         }
       }
 
@@ -162,6 +247,8 @@
               transform 200ms ease;
             opacity: 0;
             transform: translateY(-10px);
+            position: absolute; /* PREVENTS layout jumping when opened */
+            z-index: 10;
 
             > span {
               background-color: var(--role-icon-bg);
