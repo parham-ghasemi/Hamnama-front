@@ -80,10 +80,15 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: emoji;
+  src: url("../../../public/fonts/emoji.ttf");
+}
+
 .font-fa {
   font-family: Vazirmatn, sans-serif;
 }
 
 * {
-  font-family: Vazirmatn, sans-serif;
+  font-family: Vazirmatn, emoji;
 }

@@ -5,7 +5,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import clsx from "clsx";
 import { AiTwotoneSetting } from "react-icons/ai";
-import { BsFillPeopleFill, BsFillShareFill, BsMicFill, BsMicMuteFill } from "react-icons/bs";
+import { BsEmojiLaughing, BsFillPeopleFill, BsFillShareFill, BsMicFill, BsMicMuteFill } from "react-icons/bs";
 import { IoChatbubblesSharp, IoExitOutline } from "react-icons/io5";
 import { FaArrowRight } from "react-icons/fa6";
 import { TbSticker } from "react-icons/tb";
@@ -92,6 +92,7 @@ const RoomPage = () => {
   const [mediaTypeModalOpen, setMediaTypeModalOpen] = useState(false);
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [reactionDrawerOpen, setReactionDrawerOpen] = useState(false);
 
   const [currentQuality, setCurrentQuality] = useState("quality");
   const [link, setLink] = useState("");
@@ -471,6 +472,32 @@ const RoomPage = () => {
             <IoExitOutline />
           </button>
           <span>خروج</span>
+        </div>
+
+        <div className={clsx("room-page__side-bar__reaction", reactionDrawerOpen && "open")}>
+          <div className="room-page__side-bar__reaction__drawer">
+            <span>
+              😭
+            </span>
+            <span>
+              😂
+            </span>
+            <span>
+              ❤️
+            </span>
+            <span>
+              😍
+            </span>
+            <span>
+              🔥
+            </span>
+          </div>
+
+          <button className="room-page__side-bar__reaction__trigger" onClick={() => setReactionDrawerOpen((prev) => !prev)}>
+            <span>
+              <BsEmojiLaughing />
+            </span>
+          </button>
         </div>
       </div>
 
