@@ -106,6 +106,19 @@ export interface ArchiveJobStatusResponse {
   error?: string;
 }
 
+export interface ScrapeJob {
+  job_id: string;
+  url: string;
+  status: string;
+  created_at: string;
+  finished_at?: string;
+  error?: string;
+}
+
+export interface ScrapeJobsResponse {
+  jobs: ScrapeJob[];
+}
+
 export const adminApi = {
   getDashboard: () => api.get<AdminDashboardResponse>("/admin/dashboard"),
 
@@ -126,4 +139,5 @@ export const adminApi = {
 
   triggerArchiveScrape: (url: string) => api.post<ArchiveJobResponse>('/admin/scrape', { url }),
   getArchiveJobStatus: (id: string) => api.get<ArchiveJobStatusResponse>(`/admin/scrape/${id}`),
+  getScrapeJobs: () => api.get<ScrapeJobsResponse>('/admin/scrape'),
 };
