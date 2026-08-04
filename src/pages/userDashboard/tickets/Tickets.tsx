@@ -123,7 +123,9 @@ const Tickets = () => {
       </div>
 
       <button className="user-tickets__new-ticket" onClick={() => setIsModalOpen(true)}>
-        ثبت تیکت جدید
+        <p>
+          ثبت تیکت جدید
+        </p>
         <span><BsPlusLg strokeWidth={1} /></span>
       </button>
 
