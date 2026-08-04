@@ -195,5 +195,16 @@
         opacity: 0.6; // Matched this to the normal item hover opacity for visual consistency
       }
     }
+
+    &__modal-btn {
+      background-color: dark.$color-red !important;
+      transition: opacity 200ms ease !important;
+      &:hover {
+        opacity: 0.8;
+      }
+      @include mx.light {
+        background-color: light.$color-red !important;
+      }
+    }
   }
 }

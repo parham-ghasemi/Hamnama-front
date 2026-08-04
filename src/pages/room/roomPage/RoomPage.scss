@@ -1,4 +1,6 @@
 @use "../../../styles/abstracts/mixins" as mx;
+@use "../../../styles/abstracts/variables" as dark;
+@use "../../../styles/abstracts/variables.light" as light;
 
 .room-page {
   height: 100vh;
@@ -1277,5 +1279,16 @@
         }
       }
     }
+  }
+}
+
+.room-exit-primary {
+  background-color: dark.$color-red !important;
+  transition: opacity 200ms ease !important;
+  &:hover {
+    opacity: 0.8;
+  }
+  @include mx.light {
+    background-color: light.$color-red !important;
   }
 }

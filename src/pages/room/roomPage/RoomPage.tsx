@@ -26,6 +26,7 @@ import {
 } from "../../../apiCalls/roomApi";
 import { useAuth } from "../../../context/AuthContext";
 import AnimatedParticle from '../../../components/animatedParticle/AnimatedParticle';
+import { useConfirmationModal } from '../../../context/ConfirmModalContext/ConfirmaModalContext';
 
 type SocketEvent =
   | {
@@ -87,6 +88,7 @@ const RoomPage = () => {
   const { id: roomId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { openConfirmation } = useConfirmationModal();
 
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [usersModalOpen, setUsersModalOpen] = useState(false);
@@ -415,6 +417,19 @@ const RoomPage = () => {
     leaveMutation.mutate();
   };
 
+  const handleLeaveRoomClick = () => {
+    openConfirmation({
+      title: "خروج از اتاق",
+      body: "آیا مطمئن هستید که می‌خواهید از اتاق خارج شوید؟",
+      primaryButtonText: "خروج",
+      secondaryButtonText: "انصراف",
+      primaryButtonClasses: "room-exit-primary",
+      onConfirm: () => {
+        handleLeaveRoom();
+      },
+    });
+  };
+
   const handleSubmitPlayback = () => {
     emitPlayback("load", 0, link.trim());
     setCurrentTime(0);
@@ -507,7 +522,7 @@ const RoomPage = () => {
         </div>
 
         <div className="room-page__side-bar__item">
-          <button className="room-page__side-bar__exit" onClick={handleLeaveRoom}>
+          <button className="room-page__side-bar__exit" onClick={handleLeaveRoomClick}>
             <IoExitOutline />
           </button>
           <span>خروج</span>
