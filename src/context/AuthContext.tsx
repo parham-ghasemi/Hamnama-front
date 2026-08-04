@@ -5,7 +5,7 @@ import api from '../lib/axiosConfig';
 export interface User {
   id: string;
   username: string;
-  phoneNumber: string;
+  phone_number: string;
   profile_picture: string;
 }
 

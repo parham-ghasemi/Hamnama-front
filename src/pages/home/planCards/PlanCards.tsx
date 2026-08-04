@@ -2,6 +2,7 @@ import { PiCaretDownFill, PiHeartFill } from 'react-icons/pi';
 import './PlanCards.scss';
 import { BsPeopleFill, BsPersonFill } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
+import { toPersianNumerals } from '../../../helpers/NumberConversion';
 
 const PlanCards = () => {
   const plans = [
@@ -50,7 +51,7 @@ const PlanCards = () => {
 
             <p className='home-planCards__card__users-title'>تعداد کاربر</p>
             <p className='home-planCards__card__users'>
-              {`${plan.numberOfUsers} نفر`}
+              {`${toPersianNumerals(plan.numberOfUsers)} نفر`}
             </p>
 
             <div className='home-planCards__card__price-container'>
@@ -59,27 +60,29 @@ const PlanCards = () => {
                   <div className='home-planCards__card__price-container__discount'>
                     <div className="home-planCards__card__price-container__discount__old-price">
                       {
-                        plan.price.toLocaleString().replace(',', "،")
+                        toPersianNumerals(
+                          plan.price.toLocaleString().replace(',', "،")
+                        )
                       }
                     </div>
 
                     <div className="home-planCards__card__price-container__discount__discount-percent">
                       <PiCaretDownFill />
-                      {`${plan.discount.percent}%`}
+                      {`${toPersianNumerals(plan.discount.percent)}%`}
                     </div>
                   </div>
                 )
               }
               <div className='home-planCards__card__price-container__current-price'>
                 <p className='home-planCards__card__price-container__current-price__main'>
-                  {plan.discount ? plan.discount.newPrice.toLocaleString().replace(',', "،") : plan.price}
+                  {toPersianNumerals(plan.discount ? plan.discount.newPrice.toLocaleString().replace(',', "،") : plan.price)}
                   <span>
                     هــــزار تومان
                   </span>
                 </p>
 
                 <p className='home-planCards__card__price-container__current-price__sub'>
-                  {`مدت زمان ${plan.discount.daysLeft} روز `}
+                  {`مدت زمان ${toPersianNumerals(plan.discount.daysLeft)} روز `}
                 </p>
               </div>
             </div>

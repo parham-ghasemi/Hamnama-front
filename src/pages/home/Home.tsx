@@ -7,6 +7,7 @@ import Faq from './faq/Faq'
 import { useTheme } from '../../context/ThemeContext'
 import clsx from 'clsx'
 import { useNavigate } from 'react-router-dom'
+import { toPersianNumerals } from '../../helpers/NumberConversion'
 
 const Home = () => {
   const { isLight } = useTheme();
@@ -41,7 +42,7 @@ const Home = () => {
         <button className='home-page__buttons__watch' onClick={() => nav('/join-room')}>شروع به تماشا</button>
       </div>
 
-      <h2 className='home-page__steps-title'> 3 قدم تا <span>فیلم دیدن</span> کنار یکدیگر!</h2>
+      <h2 className='home-page__steps-title'> {toPersianNumerals(3)} قدم تا <span>فیلم دیدن</span> کنار یکدیگر!</h2>
       <Steps />
 
 

@@ -16,6 +16,7 @@ import {
 import { useAuth } from '../../../context/AuthContext'; // Adjust path
 import './UserInfo.scss';
 import { userApi } from '../../../apiCalls/userApi';
+import { toPersianNumerals } from '../../../helpers/NumberConversion';
 
 // --- Types --- //
 interface WatchHistoryItem {
@@ -151,7 +152,7 @@ const UpdatePhoneForm = ({ onClose }: { onClose: () => void }) => {
 
   const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phone || phone === user?.phoneNumber) {
+    if (!phone || phone === user?.phone_number) {
       toast.error('لطفا یک شماره جدید وارد کنید');
       return;
     }
@@ -303,7 +304,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       <div className="user-info__chart-tooltip">
         <p className="user-info__chart-tooltip-label">{label}</p>
         <p className="user-info__chart-tooltip-value">
-          {payload[0].value} ساعت تماشا
+          {toPersianNumerals(payload[0].value)} ساعت تماشا
         </p>
       </div>
     );
@@ -381,7 +382,7 @@ const UserInfo = () => {
 
   const sections = [
     { key: 'username', label: 'نام کاربری', value: user?.username },
-    { key: 'phone', label: 'شماره موبایل', value: user?.phoneNumber },
+    { key: 'phone', label: 'شماره موبایل', value: toPersianNumerals(user?.phone_number || 0) },
     { key: 'password', label: 'رمز عبور', value: '•••••••••••••' },
   ];
 
@@ -453,7 +454,6 @@ const UserInfo = () => {
       <div className="user-info__chart-container">
 
         <div className="user-info__chart-header">
-          {/* بخش دراپ‌داون در ابتدا قرار گرفته تا در حالت RTL در سمت راست بماند */}
           <div className="user-info__custom-dropdown" ref={dropdownRef}>
             <button
               className={`user-info__custom-dropdown-toggle ${isDropdownOpen ? 'is-open' : ''}`}
@@ -480,7 +480,7 @@ const UserInfo = () => {
           </div>
 
           <div className="user-info__chart-title-group">
-            <span className="user-info__chart-total">مجموع: {displayTotal} ساعت</span>
+            <span className="user-info__chart-total">مجموع: {toPersianNumerals(displayTotal)} ساعت</span>
             <h3 className="user-info__chart-title">گزارش تماشا (ساعات)</h3>
           </div>
         </div>

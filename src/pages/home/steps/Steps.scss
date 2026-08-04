@@ -130,12 +130,13 @@
         font-size: 51px;
         line-height: 100%;
         font-weight: 800;
-        width: 44.2px;
+        width: 60px;
         text-align: right;
         display: flex;
         align-items: center;
-        gap: 14.45px;
         color: dark.$color-white;
+        display: flex;
+        justify-content: space-between;
 
         @include mx.light {
           color: light.$color-white;

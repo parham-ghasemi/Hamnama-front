@@ -1,5 +1,6 @@
 import { BsPlusLg } from 'react-icons/bs';
 import './PlanUsers.scss';
+import { toPersianNumerals } from '../../../helpers/NumberConversion';
 
 const PlanUsers = () => {
   const users = [
@@ -42,7 +43,7 @@ const PlanUsers = () => {
               </div>
 
               <div className="plan-users__cards__card__since">
-                {`مدت مشترک شدن: ${user.daysSinceJoined} روز`}
+                {`مدت مشترک شدن: ${toPersianNumerals(user.daysSinceJoined)} روز`}
               </div>
 
               <button className='plan-users__cards__card__kick'>اخراج کاربر</button>

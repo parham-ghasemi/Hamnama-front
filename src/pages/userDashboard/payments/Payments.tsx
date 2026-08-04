@@ -1,3 +1,4 @@
+import { toPersianNumerals } from '../../../helpers/NumberConversion';
 import './Payments.scss';
 
 // Fake data array structured to mimic your rows
@@ -6,14 +7,14 @@ const PAYMENTS_DATA = [
     id: '001',
     date: '1404/10/22',
     planType: { title: 'پلن کاپلی', duration: 'یک ماهه' },
-    amount: '۱۰۹،۰۰۰ تومان',
+    amount: 109000,
     status: 'پرداخت شده',
   },
   {
     id: '002',
     date: '1404/10/22',
     planType: { title: 'پلن کاپلی', duration: 'یک ماهه' },
-    amount: '۱۰۹،۰۰۰ تومان',
+    amount: 109000,
     status: 'پرداخت نشده',
   }
 ];
@@ -39,7 +40,7 @@ const Payments = () => {
             <div key={payment.id} className='user-payments__list-container__body-wrapper__row'>
 
               <div className='user-payments__list-container__body-wrapper__row__cell'>
-                {payment.date}
+                {toPersianNumerals(payment.date)}
               </div>
 
               <div className='user-payments__list-container__body-wrapper__row__cell'>
@@ -54,7 +55,9 @@ const Payments = () => {
               </div>
 
               <div className='user-payments__list-container__body-wrapper__row__cell'>
-                {payment.amount}
+                {
+                  toPersianNumerals(payment.amount.toLocaleString().replace(',', "،"))
+                }
               </div>
 
               {/* Conditional Tailwind utility class applied here */}

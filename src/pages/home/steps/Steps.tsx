@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { useTheme } from '../../../context/ThemeContext';
 import './Steps.scss';
 import StepAnimation from './stepAnimation/StepAnimation';
+import { toPersianNumerals } from '../../../helpers/NumberConversion';
 
 const Steps = () => {
   const steps = ['ساخت حساب کاربری', "ساخت اتاق سینما", "انتخاب فیلم و تماشا"]
@@ -28,7 +29,7 @@ const Steps = () => {
         {
           steps.map((step, ind) => (
             <li key={`home-step-item-${ind}`}>
-              <span>{ind + 1}</span>
+              <span>{toPersianNumerals(ind + 1)}</span>
               <p>{step}</p>
             </li>
           ))
