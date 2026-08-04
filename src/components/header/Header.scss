@@ -278,122 +278,82 @@
     }
 
     // --- Dark/Light Theme Toggle ---
-    &__theme-btn {
+    &__new-theme-btn {
+      height: 36px;
+      width: 150px;
+      background-image: url("/slider/darkbg.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       position: relative;
-      width: 39.1px;
-      height: 39.1px;
-      flex-shrink: 0;
-      @include mx.flex-center;
-      border: none;
-      outline: none;
       cursor: pointer;
-      overflow: hidden;
-      border-radius: 12px;
-      background:
-        linear-gradient(
-          180deg,
-          rgba(255, 255, 255, 0.08),
-          rgba(255, 255, 255, 0.03)
-        ),
-        dark.$color-dark-gray;
-
-      box-shadow:
-        0 10px 24px rgba(0, 0, 0, 0.18),
-        inset 0 1px rgba(255, 255, 255, 0.06);
-      transition:
-        background 300ms ease,
-        transform 220ms ease,
-        box-shadow 220ms ease;
-
-      &::before {
-        content: "";
-        position: absolute;
-        inset: -50%;
-        background: linear-gradient(
-          120deg,
-          transparent,
-          rgba(255, 255, 255, 0.18),
-          transparent
-        );
-        transform: translateX(-180%) rotate(20deg);
-        transition: transform 700ms ease;
-      }
+      transition: opacity 200ms ease;
 
       &:hover {
-        transform: translateY(-2px);
-        box-shadow:
-          0 16px 34px rgba(0, 0, 0, 0.28),
-          inset 0 1px rgba(255, 255, 255, 0.1);
-
-        &::before {
-          transform: translateX(180%) rotate(20deg);
-        }
+        opacity: 0.8;
       }
 
-      &:active {
-        transform: scale(0.95);
-      }
-
-      @include mx.light {
-        background:
-          linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.95),
-            rgba(255, 255, 255, 0.8)
-          ),
-          light.$color-card-bg;
-
-        box-shadow:
-          0 10px 22px rgba(0, 0, 0, 0.1),
-          inset 0 1px rgba(255, 255, 255, 0.9);
-      }
-
-      &__icon {
+      &::after {
+        content: "";
+        width: 26.25px;
         position: absolute;
-        font-size: 20px;
+        left: 5.25px;
+        top: 5.25px;
+        bottom: 5.25px;
+        background-image: url("/slider/sun.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0;
+        transform: translateX(30px) rotate(180deg);
         transition:
-          opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
-          transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
-          filter 420ms ease;
-
-        &--moon {
-          color: #ffffff;
-          opacity: 1;
-          transform: rotate(0deg) scale(1);
-          filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
-        }
-
-        &--sun {
-          color: #f6b517;
-          opacity: 0;
-          transform: rotate(180deg) scale(2);
-          filter: blur(4px) drop-shadow(0 0 10px rgba(246, 181, 23, 0.4));
-        }
-
-        &.is-hidden {
-          opacity: 0;
-          transform: rotate(-180deg) scale(0.2);
-          filter: blur(4px);
-        }
-
-        &.is-visible {
-          opacity: 1;
-          transform: rotate(0deg) scale(1);
-          filter: blur(0) drop-shadow(0 0 10px rgba(246, 181, 23, 0.45));
-        }
+          opacity 250ms ease,
+          transform 250ms ease;
+      }
+      &::before {
+        content: "";
+        width: 22.5px;
+        position: absolute;
+        right: 5.25px;
+        top: 5.25px;
+        bottom: 5.25px;
+        background-image: url("/slider/moon.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 1;
+        transition:
+          opacity 250ms ease,
+          transform 250ms ease;
       }
 
       &--light {
-        .header__left__theme-btn__icon--moon {
-          opacity: 0;
-          transform: rotate(-180deg) scale(0.2);
-          filter: blur(4px);
-        }
+        background-image: url("/slider/lightbg.png");
 
-        .header__left__theme-btn__icon--sun {
+        &::after {
           opacity: 1;
-          transform: rotate(0deg) scale(1);
-          filter: blur(0) drop-shadow(0 0 10px rgba(246, 181, 23, 0.45));
+          transform: translateX(0) rotate(0);
+        }
+        &::before {
+          opacity: 0;
+          transform: translateX(-23px) rotate(180deg);
+        }
+      }
+
+      @include mx.max-w(400px) {
+        height: calc(36px * 0.75);
+        width: calc(150px * 0.75);
+        &::after {
+          width: calc(26.25px * 0.75);
+          left: calc(5.25px * 0.75);
+          top: calc(5.25px * 0.75);
+          bottom: calc(5.25px * 0.75);
+        }
+        &::before {
+          width: calc(22.5px * 0.75);
+          right: calc(5.25px * 0.75);
+          top: calc(5.25px * 0.75);
+          bottom: calc(5.25px * 0.75);
         }
       }
     }

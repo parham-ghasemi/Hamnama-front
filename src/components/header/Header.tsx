@@ -94,18 +94,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
         <button
           className={clsx(
-            "header__left__theme-btn",
-            isLight && "header__left__theme-btn--light"
+            "header__left__new-theme-btn",
+            isLight && "header__left__new-theme-btn--light"
           )}
           onClick={() => setTheme(isLight ? "dark" : "light")}
           aria-label="Toggle theme"
         >
-          <PiMoonStarsFill
-            className={clsx("header__left__theme-btn__icon", "header__left__theme-btn__icon--moon", isLight && "is-hidden")}
-          />
-          <PiSunFill
-            className={clsx("header__left__theme-btn__icon", "header__left__theme-btn__icon--sun", isLight && "is-visible")}
-          />
         </button>
       </div>
     </header>
