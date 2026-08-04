@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { BsFillGearFill, BsGiftFill, BsXLg } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';

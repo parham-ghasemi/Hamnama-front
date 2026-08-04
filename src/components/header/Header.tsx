@@ -1,5 +1,5 @@
 import './Header.scss';
-import { PiCaretRightBold, PiMoonStarsFill, PiSunFill, PiUserFill, PiListBold } from "react-icons/pi";
+import { PiCaretRightBold, PiUserFill, PiListBold } from "react-icons/pi";
 import clsx from 'clsx';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
