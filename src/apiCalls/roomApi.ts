@@ -15,7 +15,7 @@ export interface RoomMessageResponse {
   sender_id: string;
   sender_name: string;
   sender_avatar: string;
-  replying_to: string
+  replying_to: string;
   content: string;
   created_at: string;
 }
@@ -43,7 +43,7 @@ export async function getRoom(roomId: string) {
 export async function sendRoomMessage(roomId: string, content: string, replyingTo?: string) {
   const { data } = await api.post<RoomMessageResponse>(`/rooms/${roomId}/messages`, {
     content,
-    replying_to: !!replyingTo ? replyingTo : null
+    replying_to: !!replyingTo ? replyingTo : null,
   });
   return data;
 }
@@ -52,10 +52,23 @@ export async function leaveRoom(roomId: string) {
   await api.post(`/rooms/${roomId}/leave`);
 }
 
-interface JoinRoomResponse {
-  id: string
+export async function updateRoomMemberRole(
+  roomId: string,
+  userId: string,
+  role: "admin" | "member",
+) {
+  await api.patch(`/rooms/${roomId}/members/${userId}/role`, { role });
 }
+
+export async function kickRoomMember(roomId: string, userId: string) {
+  await api.delete(`/rooms/${roomId}/members/${userId}`);
+}
+
+interface JoinRoomResponse {
+  id: string;
+}
+
 export async function joinRoom(code: number) {
   const { data } = await api.post<JoinRoomResponse>(`/rooms/join`, { code });
-  return data
+  return data;
 }

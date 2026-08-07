@@ -16,7 +16,25 @@ interface UserRow {
   connectionStatus: ConnectionStatus;
 }
 
-const UsersModal = ({ isCurrentAdmin, isOpen, users }: { isCurrentAdmin: boolean; isOpen: boolean; users: UserRow[] }) => {
+interface UsersModalProps {
+  isCurrentAdmin: boolean;
+  isOpen: boolean;
+  users: UserRow[];
+  onChangeRole: (userId: string, role: "admin" | "member") => void;
+  onKick: (userId: string) => void;
+  roleLoadingId?: string | null;
+  kickLoadingId?: string | null;
+}
+
+const UsersModal = ({
+  isCurrentAdmin,
+  isOpen,
+  users,
+  onChangeRole,
+  onKick,
+  roleLoadingId = null,
+  kickLoadingId = null,
+}: UsersModalProps) => {
   const [openRoleInd, setOpenRoleInd] = useState<null | number>(null);
 
   return (
@@ -27,69 +45,112 @@ const UsersModal = ({ isCurrentAdmin, isOpen, users }: { isCurrentAdmin: boolean
       </div>
 
       <div className="room-users-modal__body">
-        {users.map((user, ind) => (
-          <div className="room-users-modal__body__card" key={user.userId}>
-            <div className="room-users-modal__body__card__profile">
-              {
-                user.avatar ? (
-                  <img src={`${import.meta.env.VITE_BASE_URL}${user?.avatar}`} alt={user.name} />
+        {users.map((user, ind) => {
+          const canManage = isCurrentAdmin && !user.isCurrentUser;
+          const isRoleLoading = roleLoadingId === user.userId;
+          const isKickLoading = kickLoadingId === user.userId;
+
+          return (
+            <div className="room-users-modal__body__card" key={user.userId}>
+              <div className="room-users-modal__body__card__profile">
+                {user.avatar ? (
+                  <img src={`${import.meta.env.VITE_BASE_URL}${user.avatar}`} alt={user.name} />
                 ) : (
                   <span>{user.name[0].toUpperCase()}</span>
-                )
-              }
-              <div>
-                <p>{user.isCurrentUser ? "شما" : user.name}</p>
-              </div>
-            </div>
-
-            <div className="room-users-modal__body__card__body">
-              <div
-                className={clsx(
-                  "room-users-modal__body__card__body__connection",
-                  user.connectionStatus,
                 )}
-              >
-                <span>
-                  <IoWifi />
-                </span>
-                <p>
-                  {user.connectionStatus === "good"
-                    ? "عالی"
-                    : user.connectionStatus === "bad"
-                      ? "ضعیف"
-                      : user.connectionStatus === "offline"
-                        ? "آفلاین"
-                        : "متوسط"}
-                </p>
+
+                <div>
+                  <p>{user.isCurrentUser ? "شما" : user.name}</p>
+                </div>
               </div>
 
-              <div className={clsx("room-users-modal__body__card__body__role", openRoleInd === ind && "open")}>
+              <div className="room-users-modal__body__card__body">
                 <div
                   className={clsx(
-                    "room-users-modal__body__card__body__role__trigger",
-                    user.isCurrentUser && "current",
-                    user.role !== "admin" && "normal",
-                    !isCurrentAdmin && "current-not-admin"
+                    "room-users-modal__body__card__body__connection",
+                    user.connectionStatus,
                   )}
-                  onClick={() => setOpenRoleInd((prev) => (prev === ind ? null : user.isCurrentUser ? null : ind))}
                 >
-                  <span>{user.role === "admin" ? <BsPersonCheckFill /> : <BsFillPersonFill />}</span>
-                  <p>{user.role === "admin" ? "کاربر ادمین" : "کاربر عادی"}</p>
-                  <FaChevronDown />
+                  <span>
+                    <IoWifi />
+                  </span>
+                  <p>
+                    {user.connectionStatus === "good"
+                      ? "عالی"
+                      : user.connectionStatus === "bad"
+                        ? "ضعیف"
+                        : user.connectionStatus === "offline"
+                          ? "آفلاین"
+                          : "متوسط"}
+                  </p>
                 </div>
 
-                <div className="room-users-modal__body__card__body__role__drop-down">
-                  <span>{user.role !== "admin" ? <BsPersonCheckFill /> : <BsFillPersonFill />}</span>
-                  <p>{user.role !== "admin" ? "کاربر ادمین" : "کاربر عادی"}</p>
+                <div
+                  className={clsx(
+                    "room-users-modal__body__card__body__role",
+                    openRoleInd === ind && "open",
+                    !canManage && "locked",
+                  )}
+                >
+                  <div
+                    className={clsx(
+                      "room-users-modal__body__card__body__role__trigger",
+                      user.isCurrentUser && "current",
+                      user.role !== "admin" && "normal",
+                      !isCurrentAdmin && "current-not-admin",
+                      !canManage && "disabled",
+                    )}
+                    onClick={() =>
+                      setOpenRoleInd((prev) => (prev === ind ? null : canManage ? ind : null))
+                    }
+                  >
+                    <span>{user.role === "admin" ? <BsPersonCheckFill /> : <BsFillPersonFill />}</span>
+                    <p>{user.role === "admin" ? "کاربر ادمین" : "کاربر عادی"}</p>
+                    <FaChevronDown />
+                  </div>
+
+                  {canManage &&
+                    <div className="room-users-modal__body__card__body__role__drop-down">
+                      <span>{user.role !== "admin" ? <BsPersonCheckFill /> : <BsFillPersonFill />}</span>
+                      <p
+                        onClick={() => {
+                          setOpenRoleInd(null);
+
+                          onChangeRole(
+                            user.userId,
+                            user.role === "admin" ? "member" : "admin",
+                          );
+                        }}
+                      >
+                        {isRoleLoading
+                          ? "درحال ثبت..."
+                          : user.role !== "admin"
+                            ? "کاربر ادمین"
+                            : "کاربر عادی"}
+                      </p>
+                    </div>
+                  }
                 </div>
               </div>
-            </div>
 
-            <div className={clsx("room-users-modal__body__card__foot", user.isCurrentUser && "current")}>
-              {user.isCurrentUser ? "شما" : "اخراج"}
+              <div className={clsx("room-users-modal__body__card__foot", user.isCurrentUser && "current")}>
+                {user.isCurrentUser ? (
+                  "شما"
+                ) : isCurrentAdmin ? (
+                  <button
+                    type="button"
+                    disabled={isKickLoading}
+                    onClick={() => onKick(user.userId)}
+                  >
+                    {isKickLoading ? "در حال اخراج..." : "اخراج"}
+                  </button>
+                ) : (
+                  "عضو"
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

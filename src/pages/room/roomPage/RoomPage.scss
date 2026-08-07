@@ -212,6 +212,7 @@
             font-size: 11.5px;
             opacity: 0.9;
             display: -webkit-box;
+            line-clamp: 2;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;

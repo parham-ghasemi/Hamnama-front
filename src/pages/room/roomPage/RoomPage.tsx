@@ -22,6 +22,8 @@ import {
   getRoom,
   leaveRoom,
   sendRoomMessage,
+  kickRoomMember,
+  updateRoomMemberRole,
   type ConnectionStatus,
   type RoomMessageResponse,
   type RoomResponse,
@@ -52,6 +54,19 @@ type SocketEvent =
     type: "user_left";
     payload: {
       user_id: string;
+    };
+  }
+  | {
+    type: "user_kicked";
+    payload: {
+      user_id: string;
+    };
+  }
+  | {
+    type: "update_role";
+    payload: {
+      user_id: string;
+      role: "admin" | "member";
     };
   }
   | {
@@ -166,6 +181,9 @@ const RoomPage = () => {
 
   useEffect(() => {
     if (!roomQuery.data) return;
+
+    console.log("ROOM QUERY MEMBERS:", roomQuery.data.members);
+
     setRoomState(roomQuery.data);
     setLink(roomQuery.data.currently_playing ?? "");
     setCurrentTime(roomQuery.data.playback_time ?? 0);
@@ -245,39 +263,34 @@ const RoomPage = () => {
           break;
 
         case "user_joined":
-          setRoomState(prev => {
-            if (!prev) return prev;
-
-            if (prev.members.some(m => m.user_id === parsed.payload.user_id))
-              return prev;
-
-            return {
-              ...prev,
-              members: [
-                ...prev.members,
-                parsed.payload
-              ]
-            } as RoomResponse;
-          });
-
-          break;
         case "user_left":
-          // roomQuery.refetch();
-          roomQuery.refetch().then(result => {
-            if (result.data) {
-              setRoomState(result.data);
-            }
-          });
-          setRoomState(prev => {
-            if (!prev) return prev;
+          refreshRoom();
+          break;
 
-            return {
-              ...prev,
-              members: prev.members.filter(
-                m => m.user_id !== parsed.payload.user_id
-              )
-            };
-          });
+        case "user_kicked":
+          if (parsed.payload.user_id === user?.id) {
+            socket.close();
+            navigate("/");
+            return;
+          }
+
+          refreshRoom();
+          break;
+
+        case "update_role":
+          setRoomState((prev) =>
+            prev
+              ? {
+                ...prev,
+                members: prev.members.map((member) =>
+                  member.user_id === parsed.payload.user_id
+                    ? { ...member, role: parsed.payload.role }
+                    : member,
+                ),
+              }
+              : prev,
+          );
+          refreshRoom();
           break;
 
         case "sync_playback": {
@@ -326,6 +339,9 @@ const RoomPage = () => {
 
       if (socketRef.current === socket) {
         socketRef.current = null;
+      }
+      if (e.code === 4003) {
+        navigate("/", { replace: true });
       }
     };
 
@@ -385,6 +401,36 @@ const RoomPage = () => {
     onSuccess: () => {
       socketRef.current?.close();
       navigate("/");
+    },
+  });
+
+  const refreshRoom = async () => {
+    const result = await roomQuery.refetch();
+
+    console.log("REFRESH ROOM:", result.data?.members);
+
+    if (result.data) {
+      setRoomState(result.data);
+    }
+  };
+
+  const updateRoleMutation = useMutation({
+    mutationFn: ({
+      userId,
+      role,
+    }: {
+      userId: string;
+      role: "admin" | "member";
+    }) => updateRoomMemberRole(roomId!, userId, role),
+    onSuccess: () => {
+      refreshRoom();
+    },
+  });
+
+  const kickMemberMutation = useMutation({
+    mutationFn: (userId: string) => kickRoomMember(roomId!, userId),
+    onSuccess: () => {
+      refreshRoom();
     },
   });
 
@@ -521,15 +567,33 @@ const RoomPage = () => {
     connectionStatus: connectionStatuses[member.user_id] ?? "good",
   }));
 
-  const isCurrentUserAdmin = (): boolean => {
-    for (let i = 0; i < members.length; i++) {
-      if (members[i].userId === user?.id && members[i].role === "admin") {
-        return true;
-      }
-    }
-    return false;
-  }
+  const isCurrentUserAdmin = members.some(
+    (member) => member.userId === user?.id && member.role === "admin",
+  );
 
+  const handleChangeMemberRole = (targetUserId: string, role: "admin" | "member") => {
+    if (!roomId) return;
+
+    updateRoleMutation.mutate({
+      userId: targetUserId,
+      role,
+    });
+  };
+
+  const handleKickMember = (targetUserId: string) => {
+    if (!roomId) return;
+
+    openConfirmation({
+      title: "اخراج کاربر",
+      body: "آیا مطمئن هستید که می‌خواهید این کاربر را از اتاق اخراج کنید؟",
+      primaryButtonText: "اخراج",
+      secondaryButtonText: "انصراف",
+      primaryButtonClasses: "room-exit-primary",
+      onConfirm: () => {
+        kickMemberMutation.mutate(targetUserId);
+      },
+    });
+  };
 
 
   return (
@@ -804,7 +868,23 @@ const RoomPage = () => {
 
         {usersModalOpen && (
           <div className="room-page__modal-overlay__modal" onClick={(e) => e.stopPropagation()}>
-            <UsersModal isOpen={usersModalOpen} users={members} isCurrentAdmin={isCurrentUserAdmin()} />
+            <UsersModal
+              isOpen={usersModalOpen}
+              users={members}
+              isCurrentAdmin={isCurrentUserAdmin}
+              onChangeRole={handleChangeMemberRole}
+              onKick={handleKickMember}
+              roleLoadingId={
+                updateRoleMutation.isPending
+                  ? updateRoleMutation.variables?.userId ?? null
+                  : null
+              }
+              kickLoadingId={
+                kickMemberMutation.isPending
+                  ? kickMemberMutation.variables ?? null
+                  : null
+              }
+            />
           </div>
         )}
 
