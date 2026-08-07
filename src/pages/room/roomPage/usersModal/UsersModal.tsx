@@ -16,7 +16,7 @@ interface UserRow {
   connectionStatus: ConnectionStatus;
 }
 
-const UsersModal = ({ isOpen, users }: { isOpen: boolean; users: UserRow[] }) => {
+const UsersModal = ({ isCurrentAdmin, isOpen, users }: { isCurrentAdmin: boolean; isOpen: boolean; users: UserRow[] }) => {
   const [openRoleInd, setOpenRoleInd] = useState<null | number>(null);
 
   return (
@@ -34,7 +34,7 @@ const UsersModal = ({ isOpen, users }: { isOpen: boolean; users: UserRow[] }) =>
                 user.avatar ? (
                   <img src={`${import.meta.env.VITE_BASE_URL}${user?.avatar}`} alt={user.name} />
                 ) : (
-                  <span>{user.name[0]}</span>
+                  <span>{user.name[0].toUpperCase()}</span>
                 )
               }
               <div>
@@ -69,6 +69,7 @@ const UsersModal = ({ isOpen, users }: { isOpen: boolean; users: UserRow[] }) =>
                     "room-users-modal__body__card__body__role__trigger",
                     user.isCurrentUser && "current",
                     user.role !== "admin" && "normal",
+                    !isCurrentAdmin && "current-not-admin"
                   )}
                   onClick={() => setOpenRoleInd((prev) => (prev === ind ? null : user.isCurrentUser ? null : ind))}
                 >

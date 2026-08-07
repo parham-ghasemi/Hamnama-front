@@ -208,6 +208,16 @@
                 opacity: 0;
               }
             }
+            &.current-not-admin {
+              background-color: var(--role-trigger-current-bg);
+              > svg {
+                opacity: 0;
+              }
+
+              & ~ .room-users-modal__body__card__body__role__drop-down {
+                opacity: 0;
+              }
+            }
 
             &:hover {
               opacity: 0.9;

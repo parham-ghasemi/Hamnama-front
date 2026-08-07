@@ -15,6 +15,7 @@ export interface RoomMessageResponse {
   sender_id: string;
   sender_name: string;
   sender_avatar: string;
+  replying_to: string
   content: string;
   created_at: string;
 }
@@ -39,9 +40,10 @@ export async function getRoom(roomId: string) {
   return data;
 }
 
-export async function sendRoomMessage(roomId: string, content: string) {
+export async function sendRoomMessage(roomId: string, content: string, replyingTo?: string) {
   const { data } = await api.post<RoomMessageResponse>(`/rooms/${roomId}/messages`, {
     content,
+    replying_to: !!replyingTo ? replyingTo : null
   });
   return data;
 }
