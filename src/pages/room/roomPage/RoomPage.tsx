@@ -79,6 +79,10 @@ type SocketEvent =
       user_id: string;
     };
   }
+  | { type: "voice_offer"; payload: any }
+  | { type: "voice_answer"; payload: any }
+  | { type: "voice_ice"; payload: any }
+  | { type: "voice_state"; payload: { user_id: string; enabled: boolean } }
   | {
     type: "update_settings";
     payload: {
@@ -173,6 +177,357 @@ const RoomPage = () => {
   const socketRef = useRef<WebSocket | null>(null);
   const syncIntervalRef = useRef<number | null>(null);
 
+  // --- Voice chat state & refs ---
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const voiceEnabledRef = useRef<boolean>(false);
+  const localStreamRef = useRef<MediaStream | null>(null);
+  const peersRef = useRef<Map<string, {
+    pc: RTCPeerConnection;
+    pendingIce: RTCIceCandidateInit[];
+    remoteDescSet: boolean;
+    isInitiator: boolean;
+    offerSent?: boolean;
+    makingOffer?: boolean;
+    addedLocalTracks?: boolean;
+  }>>(new Map());
+  const audioElsRef = useRef<Record<string, HTMLAudioElement>>({});
+
+  const [remoteVoiceEnabled, setRemoteVoiceEnabled] = useState<Record<string, boolean>>({});
+  const remoteVoiceEnabledRef = useRef<Record<string, boolean>>({});
+
+  const ICE_SERVERS: RTCIceServer[] = [
+    { urls: "stun:stun.l.google.com:19302" },
+  ];
+
+  const localUserIdRef = useRef<string>(user?.id ?? "");
+  useEffect(() => { localUserIdRef.current = user?.id ?? ""; }, [user?.id]);
+
+  useEffect(() => { voiceEnabledRef.current = voiceEnabled; }, [voiceEnabled]);
+  useEffect(() => { remoteVoiceEnabledRef.current = remoteVoiceEnabled; }, [remoteVoiceEnabled]);
+
+  const createAudioElementFor = (remoteId: string, stream: MediaStream) => {
+    console.log("voice: attaching remote stream for", remoteId);
+    let el = audioElsRef.current[remoteId];
+    if (!el) {
+      el = document.createElement("audio");
+      el.autoplay = true;
+      el.style.display = "none";
+      audioElsRef.current[remoteId] = el;
+      document.body.appendChild(el);
+    }
+    try {
+      // @ts-ignore
+      el.srcObject = stream;
+      el.play().then(() => console.log("voice: playing remote audio for", remoteId)).catch((e) => console.warn("voice: play() failed", e));
+    } catch (e) {
+      console.warn("Could not attach remote stream", e);
+    }
+  };
+
+  const removeAudioElementFor = (remoteId: string) => {
+    const el = audioElsRef.current[remoteId];
+    if (el) {
+      try {
+        el.pause();
+        // @ts-ignore
+        el.srcObject = null;
+      } catch { }
+      if (el.parentNode) el.parentNode.removeChild(el);
+      delete audioElsRef.current[remoteId];
+      console.log("voice: removed audio element for", remoteId);
+    }
+  };
+
+  const closePeer = (remoteId: string) => {
+    const meta = peersRef.current.get(remoteId);
+    if (!meta) return;
+    try {
+      console.log("voice: closing peer for", remoteId);
+      meta.pc.getSenders().forEach((s) => { try { s.track?.stop(); } catch { } });
+      meta.pc.close();
+    } catch (e) {
+      console.warn(e);
+    }
+    peersRef.current.delete(remoteId);
+    removeAudioElementFor(remoteId);
+  };
+
+  const ensurePeer = (remoteId: string) => {
+    const existing = peersRef.current.get(remoteId);
+    if (existing) return existing;
+
+    const localUserId = localUserIdRef.current;
+    const isInitiator = localUserId !== "" && localUserId > remoteId;
+
+    console.log("voice: creating peer", { remoteId, isInitiator });
+
+    const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+    const meta = {
+      pc,
+      pendingIce: [] as RTCIceCandidateInit[],
+      remoteDescSet: false,
+      isInitiator,
+      offerSent: false,
+      makingOffer: false,
+      addedLocalTracks: false,
+    };
+
+    pc.onicecandidate = (ev) => {
+      if (ev.candidate) {
+        console.log("voice: ICE candidate generated for", remoteId, ev.candidate);
+        sendSocketEvent({
+          type: "voice_ice",
+          payload: {
+            to: remoteId,
+            from: localUserIdRef.current,
+            candidate: ev.candidate.toJSON(),
+          },
+        });
+        console.log("voice: ICE candidate sent to", remoteId);
+      }
+    };
+
+    pc.ontrack = (ev) => {
+      console.log("voice: ontrack for", remoteId, ev);
+      const [stream] = ev.streams;
+      if (stream) createAudioElementFor(remoteId, stream);
+    };
+
+    pc.onconnectionstatechange = () => {
+      console.log("voice: connectionState for", remoteId, pc.connectionState);
+      const state = pc.connectionState;
+      if (state === "failed" || state === "closed" || state === "disconnected") {
+        closePeer(remoteId);
+      }
+    };
+
+    pc.oniceconnectionstatechange = () => {
+      console.log("voice: iceConnectionState for", remoteId, pc.iceConnectionState);
+    };
+
+    pc.onsignalingstatechange = () => {
+      console.log("voice: signalingState for", remoteId, pc.signalingState);
+    };
+
+    // Add local audio tracks if ready and not already added
+    if (localStreamRef.current && !meta.addedLocalTracks) {
+      localStreamRef.current.getAudioTracks().forEach((t) => pc.addTrack(t, localStreamRef.current!));
+      meta.addedLocalTracks = true;
+      console.log("voice: added local tracks to peer", remoteId);
+    }
+
+    peersRef.current.set(remoteId, meta);
+    return meta;
+  };
+
+  const applyQueuedIce = async (remoteId: string) => {
+    const meta = peersRef.current.get(remoteId);
+    if (!meta) return;
+    for (const c of meta.pendingIce) {
+      try {
+        await meta.pc.addIceCandidate(c);
+        console.log("voice: applied queued ICE for", remoteId);
+      } catch (e) {
+        console.warn("addIceCandidate failed", e);
+      }
+    }
+    meta.pendingIce = [];
+  };
+
+  const handleOffer = async (payload: any) => {
+    const enabled = voiceEnabledRef.current;
+    if (!enabled) {
+      console.log("voice: received offer but local voice disabled; ignoring");
+      return;
+    }
+    const from = payload.from as string;
+    const to = payload.to as string;
+    if (to !== localUserIdRef.current) return;
+    console.log("voice: offer received from", from);
+
+    const meta = ensurePeer(from);
+
+    try {
+      await meta.pc.setRemoteDescription(new RTCSessionDescription(payload.sdp));
+      meta.remoteDescSet = true;
+      console.log("voice: remote description set for", from);
+      await applyQueuedIce(from);
+
+      const ans = await meta.pc.createAnswer();
+      await meta.pc.setLocalDescription(ans);
+      console.log("voice: answer created for", from);
+
+      sendSocketEvent({ type: "voice_answer", payload: { to: from, from: localUserIdRef.current, sdp: meta.pc.localDescription } });
+      console.log("voice: answer sent to", from);
+    } catch (e) {
+      console.error("handleOffer error", e);
+    }
+  };
+
+  const handleAnswer = async (payload: any) => {
+    const enabled = voiceEnabledRef.current;
+    if (!enabled) {
+      console.log("voice: received answer but local voice disabled; ignoring");
+      return;
+    }
+    const from = payload.from as string;
+    const to = payload.to as string;
+    if (to !== localUserIdRef.current) return;
+    console.log("voice: answer received from", from);
+    const meta = peersRef.current.get(from);
+    if (!meta) return;
+
+    try {
+      await meta.pc.setRemoteDescription(new RTCSessionDescription(payload.sdp));
+      meta.remoteDescSet = true;
+      console.log("voice: remote description set (answer) for", from);
+      await applyQueuedIce(from);
+    } catch (e) {
+      console.error("handleAnswer error", e);
+    }
+  };
+
+  const handleIce = async (payload: any) => {
+    const enabled = voiceEnabledRef.current;
+    if (!enabled) {
+      console.log("voice: received ICE but local voice disabled; ignoring");
+      return;
+    }
+    const from = payload.from as string;
+    const to = payload.to as string;
+    if (to !== localUserIdRef.current) return;
+    const candidate = payload.candidate as RTCIceCandidateInit;
+    console.log("voice: ICE received from", from, candidate);
+    const meta = peersRef.current.get(from);
+    if (!meta) {
+      const newMeta = ensurePeer(from);
+      newMeta.pendingIce.push(candidate);
+      console.log("voice: queued ICE for new peer", from);
+      return;
+    }
+
+    if (!meta.remoteDescSet) {
+      meta.pendingIce.push(candidate);
+      console.log("voice: queued ICE for", from);
+      return;
+    }
+
+    try {
+      await meta.pc.addIceCandidate(candidate);
+      console.log("voice: ICE applied for", from);
+    } catch (e) {
+      console.warn("addIceCandidate failed", e);
+    }
+  };
+
+  const startVoiceConnections = async () => {
+    if (!roomState) return;
+    console.log("voice: startVoiceConnections, local enabled?", voiceEnabledRef.current);
+    if (!voiceEnabledRef.current) return;
+
+    for (const member of roomState.members) {
+      const remoteId = member.user_id;
+      if (remoteId === localUserIdRef.current) continue;
+      // only connect to members who have voice enabled
+      if (!remoteVoiceEnabledRef.current[remoteId]) continue;
+
+      const meta = ensurePeer(remoteId);
+      // add local tracks if not added
+      if (localStreamRef.current && !meta.addedLocalTracks) {
+        localStreamRef.current.getAudioTracks().forEach((t) => meta.pc.addTrack(t, localStreamRef.current!));
+        meta.addedLocalTracks = true;
+        console.log("voice: added local tracks to existing peer", remoteId);
+      }
+
+      if (meta.isInitiator && !meta.offerSent && !meta.makingOffer) {
+        try {
+          meta.makingOffer = true;
+          console.log("voice: creating offer for", remoteId);
+          const offer = await meta.pc.createOffer();
+          await meta.pc.setLocalDescription(offer);
+          meta.offerSent = true;
+          meta.makingOffer = false;
+          console.log("voice: offer created for", remoteId);
+          sendSocketEvent({ type: "voice_offer", payload: { to: remoteId, from: localUserIdRef.current, sdp: meta.pc.localDescription } });
+          console.log("voice: offer sent to", remoteId);
+        } catch (e) {
+          meta.makingOffer = false;
+          console.error("createOffer failed", e);
+        }
+      }
+    }
+  };
+
+  const stopAllVoice = () => {
+    peersRef.current.forEach((_, id) => closePeer(id));
+    peersRef.current.clear();
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((t) => t.stop());
+      localStreamRef.current = null;
+    }
+    Object.keys(audioElsRef.current).forEach((id) => removeAudioElementFor(id));
+  };
+
+  const enableVoice = async () => {
+    if (!user?.id) return;
+    try {
+      console.log("voice: acquiring microphone...");
+      const s = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      console.log("voice: microphone acquired");
+      localStreamRef.current = s;
+      if (isMicMuted) s.getAudioTracks().forEach((t) => (t.enabled = false));
+
+      // update refs before starting connections
+      voiceEnabledRef.current = true;
+      setVoiceEnabled(true);
+
+      // add local tracks to any existing peers
+      peersRef.current.forEach((meta, remoteId) => {
+        if (!meta.addedLocalTracks && localStreamRef.current) {
+          localStreamRef.current.getAudioTracks().forEach((t) => meta.pc.addTrack(t, localStreamRef.current!));
+          meta.addedLocalTracks = true;
+          console.log("voice: added local tracks to peer after mic acquisition", remoteId);
+        }
+      });
+
+      sendSocketEvent({ type: "voice_state", payload: { user_id: localUserIdRef.current, enabled: true } });
+      console.log("voice: voice_state enabled sent");
+      await startVoiceConnections();
+    } catch (e) {
+      console.error("getUserMedia failed", e);
+      voiceEnabledRef.current = false;
+      setVoiceEnabled(false);
+    }
+  };
+
+  const disableVoice = () => {
+    try {
+      sendSocketEvent({ type: "voice_state", payload: { user_id: localUserIdRef.current, enabled: false } });
+      console.log("voice: voice_state disabled sent");
+    } catch { }
+    stopAllVoice();
+    voiceEnabledRef.current = false;
+    setVoiceEnabled(false);
+  };
+
+  // toggle mute without tearing down connections
+  useEffect(() => {
+    if (!localStreamRef.current) return;
+    localStreamRef.current.getAudioTracks().forEach((t) => {
+      t.enabled = !isMicMuted;
+    });
+  }, [isMicMuted]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      try {
+        disableVoice();
+      } catch { }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const roomQuery = useQuery({
     queryKey: ["room", roomId],
     enabled: !!roomId,
@@ -262,10 +617,32 @@ const RoomPage = () => {
           }));
           break;
 
-        case "user_joined":
-        case "user_left":
+        case "user_left": {
+          const leavingId = parsed.payload.user_id as string;
+          console.log("voice: user_left for", leavingId);
+          closePeer(leavingId);
+          setRemoteVoiceEnabled((prev) => {
+            const copy = { ...prev };
+            delete copy[leavingId];
+            return copy;
+          });
           refreshRoom();
           break;
+        }
+
+        case "user_joined": {
+          refreshRoom();
+          // announce our voice state to the newcomer so they can initiate if needed
+          if (voiceEnabledRef.current) {
+            try {
+              sendSocketEvent({ type: "voice_state", payload: { user_id: localUserIdRef.current, enabled: true } });
+              console.log("voice: announced local voice_state to new user");
+            } catch (e) {
+              console.warn(e);
+            }
+          }
+          break;
+        }
 
         case "user_kicked":
           if (parsed.payload.user_id === user?.id) {
@@ -327,6 +704,63 @@ const RoomPage = () => {
               : prev,
           );
           break;
+
+        // --- Voice signaling ---
+        case "voice_offer":
+          // payload: { to, from, sdp }
+          // handle only if targeted at us
+          // @ts-ignore
+          handleOffer(parsed.payload);
+          break;
+
+        case "voice_answer":
+          // @ts-ignore
+          handleAnswer(parsed.payload);
+          break;
+
+        case "voice_ice":
+          // @ts-ignore
+          handleIce(parsed.payload);
+          break;
+
+        case "voice_state": {
+          const remoteId = parsed.payload.user_id as string;
+          const enabled = parsed.payload.enabled as boolean;
+          if (remoteId === localUserIdRef.current) break;
+          console.log("voice: voice_state from", remoteId, enabled);
+
+          setRemoteVoiceEnabled((prev) => ({ ...prev, [remoteId]: enabled }));
+
+          if (!enabled) {
+            // remote disabled -> close peer
+            closePeer(remoteId);
+            break;
+          }
+
+          // remote enabled: if local is participating, initiate connection (if initiator)
+          if (voiceEnabledRef.current) {
+            const meta = ensurePeer(remoteId);
+            if (localStreamRef.current && !meta.addedLocalTracks) {
+              localStreamRef.current.getAudioTracks().forEach((t) => meta.pc.addTrack(t, localStreamRef.current!));
+              meta.addedLocalTracks = true;
+            }
+            if (meta.isInitiator && !meta.offerSent && !meta.makingOffer) {
+              meta.makingOffer = true;
+              console.log("voice: creating offer (due to remote voice_state) for", remoteId);
+              meta.pc.createOffer().then(async (offer) => {
+                await meta.pc.setLocalDescription(offer);
+                meta.offerSent = true;
+                meta.makingOffer = false;
+                sendSocketEvent({ type: "voice_offer", payload: { to: remoteId, from: localUserIdRef.current, sdp: meta.pc.localDescription } });
+                console.log("voice: offer sent to", remoteId);
+              }).catch((e) => {
+                meta.makingOffer = false;
+                console.error(e);
+              });
+            }
+          }
+          break;
+        }
 
         case "error":
           console.log(parsed.payload.message);
@@ -616,8 +1050,18 @@ const RoomPage = () => {
         </div>
 
         <div className="room-page__side-bar__item">
-          <button className="room-page__side-bar__microphone" onClick={() => setIsMicMuted((prev) => !prev)}>
-            {isMicMuted ? <BsMicMuteFill /> : <BsMicFill />}
+          <button
+            className={clsx("room-page__side-bar__microphone", voiceEnabled && "voice-active")}
+            onClick={() => {
+              if (!voiceEnabled) {
+                enableVoice();
+              } else {
+                // toggle mute when voice is active
+                setIsMicMuted((prev) => !prev);
+              }
+            }}
+          >
+            {!voiceEnabled ? <BsMicFill /> : isMicMuted ? <BsMicMuteFill /> : <BsMicFill />}
           </button>
           <span>میکروفون</span>
         </div>
