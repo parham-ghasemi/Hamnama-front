@@ -1,0 +1,201 @@
+@use "../../../styles/abstracts/variables" as dark;
+@use "../../../styles/abstracts/variables.light" as light;
+@use "../../../styles/abstracts/mixins" as mx;
+
+.cinema-ambience {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  contain: strict;
+
+  /* ---- Static atmosphere ------------------------------------------- */
+
+  &__wash {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(
+        90% 55% at 50% -8%,
+        rgba(208, 78, 47, 0.2) 0%,
+        rgba(208, 78, 47, 0.06) 38%,
+        transparent 70%
+      ),
+      radial-gradient(
+        60% 40% at 8% 42%,
+        rgba(224, 163, 64, 0.07) 0%,
+        transparent 65%
+      ),
+      radial-gradient(
+        55% 45% at 95% 78%,
+        rgba(208, 78, 47, 0.09) 0%,
+        transparent 65%
+      );
+
+    @include mx.light {
+      background:
+        radial-gradient(
+          90% 55% at 50% -8%,
+          rgba(139, 91, 130, 0.14) 0%,
+          transparent 65%
+        ),
+        radial-gradient(
+          55% 45% at 95% 78%,
+          rgba(139, 91, 130, 0.08) 0%,
+          transparent 65%
+        );
+    }
+  }
+
+  /* Very fine film grain. Keeps large flat areas from looking dead. */
+  &__grain {
+    position: absolute;
+    inset: -50%;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: ambience-grain 900ms steps(3) infinite;
+
+    @include mx.light {
+      opacity: 0.02;
+    }
+
+    @include mx.max-w(768px) {
+      animation: none;
+    }
+
+    @include mx.reduced-motion {
+      animation: none;
+    }
+  }
+
+  &__vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      110% 80% at 50% 40%,
+      transparent 45%,
+      rgba(0, 0, 0, 0.45) 100%
+    );
+
+    @include mx.light {
+      background: radial-gradient(
+        110% 80% at 50% 40%,
+        transparent 55%,
+        rgba(9, 9, 9, 0.09) 100%
+      );
+    }
+  }
+
+  /* ---- Cursor-reactive pieces --------------------------------------- */
+
+  &__spot,
+  &__strip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 700ms mx.$ease-out-soft;
+    will-change: transform;
+  }
+
+  &__spot {
+    width: 620px;
+    height: 620px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(208, 78, 47, 0.16) 0%,
+      rgba(224, 163, 64, 0.06) 35%,
+      transparent 68%
+    );
+    filter: blur(30px);
+
+    @include mx.light {
+      background: radial-gradient(
+        circle,
+        rgba(139, 91, 130, 0.12) 0%,
+        transparent 66%
+      );
+    }
+  }
+
+  &__strip {
+    width: 118px;
+    height: 296px;
+
+    > svg {
+      width: 100%;
+      height: 100%;
+      animation: ambience-strip-drift 14s ease-in-out infinite alternate;
+
+      @include mx.reduced-motion {
+        animation: none;
+      }
+    }
+
+    .strip-body {
+      fill: none;
+      stroke: dark.$color-primary;
+      stroke-width: 1.25;
+      opacity: 0.5;
+    }
+
+    .strip-hole {
+      fill: dark.$color-primary;
+      opacity: 0.32;
+    }
+
+    .strip-frame {
+      fill: none;
+      stroke: dark.$color-primary;
+      stroke-width: 1;
+      opacity: 0.28;
+    }
+
+    @include mx.light {
+      .strip-body,
+      .strip-frame {
+        stroke: light.$color-primary;
+      }
+      .strip-hole {
+        fill: light.$color-primary;
+      }
+    }
+  }
+
+  /* Only faded in once the rAF loop is actually running. */
+  &--active {
+    .cinema-ambience__spot {
+      opacity: 1;
+    }
+
+    .cinema-ambience__strip {
+      opacity: 0.16;
+    }
+  }
+}
+
+@keyframes ambience-grain {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  33% {
+    transform: translate3d(-2%, 1%, 0);
+  }
+  66% {
+    transform: translate3d(1%, -2%, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes ambience-strip-drift {
+  from {
+    transform: rotate(-6deg) translateY(-6px);
+  }
+  to {
+    transform: rotate(6deg) translateY(6px);
+  }
+}

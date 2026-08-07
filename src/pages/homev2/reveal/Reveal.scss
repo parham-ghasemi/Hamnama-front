@@ -1,0 +1,69 @@
+@use "../../../styles/abstracts/mixins" as mx;
+
+.reveal {
+  --reveal-delay: 0ms;
+  --reveal-duration: 620ms;
+
+  opacity: 0;
+
+  &--in {
+    // `backwards` (not `both`) so once the entrance finishes the element
+    // returns to its own styles and hover transforms keep working.
+    opacity: 1;
+    animation-duration: var(--reveal-duration);
+    animation-delay: var(--reveal-delay);
+    animation-timing-function: mx.$ease-out-soft;
+    animation-fill-mode: backwards;
+  }
+
+  &--up.reveal--in {
+    animation-name: reveal-up;
+  }
+
+  &--fade.reveal--in {
+    animation-name: reveal-fade;
+  }
+
+  &--scale.reveal--in {
+    animation-name: reveal-scale;
+  }
+
+  @include mx.reduced-motion {
+    opacity: 1;
+
+    &--in {
+      animation: none;
+    }
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes reveal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes reveal-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.965);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

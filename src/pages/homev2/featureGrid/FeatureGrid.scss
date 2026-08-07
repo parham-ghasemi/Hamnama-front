@@ -1,0 +1,268 @@
+@use "../../../styles/abstracts/variables" as dark;
+@use "../../../styles/abstracts/variables.light" as light;
+@use "sass:color";
+@use "../../../styles/abstracts/mixins" as mx;
+
+.home-v2-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 69px 63px;
+  position: relative;
+
+  width: 100%;
+  max-width: 1075.25px;
+  margin: 136px auto 0;
+  padding: 0 20px;
+  box-sizing: border-box;
+
+  @include mx.max-w(1200px) {
+    gap: 40px 30px;
+    margin-top: 90px;
+  }
+
+  @include mx.max-w(1024px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px 20px;
+    margin-top: 70px;
+  }
+
+  @include mx.max-w(640px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 40px;
+    max-width: 440px;
+  }
+
+  &__blob {
+    @include mx.background-blob(1600px, 600px, 50%, 50%, auto, auto);
+    transform: translate(50%, -50%);
+
+    @include mx.max-w(768px) {
+      display: none; // Prevent horizontal scrollbar on mobile
+    }
+  }
+
+  &__item {
+    width: 100%;
+    min-height: 96px;
+    height: auto;
+    border-radius: 17px;
+    box-sizing: border-box;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+
+    @include mx.cinema-surface;
+    @include mx.ambient-shadow(0.55);
+
+    &::before {
+      @include mx.gradient-border(17px);
+      opacity: 0.85;
+      transition: opacity mx.$dur-base ease;
+      z-index: 2;
+    }
+
+    // Warm light pooled behind the icon corner, revealed on hover.
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(
+        70% 130% at 100% 50%,
+        rgba(208, 78, 47, 0.16) 0%,
+        transparent 62%
+      );
+      opacity: 0;
+      transition: opacity mx.$dur-slow ease;
+      pointer-events: none;
+      z-index: 0;
+
+      @include mx.light {
+        background: radial-gradient(
+          70% 130% at 100% 50%,
+          rgba(139, 91, 130, 0.12) 0%,
+          transparent 62%
+        );
+      }
+    }
+
+    @include mx.light {
+      background: light.$color-card-bg;
+      box-shadow: 0 8px 20px -14px
+        color.adjust(light.$color-black, $alpha: -0.7);
+
+      &::before {
+        @include mx.gradient-border(
+          17px,
+          rgba(139, 91, 130, 0.25),
+          rgba(0, 0, 0, 0.04)
+        );
+      }
+    }
+
+    display: flex;
+    align-items: center;
+    padding: 20px 24px;
+    gap: 14px;
+    transition:
+      transform mx.$dur-base mx.$ease-out-soft,
+      box-shadow mx.$dur-base mx.$ease-out-soft;
+
+    @include mx.reduced-motion {
+      transition: none;
+    }
+
+    &:hover,
+    &:focus-within {
+      transform: translateY(-6px);
+      @include mx.ambient-shadow(1.1);
+
+      &::before {
+        opacity: 1;
+      }
+
+      &::after {
+        opacity: 1;
+      }
+
+      @include mx.max-w(768px) {
+        transform: translateY(-3px);
+      }
+
+      .home-v2-feature-grid__item__right {
+        color: color.adjust(dark.$color-primary, $lightness: 8%);
+        background-color: #5a2c22;
+
+        > svg {
+          transform: scale(1.1) rotate(-4deg);
+        }
+
+        @include mx.light {
+          background-color: light.$color-light-gray;
+        }
+      }
+
+      .home-v2-feature-grid__item__right__glow {
+        opacity: 1;
+
+        @include mx.light {
+          opacity: 0;
+        }
+      }
+    }
+
+    @include mx.max-w(1024px) {
+      padding: 18px 20px;
+    }
+
+    @include mx.max-w(480px) {
+      padding: 14px 16px;
+      gap: 12px;
+      border-radius: 14px;
+
+      &::before {
+        border-radius: 14px;
+      }
+    }
+
+    &__right {
+      @include mx.flex-center;
+      width: 47.6px;
+      height: 47.6px;
+      flex-shrink: 0; // Ensures icon container doesn't shrink on smaller screens
+      background-color: #48261f;
+      border-radius: 7px;
+      z-index: 1;
+
+      font-size: 27.2px;
+      transition:
+        box-shadow mx.$dur-base ease,
+        background-color mx.$dur-base ease,
+        color mx.$dur-base ease;
+      color: dark.$color-primary;
+      position: relative;
+      box-shadow: 0 0 0 1px rgba(208, 78, 47, 0.18) inset;
+
+      > svg {
+        position: relative;
+        z-index: 1;
+        transition: transform mx.$dur-base mx.$ease-out-soft;
+
+        @include mx.reduced-motion {
+          transition: none;
+        }
+      }
+
+      @include mx.light {
+        background-color: light.$color-light-gray;
+        color: light.$color-primary;
+        box-shadow: none;
+      }
+
+      @include mx.max-w(480px) {
+        width: 42px;
+        height: 42px;
+        font-size: 22px;
+      }
+
+      &__glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 240%;
+        height: 240%;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(
+          circle,
+          rgba(208, 78, 47, 0.35) 0%,
+          transparent 62%
+        );
+        opacity: 0;
+        transition: opacity mx.$dur-slow ease;
+        pointer-events: none;
+
+        @include mx.light {
+          display: none;
+          background: transparent;
+        }
+      }
+    }
+
+    &__left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6.8px;
+      z-index: 1;
+
+      &__title {
+        font-weight: 900;
+        font-size: 17px;
+        color: dark.$color-primary;
+
+        @include mx.light {
+          color: light.$color-primary;
+        }
+
+        @include mx.max-w(480px) {
+          font-size: 15px;
+        }
+      }
+
+      &__desc {
+        font-size: 12.75px;
+        font-weight: 600;
+        color: color.adjust(dark.$color-gray, $lightness: -8%);
+
+        @include mx.light {
+          color: light.$color-dark-gray;
+        }
+
+        @include mx.max-w(480px) {
+          font-size: 11.5px;
+        }
+      }
+    }
+  }
+}

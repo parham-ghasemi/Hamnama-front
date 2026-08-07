@@ -1,0 +1,43 @@
+import clsx from 'clsx';
+import { useTheme } from '../../../context/ThemeContext';
+import './Steps.scss';
+import StepAnimation from './stepAnimation/StepAnimation';
+import { toPersianNumerals } from '../../../helpers/NumberConversion';
+import Reveal from '../reveal/Reveal';
+
+const Steps = () => {
+  const steps = ['ساخت حساب کاربری', "ساخت اتاق سینما", "انتخاب فیلم و تماشا"]
+  const { isLight } = useTheme();
+  return (
+    <div className='home-v2-steps'>
+      <StepAnimation />
+
+      <div className="home-v2-steps__blob"></div>
+
+      <ul className="home-v2-steps__steps-container">
+        <div className={clsx("img", isLight && "img--light")}>
+          <img
+            src="/homepage/lightglowlights.png"
+            className='light'
+            alt=""
+          />
+          <img
+            src="/homepage/glowlights.png"
+            className='dark'
+            alt=""
+          />
+        </div>
+        {
+          steps.map((step, ind) => (
+            <Reveal as='li' key={`home-step-item-${ind}`} delay={ind * 110}>
+              <span>{toPersianNumerals(ind + 1)}</span>
+              <p>{step}</p>
+            </Reveal>
+          ))
+        }
+      </ul>
+    </div>
+  )
+}
+
+export default Steps

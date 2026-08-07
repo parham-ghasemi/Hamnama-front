@@ -22,6 +22,7 @@ import AdminLayout from "./layouts/adminLayout/AdminLayout";
 import AdminRoute from "./components/adminRoute/AdminRoute";
 import { AdminDashboard, AdminTickets, AdminUsers, AdminRooms, AdminSettings } from "./pages/admin";
 import { ConfirmationModalProvider } from "./context/ConfirmModalContext/ConfirmaModalContext";
+import HomeV2 from "./pages/homev2/HomeV2";
 
 const queryClient = new QueryClient({});
 
@@ -52,6 +53,7 @@ function App() {
 
                 <Route element={<DesktopLayout />}>
                   <Route index element={<Home />} />
+                  <Route path="homev2" element={<HomeV2 />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/plan-details" element={<PlanDetails />} />
                   <Route path="*" element={<p className="text-6xl font-black text-center my-60">THIS PAGE WAS NOT FOUND!</p>} />

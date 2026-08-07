@@ -47,3 +47,111 @@
     display: none;
   }
 }
+
+/* ------------------------------------------------------------------
+ * Additions for the cinematic redesign.
+ * These stay inside the existing abstracts layer so components keep
+ * consuming a single design source instead of ad-hoc values.
+ * ------------------------------------------------------------------ */
+
+/// Disables animation/transition for users who prefer reduced motion.
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}
+
+/// Standard easing + duration tokens used across the home page.
+$ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+$ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+$dur-fast: 180ms;
+$dur-base: 320ms;
+$dur-slow: 520ms;
+
+/// A 1px gradient hairline border drawn with a mask so it can be
+/// brightened on hover without repainting the card background.
+@mixin gradient-border(
+  $radius: 20px,
+  $from: rgba(255, 255, 255, 0.22),
+  $to: rgba(255, 255, 255, 0.03)
+) {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: $radius;
+  padding: 1px;
+  background: linear-gradient(
+    150deg,
+    $from,
+    $to 45%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  pointer-events: none;
+}
+
+/// Layered "cinema" card surface: a dark base with a soft top light,
+/// so cards read as lit objects instead of flat rectangles.
+@mixin cinema-surface {
+  background:
+    radial-gradient(
+      120% 90% at 50% -20%,
+      rgba(208, 78, 47, 0.16) 0%,
+      rgba(208, 78, 47, 0) 60%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.075) 0%,
+      rgba(255, 255, 255, 0.025) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(14, 12, 12, 0.72) 0%,
+      rgba(10, 9, 10, 0.86) 100%
+    );
+
+  @include light {
+    background:
+      radial-gradient(
+        120% 90% at 50% -20%,
+        rgba(139, 91, 130, 0.1) 0%,
+        rgba(139, 91, 130, 0) 60%
+      ),
+      light.$color-card-bg;
+  }
+}
+
+/// Soft ambient elevation. Never a hard drop shadow.
+@mixin ambient-shadow($strength: 1) {
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.05) inset,
+    0 #{18px * $strength} #{40px * $strength} #{-18px * $strength}
+      rgba(0, 0, 0, 0.8),
+    0 0 #{40px * $strength} #{-14px * $strength}
+      rgba(208, 78, 47, 0.22 * $strength);
+
+  @include light {
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.9) inset,
+      0 #{10px * $strength} #{24px * $strength} #{-14px * $strength}
+        rgba(9, 9, 9, 0.28);
+  }
+}
+
+/// A row of film sprocket holes, used as a subtle divider.
+@mixin sprockets($size: 5px, $gap: 12px, $color: rgba(255, 255, 255, 0.22)) {
+  background-image: radial-gradient(
+    $color 0 $size * 0.5,
+    transparent $size * 0.5
+  );
+  background-size: $gap $gap;
+  background-repeat: repeat-x;
+  background-position: center;
+}
