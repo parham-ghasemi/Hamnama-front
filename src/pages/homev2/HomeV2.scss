@@ -258,6 +258,7 @@
 
       @include mx.max-w(480px) {
         padding: 8px 14px;
+        font-size: 12px;
       }
     }
 
@@ -268,7 +269,7 @@
       display: block;
 
       @include mx.max-w(768px) {
-        height: 400px;
+        height: 40px;
       }
     }
 
