@@ -8,11 +8,14 @@ import PhoneInput from './phoneInput/PhoneInput';
 import LoginPassword from './LoginPassword/LoginPassword';
 import OtpInput from './otpInput/OtpInput';
 import RegisterInfo from './registerInfo/RegisterInfo';
+import CinemaAmbience from '../homev2/ambience/CinemaAmbience';
 
 import './Auth.scss';
 import { useAuth } from '../../context/AuthContext';
 
 type AuthStep = 'phone' | 'password' | 'otp' | 'register';
+
+const STEP_ORDER: AuthStep[] = ['phone', 'password', 'otp', 'register'];
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -154,31 +157,45 @@ const Auth = () => {
     setStep('phone');
   };
 
+  const activeIndex = STEP_ORDER.indexOf(step);
+
   return (
     <div className="auth-container">
-      {step === 'phone' && (
-        <PhoneInput setPhoneNumber={handlePhoneSubmit} />
-      )}
+      <CinemaAmbience />
 
-      {step === 'password' && (
-        <LoginPassword
-          setPassword={handlePasswordSubmit}
-          goOtp={handleGoToOtpLogin}
-        />
-      )}
+      <div className="auth-container__panel">
+        <div className="auth-container__sprockets" aria-hidden="true" />
 
-      {step === 'otp' && (
-        <OtpInput
-          phoneNumber={phoneNumber}
-          onSubmit={handleOtpSubmit}
-          onChangePhone={handleChangePhone}
-          resendOtp={handleResendOtp}
-        />
-      )}
+        {step === 'phone' && (
+          <PhoneInput setPhoneNumber={handlePhoneSubmit} />
+        )}
 
-      {step === 'register' && (
-        <RegisterInfo onSubmit={handleRegisterSubmit} />
-      )}
+        {step === 'password' && (
+          <LoginPassword
+            setPassword={handlePasswordSubmit}
+            goOtp={handleGoToOtpLogin}
+          />
+        )}
+
+        {step === 'otp' && (
+          <OtpInput
+            phoneNumber={phoneNumber}
+            onSubmit={handleOtpSubmit}
+            onChangePhone={handleChangePhone}
+            resendOtp={handleResendOtp}
+          />
+        )}
+
+        {step === 'register' && (
+          <RegisterInfo onSubmit={handleRegisterSubmit} />
+        )}
+
+        <div className="auth-container__steps" aria-hidden="true">
+          {STEP_ORDER.map((s, i) => (
+            <span key={s} className={i <= activeIndex ? 'is-active' : undefined} />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

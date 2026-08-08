@@ -1,6 +1,126 @@
-@use "../../styles//abstracts//mixins" as mx;
+@use "../../styles/abstracts/variables" as dark;
+@use "../../styles/abstracts/variables.light" as light;
+@use "../../styles/abstracts/mixins" as mx;
+@use "sass:color";
 
 .auth-container {
+  position: relative;
   min-height: 100vh;
+  width: 100%;
   @include mx.flex-center;
+  padding: 48px 20px;
+  box-sizing: border-box;
+  isolation: isolate;
+  color: dark.$color-white;
+
+  background:
+    radial-gradient(
+      90% 60% at 50% -10%,
+      rgba(208, 78, 47, 0.18) 0%,
+      rgba(208, 78, 47, 0) 60%
+    ),
+    linear-gradient(180deg, #0d0b0b 0%, #0a0909 55%, #0c0a0b 100%);
+
+  @include mx.light {
+    background:
+      radial-gradient(
+        90% 60% at 50% -10%,
+        rgba(139, 91, 130, 0.14) 0%,
+        rgba(139, 91, 130, 0) 60%
+      ),
+      light.$color-bg;
+    color: light.$color-black;
+  }
+
+  @include mx.max-w(480px) {
+    padding: 28px 14px;
+  }
+
+  > *:not(.cinema-ambience) {
+    position: relative;
+    z-index: 1;
+  }
+
+  // The "ticket stub" panel every auth step lives inside.
+  &__panel {
+    position: relative;
+    width: 100%;
+    max-width: 620px;
+    padding: 44px 40px 40px;
+    border-radius: 26px;
+    box-sizing: border-box;
+
+    @include mx.cinema-surface;
+    @include mx.ambient-shadow(1);
+    backdrop-filter: blur(14px);
+
+    @include mx.max-w(768px) {
+      padding: 34px 24px 30px;
+      border-radius: 22px;
+    }
+
+    @include mx.max-w(480px) {
+      padding: 26px 16px 24px;
+      border-radius: 18px;
+    }
+
+    &::before {
+      @include mx.gradient-border(26px);
+
+      @include mx.max-w(768px) {
+        border-radius: 22px;
+      }
+      @include mx.max-w(480px) {
+        border-radius: 18px;
+      }
+    }
+  }
+
+  // Film sprocket strip at the top of the panel, tying the auth screens
+  // back to the cinema language used on the home page.
+  &__sprockets {
+    @include mx.sprockets(4px, 14px, rgba(255, 255, 255, 0.16));
+    height: 14px;
+    margin-bottom: 26px;
+    opacity: 0.9;
+
+    @include mx.light {
+      @include mx.sprockets(4px, 14px, rgba(9, 9, 9, 0.16));
+    }
+
+    @include mx.max-w(480px) {
+      margin-bottom: 18px;
+    }
+  }
+
+  // Step indicator: four small marks, filled up to the active step.
+  &__steps {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 28px;
+
+    > span {
+      width: 26px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      transition: background mx.$dur-base mx.$ease-out-soft;
+
+      @include mx.light {
+        background: rgba(9, 9, 9, 0.12);
+      }
+
+      &.is-active {
+        background: dark.$color-primary;
+        box-shadow: 0 0 14px -2px rgba(208, 78, 47, 0.8);
+
+        @include mx.light {
+          background: light.$color-primary;
+          box-shadow: none;
+        }
+      }
+    }
+  }
 }

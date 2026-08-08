@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './LoginPassword.scss';
 import { Link } from 'react-router-dom';
-import { PiEyeBold, PiEyeSlashBold, PiSpinnerGapBold } from 'react-icons/pi';
+import { PiEyeBold, PiEyeSlashBold, PiSpinnerGapBold, PiLockKeyFill } from 'react-icons/pi';
 
 interface LoginPasswordProps {
   setPassword: (word: string) => void;
@@ -28,6 +28,11 @@ const LoginPassword = ({ setPassword, goOtp, isLoading = false }: LoginPasswordP
 
   return (
     <form className='login-password' onSubmit={handleSubmit}>
+      <span className='login-password__badge'>
+        <PiLockKeyFill aria-hidden='true' />
+        ورود
+      </span>
+
       <h1 className='login-password__title'>
         ورود در <Link to='/'>هم‌نما</Link>
       </h1>

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import './OtpInput.scss';
-import { PiArrowClockwiseBold, PiSpinnerGapBold } from 'react-icons/pi';
+import { PiArrowClockwiseBold, PiSpinnerGapBold, PiChatCircleDotsFill } from 'react-icons/pi';
 
 interface OtpInputProps {
   phoneNumber: string;
@@ -92,6 +92,11 @@ const OtpInput = ({
 
   return (
     <form className='otp-input' onSubmit={handleSubmit}>
+      <span className='otp-input__badge'>
+        <PiChatCircleDotsFill aria-hidden='true' />
+        کد تایید
+      </span>
+
       <h1 className='otp-input__title'>تایید شماره موبایل</h1>
 
       <h2 className='otp-input__subtitle'>

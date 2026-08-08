@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './RegisterInfo.scss';
 import { Link } from 'react-router-dom';
-import { PiEyeBold, PiEyeSlashBold, PiUserFill, PiSpinnerGapBold } from 'react-icons/pi';
+import { PiEyeBold, PiEyeSlashBold, PiUserFill, PiSpinnerGapBold, PiIdentificationBadgeFill } from 'react-icons/pi';
 import { toast } from 'sonner';
 import clsx from 'clsx';
 
@@ -52,6 +52,11 @@ const RegisterInfo = ({ onSubmit, isLoading = false }: RegisterInfoProps) => {
 
   return (
     <form className="register-info" onSubmit={handleSubmit}>
+      <span className="register-info__badge">
+        <PiIdentificationBadgeFill aria-hidden="true" />
+        ساخت حساب
+      </span>
+
       <div className="register-info__group">
         <h2 className="register-info__label">نام کاربری</h2>
         <div className="register-info__input-wrapper">

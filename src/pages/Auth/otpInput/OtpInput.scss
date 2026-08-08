@@ -1,283 +1,173 @@
 @use "../../../styles/abstracts/variables" as dark;
 @use "../../../styles/abstracts/variables.light" as light;
 @use "../../../styles/abstracts/mixins" as mx;
-@use "sass:color";
+@use "../shared" as auth;
 
 .otp-input {
-  @include mx.flex-center;
-  flex-direction: column;
-  gap: 32px;
-  width: 100%;
-  padding: 0 24px;
-  box-sizing: border-box;
+  @include auth.auth-form;
 
-  @include mx.max-w(768px) {
-    gap: 24px;
-  }
-  @include mx.max-w(480px) {
-    gap: 16px;
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    color: dark.$color-primary;
+    background: rgba(208, 78, 47, 0.12);
+    border: 1px solid rgba(208, 78, 47, 0.28);
+
+    @include mx.light {
+      color: light.$color-primary;
+      background: rgba(139, 91, 130, 0.1);
+      border-color: rgba(139, 91, 130, 0.3);
+    }
   }
 
   &__title {
-    font-size: 69px;
-    font-weight: 700;
-    text-align: center;
-
-    @include mx.max-w(1024px) {
-      font-size: 52px;
-    }
-    @include mx.max-w(768px) {
-      font-size: 36px;
-    }
-    @include mx.max-w(480px) {
-      font-size: 28px;
-    }
-
-    @include mx.light {
-      color: light.$color-black;
-    }
+    @include auth.auth-title;
   }
 
   &__subtitle {
-    font-size: 32px;
-    color: dark.$color-gray;
-    text-align: center;
-
-    @include mx.max-w(1024px) {
-      font-size: 24px;
-    }
-    @include mx.max-w(768px) {
-      font-size: 20px;
-    }
-    @include mx.max-w(480px) {
-      font-size: 16px;
-    }
-
-    @include mx.light {
-      color: light.$color-black;
-    }
+    @include auth.auth-subtitle;
   }
 
   &__content {
     display: flex;
-    gap: 21px;
+    gap: 14px;
     align-items: center;
     justify-content: center;
     width: 100%;
 
-    @include mx.max-w(768px) {
-      gap: 16px;
-    }
     @include mx.max-w(480px) {
-      gap: 12px;
-      flex-wrap: wrap; // Wraps timer below inputs on ultra-tiny screens if needed
+      gap: 10px;
     }
   }
 
   &__fields {
     display: flex;
-    gap: 16px;
+    gap: 12px;
     flex-direction: row-reverse;
 
-    @include mx.max-w(768px) {
-      gap: 12px;
-    }
     @include mx.max-w(480px) {
       gap: 8px;
     }
   }
 
   &__field {
-    width: 96px;
-    height: 96px;
-    background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
-    border-radius: 16px;
+    @include auth.auth-field(14px);
+    width: 72px;
+    height: 78px;
     text-align: center;
-    font-size: 43px;
+    font-size: 32px;
     font-weight: 700;
-    outline: none;
-    box-sizing: border-box;
 
     @include mx.max-w(768px) {
-      width: 72px;
-      height: 72px;
-      font-size: 32px;
-      border-radius: 12px;
+      width: 62px;
+      height: 68px;
+      font-size: 28px;
     }
 
     @include mx.max-w(480px) {
       width: 52px;
-      height: 56px;
-      font-size: 24px;
-      border-radius: 10px;
+      height: 58px;
+      font-size: 22px;
+      border-radius: 12px;
     }
 
-    // Safety net for very narrow phones (e.g. 320px width)
     @include mx.max-w(350px) {
       width: 44px;
-      height: 48px;
-      font-size: 20px;
-    }
-
-    @include mx.light {
-      background-color: light.$color-white;
-      border: 1px solid light.$color-light-gray;
-      color: light.$color-black;
-    }
-
-    &:focus {
-      background-color: color.adjust(
-        dark.$color-light-gray,
-        $lightness: 3%,
-        $alpha: -0.8
-      );
-
-      @include mx.light {
-        border-color: light.$color-primary;
-      }
+      height: 50px;
+      font-size: 18px;
     }
   }
 
   &__timer {
-    width: 96px;
-    height: 96px;
-    background: dark.$color-card-bg;
-    border-radius: 16px;
+    width: 72px;
+    height: 78px;
+    border-radius: 14px;
     @include mx.flex-center;
-    font-size: 27px;
+    font-size: 18px;
     font-weight: 700;
+    font-variant-numeric: tabular-nums;
     box-sizing: border-box;
+    color: dark.$color-gray;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px dashed rgba(255, 255, 255, 0.14);
+
+    @include mx.light {
+      background: rgba(9, 9, 9, 0.03);
+      border-color: light.$color-light-gray;
+      color: light.$color-dark-gray;
+    }
 
     @include mx.max-w(768px) {
-      width: 72px;
-      height: 72px;
-      font-size: 20px;
-      border-radius: 12px;
+      width: 62px;
+      height: 68px;
+      font-size: 16px;
     }
 
     @include mx.max-w(480px) {
-      width: 56px;
-      height: 56px;
-      font-size: 16px;
-      border-radius: 10px;
+      width: 52px;
+      height: 58px;
+      font-size: 14px;
+      border-radius: 12px;
     }
 
     @include mx.max-w(350px) {
-      width: 48px;
-      height: 48px;
-      font-size: 14px;
-    }
-
-    @include mx.light {
-      background: light.$color-card-bg;
-      border: 1px solid light.$color-light-gray;
-      color: light.$color-black;
+      width: 44px;
+      height: 50px;
+      font-size: 12px;
     }
   }
 
   &__resend {
     background: transparent;
-    border: none; // Resets default browser button borders
+    border: none;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 43px;
+    color: inherit;
+    @include mx.flex-center;
+    font-size: 26px;
+    transition:
+      color mx.$dur-fast mx.$ease-out-soft,
+      transform mx.$dur-base mx.$ease-out-soft;
 
-    @include mx.max-w(768px) {
-      font-size: 32px;
-    }
     @include mx.max-w(480px) {
-      font-size: 24px;
-    }
-
-    @include mx.light {
-      color: light.$color-black;
+      font-size: 20px;
     }
 
     &:hover {
       color: dark.$color-primary;
+      transform: rotate(-90deg);
 
       @include mx.light {
         color: light.$color-primary-hover;
+      }
+    }
+
+    @include mx.reduced-motion {
+      transition: none;
+
+      &:hover {
+        transform: none;
       }
     }
   }
 
   &__change-phone {
-    color: dark.$color-primary;
-    cursor: pointer;
-    text-align: center;
-    font-size: 18px;
-
-    @include mx.max-w(480px) {
-      font-size: 16px;
-    }
-
-    @include mx.light {
-      color: light.$color-primary;
-    }
-
-    &:hover {
-      color: color.adjust(dark.$color-primary, $lightness: 5%);
-
-      @include mx.light {
-        color: light.$color-primary-hover;
-      }
-    }
+    @include auth.auth-quiet-link;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+    text-decoration-color: rgba(255, 255, 255, 0.2);
   }
 
   &__error {
-    color: dark.$color-red;
-    text-align: center;
-
-    @include mx.max-w(480px) {
-      font-size: 14px;
-    }
-
-    @include mx.light {
-      color: light.$color-red;
-    }
+    @include auth.auth-error;
   }
 
   &__subBtn {
-    background: dark.$color-primary;
-    width: 100%;
-    max-width: 400px;
-    padding: 16px;
-    border-radius: 16px;
-    cursor: pointer;
-    font-size: 32px;
-    font-weight: 700;
-    margin-top: 69px;
-
-    @include mx.max-w(1024px) {
-      margin-top: 52px;
-    }
-
-    @include mx.max-w(768px) {
-      font-size: 24px;
-      padding: 12px;
-      border-radius: 12px;
-      margin-top: 40px;
-    }
-
-    @include mx.max-w(480px) {
-      font-size: 20px;
-      margin-top: 32px;
-    }
-
-    @include mx.light {
-      background: light.$color-primary-bg;
-      color: light.$color-white;
-    }
-
-    &:hover {
-      background: dark.$color-primary-hover;
-
-      @include mx.light {
-        background: light.$color-primary-bg-hover;
-      }
-    }
+    @include auth.auth-primary-btn;
+    margin-top: 12px;
   }
 }
