@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import './OtpInput.scss';
-import { PiArrowClockwiseBold } from 'react-icons/pi';
+import { PiArrowClockwiseBold, PiSpinnerGapBold } from 'react-icons/pi';
 
 interface OtpInputProps {
   phoneNumber: string;
   onSubmit: (otp: string) => void;
   onChangePhone: () => void;
   resendOtp: () => void;
+  isLoading?: boolean;
 }
 
 const OtpInput = ({
@@ -14,6 +15,7 @@ const OtpInput = ({
   onSubmit,
   onChangePhone,
   resendOtp,
+  isLoading = false
 }: OtpInputProps) => {
   const [otp, setOtp] = useState(['', '', '', '']);
   const [timeLeft, setTimeLeft] = useState(60);
@@ -36,7 +38,6 @@ const OtpInput = ({
 
     const newOtp = [...otp];
     newOtp[index] = value.slice(-1);
-
     setOtp(newOtp);
 
     if (value && index < 3) {
@@ -46,10 +47,7 @@ const OtpInput = ({
     if (error) setError('');
   };
 
-  const handleKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>,
-    index: number
-  ) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === 'Backspace' && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
@@ -57,27 +55,21 @@ const OtpInput = ({
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-
-    const pasted = e.clipboardData
-      .getData('text')
-      .replace(/\D/g, '')
-      .slice(0, 4);
-
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 4);
     if (!pasted) return;
 
     const newOtp = ['', '', '', ''];
-
     pasted.split('').forEach((digit, index) => {
       newOtp[index] = digit;
     });
 
     setOtp(newOtp);
-
     const focusIndex = Math.min(pasted.length, 3);
     inputRefs.current[focusIndex]?.focus();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     const code = otp.join('');
 
     if (code.length !== 4) {
@@ -94,12 +86,12 @@ const OtpInput = ({
   };
 
   const maskedPhone = phoneNumber.slice(-3) + '****' + phoneNumber.slice(0, 4);
-
   const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
   const seconds = String(timeLeft % 60).padStart(2, '0');
+  const isCodeComplete = otp.join('').length === 4;
 
   return (
-    <div className='otp-input'>
+    <form className='otp-input' onSubmit={handleSubmit}>
       <h1 className='otp-input__title'>تایید شماره موبایل</h1>
 
       <h2 className='otp-input__subtitle'>
@@ -111,18 +103,17 @@ const OtpInput = ({
           {otp.map((digit, index) => (
             <input
               key={index}
-              ref={(el) => {
-                inputRefs.current[index] = el;
-              }}
+              ref={(el) => { inputRefs.current[index] = el; }}
               type='text'
-              inputMode='numeric' // Forces number pad on mobile
-              dir='ltr'           // Guarantees proper LTR digit entry
+              inputMode='numeric'
+              dir='ltr'
               maxLength={1}
               value={digit}
               onChange={(e) => handleChange(e.target.value, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
               onPaste={handlePaste}
               className='otp-input__field'
+              disabled={isLoading}
             />
           ))}
         </div>
@@ -135,6 +126,7 @@ const OtpInput = ({
               type='button'
               className='otp-input__resend'
               onClick={handleResend}
+              disabled={isLoading}
             >
               <PiArrowClockwiseBold />
             </button>
@@ -148,10 +140,14 @@ const OtpInput = ({
 
       {error && <p className='otp-input__error'>{error}</p>}
 
-      <button className='otp-input__subBtn' onClick={handleSubmit}>
-        تایید
+      <button
+        type='submit'
+        className='otp-input__subBtn'
+        disabled={!isCodeComplete || isLoading}
+      >
+        {isLoading ? <PiSpinnerGapBold className="icon-spin" /> : 'تایید'}
       </button>
-    </div>
+    </form>
   );
 };
 

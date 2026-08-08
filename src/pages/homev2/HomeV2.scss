@@ -10,17 +10,6 @@
   overflow-x: hidden;
   isolation: isolate;
 
-  // Base text colour for the page. Sections opt out where they need to.
-  color: dark.$color-white;
-
-  // Warm cinematic base. The ambience layer paints light on top of this.
-  background: linear-gradient(180deg, #0d0b0b 0%, #0a0909 40%, #0c0a0b 100%);
-
-  @include mx.light {
-    background: light.$color-bg;
-    color: light.$color-black;
-  }
-
   // Everything except the fixed ambience layer sits above it.
   > *:not(.cinema-ambience) {
     position: relative;

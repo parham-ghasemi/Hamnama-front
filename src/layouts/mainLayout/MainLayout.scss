@@ -7,13 +7,21 @@
   display: flex;
   flex-direction: column;
   // background: dark.$color-bg;
-  background: #0c0517;
-  background: linear-gradient(
-    -90deg,
-    rgba(12, 5, 23, 1) 0%,
-    rgba(15, 8, 38, 1) 100%
-  );
+  // background: #0c0517;
+  // background: linear-gradient(
+  //   -90deg,
+  //   rgba(12, 5, 23, 1) 0%,
+  //   rgba(15, 8, 38, 1) 100%
+  // );
   color: dark.$color-white;
+
+  // Warm cinematic base. The ambience layer paints light on top of this.
+  background: linear-gradient(180deg, #0d0b0b 0%, #0a0909 40%, #0c0a0b 100%);
+
+  @include mx.light {
+    background: light.$color-bg;
+    color: light.$color-black;
+  }
   transition: background 200ms ease;
 
   // * {

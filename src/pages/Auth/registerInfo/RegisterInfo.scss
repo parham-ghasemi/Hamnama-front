@@ -150,6 +150,10 @@
     color: dark.$color-red;
     text-align: center;
 
+    > p.highlight {
+      color: color.adjust(dark.$color-red, $red: 50%);
+    }
+
     @include mx.max-w(768px) {
       gap: 8px;
       font-size: 14px;

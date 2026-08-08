@@ -29,7 +29,7 @@ const Auth = () => {
   const showErrorToast = (error: unknown, defaultMsg: string) => {
     if (error instanceof AxiosError && error.response?.data) {
       // Assuming your Go backend sends plain text errors
-      toast.error(error.response.data);
+      toast.error(error.response.data.message);
     } else {
       toast.error(defaultMsg);
     }

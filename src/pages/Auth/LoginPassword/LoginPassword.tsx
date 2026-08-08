@@ -1,20 +1,22 @@
 import { useState } from 'react';
 import './LoginPassword.scss';
 import { Link } from 'react-router-dom';
-import { PiEyeBold, PiEyeSlashBold } from 'react-icons/pi';
+import { PiEyeBold, PiEyeSlashBold, PiSpinnerGapBold } from 'react-icons/pi';
 
-const LoginPassword = ({
-  setPassword,
-  goOtp,
-}: {
+interface LoginPasswordProps {
   setPassword: (word: string) => void;
   goOtp: () => void;
-}) => {
+  isLoading?: boolean;
+}
+
+const LoginPassword = ({ setPassword, goOtp, isLoading = false }: LoginPasswordProps) => {
   const [password, setPasswordValue] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (!password.trim()) {
       setError('رمز عبور خود را وارد کنید');
       return;
@@ -25,7 +27,7 @@ const LoginPassword = ({
   };
 
   return (
-    <div className='login-password'>
+    <form className='login-password' onSubmit={handleSubmit}>
       <h1 className='login-password__title'>
         ورود در <Link to='/'>هم‌نما</Link>
       </h1>
@@ -38,14 +40,14 @@ const LoginPassword = ({
         <input
           placeholder='رمز عبور'
           type={showPassword ? 'text' : 'password'}
-          dir='ltr' // Keeps password cursor behavior predictable
+          dir='ltr'
           className='login-password__input'
           value={password}
           onChange={(e) => {
             setPasswordValue(e.target.value);
-
             if (error) setError('');
           }}
+          disabled={isLoading}
         />
 
         <button
@@ -57,10 +59,7 @@ const LoginPassword = ({
         </button>
       </div>
 
-      <p
-        className='login-password__otp-link'
-        onClick={goOtp}
-      >
+      <p className='login-password__otp-link' onClick={goOtp}>
         ورود با رمز یکبار مصرف
       </p>
 
@@ -71,12 +70,13 @@ const LoginPassword = ({
       )}
 
       <button
+        type='submit'
         className='login-password__subBtn'
-        onClick={handleSubmit}
+        disabled={!password.trim() || isLoading}
       >
-        ادامه
+        {isLoading ? <PiSpinnerGapBold className="icon-spin" /> : 'ادامه'}
       </button>
-    </div>
+    </form>
   );
 };
 
