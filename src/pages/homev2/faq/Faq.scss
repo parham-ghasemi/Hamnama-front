@@ -42,8 +42,13 @@
 
     pointer-events: none;
     opacity: var(--glow-opacity);
-    z-index: 3;
+    z-index: 0;
 
+    /*
+   * The trick:
+   * the glow is behind the actual FAQ content, and the
+   * content/background of the trigger covers its center.
+   */
     background: radial-gradient(
       200px circle at var(--mx) var(--my),
       rgba(255, 210, 190, 0.85),
@@ -52,18 +57,6 @@
     );
 
     transition: opacity 0.15s linear;
-
-    mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-
-    mask-composite: exclude;
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-
-    padding: 2px;
 
     @include mx.light {
       background: radial-gradient(
@@ -90,6 +83,9 @@
     &__inner {
       position: relative;
       border-radius: 17px;
+
+      // The actual subtle border.
+      border: 2px solid transparent;
     }
 
     @include mx.max-w(1024px) {
@@ -170,7 +166,7 @@
         transform: translateY(-50%);
         width: 3.4px;
         height: 42.5px;
-        background: linear-gradient(180deg, dark.$color-primary, #8f2f1c);
+        background: linear-gradient(180deg, dark.$color-primary, #ff0000);
         border-radius: 10px 0 0 10px;
         transition:
           width mx.$dur-base mx.$ease-out-soft,

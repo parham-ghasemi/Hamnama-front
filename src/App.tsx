@@ -1,7 +1,7 @@
 import { Toaster } from "sonner";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import Home from "./pages/home/Home"
+// import Home from "./pages/home/Home"
 import ScrollToTop from "./components/ScrollToTop";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DesktopLayout from "./layouts/mainLayout/MainLayout";
@@ -52,8 +52,9 @@ function App() {
                 </Route>
 
                 <Route element={<DesktopLayout />}>
-                  <Route index element={<Home />} />
-                  <Route path="homev2" element={<HomeV2 />} />
+                  <Route index element={<HomeV2 />} />
+                  {/* <Route index element={<Home />} /> */}
+                  {/* <Route path="homev2" element={<HomeV2 />} /> */}
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/plan-details" element={<PlanDetails />} />
                   <Route path="*" element={<p className="text-6xl font-black text-center my-60">THIS PAGE WAS NOT FOUND!</p>} />
