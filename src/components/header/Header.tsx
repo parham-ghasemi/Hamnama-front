@@ -13,7 +13,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const { setTheme, isLight } = useTheme();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading: isUserLoading } = useAuth();
   const nav = useNavigate();
   const location = useLocation();
 
@@ -64,7 +64,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         </button>
 
         <div className="header__left__user">
-          {isAuthenticated ? (
+          {isAuthenticated && isUserLoading && !user ? (
+            <div className="header__left__user__skeleton" aria-hidden="true">
+              <span className="header__left__user__skeleton__line" />
+              <span className="header__left__user__skeleton__dot" />
+            </div>
+          ) : isAuthenticated ? (
             <div
               className="header__left__user__profile"
               ref={profileRef}
@@ -73,7 +78,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               <p className="header__left__user__profile__name">{user?.username}</p>
               <div className="header__left__user__profile__photo">
                 {user?.profile_picture ? (
-                  <img src={`${import.meta.env.VITE_BASE_URL}${user?.profile_picture}`} alt="profile picture" />
+                  <img src={`${import.meta.env['VITE_BASE_URL']}${user?.profile_picture}`} alt="profile picture" />
                 ) : (
                   <PiUserFill />
                 )}

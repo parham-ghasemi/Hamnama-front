@@ -1,109 +1,90 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  type ReactNode,
-} from "react";
-import { createPortal } from "react-dom";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import clsx from "clsx";
 import "./ConfirmModalContext.scss";
 
-interface ConfirmationOptions {
+type ConfirmOptions = {
+  onConfirm: () => void | Promise<void>;
   title: string;
-  body?: ReactNode;
+  body?: string;
   primaryButtonText: string;
   secondaryButtonText: string;
   primaryButtonClasses?: string;
-  onConfirm?: () => void;
-}
+};
 
-interface ConfirmationModalContextType {
-  openConfirmation: (options: ConfirmationOptions) => void;
-  closeConfirmation: () => void;
-}
+type ConfirmContextValue = {
+  openConfirmation: (options: ConfirmOptions) => void;
+};
 
-const ConfirmationModalContext =
-  createContext<ConfirmationModalContextType | null>(null);
+const ConfirmationModalContext = createContext<ConfirmContextValue>({
+  openConfirmation: () => { },
+});
 
-export function ConfirmationModalProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  const [modal, setModal] = useState<ConfirmationOptions | null>(null);
+export const ConfirmationModalProvider = ({ children }: { children: React.ReactNode }) => {
+  const [options, setOptions] = useState<ConfirmOptions | null>(null);
+  const [isActive, setIsActive] = useState(false);
+  const [isBusy, setIsBusy] = useState(false);
 
-  const closeConfirmation = () => {
-    setModal(null);
-  };
+  const openConfirmation = useCallback((next: ConfirmOptions) => {
+    setOptions(next);
+    setTimeout(() => setIsActive(true), 10);
+  }, []);
+
+  const close = useCallback(() => {
+    setIsActive(false);
+    setTimeout(() => setOptions(null), 300);
+  }, []);
+
+  const confirm = useCallback(async () => {
+    if (!options) return;
+    setIsBusy(true);
+    try {
+      await options.onConfirm();
+    } finally {
+      setIsBusy(false);
+      close();
+    }
+  }, [options, close]);
+
+  const value = useMemo(() => ({ openConfirmation }), [openConfirmation]);
 
   return (
-    <ConfirmationModalContext.Provider
-      value={{
-        openConfirmation: setModal,
-        closeConfirmation,
-      }}
-    >
+    <ConfirmationModalContext.Provider value={value}>
       {children}
 
-      {modal &&
-        createPortal(
-          <div className="confirmation-modal" dir="rtl">
-            <div
-              className="confirmation-modal__overlay"
-              onClick={closeConfirmation}
-              aria-hidden="true"
-            />
-
-            <div
-              className="confirmation-modal__content"
-              role="dialog"
-              aria-modal="true"
-            >
-              <div className="confirmation-modal__content__header">
-                <h2 className="confirmation-modal__content__header__title">
-                  {modal.title}
-                </h2>
-              </div>
-
-              {modal.body && (
-                <div className="confirmation-modal__content__body">
-                  {modal.body}
-                </div>
-              )}
-
-              <div className="confirmation-modal__content__actions">
-                <button
-                  className="confirmation-modal__content__actions__secondary-button"
-                  onClick={closeConfirmation}
-                >
-                  {modal.secondaryButtonText}
-                </button>
-
-                <button
-                  className={`confirmation-modal__content__actions__primary-button ${modal.primaryButtonClasses ?? ""}`.trim()}
-                  onClick={() => {
-                    modal.onConfirm?.();
-                    closeConfirmation();
-                  }}
-                >
-                  {modal.primaryButtonText}
-                </button>
-              </div>
+      {options && (
+        <div
+          className={clsx("confirm-modal-overlay", isActive && "is-active")}
+          onClick={close}
+          role="presentation"
+        >
+          <div
+            className="confirm-modal"
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span className="confirm-modal__sprockets" aria-hidden="true" />
+            <h3 className="confirm-modal__title">{options.title}</h3>
+            <p className="confirm-modal__body">{options.body}</p>
+            <div className="confirm-modal__actions">
+              <button
+                type="button"
+                className={clsx("confirm-modal__primary", options.primaryButtonClasses)}
+                onClick={confirm}
+                disabled={isBusy}
+              >
+                {isBusy && <span className="confirm-modal__spinner" aria-hidden="true" />}
+                {options.primaryButtonText}
+              </button>
+              <button type="button" className="confirm-modal__secondary" onClick={close}>
+                {options.secondaryButtonText}
+              </button>
             </div>
-          </div>,
-          document.body
-        )}
+          </div>
+        </div>
+      )}
     </ConfirmationModalContext.Provider>
   );
-}
+};
 
-export function useConfirmationModal() {
-  const context = useContext(ConfirmationModalContext);
-
-  if (!context) {
-    throw new Error(
-      "useConfirmationModal must be used inside ConfirmationModalProvider"
-    );
-  }
-
-  return context;
-}
+export const useConfirmationModal = () => useContext(ConfirmationModalContext);

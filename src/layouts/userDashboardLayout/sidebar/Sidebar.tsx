@@ -50,6 +50,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
 
   return (
     <div className="user-sidebar">
+      <span className="user-sidebar__filmstrip" aria-hidden="true" />
+
       <ul>
         {
           items.map((item, ind) => {

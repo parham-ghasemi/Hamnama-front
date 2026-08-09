@@ -9,11 +9,13 @@ const UserDashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="user-dashboard-layout">
+    <div className="user-dashboard-layout" dir="rtl">
       {/* Pass the toggle function to Header */}
       <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
 
       <main className="user-dashboard-layout__content">
+        <div className="user-dashboard-layout__content__glow" aria-hidden="true" />
+
         {/* Mobile Backdrop Overlay */}
         <div
           className={clsx(

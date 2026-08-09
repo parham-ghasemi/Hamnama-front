@@ -14,12 +14,52 @@
   right: 0;
   left: 0;
   top: 0;
-  background-color: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(15px);
   box-sizing: border-box;
+  color: dark.$color-white;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.015) 100%
+    ),
+    rgba(10, 8, 10, 0.55);
+  backdrop-filter: blur(18px) saturate(140%);
+  transition:
+    background-color mx.$dur-base mx.$ease-out-soft,
+    box-shadow mx.$dur-base mx.$ease-out-soft;
+
+  // Warm hairline + soft glow instead of a hard edge.
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.16) 22%,
+      rgba(208, 78, 47, 0.45) 50%,
+      rgba(255, 255, 255, 0.16) 78%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    pointer-events: none;
+  }
 
   @include mx.light {
-    background-color: color.adjust(light.$color-dark-gray, $alpha: -0.6);
+    color: light.$color-black;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 6px 24px -18px rgba(9, 9, 9, 0.5);
+
+    &::after {
+      background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(139, 91, 130, 0.35) 50%,
+        rgba(0, 0, 0, 0) 100%
+      );
+    }
   }
 
   @include mx.max-w(1024px) {
@@ -46,6 +86,12 @@
     width: auto;
     display: flex;
     align-items: center;
+    color: inherit;
+    transition: opacity mx.$dur-fast mx.$ease-out-soft;
+
+    &:hover {
+      opacity: 0.85;
+    }
 
     > img {
       height: 100%;
@@ -62,17 +108,18 @@
     background: transparent;
     border: none;
     color: dark.$color-white;
-    font-size: 26px;
+    font-size: 24px;
     cursor: pointer;
     padding: 0;
     width: 38px;
     height: 38px;
-    border-radius: 8px;
+    border-radius: 11px;
     @include mx.flex-center;
     display: none;
     transition:
-      background 200ms ease,
-      color 200ms ease;
+      background mx.$dur-fast mx.$ease-out-soft,
+      color mx.$dur-fast mx.$ease-out-soft,
+      transform mx.$dur-fast mx.$ease-out-soft;
 
     @include mx.light {
       color: light.$color-black;
@@ -84,6 +131,10 @@
       @include mx.light {
         background-color: rgba(0, 0, 0, 0.05);
       }
+    }
+
+    &:active {
+      transform: scale(0.94);
     }
 
     @include mx.max-w(992px) {
@@ -102,21 +153,31 @@
 
     // --- Watch Button ---
     &__watchbtn {
+      position: relative;
+      overflow: hidden;
+      font-family: inherit;
       font-size: 14.5px;
       font-weight: 700;
-      background: dark.$color-primary-bg;
-      color: dark.$color-white;
+      background: linear-gradient(
+        180deg,
+        color.adjust(dark.$color-primary, $lightness: 4%) 0%,
+        dark.$color-primary-bg 100%
+      );
+      color: #fff;
       border: none;
-      border-radius: 12px;
+      border-radius: 13px;
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 6px;
       cursor: pointer;
       transition:
-        background 200ms ease,
-        transform 150ms ease;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
+        filter mx.$dur-fast mx.$ease-out-soft,
+        transform mx.$dur-fast mx.$ease-out-soft,
+        box-shadow mx.$dur-base mx.$ease-out-soft;
+      box-shadow:
+        0 1px 0 0 rgba(255, 255, 255, 0.2) inset,
+        0 10px 22px -14px rgba(208, 78, 47, 0.9);
       height: 39.1px;
       padding: 0 16px;
       white-space: nowrap;
@@ -125,14 +186,38 @@
       @include mx.light {
         background: light.$color-primary-bg;
         color: light.$color-white;
-        box-shadow: light.$shadow;
+        box-shadow:
+          0 1px 0 0 rgba(255, 255, 255, 0.25) inset,
+          0 10px 22px -14px rgba(104, 61, 96, 0.8);
+      }
+
+      // Light sweep, same family as the home page CTAs.
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 45%;
+        left: -60%;
+        background: linear-gradient(
+          100deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.32) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        transform: skewX(-18deg);
+        transition: left mx.$dur-slow mx.$ease-out-soft;
+        pointer-events: none;
       }
 
       &:hover {
-        background: dark.$color-primary-bg-hover;
+        filter: brightness(1.06);
+        box-shadow:
+          0 1px 0 0 rgba(255, 255, 255, 0.24) inset,
+          0 14px 26px -14px rgba(208, 78, 47, 1);
 
-        @include mx.light {
-          background: light.$color-primary-bg-hover;
+        &::before {
+          left: 120%;
         }
 
         .header__left__watchbtn__Icon {
@@ -145,7 +230,7 @@
       }
 
       &__Icon {
-        transition: transform 200ms ease;
+        transition: transform mx.$dur-base mx.$ease-out-soft;
         font-size: 16px;
         flex-shrink: 0;
       }
@@ -164,27 +249,112 @@
       display: flex;
       align-items: center;
 
+      // Loading placeholder while the profile is being fetched.
+      &__skeleton {
+        height: 39.1px;
+        min-width: 108px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 0 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+
+        @include mx.light {
+          background: rgba(9, 9, 9, 0.05);
+          border-color: rgba(9, 9, 9, 0.08);
+        }
+
+        &__line,
+        &__dot {
+          display: block;
+          background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.07) 0%,
+            rgba(255, 255, 255, 0.18) 50%,
+            rgba(255, 255, 255, 0.07) 100%
+          );
+          background-size: 220% 100%;
+          animation: header-shimmer 1.35s ease-in-out infinite;
+
+          @include mx.light {
+            background: linear-gradient(
+              90deg,
+              rgba(9, 9, 9, 0.06) 0%,
+              rgba(9, 9, 9, 0.14) 50%,
+              rgba(9, 9, 9, 0.06) 100%
+            );
+            background-size: 220% 100%;
+          }
+
+          @include mx.reduced-motion {
+            animation: none;
+          }
+        }
+
+        &__line {
+          height: 9px;
+          flex: 1;
+          border-radius: 99px;
+
+          @include mx.max-w(576px) {
+            display: none;
+          }
+        }
+
+        &__dot {
+          height: 26px;
+          width: 26px;
+          border-radius: 100%;
+          flex-shrink: 0;
+        }
+      }
+
       &__profile {
         height: 39.1px;
-        background-color: dark.$color-dark-gray;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.09) 0%,
+          rgba(255, 255, 255, 0.035) 100%
+        );
+        border: 1px solid rgba(255, 255, 255, 0.1);
         color: dark.$color-white;
         display: flex;
         align-items: center;
         gap: 8px;
         padding: 0 12px;
-        border-radius: 12px;
+        border-radius: 13px;
         font-weight: 600;
         font-size: 14px;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 10px 22px -18px rgba(0, 0, 0, 0.9);
         cursor: pointer;
         position: relative;
         user-select: none;
-        transition: background 200ms ease;
+        transition:
+          background mx.$dur-fast mx.$ease-out-soft,
+          border-color mx.$dur-fast mx.$ease-out-soft;
+
+        &:hover {
+          border-color: rgba(208, 78, 47, 0.45);
+          background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.13) 0%,
+            rgba(255, 255, 255, 0.05) 100%
+          );
+        }
 
         @include mx.light {
-          background-color: light.$color-card-bg;
+          background: light.$color-card-bg;
+          border-color: light.$color-light-gray;
           color: light.$color-black;
-          box-shadow: light.$shadow;
+          box-shadow: 0 8px 18px -16px rgba(9, 9, 9, 0.6);
+
+          &:hover {
+            border-color: light.$color-primary;
+            background: light.$color-card-bg;
+          }
         }
 
         &__name {
@@ -200,8 +370,12 @@
         }
 
         &__photo {
-          background-color: dark.$color-light-gray;
-          color: dark.$color-gray;
+          background: linear-gradient(
+            160deg,
+            rgba(224, 163, 64, 0.85) 0%,
+            rgba(208, 78, 47, 0.85) 100%
+          );
+          color: rgba(255, 255, 255, 0.92);
           border-radius: 100%;
           width: 26px;
           height: 26px;
@@ -210,8 +384,12 @@
           @include mx.flex-center;
 
           @include mx.light {
-            background-color: light.$color-light-gray;
-            color: light.$color-gray;
+            background: linear-gradient(
+              160deg,
+              rgba(139, 91, 130, 0.9) 0%,
+              rgba(104, 61, 96, 0.9) 100%
+            );
+            color: #fff;
           }
 
           > img {
@@ -236,18 +414,27 @@
       }
 
       &__loginbtn {
+        position: relative;
+        overflow: hidden;
         height: 39.1px;
         padding: 0 16px;
-        background: dark.$color-primary-bg;
-        color: dark.$color-white;
+        background: linear-gradient(
+          180deg,
+          color.adjust(dark.$color-primary, $lightness: 4%) 0%,
+          dark.$color-primary-bg 100%
+        );
+        color: #fff;
         border: none;
-        border-radius: 12px;
+        border-radius: 13px;
         @include mx.flex-center;
         cursor: pointer;
+        font-family: inherit;
         transition:
-          background 200ms ease,
-          transform 150ms ease;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
+          filter mx.$dur-fast mx.$ease-out-soft,
+          transform mx.$dur-fast mx.$ease-out-soft;
+        box-shadow:
+          0 1px 0 0 rgba(255, 255, 255, 0.2) inset,
+          0 10px 22px -14px rgba(208, 78, 47, 0.9);
         font-size: 14px;
         font-weight: 700;
         white-space: nowrap;
@@ -255,15 +442,10 @@
         @include mx.light {
           background: light.$color-primary-bg;
           color: light.$color-white;
-          box-shadow: light.$shadow;
         }
 
         &:hover {
-          background: dark.$color-primary-bg-hover;
-
-          @include mx.light {
-            background: light.$color-primary-bg-hover;
-          }
+          filter: brightness(1.06);
         }
 
         &:active {
@@ -277,20 +459,31 @@
       }
     }
 
-    // --- Dark/Light Theme Toggle ---
+    // --- Dark/Light Theme Toggle (kept as-is by design) ---
     &__new-theme-btn {
       height: 36px;
       width: 150px;
+      border: none;
+      padding: 0;
+      border-radius: 999px;
       background-image: url("/slider/darkbg.png");
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       position: relative;
       cursor: pointer;
-      transition: opacity 200ms ease;
+      box-shadow:
+        0 1px 0 0 rgba(255, 255, 255, 0.08) inset,
+        0 8px 20px -16px rgba(0, 0, 0, 0.9);
+      transition:
+        opacity mx.$dur-fast mx.$ease-out-soft,
+        box-shadow mx.$dur-base mx.$ease-out-soft;
 
       &:hover {
-        opacity: 0.8;
+        opacity: 0.9;
+        box-shadow:
+          0 1px 0 0 rgba(255, 255, 255, 0.12) inset,
+          0 10px 24px -14px rgba(208, 78, 47, 0.7);
       }
 
       &::after {
@@ -357,5 +550,14 @@
         }
       }
     }
+  }
+}
+
+@keyframes header-shimmer {
+  0% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -120% 0;
   }
 }

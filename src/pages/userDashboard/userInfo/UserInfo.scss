@@ -3,32 +3,134 @@
 @use "../../../styles/abstracts/mixins" as mx;
 @use "sass:color";
 
+/* ---------------------------------------------------------------
+ * Shared loading primitives (skeletons + button spinner)
+ * --------------------------------------------------------------- */
+.skeleton {
+  border-radius: 10px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.16) 50%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  background-size: 220% 100%;
+  animation: ui-shimmer 1.35s ease-in-out infinite;
+
+  @include mx.light {
+    background: linear-gradient(
+      90deg,
+      rgba(9, 9, 9, 0.05) 0%,
+      rgba(9, 9, 9, 0.13) 50%,
+      rgba(9, 9, 9, 0.05) 100%
+    );
+    background-size: 220% 100%;
+  }
+
+  @include mx.reduced-motion {
+    animation: none;
+  }
+
+  &--avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 100%;
+    flex-shrink: 0;
+  }
+
+  &--line {
+    height: 13px;
+    border-radius: 99px;
+  }
+
+  &--button {
+    height: 66px;
+    width: 157px;
+    border-radius: 12px;
+
+    @include mx.max-w(768px) {
+      width: 100%;
+      height: 56px;
+    }
+  }
+
+  &--pill {
+    height: 50px;
+    width: 170px;
+    border-radius: 16px;
+
+    @include mx.max-w(576px) {
+      width: 100%;
+    }
+  }
+}
+
+.skeleton-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-spinner {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: currentColor;
+  animation: ui-spin 700ms linear infinite;
+
+  @include mx.reduced-motion {
+    animation-duration: 2s;
+  }
+}
+
+@keyframes ui-shimmer {
+  0% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+@keyframes ui-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------------------------------------------------------------
+ * Page
+ * --------------------------------------------------------------- */
 .user-info {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 47px 26px;
+  gap: 28px 26px;
   position: relative;
 
   @include mx.max-w(768px) {
     gap: 20px;
   }
   @include mx.max-w(1094px) {
-    gap: 20px;
     grid-template-columns: 1fr; // Stack into a single column on tablet
-    gap: 30px;
+    gap: 22px;
   }
 
-  > * {
-    border-radius: 15px;
-    background-color: color.adjust(
-      dark.$color-primary-bg,
-      $alpha: -0.9,
-      $lightness: 20%
-    );
-    background-color: #ea9c7233;
+  // Every direct child is a lit cinema card.
+  > *:not(.user-info__blob, .edit-modal-overlay) {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    @include mx.cinema-surface;
+    @include mx.ambient-shadow(0.85);
+
+    &::before {
+      @include mx.gradient-border(20px);
+    }
 
     @include mx.light {
-      background-color: light.$color-card-bg;
+      border: light.$card-outline;
     }
   }
 
@@ -42,8 +144,23 @@
     transform: translate(-50%, -50%);
   }
 
+  &__sprockets {
+    position: absolute;
+    top: 9px;
+    left: 24px;
+    right: 24px;
+    height: 5px;
+    opacity: 0.35;
+    pointer-events: none;
+    @include mx.sprockets(4px, 12px);
+
+    @include mx.light {
+      @include mx.sprockets(4px, 12px, rgba(9, 9, 9, 0.16));
+    }
+  }
+
   &__top-card {
-    grid-column: 1 / -1; // Makes it always span full width regardless of column count
+    grid-column: 1 / -1; // Always span full width
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -54,13 +171,13 @@
       flex-direction: column;
       align-items: flex-start;
       height: auto;
-      padding: 24px;
+      padding: 26px 24px;
       gap: 24px;
     }
 
     &__right {
       @include mx.flex-center;
-      gap: 25px;
+      gap: 22px;
 
       @include mx.max-w(768px) {
         width: 100%;
@@ -73,19 +190,43 @@
         position: relative;
         cursor: pointer;
         @include mx.flex-center;
-        outline: 1px solid dark.$color-gray;
         border-radius: 100%;
+        background: linear-gradient(
+          160deg,
+          rgba(224, 163, 64, 0.85) 0%,
+          rgba(208, 78, 47, 0.85) 100%
+        );
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.14),
+          0 14px 28px -16px rgba(208, 78, 47, 0.9);
+        transition:
+          transform mx.$dur-base mx.$ease-out-soft,
+          box-shadow mx.$dur-base mx.$ease-out-soft;
+
+        @include mx.light {
+          background: linear-gradient(
+            160deg,
+            rgba(139, 91, 130, 0.95) 0%,
+            rgba(104, 61, 96, 0.95) 100%
+          );
+        }
 
         > p {
           font-weight: 900;
           font-size: 28px;
+          color: #fff;
         }
 
         &:hover {
+          transform: translateY(-2px);
+          box-shadow:
+            0 0 0 1px rgba(255, 255, 255, 0.22),
+            0 18px 34px -16px rgba(208, 78, 47, 1);
+
           > span {
-            height: 25px;
-            width: 25px;
-            bottom: 3px;
+            height: 26px;
+            width: 26px;
+            bottom: 2px;
           }
         }
 
@@ -100,43 +241,35 @@
           position: absolute;
           right: 0;
           bottom: 0;
-          box-shadow: 0 0 5px 0 dark.$color-black;
-          height: 22px;
-          width: 22px;
+          height: 23px;
+          width: 23px;
           border-radius: 100%;
-          background-color: color.adjust(dark.$color-gray, $lightness: -10%);
+          color: #fff;
+          background-color: rgba(20, 16, 18, 0.92);
+          box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16);
           @include mx.flex-center;
-          transition: all 200ms ease;
-
-          @include mx.light {
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            background-color: light.$color-light-gray;
-          }
+          transition: all mx.$dur-base mx.$ease-out-soft;
         }
       }
 
       &__subinfo {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: 5px;
-
-        @include mx.max-w(768px) {
-          align-items: flex-start;
-        }
+        gap: 6px;
 
         > p {
-          font-size: 19px;
-          font-weight: 700;
+          font-size: 18px;
+          font-weight: 800;
+          letter-spacing: -0.01em;
 
           @include mx.max-w(768px) {
-            font-size: 17px;
+            font-size: 16px;
           }
         }
 
         > span {
-          font-size: 15px;
-          font-weight: 700;
+          font-size: 14px;
+          font-weight: 600;
           color: dark.$color-gray;
 
           @include mx.light {
@@ -152,36 +285,66 @@
       }
 
       > button {
-        height: 66px;
-        width: 157px;
-        border-radius: 12px;
-        background-color: dark.$color-primary-bg;
-        transition: background-color 200ms ease;
+        position: relative;
+        overflow: hidden;
+        height: 60px;
+        width: 165px;
+        border: none;
+        border-radius: 14px;
+        font-family: inherit;
         font-size: 16px;
-        font-weight: 900;
-        text-shadow: 0px 3px 3px color.adjust(dark.$color-black, $alpha: -0.6);
+        font-weight: 800;
+        color: #fff;
         cursor: pointer;
-        box-shadow: 0 4px 4px 0 color.adjust(dark.$color-black, $alpha: -0.8);
+        background: linear-gradient(
+          180deg,
+          color.adjust(dark.$color-primary, $lightness: 4%) 0%,
+          dark.$color-primary-bg 100%
+        );
+        box-shadow:
+          0 1px 0 0 rgba(255, 255, 255, 0.2) inset,
+          0 16px 30px -18px rgba(208, 78, 47, 0.95);
+        transition:
+          filter mx.$dur-fast mx.$ease-out-soft,
+          transform mx.$dur-fast mx.$ease-out-soft;
 
         @include mx.max-w(768px) {
           width: 100%;
-          height: 56px;
+          height: 54px;
         }
 
         @include mx.light {
-          background-color: light.$color-primary-bg;
+          background: light.$color-primary-bg;
           color: light.$color-white;
-          text-shadow: none;
-          box-shadow: 0 4px 4px 0
-            color.adjust(light.$color-black, $alpha: -0.75);
+        }
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 45%;
+          left: -60%;
+          background: linear-gradient(
+            100deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.3) 50%,
+            rgba(255, 255, 255, 0) 100%
+          );
+          transform: skewX(-18deg);
+          transition: left mx.$dur-slow mx.$ease-out-soft;
         }
 
         &:hover {
-          background-color: dark.$color-primary-bg-hover;
+          filter: brightness(1.06);
 
-          @include mx.light {
-            background-color: light.$color-primary-bg-hover;
+          &::before {
+            left: 120%;
           }
+        }
+
+        &:active {
+          transform: scale(0.98);
         }
       }
     }
@@ -190,20 +353,21 @@
   &__chart-container {
     display: flex;
     flex-direction: column;
-    padding: 20px 20px 20px 0;
+    padding: 22px 22px 20px 6px;
     height: 450px;
     width: 100%;
 
     @include mx.max-w(768px) {
-      height: 350px;
+      height: 360px;
+      padding: 18px 14px 16px 2px;
     }
   }
 
   &__chart-header {
     display: flex;
-    justify-content: space-between; // فاصله‌گذاری؛ آیتم اول راست، دوم چپ قرار می‌گیرد
+    justify-content: space-between;
     align-items: center;
-    margin: 0 20px 20px;
+    margin: 0 18px 20px;
     flex-wrap: wrap-reverse;
     gap: 15px;
   }
@@ -211,13 +375,13 @@
   &__chart-title-group {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 14px;
   }
 
   &__chart-title {
     margin: 0;
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 17px;
+    font-weight: 800;
     color: dark.$color-white;
 
     @include mx.light {
@@ -226,12 +390,18 @@
   }
 
   &__chart-total {
-    font-size: 15px;
-    font-weight: 900;
-    color: dark.$color-primary-bg-hover;
+    font-size: 14px;
+    font-weight: 800;
+    padding: 5px 11px;
+    border-radius: 99px;
+    color: dark.$color-yellow;
+    background-color: rgba(224, 163, 64, 0.12);
+    border: 1px solid rgba(224, 163, 64, 0.22);
 
     @include mx.light {
       color: light.$color-primary;
+      background-color: rgba(139, 91, 130, 0.1);
+      border-color: rgba(139, 91, 130, 0.22);
     }
   }
 
@@ -245,39 +415,43 @@
       align-items: center;
       justify-content: space-between;
       width: 100%;
-      background: transparent;
+      background: rgba(255, 255, 255, 0.04);
       color: dark.$color-white;
-      border: 1px solid rgba(150, 150, 150, 0.4);
-      padding: 8px 14px;
-      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 9px 14px;
+      border-radius: 12px;
       cursor: pointer;
       font-family: inherit;
       font-size: 13px;
-      transition: all 0.3s ease;
+      font-weight: 600;
+      transition: all mx.$dur-fast mx.$ease-out-soft;
 
       .dropdown-icon {
         font-size: 16px;
-        transition: transform 0.3s ease;
+        transition: transform mx.$dur-base mx.$ease-out-soft;
       }
 
       &:hover {
-        border-color: dark.$color-primary;
+        border-color: color.adjust(dark.$color-primary, $alpha: -0.4);
+        background: rgba(255, 255, 255, 0.07);
       }
 
       &.is-open {
         border-color: dark.$color-primary;
         .dropdown-icon {
-          transform: rotate(180deg); // چرخش نرم آیکون در زمان باز شدن
+          transform: rotate(180deg);
         }
       }
 
       @include mx.light {
         color: light.$color-black;
+        background: light.$color-white;
         border-color: light.$color-light-gray;
 
         &:hover,
         &.is-open {
           border-color: light.$color-primary;
+          background: light.$color-white;
         }
       }
     }
@@ -287,18 +461,26 @@
       top: calc(100% + 8px);
       right: 0;
       width: 100%;
-      background: dark.$color-dark-gray;
-      border: 1px solid rgba(150, 150, 150, 0.1);
-      border-radius: 10px;
+      border-radius: 14px;
       overflow: hidden;
       z-index: 10;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      padding: 4px;
+      backdrop-filter: blur(16px);
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.07) 0%,
+          rgba(255, 255, 255, 0.03) 100%
+        ),
+        rgba(14, 12, 13, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 40px -26px rgba(0, 0, 0, 0.95);
 
       // Animations
       opacity: 0;
       visibility: hidden;
-      transform: translateY(-10px);
-      transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transform: translateY(-8px);
+      transition: all mx.$dur-base mx.$ease-out-soft;
 
       &.is-open {
         opacity: 1;
@@ -314,23 +496,29 @@
     }
 
     &-item {
-      padding: 12px 14px;
+      padding: 11px 12px;
+      border-radius: 10px;
       font-size: 13px;
+      font-weight: 600;
       color: dark.$color-gray;
       cursor: pointer;
       transition:
-        background 0.2s,
-        color 0.2s;
+        background mx.$dur-fast mx.$ease-out-soft,
+        color mx.$dur-fast mx.$ease-out-soft;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.07);
         color: dark.$color-white;
       }
 
       &.is-active {
-        color: dark.$color-primary-bg-hover;
-        background: rgba(255, 255, 255, 0.03);
-        font-weight: bold;
+        color: #fff;
+        background: linear-gradient(
+          -90deg,
+          rgba(208, 78, 47, 0.1) 0%,
+          rgba(208, 78, 47, 0.5) 100%
+        );
+        font-weight: 800;
       }
 
       @include mx.light {
@@ -342,8 +530,8 @@
         }
 
         &.is-active {
-          color: light.$color-primary;
-          background: rgba(0, 0, 0, 0.04);
+          color: light.$color-white;
+          background: light.$color-primary;
         }
       }
     }
@@ -356,11 +544,11 @@
     min-height: 0;
 
     // Dark Mode Variables
-    --chart-line-color: #{dark.$color-primary-bg-hover};
+    --chart-line-color: #{dark.$color-primary-hover};
     --chart-axis-color: #{dark.$color-gray};
-    --chart-grid-color: rgba(150, 150, 150, 0.15);
-    --chart-cursor-color: rgba(206, 87, 63, 0.2);
-    --chart-dot-stroke: rgba(255, 255, 255, 0.8);
+    --chart-grid-color: rgba(255, 255, 255, 0.08);
+    --chart-cursor-color: rgba(224, 163, 64, 0.28);
+    --chart-dot-stroke: rgba(255, 255, 255, 0.85);
 
     svg {
       outline: none;
@@ -379,9 +567,12 @@
   &__chart-loading,
   &__chart-empty {
     display: flex;
+    flex-direction: column;
+    gap: 18px;
     justify-content: center;
     align-items: center;
     height: 100%;
+    font-size: 14px;
     color: dark.$color-gray;
 
     @include mx.light {
@@ -389,19 +580,54 @@
     }
   }
 
+  // Playful "equalizer" placeholder while the chart loads.
+  &__chart-loading__bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 7px;
+    height: 74px;
+
+    > span {
+      display: block;
+      width: 9px;
+      height: 100%;
+      border-radius: 6px;
+      transform-origin: bottom;
+      background: linear-gradient(
+        180deg,
+        rgba(224, 163, 64, 0.75) 0%,
+        rgba(208, 78, 47, 0.55) 100%
+      );
+      animation: chart-bars 1.1s ease-in-out infinite alternate;
+
+      @include mx.light {
+        background: linear-gradient(
+          180deg,
+          rgba(139, 91, 130, 0.7) 0%,
+          rgba(104, 61, 96, 0.5) 100%
+        );
+      }
+
+      @include mx.reduced-motion {
+        animation: none;
+        transform: scaleY(0.5);
+      }
+    }
+  }
+
   // --- Tooltip Component Style ---
   &__chart-tooltip {
-    background-color: rgba(14, 14, 14, 0.85); // dark.$color-black
-    backdrop-filter: blur(8px);
+    background-color: rgba(14, 12, 13, 0.9);
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 12px 16px;
-    border-radius: 12px;
+    border-radius: 14px;
     color: dark.$color-white;
     direction: rtl;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 18px 34px -22px rgba(0, 0, 0, 0.95);
 
     @include mx.light {
-      background-color: rgba(255, 255, 255, 0.9);
+      background-color: rgba(255, 255, 255, 0.94);
       border-color: light.$color-light-gray;
       color: light.$color-black;
       box-shadow: light.$shadow;
@@ -421,7 +647,7 @@
       margin: 0;
       font-weight: 900;
       font-size: 16px;
-      color: dark.$color-primary-bg-hover;
+      color: dark.$color-yellow;
 
       @include mx.light {
         color: light.$color-primary;
@@ -430,42 +656,39 @@
   }
 
   &__info-card {
-    padding: 40px 26px;
+    padding: 30px 26px;
 
     @include mx.max-w(768px) {
       padding: 24px;
     }
 
     &__section {
-      height: 100px;
       display: flex;
       justify-content: space-between;
-      align-items: center; // Added for better desktop centering
-      margin-top: 38px;
-      border-bottom: 1px solid dark.$color-gray;
+      align-items: center;
+      padding: 24px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+      @include mx.light {
+        border-bottom-color: color.adjust(
+          light.$color-light-gray,
+          $alpha: -0.3
+        );
+      }
 
       @include mx.max-w(576px) {
         flex-direction: column;
-        align-items: flex-start; // Stack items on small mobile
-        height: auto;
-        padding-bottom: 24px;
+        align-items: flex-start;
         gap: 16px;
-        margin-top: 24px;
-      }
-
-      @include mx.light {
-        border-bottom: 1px solid light.$color-light-gray;
       }
 
       &:last-of-type {
         border-bottom: none;
-        @include mx.max-w(576px) {
-          padding-bottom: 0;
-        }
+        padding-bottom: 0;
       }
 
       &:first-of-type {
-        margin-top: 0;
+        padding-top: 0;
       }
 
       &__right {
@@ -474,25 +697,22 @@
         gap: 8px;
 
         > p {
-          font-weight: 900;
-          font-size: 19px;
+          font-weight: 800;
+          font-size: 15px;
+          color: dark.$color-gray;
+          letter-spacing: 0.01em;
 
-          @include mx.max-w(768px) {
-            font-size: 17px;
+          @include mx.light {
+            color: light.$color-gray;
           }
         }
 
         > span {
-          font-size: 20px;
-          font-weight: 600;
-          color: dark.$color-gray;
+          font-size: 19px;
+          font-weight: 700;
 
           @include mx.max-w(768px) {
             font-size: 17px;
-          }
-
-          @include mx.light {
-            color: light.$color-dark-gray;
           }
         }
       }
@@ -503,44 +723,56 @@
         }
 
         > button {
-          height: 50px;
+          height: 46px;
           width: 170px;
-          border-radius: 16px;
-          border: 1px solid dark.$color-white;
+          border-radius: 14px;
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          background-color: rgba(255, 255, 255, 0.03);
+          color: dark.$color-white;
+          font-family: inherit;
           @include mx.flex-center;
-          gap: 5px;
+          gap: 6px;
           font-size: 13px;
-          font-weight: 900;
+          font-weight: 800;
           cursor: pointer;
-          transition: background-color 200ms ease;
+          transition:
+            background-color mx.$dur-fast mx.$ease-out-soft,
+            border-color mx.$dur-fast mx.$ease-out-soft,
+            color mx.$dur-fast mx.$ease-out-soft,
+            transform mx.$dur-fast mx.$ease-out-soft;
 
           @include mx.max-w(1100px) {
-            width: 150px;
+            width: 152px;
           }
 
           @include mx.max-w(576px) {
-            width: 100%; // Full width edit buttons on small mobile
+            width: 100%;
           }
 
           @include mx.light {
-            border: 1px solid light.$color-black;
+            border: 1px solid light.$color-light-gray;
             color: light.$color-black;
             background-color: transparent;
           }
 
           > svg {
-            font-size: 16px;
+            font-size: 15px;
           }
 
           &:hover {
-            background-color: color.adjust(dark.$color-white, $alpha: -0.95);
+            background-color: rgba(208, 78, 47, 0.14);
+            border-color: rgba(208, 78, 47, 0.5);
+            transform: translateY(-1px);
 
             @include mx.light {
-              background-color: color.adjust(
-                light.$color-primary,
-                $alpha: -0.92
-              );
+              background-color: rgba(139, 91, 130, 0.1);
+              border-color: light.$color-primary;
+              color: light.$color-primary;
             }
+          }
+
+          &:active {
+            transform: scale(0.98);
           }
         }
       }
@@ -556,8 +788,8 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
+  background-color: rgba(6, 5, 8, 0.62);
+  backdrop-filter: blur(10px);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -567,7 +799,7 @@
   // Animation states
   opacity: 0;
   pointer-events: none;
-  transition: opacity 300ms ease;
+  transition: opacity mx.$dur-base mx.$ease-out-soft;
 
   @include mx.light {
     background-color: rgba(255, 255, 255, 0.6);
@@ -585,51 +817,67 @@
 }
 
 .edit-modal {
+  position: relative;
   width: 100%;
   max-width: 450px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow: hidden;
+  direction: rtl;
+  color: dark.$color-white;
 
-  border: 1px solid color.adjust(dark.$color-white, $alpha: -0.9);
-  border-radius: 26px;
-  padding: 24px 26px;
-  background-color: color.adjust(dark.$color-dark-gray, $alpha: -0.4);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  border-radius: 24px;
+  padding: 28px 26px 26px;
+  @include mx.cinema-surface;
+  @include mx.ambient-shadow(1.1);
+
+  &::before {
+    @include mx.gradient-border(24px);
+  }
 
   // Modal open animations
-  transform: scale(0.9) translateY(20px);
+  transform: scale(0.94) translateY(18px);
   opacity: 0;
   transition:
-    transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1),
-    opacity 300ms ease;
+    transform 350ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    opacity mx.$dur-base mx.$ease-out-soft;
 
   @include mx.light {
-    background-color: light.$color-card-bg;
-    border: 1px solid color.adjust(light.$color-gray, $alpha: -0.8);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    color: light.$color-black;
+    border: light.$card-outline;
+  }
+
+  &__sprockets {
+    position: absolute;
+    top: 10px;
+    left: 24px;
+    right: 24px;
+    height: 5px;
+    opacity: 0.4;
+    pointer-events: none;
+    @include mx.sprockets(4px, 12px);
+
+    @include mx.light {
+      @include mx.sprockets(4px, 12px, rgba(9, 9, 9, 0.16));
+    }
   }
 
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 20px;
-    border-bottom: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
     @include mx.light {
-      border-bottom-color: color.adjust(light.$color-light-gray, $alpha: -0.5);
+      border-bottom-color: color.adjust(light.$color-light-gray, $alpha: -0.4);
     }
 
     h3 {
-      font-size: 24px;
-      font-weight: 700;
-      color: dark.$color-white;
+      font-size: 21px;
+      font-weight: 800;
       margin: 0;
-
-      @include mx.light {
-        color: light.$color-black;
-      }
     }
   }
 
@@ -637,30 +885,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 44px;
-    width: 44px;
+    height: 42px;
+    width: 42px;
     border-radius: 50%;
     background-color: transparent;
-    border: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
-    color: color.adjust(dark.$color-white, $alpha: -0.2);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.8);
     cursor: pointer;
-    transition: all 300ms ease;
-    font-size: 24px;
+    transition: all mx.$dur-base mx.$ease-out-soft;
+    font-size: 22px;
 
     @include mx.light {
       color: light.$color-dark-gray;
-      border-color: color.adjust(light.$color-dark-gray, $alpha: -0.5);
+      border-color: color.adjust(light.$color-dark-gray, $alpha: -0.6);
     }
 
     &:hover {
       background-color: color.adjust(dark.$color-red, $alpha: -0.7);
-      color: dark.$color-white;
+      color: #fff;
       border-color: transparent;
 
       @include mx.light {
-        background-color: color.adjust(dark.$color-red, $alpha: -0.1);
+        background-color: light.$color-red;
         color: light.$color-white;
-        border-color: color.adjust(dark.$color-red, $alpha: -0.1);
+        border-color: transparent;
       }
     }
   }
@@ -668,10 +916,10 @@
   &__subtitle {
     font-size: 14px;
     font-weight: 500;
-    color: color.adjust(dark.$color-white, $alpha: -0.4);
+    color: rgba(221, 221, 221, 0.65);
     text-align: center;
     margin-top: -5px;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
 
     @include mx.light {
       color: light.$color-gray;
@@ -681,84 +929,252 @@
   &__form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 14px;
 
     input {
       width: 100%;
       height: 50px;
       outline: none;
-      background-color: color.adjust(dark.$color-white, $alpha: -0.9);
-      border: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
-      border-radius: 17px;
-      padding: 0 15px;
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.055) 0%,
+          rgba(255, 255, 255, 0.025) 100%
+        ),
+        rgba(9, 8, 8, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 15px;
+      padding: 0 16px;
       color: dark.$color-white;
       font-family: inherit;
-      font-size: 16px;
+      font-size: 15px;
       transition:
-        background-color 200ms ease,
-        border-color 200ms ease;
+        border-color mx.$dur-fast mx.$ease-out-soft,
+        box-shadow mx.$dur-base mx.$ease-out-soft;
+
+      &::placeholder {
+        color: rgba(171, 170, 170, 0.55);
+      }
 
       &:focus {
-        background-color: color.adjust(dark.$color-white, $alpha: -0.88);
+        border-color: color.adjust(dark.$color-primary, $alpha: -0.35);
+        box-shadow: 0 0 0 3px rgba(208, 78, 47, 0.16);
+      }
+
+      &:disabled {
+        opacity: 0.6;
       }
 
       @include mx.light {
-        background-color: light.$color-card-bg;
+        background: light.$color-white;
         border: 1px solid light.$color-light-gray;
-        color: light.$color-gray;
+        color: light.$color-black;
 
         &:focus {
           border-color: light.$color-primary;
+          box-shadow: 0 0 0 3px rgba(139, 91, 130, 0.18);
         }
       }
     }
 
     button {
-      height: 51px;
-      border-radius: 17px;
-      font-size: 16px;
+      height: 50px;
+      border-radius: 15px;
+      font-family: inherit;
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
       border: none;
-      transition: background-color 200ms ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition:
+        filter mx.$dur-fast mx.$ease-out-soft,
+        background-color mx.$dur-fast mx.$ease-out-soft,
+        transform mx.$dur-fast mx.$ease-out-soft;
 
-      background-color: color.adjust(dark.$color-white, $alpha: -0.58);
-      color: dark.$color-white;
+      background: linear-gradient(
+        180deg,
+        color.adjust(dark.$color-primary, $lightness: 4%) 0%,
+        dark.$color-primary-bg 100%
+      );
+      color: #fff;
+      box-shadow:
+        0 1px 0 0 rgba(255, 255, 255, 0.2) inset,
+        0 14px 26px -18px rgba(208, 78, 47, 0.95);
 
       @include mx.light {
-        background-color: light.$color-primary-bg;
+        background: light.$color-primary-bg;
         color: light.$color-white;
       }
 
-      &:hover {
-        background-color: color.adjust(dark.$color-white, $alpha: -0.5);
-
-        @include mx.light {
-          background-color: light.$color-primary-bg-hover;
-        }
+      &:hover:not(:disabled) {
+        filter: brightness(1.06);
       }
 
-      // Replaces previous secondary button styles to match the target cancel button
+      &:active:not(:disabled) {
+        transform: scale(0.98);
+      }
+
+      &:disabled {
+        opacity: 0.72;
+        cursor: progress;
+      }
+
       &.secondary-btn {
-        background-color: transparent;
+        background: rgba(255, 255, 255, 0.05);
         color: dark.$color-white;
-        border: 1px solid color.adjust(dark.$color-white, $alpha: -0.6);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        box-shadow: none;
 
         @include mx.light {
-          color: light.$color-primary;
+          color: light.$color-black;
           border: 1px solid light.$color-light-gray;
-          background-color: transparent;
+          background: transparent;
         }
 
-        &:hover {
-          background-color: color.adjust(dark.$color-red, $alpha: -0.7);
+        &:hover:not(:disabled) {
+          background: rgba(255, 255, 255, 0.1);
 
           @include mx.light {
-            background-color: color.adjust(dark.$color-red, $alpha: -0.1);
-            color: light.$color-white;
+            background: rgba(0, 0, 0, 0.04);
           }
         }
       }
+
+      &.danger-btn {
+        color: color.adjust(dark.$color-red, $lightness: 22%);
+        border-color: rgba(178, 56, 64, 0.5);
+
+        @include mx.light {
+          color: light.$color-red;
+          border-color: rgba(178, 56, 64, 0.5);
+        }
+
+        &:hover:not(:disabled) {
+          background: rgba(178, 56, 64, 0.16);
+        }
+      }
     }
+  }
+}
+
+/* Profile picture preview inside the modal */
+.avatar-picker {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+
+  @include mx.light {
+    background: rgba(9, 9, 9, 0.03);
+    border-color: light.$color-light-gray;
+  }
+
+  &__preview {
+    position: relative;
+    height: 84px !important;
+    width: 84px;
+    flex-shrink: 0;
+    border-radius: 100% !important;
+    overflow: hidden;
+    padding: 0;
+    cursor: pointer;
+    background: linear-gradient(
+      160deg,
+      rgba(224, 163, 64, 0.8) 0%,
+      rgba(208, 78, 47, 0.8) 100%
+    ) !important;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.16),
+      0 14px 28px -18px rgba(0, 0, 0, 0.9) !important;
+
+    @include mx.light {
+      background: linear-gradient(
+        160deg,
+        rgba(139, 91, 130, 0.9) 0%,
+        rgba(104, 61, 96, 0.9) 100%
+      ) !important;
+    }
+
+    > img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__placeholder {
+    @include mx.flex-center;
+    height: 100%;
+    width: 100%;
+    font-size: 30px;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  &__loading {
+    position: absolute;
+    inset: 0;
+    @include mx.flex-center;
+    background-color: rgba(10, 8, 10, 0.55);
+    backdrop-filter: blur(2px);
+  }
+
+  &__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+
+    &__name {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 800;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &__hint {
+      font-size: 12.5px;
+      color: dark.$color-gray;
+
+      @include mx.light {
+        color: light.$color-gray;
+      }
+    }
+
+    &__clear {
+      align-self: flex-start;
+      height: auto !important;
+      padding: 0 !important;
+      background: none !important;
+      border: none !important;
+      box-shadow: none !important;
+      color: color.adjust(dark.$color-red, $lightness: 22%) !important;
+      font-size: 12.5px !important;
+      font-weight: 700 !important;
+      text-decoration: underline;
+      cursor: pointer;
+
+      @include mx.light {
+        color: light.$color-red !important;
+      }
+    }
+  }
+}
+
+@keyframes chart-bars {
+  from {
+    transform: scaleY(0.25);
+    opacity: 0.55;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
   }
 }

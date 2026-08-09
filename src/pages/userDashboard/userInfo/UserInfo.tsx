@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { PiCameraLight } from 'react-icons/pi';
-import { IoPencilSharp, IoClose, IoChevronDown } from 'react-icons/io5';
+import { IoPencilSharp, IoClose, IoChevronDown, IoTrashOutline, IoImageOutline } from 'react-icons/io5';
 import { toast } from 'sonner';
 import { AxiosError } from 'axios';
 import { useQuery } from '@tanstack/react-query';
@@ -26,6 +26,12 @@ interface WatchHistoryItem {
 
 type TimeframeOption = 'all_time' | 'past_month' | 'past_year' | 'past_week';
 
+// Max upload size for the profile picture.
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
+
+// --- Small shared spinner used by every submitting button --- //
+const Spinner = () => <span className="btn-spinner" aria-hidden="true" />;
+
 // --- Helper: Fill missing dates with 0 --- //
 const processChartData = (history?: WatchHistoryItem[]) => {
   if (!history || history.length === 0) return [];
@@ -35,10 +41,10 @@ const processChartData = (history?: WatchHistoryItem[]) => {
     (a, b) => new Date(a.watch_date).getTime() - new Date(b.watch_date).getTime()
   );
 
-  const startDate = new Date(sortedHistory[0].watch_date);
+  const startDate = new Date(sortedHistory[0]!.watch_date);
   startDate.setHours(0, 0, 0, 0);
 
-  const endDate = new Date(sortedHistory[sortedHistory.length - 1].watch_date);
+  const endDate = new Date(sortedHistory[sortedHistory.length - 1]!.watch_date);
   endDate.setHours(0, 0, 0, 0);
 
   // Map to quickly look up existing hours by a safe date key (YYYY-M-D)
@@ -75,11 +81,13 @@ const processChartData = (history?: WatchHistoryItem[]) => {
 const UpdateUsernameForm = ({ onClose }: { onClose: () => void }) => {
   const { user, fetchUser } = useAuth();
   const [username, setUsername] = useState(user?.username || '');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (username === user?.username) return onClose();
 
+    setIsSubmitting(true);
     try {
       await userApi.updateUsername(username);
       await fetchUser();
@@ -89,6 +97,8 @@ const UpdateUsernameForm = ({ onClose }: { onClose: () => void }) => {
       if (error instanceof AxiosError && error.response) {
         toast.error(error.response.data || 'خطا در تغییر نام کاربری');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -100,8 +110,12 @@ const UpdateUsernameForm = ({ onClose }: { onClose: () => void }) => {
         onChange={(e) => setUsername(e.target.value)}
         placeholder="نام کاربری جدید"
         required
+        disabled={isSubmitting}
       />
-      <button type="submit">ثبت تغییرات</button>
+      <button type="submit" disabled={isSubmitting}>
+        {isSubmitting && <Spinner />}
+        {isSubmitting ? 'در حال ثبت...' : 'ثبت تغییرات'}
+      </button>
     </form>
   );
 };
@@ -109,9 +123,11 @@ const UpdateUsernameForm = ({ onClose }: { onClose: () => void }) => {
 const UpdatePasswordForm = ({ onClose }: { onClose: () => void }) => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       await userApi.updatePassword(currentPassword, newPassword);
       toast.success('رمز عبور با موفقیت تغییر کرد');
@@ -120,6 +136,8 @@ const UpdatePasswordForm = ({ onClose }: { onClose: () => void }) => {
       if (error instanceof AxiosError && error.response) {
         toast.error(error.response.data || 'خطا در تغییر رمز عبور');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -131,6 +149,7 @@ const UpdatePasswordForm = ({ onClose }: { onClose: () => void }) => {
         onChange={(e) => setCurrentPassword(e.target.value)}
         placeholder="رمز عبور فعلی"
         required
+        disabled={isSubmitting}
       />
       <input
         type="password"
@@ -138,8 +157,12 @@ const UpdatePasswordForm = ({ onClose }: { onClose: () => void }) => {
         onChange={(e) => setNewPassword(e.target.value)}
         placeholder="رمز عبور جدید"
         required
+        disabled={isSubmitting}
       />
-      <button type="submit">تغییر رمز</button>
+      <button type="submit" disabled={isSubmitting}>
+        {isSubmitting && <Spinner />}
+        {isSubmitting ? 'در حال تغییر...' : 'تغییر رمز'}
+      </button>
     </form>
   );
 };
@@ -149,6 +172,7 @@ const UpdatePhoneForm = ({ onClose }: { onClose: () => void }) => {
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'request' | 'verify'>('request');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,6 +181,7 @@ const UpdatePhoneForm = ({ onClose }: { onClose: () => void }) => {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       await userApi.requestPhoneUpdate(phone);
       toast.success('کد تایید ارسال شد');
@@ -165,11 +190,14 @@ const UpdatePhoneForm = ({ onClose }: { onClose: () => void }) => {
       if (error instanceof AxiosError && error.response) {
         toast.error(error.response.data || 'خطا در ارسال کد');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       await userApi.confirmPhoneUpdate(phone, otp);
       await fetchUser();
@@ -179,6 +207,8 @@ const UpdatePhoneForm = ({ onClose }: { onClose: () => void }) => {
       if (error instanceof AxiosError && error.response) {
         toast.error(error.response.data || 'کد وارد شده اشتباه است');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -193,9 +223,18 @@ const UpdatePhoneForm = ({ onClose }: { onClose: () => void }) => {
           onChange={(e) => setOtp(e.target.value)}
           placeholder="کد ۴ رقمی"
           required
+          disabled={isSubmitting}
         />
-        <button type="submit">تایید و تغییر شماره</button>
-        <button type="button" className="secondary-btn" onClick={() => setStep('request')}>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting && <Spinner />}
+          {isSubmitting ? 'در حال تایید...' : 'تایید و تغییر شماره'}
+        </button>
+        <button
+          type="button"
+          className="secondary-btn"
+          onClick={() => setStep('request')}
+          disabled={isSubmitting}
+        >
           اصلاح شماره
         </button>
       </form>
@@ -210,8 +249,12 @@ const UpdatePhoneForm = ({ onClose }: { onClose: () => void }) => {
         onChange={(e) => setPhone(e.target.value)}
         placeholder="شماره موبایل جدید (مثلا ۰۹XXXXXXXXX)"
         required
+        disabled={isSubmitting}
       />
-      <button type="submit">دریافت کد تایید</button>
+      <button type="submit" disabled={isSubmitting}>
+        {isSubmitting && <Spinner />}
+        {isSubmitting ? 'در حال ارسال...' : 'دریافت کد تایید'}
+      </button>
     </form>
   );
 };
@@ -220,11 +263,39 @@ const UpdatePhoneForm = ({ onClose }: { onClose: () => void }) => {
 const UpdateProfilePictureForm = ({ onClose }: { onClose: () => void }) => {
   const { user, fetchUser } = useAuth();
   const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Keep the object URL in sync with the selected file and revoke it on cleanup.
+  useEffect(() => {
+    if (!file) {
+      setPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const selected = e.target.files[0];
+
+      if (!selected.type.startsWith('image/')) {
+        toast.error('فقط فایل تصویری مجاز است');
+        e.target.value = '';
+        return;
+      }
+
+      if (selected.size > MAX_IMAGE_SIZE) {
+        toast.error('حجم عکس نباید بیشتر از ۱۰ مگابایت باشد');
+        e.target.value = '';
+        return;
+      }
+
+      setFile(selected);
     }
   };
 
@@ -232,6 +303,7 @@ const UpdateProfilePictureForm = ({ onClose }: { onClose: () => void }) => {
     e.preventDefault();
     if (!file) return;
 
+    setIsUploading(true);
     try {
       await userApi.uploadProfilePicture(file);
       await fetchUser();
@@ -241,10 +313,13 @@ const UpdateProfilePictureForm = ({ onClose }: { onClose: () => void }) => {
       if (error instanceof AxiosError && error.response) {
         toast.error(error.response.data || 'خطا در آپلود عکس');
       }
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const handleDelete = async () => {
+    setIsDeleting(true);
     try {
       await userApi.removeProfilePicture();
       await fetchUser();
@@ -254,8 +329,17 @@ const UpdateProfilePictureForm = ({ onClose }: { onClose: () => void }) => {
       if (error instanceof AxiosError && error.response) {
         toast.error(error.response.data || 'خطا در حذف عکس');
       }
+    } finally {
+      setIsDeleting(false);
     }
   };
+
+  const currentPicture = user?.profile_picture
+    ? `${import.meta.env['VITE_BASE_URL']}${user.profile_picture}`
+    : null;
+
+  const shownImage = previewUrl || currentPicture;
+  const isBusy = isUploading || isDeleting;
 
   return (
     <form onSubmit={handleUpload} className="edit-modal__form">
@@ -267,24 +351,80 @@ const UpdateProfilePictureForm = ({ onClose }: { onClose: () => void }) => {
         style={{ display: 'none' }}
       />
 
+      {/* Live preview of the picked (or current) picture */}
+      <div className="avatar-picker">
+        <button
+          type="button"
+          className="avatar-picker__preview"
+          onClick={() => !isBusy && fileInputRef.current?.click()}
+          aria-label="انتخاب عکس پروفایل"
+          disabled={isBusy}
+        >
+          {shownImage ? (
+            <img src={shownImage} alt="پیش‌نمایش عکس پروفایل" />
+          ) : (
+            <span className="avatar-picker__placeholder">
+              <IoImageOutline />
+            </span>
+          )}
+
+          {isUploading && (
+            <span className="avatar-picker__loading">
+              <Spinner />
+            </span>
+          )}
+        </button>
+
+        <div className="avatar-picker__meta">
+          <p className="avatar-picker__meta__name">
+            {file ? file.name : previewUrl || currentPicture ? 'عکس فعلی' : 'عکسی انتخاب نشده'}
+          </p>
+          <span className="avatar-picker__meta__hint">
+            {file
+              ? `${toPersianNumerals((file.size / (1024 * 1024)).toFixed(1))} مگابایت`
+              : 'فرمت تصویری، حداکثر ۱۰ مگابایت'}
+          </span>
+          {file && (
+            <button
+              type="button"
+              className="avatar-picker__meta__clear"
+              onClick={() => {
+                setFile(null);
+                if (fileInputRef.current) fileInputRef.current.value = '';
+              }}
+              disabled={isBusy}
+            >
+              حذف انتخاب
+            </button>
+          )}
+        </div>
+      </div>
+
       <button
         type="button"
         className="secondary-btn"
         onClick={() => fileInputRef.current?.click()}
+        disabled={isBusy}
       >
-        {file ? file.name : 'انتخاب عکس جدید'}
+        {file ? 'انتخاب عکس دیگر' : 'انتخاب عکس جدید'}
       </button>
 
-      {file && <button type="submit">آپلود عکس</button>}
+      {file && (
+        <button type="submit" disabled={isBusy}>
+          {isUploading && <Spinner />}
+          {isUploading ? 'در حال آپلود...' : 'آپلود عکس'}
+        </button>
+      )}
 
       {user?.profile_picture && !file && (
         <button
           type="button"
-          className="secondary-btn"
+          className="secondary-btn danger-btn"
           onClick={handleDelete}
-          style={{ borderColor: 'rgba(239, 68, 68, 0.6)', color: '#ef4444' }}
+          disabled={isBusy}
         >
-          حذف عکس فعلی
+          {isDeleting ? <Spinner /> : <IoTrashOutline />}
+          {isDeleting ? 'در حال حذف...' : 'حذف عکس فعلی'}
         </button>
       )}
     </form>
@@ -315,7 +455,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 // --- Main Component --- //
 
 const UserInfo = () => {
-  const { user } = useAuth();
+  const { user, isLoading: isUserLoading } = useAuth();
 
   const [editingField, setEditingField] = useState<'username' | 'phone' | 'password' | 'profilePicture' | null>(null);
   const [isModalActive, setIsModalActive] = useState(false);
@@ -404,50 +544,83 @@ const UserInfo = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isModalActive]);
 
+  const isProfileLoading = isUserLoading && !user;
+
   return (
     <div className="user-info">
       <div className="user-info__blob" />
 
       <div className="user-info__top-card">
-        <div className="user-info__top-card__right">
-          <div className="user-info__top-card__right__img" onClick={() => handleOpenModal('profilePicture')}>
-            {user?.profile_picture ? (
-              <img src={`${import.meta.env.VITE_BASE_URL}${user?.profile_picture}`} alt="profile image" />
-            ) : (
-              <p>{user?.username?.[0]}</p>
-            )}
+        <span className="user-info__sprockets" aria-hidden="true" />
 
-            <span>
-              <PiCameraLight />
-            </span>
-          </div>
-          <div className="user-info__top-card__right__subinfo">
-            <p>وضعیت اشتراک</p>
-            <span>اشتراک ندارید</span>
-          </div>
-        </div>
+        {isProfileLoading ? (
+          <>
+            <div className="user-info__top-card__right">
+              <div className="skeleton skeleton--avatar" />
+              <div className="skeleton-stack">
+                <div className="skeleton skeleton--line" style={{ width: 110 }} />
+                <div className="skeleton skeleton--line" style={{ width: 74 }} />
+              </div>
+            </div>
+            <div className="user-info__top-card__left">
+              <div className="skeleton skeleton--button" />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="user-info__top-card__right">
+              <div className="user-info__top-card__right__img" onClick={() => handleOpenModal('profilePicture')}>
+                {user?.profile_picture ? (
+                  <img src={`${import.meta.env['VITE_BASE_URL']}${user?.profile_picture}`} alt="profile image" />
+                ) : (
+                  <p>{user?.username?.[0]}</p>
+                )}
 
-        <div className="user-info__top-card__left">
-          <button>خرید اشتراک</button>
-        </div>
+                <span>
+                  <PiCameraLight />
+                </span>
+              </div>
+              <div className="user-info__top-card__right__subinfo">
+                <p>وضعیت اشتراک</p>
+                <span>اشتراک ندارید</span>
+              </div>
+            </div>
+
+            <div className="user-info__top-card__left">
+              <button>خرید اشتراک</button>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="user-info__info-card">
-        {sections.map((item) => (
-          <div className="user-info__info-card__section" key={item.key}>
-            <div className="user-info__info-card__section__right">
-              <p>{item.label}</p>
-              <span>{item.value}</span>
+        {isProfileLoading
+          ? [0, 1, 2].map((i) => (
+            <div className="user-info__info-card__section" key={`skeleton-${i}`}>
+              <div className="user-info__info-card__section__right">
+                <div className="skeleton skeleton--line" style={{ width: 90 }} />
+                <div className="skeleton skeleton--line" style={{ width: 150, height: 18 }} />
+              </div>
+              <div className="user-info__info-card__section__left">
+                <div className="skeleton skeleton--pill" />
+              </div>
             </div>
+          ))
+          : sections.map((item) => (
+            <div className="user-info__info-card__section" key={item.key}>
+              <div className="user-info__info-card__section__right">
+                <p>{item.label}</p>
+                <span>{item.value}</span>
+              </div>
 
-            <div className="user-info__info-card__section__left">
-              <button onClick={() => handleOpenModal(item.key as any)}>
-                <IoPencilSharp />
-                ویرایش {item.label}
-              </button>
+              <div className="user-info__info-card__section__left">
+                <button onClick={() => handleOpenModal(item.key as any)}>
+                  <IoPencilSharp />
+                  ویرایش {item.label}
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
 
       {/* --- Watch History Chart --- */}
@@ -480,7 +653,13 @@ const UserInfo = () => {
           </div>
 
           <div className="user-info__chart-title-group">
-            <span className="user-info__chart-total">مجموع: {toPersianNumerals(displayTotal)} ساعت</span>
+            <span className="user-info__chart-total">
+              {isChartLoading ? (
+                <span className="skeleton skeleton--line" style={{ width: 96, display: 'inline-block' }} />
+              ) : (
+                <>مجموع: {toPersianNumerals(displayTotal)} ساعت</>
+              )}
+            </span>
             <h3 className="user-info__chart-title">گزارش تماشا (ساعات)</h3>
           </div>
         </div>
@@ -488,6 +667,11 @@ const UserInfo = () => {
         <div className="user-info__chart-area">
           {isChartLoading ? (
             <div className="user-info__chart-loading">
+              <div className="user-info__chart-loading__bars" aria-hidden="true">
+                {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+                  <span key={i} style={{ animationDelay: `${i * 90}ms` }} />
+                ))}
+              </div>
               <p>در حال بارگذاری نمودار...</p>
             </div>
           ) : chartData.length > 0 ? (
@@ -537,6 +721,7 @@ const UserInfo = () => {
           onClick={handleCloseModal}
         >
           <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
+            <span className="edit-modal__sprockets" aria-hidden="true" />
             <div className="edit-modal__header">
               <h3>
                 ویرایش{' '}

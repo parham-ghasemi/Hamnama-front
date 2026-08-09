@@ -4,45 +4,63 @@
 @use "sass:color";
 
 .username-dropdown {
-  padding: 14px;
   position: fixed;
   top: 70px;
-  border-radius: 18px;
-  background-color: rgba(27, 23, 32, 1);
+  padding: 16px 14px 6px;
+  border-radius: 20px;
   color: dark.$color-white;
-  backdrop-filter: blur(10px);
   width: 300px;
   cursor: default;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
+  overflow: hidden;
+  backdrop-filter: blur(18px);
+  @include mx.cinema-surface;
+  @include mx.ambient-shadow(1);
+  background-color: color.adjust(dark.$color-dark-gray, $alpha: -0.2);
+  &::before {
+    @include mx.gradient-border(20px);
+  }
 
   // Animation base states (Hidden by default)
   opacity: 0;
   visibility: hidden;
   pointer-events: none; // Prevents clicking when invisible
-  // Starts slightly higher on the Y axis for a slide-down effect
-  transform: translateX(90%) translateY(-15px);
+  transform: translateX(90%) translateY(-15px) scale(0.98);
   transition:
-    opacity 250ms ease,
-    transform 250ms ease,
-    visibility 250ms ease;
+    opacity mx.$dur-base mx.$ease-out-soft,
+    transform mx.$dur-base mx.$ease-out-soft,
+    visibility mx.$dur-base mx.$ease-out-soft;
 
   // The class added when isOpen is true
   &--open {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    // Settles into its final position
-    transform: translateX(100%) translateY(0);
+    transform: translateX(100%) translateY(0) scale(1);
   }
 
   // Light Mode Base
   @include mx.light {
-    background-color: light.$color-card-bg;
     color: light.$color-black;
     border: light.$card-outline;
-    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 18px 36px -26px rgba(9, 9, 9, 0.6);
+  }
+
+  &__sprockets {
+    position: absolute;
+    top: 7px;
+    left: 20px;
+    right: 20px;
+    height: 5px;
+    opacity: 0.45;
+    @include mx.sprockets(4px, 11px);
+    pointer-events: none;
+
+    @include mx.light {
+      @include mx.sprockets(4px, 11px, rgba(9, 9, 9, 0.18));
+    }
   }
 
   &__header {
@@ -52,8 +70,9 @@
     gap: 12px;
 
     > p {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 800;
+      letter-spacing: 0.01em;
       color: dark.$color-primary;
 
       @include mx.light {
@@ -62,27 +81,61 @@
     }
 
     > button {
+      position: relative;
+      overflow: hidden;
       width: 100%;
-      height: 50px;
-      border-radius: 12px;
-      background-color: dark.$color-primary-bg;
-      transition: background-color 200ms ease;
-      color: dark.$color-white;
-      text-shadow: 0 4px 4px color.adjust(dark.$color-black, $alpha: -0.75);
+      height: 48px;
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      background: linear-gradient(
+        180deg,
+        color.adjust(dark.$color-primary, $lightness: 4%) 0%,
+        dark.$color-primary-bg 100%
+      );
+      color: #fff;
       cursor: pointer;
+      box-shadow:
+        0 1px 0 0 rgba(255, 255, 255, 0.2) inset,
+        0 12px 24px -16px rgba(208, 78, 47, 0.95);
+      transition:
+        filter mx.$dur-fast mx.$ease-out-soft,
+        transform mx.$dur-fast mx.$ease-out-soft;
 
       @include mx.light {
-        background-color: light.$color-primary-bg;
+        background: light.$color-primary-bg;
         color: light.$color-white;
-        text-shadow: none;
+      }
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 45%;
+        left: -60%;
+        background: linear-gradient(
+          100deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.3) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        transform: skewX(-18deg);
+        transition: left mx.$dur-slow mx.$ease-out-soft;
       }
 
       &:hover {
-        background-color: dark.$color-primary-bg-hover;
+        filter: brightness(1.06);
 
-        @include mx.light {
-          background-color: light.$color-primary-bg-hover;
+        &::before {
+          left: 120%;
         }
+      }
+
+      &:active {
+        transform: scale(0.98);
       }
     }
   }
@@ -91,7 +144,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    border-bottom: 1px solid color.adjust(dark.$color-white, $alpha: -0.5);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
     @include mx.light {
       border-bottom: 1px solid
@@ -100,10 +153,10 @@
 
     &__username {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       align-items: center;
-      padding: 22px 14px;
-      border-bottom: 1px solid color.adjust(dark.$color-white, $alpha: -0.5);
+      padding: 20px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
       @include mx.light {
         border-bottom: 1px solid
@@ -111,23 +164,40 @@
       }
 
       > span {
-        font-size: 20px;
-        font-weight: 900;
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
       }
 
       &__photo {
-        background-color: dark.$color-light-gray;
-        color: dark.$color-gray;
+        background: linear-gradient(
+          160deg,
+          rgba(224, 163, 64, 0.9) 0%,
+          rgba(208, 78, 47, 0.9) 100%
+        );
+        color: rgba(255, 255, 255, 0.95);
         border-radius: 100%;
-        width: 50px;
-        height: 50px;
+        width: 46px;
+        height: 46px;
         overflow: hidden;
+        flex-shrink: 0;
         @include mx.flex-center;
         align-items: end;
+        box-shadow: 0 8px 18px -12px rgba(208, 78, 47, 0.9);
 
         @include mx.light {
-          background-color: light.$color-light-gray;
-          color: light.$color-gray;
+          background: linear-gradient(
+            160deg,
+            rgba(139, 91, 130, 0.95) 0%,
+            rgba(104, 61, 96, 0.95) 100%
+          );
+          color: #fff;
+        }
+
+        > img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
         }
 
         > svg {
@@ -141,46 +211,60 @@
     > ul {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      padding: 22px 14px;
+      gap: 4px;
+      padding: 14px 0;
       flex: 1;
 
       > li {
         display: flex;
         align-items: center;
         gap: 10px;
-        font-size: 16px;
-        font-weight: 900;
+        padding: 11px 10px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 700;
         cursor: pointer;
-        transition: color 200ms ease;
+        transition:
+          color mx.$dur-fast mx.$ease-out-soft,
+          background-color mx.$dur-fast mx.$ease-out-soft,
+          transform mx.$dur-fast mx.$ease-out-soft;
 
         &:hover {
           color: dark.$color-primary;
+          background-color: rgba(255, 255, 255, 0.06);
+          transform: translateX(-3px);
 
           @include mx.light {
             color: light.$color-primary;
+            background-color: rgba(9, 9, 9, 0.04);
           }
         }
 
         > svg {
-          font-size: 20px;
+          font-size: 18px;
+          opacity: 0.9;
         }
       }
     }
   }
 
   &__footer {
-    padding: 22px 14px;
+    padding: 14px 10px 16px;
 
     &__exit {
       cursor: pointer;
       display: flex;
       gap: 8px;
       align-items: center;
-      transition: color 200ms ease;
+      font-weight: 700;
+      font-size: 15px;
+      transition:
+        color mx.$dur-fast mx.$ease-out-soft,
+        transform mx.$dur-fast mx.$ease-out-soft;
 
       &:hover {
         color: dark.$color-red;
+        transform: translateX(-3px);
 
         @include mx.light {
           color: light.$color-red;
@@ -188,7 +272,7 @@
       }
 
       > svg {
-        font-size: 20px;
+        font-size: 17px;
       }
     }
   }
@@ -198,7 +282,7 @@
   background-color: dark.$color-red !important;
   transition: opacity 200ms ease !important;
   &:hover {
-    opacity: 0.8;
+    opacity: 0.85;
   }
   @include mx.light {
     background-color: light.$color-red !important;

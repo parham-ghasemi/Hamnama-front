@@ -48,6 +48,8 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
     <>
       {/* Conditionally add the open class */}
       <div className={clsx('username-dropdown', isOpen && 'username-dropdown--open')}>
+        <span className="username-dropdown__sprockets" aria-hidden="true" />
+
         <div className='username-dropdown__header'>
           <p>اشتراک ندارید</p>
           <button>خرید اشتراک</button>
@@ -58,7 +60,7 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
             <div className='username-dropdown__body__username__photo'>
               {
                 user?.profile_picture ? (
-                  <img src={`${import.meta.env.VITE_BASE_URL}${user?.profile_picture}`} alt="profile picture" />
+                  <img src={`${import.meta.env['VITE_BASE_URL']}${user?.profile_picture}`} alt="profile picture" />
                 ) : (
                   <PiUserFill />
                 )
