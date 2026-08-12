@@ -2,6 +2,7 @@
 @use "../../../styles/abstracts/variables.light" as light;
 @use "../../../styles/abstracts/mixins" as mx;
 @use "sass:color";
+@use "../_dash" as dash;
 
 $row-odd-bg: color.adjust(dark.$color-light-gray, $alpha: -0.87);
 
@@ -23,7 +24,7 @@ $row-odd-bg: color.adjust(dark.$color-light-gray, $alpha: -0.87);
 
     &__header {
       @include mx.flex-center;
-      background-color: $row-odd-bg;
+      @include dash.headbar;
       justify-content: space-evenly;
       height: 97px;
       width: 100%;
@@ -76,32 +77,37 @@ $row-odd-bg: color.adjust(dark.$color-light-gray, $alpha: -0.87);
 
       &__row {
         @include mx.flex-center;
+        @include dash.row(17px);
         justify-content: space-evenly;
         height: 97px;
         width: 100%;
-        border-radius: 17px;
+
+        &:hover {
+          @include dash.row-hover;
+        }
 
         @include mx.light {
           background: light.$color-card-bg;
         }
 
-        &:nth-child(odd) {
-          background-color: $row-odd-bg;
-
-          @include mx.light {
-            background-color: light.$color-card-bg;
-          }
-        }
-
-        &:nth-child(even) {
+        // Podium: the top three rows get a warmer light leak.
+        &:nth-child(-n + 3)::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
           background: linear-gradient(
-            to right,
-            rgba(111, 2, 31, 0.2),
-            rgba(75, 0, 20, 0.2)
+            -90deg,
+            rgba(224, 163, 64, 0) 45%,
+            rgba(224, 163, 64, 0.14) 100%
           );
 
           @include mx.light {
-            background: light.$color-card-bg;
+            background: linear-gradient(
+              -90deg,
+              rgba(139, 91, 130, 0) 45%,
+              rgba(139, 91, 130, 0.08) 100%
+            );
           }
         }
 
@@ -197,7 +203,9 @@ $row-odd-bg: color.adjust(dark.$color-light-gray, $alpha: -0.87);
           &__text {
             font-weight: 600;
             font-size: 16px;
-            color: color.adjust(dark.$color-dark-gray, $lightness: 20%);
+            position: relative;
+            z-index: 1;
+            color: color.adjust(dark.$color-gray, $lightness: -6%);
 
             @include mx.light {
               color: light.$color-primary;

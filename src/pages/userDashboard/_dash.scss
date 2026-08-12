@@ -1,0 +1,178 @@
+// Shared cinematic surfaces for the user dashboard pages.
+// Keeps the tables/cards visually consistent with the home, auth and
+// user-info screens without changing any markup or behaviour.
+@use "../../styles/abstracts/variables" as dark;
+@use "../../styles/abstracts/variables.light" as light;
+@use "../../styles/abstracts/mixins" as mx;
+@use "sass:color";
+
+/// Warm "marquee" bar used for table headers.
+@mixin headbar {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.09) 0%,
+      rgba(255, 255, 255, 0.03) 100%
+    ),
+    linear-gradient(
+      -90deg,
+      rgba(208, 78, 47, 0.32) 0%,
+      rgba(224, 163, 64, 0.16) 100%
+    ),
+    rgba(14, 12, 12, 0.72);
+  box-shadow: 0 14px 30px -22px rgba(0, 0, 0, 0.9);
+
+  @include mx.light {
+    background: light.$color-primary-bg;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 8px;
+    height: 5px;
+    opacity: 0.35;
+    pointer-events: none;
+    @include mx.sprockets(4px, 12px);
+  }
+}
+
+/// A single lit row / card surface.
+@mixin row($radius: 17px) {
+  position: relative;
+  border-radius: $radius;
+  overflow: hidden;
+  @include mx.cinema-surface;
+  @include mx.ambient-shadow(0.6);
+  transition:
+    transform mx.$dur-fast mx.$ease-out-soft,
+    box-shadow mx.$dur-base mx.$ease-out-soft;
+
+  &::before {
+    @include mx.gradient-border($radius);
+  }
+
+  @include mx.light {
+    outline: light.$card-outline;
+  }
+}
+
+/// Hover treatment for interactive rows/cards.
+@mixin row-hover {
+  transform: translateY(-2px);
+  @include mx.ambient-shadow(1);
+}
+
+/// Warm primary CTA with a light sweep, matching the home page buttons.
+@mixin primary-btn {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  color: #fff;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0) 60%
+    ),
+    linear-gradient(
+      -90deg,
+      dark.$color-primary 0%,
+      color.adjust(dark.$color-yellow, $lightness: -12%) 140%
+    );
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.18) inset,
+    0 16px 30px -18px rgba(208, 78, 47, 0.9);
+  transition:
+    transform mx.$dur-fast mx.$ease-out-soft,
+    box-shadow mx.$dur-base mx.$ease-out-soft,
+    filter mx.$dur-fast mx.$ease-out-soft;
+
+  @include mx.light {
+    background: light.$color-primary-bg;
+    color: light.$color-white;
+    box-shadow: 0 12px 24px -16px rgba(9, 9, 9, 0.5);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-140%);
+    background: linear-gradient(
+      100deg,
+      rgba(255, 255, 255, 0) 30%,
+      rgba(255, 255, 255, 0.28) 50%,
+      rgba(255, 255, 255, 0) 70%
+    );
+    pointer-events: none;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    filter: saturate(1.06);
+
+    &::after {
+      transform: translateX(140%);
+      transition: transform 720ms mx.$ease-out-soft;
+
+      @include mx.reduced-motion {
+        transition: none;
+      }
+    }
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: progress;
+  }
+}
+
+/// Recessed warm input field.
+@mixin field {
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: dark.$color-white;
+  transition:
+    border-color mx.$dur-fast mx.$ease-out-soft,
+    box-shadow mx.$dur-fast mx.$ease-out-soft,
+    background-color mx.$dur-fast mx.$ease-out-soft;
+
+  @include mx.light {
+    background: light.$color-white;
+    border: 1px solid light.$color-light-gray;
+    color: light.$color-black;
+  }
+
+  &:focus {
+    border-color: color.adjust(dark.$color-primary, $alpha: -0.3);
+    box-shadow: 0 0 0 3px rgba(208, 78, 47, 0.15);
+    background: rgba(255, 255, 255, 0.07);
+
+    @include mx.light {
+      border-color: light.$color-primary;
+      box-shadow: 0 0 0 3px rgba(139, 91, 130, 0.15);
+    }
+  }
+}
+
+/// Thin sprocket strip, used as a decorative top edge on panels.
+@mixin sprocket-strip($top: 10px) {
+  content: "";
+  position: absolute;
+  top: $top;
+  left: 22px;
+  right: 22px;
+  height: 6px;
+  opacity: 0.4;
+  pointer-events: none;
+  @include mx.sprockets(4px, 12px);
+}

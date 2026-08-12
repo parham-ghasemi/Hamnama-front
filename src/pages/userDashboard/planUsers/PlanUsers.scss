@@ -2,6 +2,7 @@
 @use "../../../styles/abstracts/variables.light" as light;
 @use "../../../styles/abstracts/mixins" as mx;
 @use "sass:color";
+@use "../_dash" as dash;
 
 .plan-users {
   @include mx.flex-center;
@@ -27,8 +28,7 @@
     }
 
     &__card {
-      border-radius: 17px;
-      background-color: color.adjust(dark.$color-light-gray, $alpha: -0.94);
+      @include dash.row(17px);
       height: 271px;
       width: 196px;
       padding: 24px 16px;
@@ -41,9 +41,13 @@
         box-shadow ease 200ms;
 
       @include mx.light {
-        background-color: light.$color-card-bg;
+        background: light.$color-card-bg;
         outline: light.$card-outline;
         box-shadow: 0 3px 6px 0 color.adjust(light.$color-black, $alpha: -0.92);
+      }
+
+      &:not(&--add):hover {
+        @include dash.row-hover;
       }
 
       // Responsive adjustments for mobile devices
@@ -84,8 +88,13 @@
           font-weight: 800;
           height: 60px;
           width: 60px;
-          background-color: dark.$color-light-gray;
-          color: dark.$color-dark-gray;
+          background: linear-gradient(
+            160deg,
+            rgba(224, 163, 64, 0.9) 0%,
+            rgba(208, 78, 47, 0.9) 100%
+          );
+          color: #fff;
+          box-shadow: 0 10px 20px -14px rgba(208, 78, 47, 0.9);
           border-radius: 100%;
           @include mx.flex-center;
 
@@ -166,7 +175,8 @@
       &__add-icon {
         height: 61px;
         width: 61px;
-        background-color: color.adjust(#611168, $alpha: -0.7);
+        background-color: rgba(208, 78, 47, 0.24);
+        color: color.adjust(dark.$color-yellow, $lightness: 6%);
         border-radius: 100%;
         @include mx.flex-center;
         font-size: 28px;
@@ -201,8 +211,8 @@
       }
 
       &--add {
-        transition: background-color ease 200ms;
         cursor: pointer;
+        border-style: dashed;
 
         @include mx.max-w(480px) {
           justify-content: center;
@@ -219,7 +229,7 @@
 
           .plan-users__cards__card__add-icon {
             transform: scale(1.08);
-            background-color: color.adjust(#611168, $alpha: -0.6);
+            background-color: rgba(208, 78, 47, 0.36);
 
             @include mx.light {
               background-color: color.adjust(

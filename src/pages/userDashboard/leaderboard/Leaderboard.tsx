@@ -5,7 +5,7 @@ import api from "../../../lib/axiosConfig";
 import { PiUserFill } from "react-icons/pi";
 
 const DEFAULT_AVATAR = "/assets/images/default-avatar.png";
-const API_BASE_URL = import.meta.env.VITE_BASE_URL || "";
+const API_BASE_URL = import.meta.env['VITE_BASE_URL'] || "";
 
 export interface LeaderboardUser {
   id: string;

@@ -2,6 +2,7 @@
 @use "../../../styles/abstracts/variables.light" as light;
 @use "../../../styles//abstracts//mixins" as mx;
 @use "sass:color";
+@use "../_dash" as dash;
 
 .user-payments {
   @include mx.flex-center;
@@ -21,7 +22,7 @@
 
     &__header {
       @include mx.flex-center;
-      background-color: color.adjust(dark.$color-light-gray, $alpha: -0.75);
+      @include dash.headbar;
       justify-content: space-evenly;
       height: 97px;
       width: 100%;
@@ -60,15 +61,17 @@
 
       &__row {
         @include mx.flex-center;
+        @include dash.row(17px);
         justify-content: space-evenly;
-        background-color: color.adjust(dark.$color-light-gray, $alpha: -0.87);
         height: 97px;
         width: 100%;
-        border-radius: 17px;
+
+        &:hover {
+          @include dash.row-hover;
+        }
 
         @include mx.light {
-          background-color: light.$color-card-bg;
-          box-shadow: none;
+          background: light.$color-card-bg;
         }
 
         // Card Transformation on Mobile

@@ -2,6 +2,7 @@
 @use "../../../styles/abstracts/variables.light" as light;
 @use "../../../styles/abstracts/mixins" as mx;
 @use "sass:color";
+@use "../_dash" as dash;
 
 .user-tickets {
   @include mx.flex-center;
@@ -18,12 +19,11 @@
 
     &__header {
       @include mx.flex-center;
+      @include dash.headbar;
       justify-content: space-evenly;
 
       width: 100%;
       height: 97px;
-
-      background-color: color.adjust(dark.$color-light-gray, $alpha: -0.75);
       border-radius: 17px;
 
       @include mx.light {
@@ -59,29 +59,22 @@
 
       &__row {
         @include mx.flex-center;
+        @include dash.row(17px);
         justify-content: space-evenly;
 
         width: 100%;
         height: 97px;
-
-        background-color: color.adjust(dark.$color-light-gray, $alpha: -0.87);
-        border-radius: 17px;
-
         cursor: pointer;
-        transition: 0.2s;
 
         @include mx.light {
-          background-color: light.$color-card-bg;
+          background: light.$color-card-bg;
         }
 
         &:hover {
-          background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
+          @include dash.row-hover;
 
-          @include mx.light {
-            background-color: color.adjust(
-              light.$color-card-bg,
-              $lightness: -4%
-            );
+          .user-tickets__list-container__body-wrapper__row__cell.icon {
+            transform: translateX(-3px);
           }
         }
 
@@ -181,6 +174,12 @@
           &.icon {
             width: 40px;
             font-size: 40px;
+            color: dark.$color-primary;
+            transition: transform mx.$dur-fast mx.$ease-out-soft;
+
+            @include mx.light {
+              color: light.$color-primary;
+            }
 
             @include mx.max-w(768px) {
               position: absolute;
@@ -203,19 +202,12 @@
     border-radius: 250px;
     height: 62px;
     width: 239px;
-    background-color: color.adjust(dark.$color-white, $alpha: -0.68);
+    @include dash.primary-btn;
     font-size: 18px;
     font-weight: 700;
-    transition: background-color 200ms ease;
-    border: none;
     outline: none;
     cursor: pointer;
     padding: 12px;
-
-    @include mx.light {
-      background-color: light.$color-primary-bg;
-      color: light.$color-white;
-    }
 
     // Full width on mobile
     @include mx.max-w(768px) {
@@ -226,6 +218,8 @@
     > p {
       flex: 1;
       text-align: center;
+      position: relative;
+      z-index: 1;
     }
 
     > span {
@@ -233,21 +227,15 @@
       width: 40px;
       border-radius: 50%;
       @include mx.flex-center;
-      background-color: color.adjust(dark.$color-light-gray, $alpha: -0.57);
+      background-color: rgba(255, 255, 255, 0.2);
       font-size: 27px;
       stroke-width: 8px;
+      position: relative;
+      z-index: 1;
 
       @include mx.light {
-        background-color: light.$color-primary-bg-hover;
+        background-color: rgba(255, 255, 255, 0.22);
         color: light.$color-white;
-      }
-    }
-
-    &:hover {
-      background-color: color.adjust(dark.$color-white, $alpha: -0.6);
-
-      @include mx.light {
-        background-color: light.$color-primary-bg-hover;
       }
     }
   }
@@ -285,12 +273,21 @@
   &__modal-content {
     width: 550px;
     max-width: 90%;
-    background-color: color.adjust(dark.$color-dark-gray, $alpha: -0.6);
-    border: 1px solid color.adjust(dark.$color-white, $alpha: -0.8);
+    position: relative;
+    overflow: hidden;
     border-radius: 26px;
-    padding: 30px;
+    padding: 34px 30px 30px;
     direction: rtl;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    @include mx.cinema-surface;
+    @include mx.ambient-shadow(1.1);
+
+    &::before {
+      @include mx.gradient-border(26px);
+    }
+
+    &::after {
+      @include dash.sprocket-strip(12px);
+    }
 
     transform: scale(0.9) translateY(20px);
     opacity: 0;
@@ -299,9 +296,8 @@
       opacity 300ms ease;
 
     @include mx.light {
-      background-color: light.$color-card-bg;
-      border: 1px solid light.$color-light-gray;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      background: light.$color-card-bg;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     }
 
     // Slight padding reduction on mobile
@@ -377,28 +373,12 @@
         > input,
         > textarea {
           width: 100%;
-          background-color: color.adjust(dark.$color-white, $alpha: -0.93);
-          border: 1px solid color.adjust(dark.$color-white, $alpha: -0.75);
+          @include dash.field;
           border-radius: 14px;
           padding: 14px;
-          color: dark.$color-white;
+          font-family: inherit;
           font-size: 16px;
           outline: none;
-          transition: border-color 200ms ease;
-
-          @include mx.light {
-            background-color: light.$color-white;
-            border: 1px solid light.$color-light-gray;
-            color: light.$color-black;
-          }
-
-          &:focus {
-            border-color: color.adjust(dark.$color-white, $alpha: -0.4);
-
-            @include mx.light {
-              border-color: light.$color-primary;
-            }
-          }
         }
 
         > textarea {
