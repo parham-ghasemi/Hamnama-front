@@ -1,144 +1,113 @@
 @use "../../../../styles/abstracts/mixins" as mx;
 
 .room-settings-modal {
-  width: 400px;
-  max-width: 95%; /* Ensures the modal doesn't overflow on small mobile screens */
-  border-radius: 26px;
-  background-color: var(--modal-bg);
+  width: 420px;
+  max-width: 95%;
+  border-radius: 20px;
+  background: var(--modal-bg);
+  color: var(--modal-text);
   opacity: 0;
-  transition: opacity ease 200ms;
+  transform: translateY(10px) scale(0.98);
+  transition:
+    opacity 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
   overflow: hidden;
-  margin: 0 auto;
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.05) inset,
+    0 24px 48px -16px rgba(0, 0, 0, 0.6);
 
   @include mx.max-w(480px) {
-    border-radius: 18px;
+    border-radius: 16px;
   }
 
   &.open {
     opacity: 1;
+    transform: translateY(0) scale(1);
   }
 
   &__head {
     width: 100%;
-    height: 162px;
-    background-color: var(--modal-head-bg);
-    @include mx.flex-center;
-    gap: 9px;
+    padding: 22px 24px;
+    background: var(--modal-head-bg);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border-subtle);
 
     @include mx.max-w(480px) {
-      height: 100px;
+      padding: 16px 18px;
     }
 
     > span {
-      font-size: 31px;
+      font-size: 20px;
       font-weight: 800;
-
-      @include mx.max-w(480px) {
-        font-size: 24px;
-      }
     }
 
     > svg {
-      font-size: 49px;
-
-      @include mx.max-w(480px) {
-        font-size: 36px;
-      }
+      font-size: 24px;
+      color: var(--accent);
     }
   }
 
   &__body {
-    padding: 22px 27px;
+    padding: 22px 22px 26px;
     display: flex;
     flex-direction: column;
-    background-color: var(--modal-body-bg);
-    gap: 32px;
+    gap: 28px;
+    background: var(--modal-body-bg);
 
     @include mx.max-w(480px) {
-      padding: 20px 16px;
-      gap: 24px;
+      padding: 18px 14px 22px;
+      gap: 22px;
     }
 
     &__row {
       > h5 {
-        font-size: 24px;
-        font-weight: 900;
+        font-size: 14px;
+        font-weight: 700;
         display: flex;
         gap: 10px;
-        margin-bottom: 16px;
+        margin-bottom: 12px;
         color: var(--modal-text);
-        align-items: center; /* Aligns text perfectly with the pseudo-element */
+        align-items: center;
+        opacity: 0.85;
+        letter-spacing: 0.01em;
 
         @include mx.max-w(480px) {
-          font-size: 18px;
-          margin-bottom: 12px;
+          font-size: 13px;
+          margin-bottom: 10px;
         }
 
         &::before {
           content: "";
-          height: 37px;
-          width: 6px;
-          border-radius: 7px 0 0 7px;
-          background-color: var(--set-row-border);
+          height: 14px;
+          width: 3px;
+          border-radius: 2px;
+          background: var(--set-row-border);
           display: block;
-
-          @include mx.max-w(480px) {
-            height: 28px;
-          }
+          flex-shrink: 0;
         }
       }
 
       &__items {
         display: flex;
-        justify-content: space-between;
+        gap: 10px;
 
-        &--2 {
-          gap: 28px;
-
-          @include mx.max-w(480px) {
-            gap: 12px;
-          }
-
-          .room-settings-modal__body__row__items__item {
-            font-size: 24px;
-            font-weight: 900;
-
-            @include mx.max-w(480px) {
-              font-size: 16px;
-            }
-
-            &:first-of-type {
-              background-color: var(--set-item-1);
-            }
-            &:last-of-type {
-              background-color: var(--set-item-2);
-            }
-          }
+        @include mx.max-w(480px) {
+          gap: 8px;
         }
+
+        &--2,
         &--3 {
-          gap: 17px;
-
-          @include mx.max-w(480px) {
-            gap: 8px; /* Tighter gap so all 3 buttons fit on mobile */
-          }
-
           .room-settings-modal__body__row__items__item {
-            font-size: 20px;
-            font-weight: 500;
+            background: var(--set-item-bg);
+            border: 1.5px solid transparent;
 
-            @include mx.max-w(480px) {
-              font-size: 13px; /* Smaller font to accommodate narrower columns */
-              padding: 0 4px;
-            }
-
-            &:first-of-type {
-              background-color: var(--set-item-3);
-            }
-            &:nth-of-type(2) {
-              background-color: var(--set-item-4);
-            }
-            &:last-of-type {
-              background-color: var(--set-item-5);
+            &.active {
+              background: var(--set-item-active-bg);
+              border-color: var(--set-item-active-border);
+              box-shadow: 0 0 0 1px var(--set-item-active-border),
+                0 4px 16px -4px var(--accent-glow);
             }
           }
         }
@@ -146,31 +115,66 @@
         &__item {
           width: 100%;
           flex: 1;
-          height: 107px;
-          border-radius: 12px;
-          @include mx.flex-center;
+          min-height: 88px;
+          border-radius: 14px;
+          display: flex;
           flex-direction: column;
-          gap: 20px;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
           cursor: pointer;
-          transition: opacity 200ms ease;
-
-          /* Resets (Since some of your items are <button> tags and others are <div> tags) */
-          border: none;
+          transition:
+            background 180ms ease,
+            border-color 180ms ease,
+            box-shadow 180ms ease,
+            transform 160ms ease;
+          border: 1.5px solid transparent;
           color: inherit;
           font-family: inherit;
+          background: var(--set-item-bg);
+          padding: 12px 8px;
 
           @include mx.max-w(480px) {
-            height: 80px;
-            gap: 10px;
-            border-radius: 10px;
+            min-height: 72px;
+            gap: 8px;
+            border-radius: 12px;
+            padding: 10px 4px;
 
             svg {
-              font-size: 24px; /* Ensure icons shrink nicely on mobile */
+              font-size: 20px;
             }
           }
 
-          &:hover {
-            opacity: 0.9;
+          svg {
+            font-size: 22px;
+            opacity: 0.75;
+            transition: opacity 160ms ease, color 160ms ease;
+          }
+
+          span {
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0.8;
+          }
+
+          &.active {
+            svg {
+              opacity: 1;
+              color: var(--accent);
+            }
+            span {
+              opacity: 1;
+              font-weight: 700;
+            }
+          }
+
+          &:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
+          }
+
+          &:active {
+            transform: translateY(0);
           }
         }
       }

@@ -6,7 +6,7 @@
   max-height: 90vh; /* Keeps it inside viewport on small screens */
   display: flex;
   flex-direction: column;
-  border-radius: 26px;
+  border-radius: 18px;
   background-color: var(--modal-bg);
   opacity: 0;
   transition: opacity ease 200ms;
@@ -23,48 +23,36 @@
 
   &__head {
     width: 100%;
-    height: 162px;
+    height: auto;
+    padding: 22px 24px;
     flex-shrink: 0; /* Prevents header from shrinking when body scrolls */
     background-color: var(--modal-head-bg);
     @include mx.flex-center;
     gap: 9px;
+  }
 
-    @include mx.max-w(1080px) {
-      height: 120px;
-    }
+  > span {
+    font-size: 31px;
+    font-weight: 800;
 
     @include mx.max-w(768px) {
-      height: 100px;
-      gap: 6px;
+      font-size: 24px;
     }
 
     @include mx.max-w(480px) {
-      height: 80px;
+      font-size: 20px;
+    }
+  }
+
+  > svg {
+    font-size: 49px;
+
+    @include mx.max-w(768px) {
+      font-size: 38px;
     }
 
-    > span {
-      font-size: 31px;
-      font-weight: 800;
-
-      @include mx.max-w(768px) {
-        font-size: 24px;
-      }
-
-      @include mx.max-w(480px) {
-        font-size: 20px;
-      }
-    }
-
-    > svg {
-      font-size: 49px;
-
-      @include mx.max-w(768px) {
-        font-size: 38px;
-      }
-
-      @include mx.max-w(480px) {
-        font-size: 30px;
-      }
+    @include mx.max-w(480px) {
+      font-size: 30px;
     }
   }
 

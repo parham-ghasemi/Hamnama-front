@@ -1,46 +1,98 @@
 import './MediaTypeModal.scss';
-import clsx from "clsx"
-import { BsDisplay, BsLink45Deg } from "react-icons/bs"
-import { IoOptionsOutline, IoTvOutline } from "react-icons/io5"
-import { TbArchiveFilled } from 'react-icons/tb';
+import clsx from "clsx";
+import { BsLink45Deg } from "react-icons/bs";
+import { IoClose, IoTvOutline } from "react-icons/io5";
+import { TbArchiveFilled, TbPlayerPlay } from 'react-icons/tb';
 
-const MediaTypeModal = ({ openArchive, isOpen, closeModal, onShareScreen }: { isOpen: boolean, openArchive: () => void, closeModal: () => void, onShareScreen: () => void }) => {
+const MediaTypeModal = ({
+  openArchive,
+  isOpen,
+  closeModal,
+  onShareScreen,
+}: {
+  isOpen: boolean;
+  openArchive: () => void;
+  closeModal: () => void;
+  onShareScreen: () => void;
+}) => {
   const handleOpenArchive = () => {
-    closeModal()
-    openArchive()
-  }
+    closeModal();
+    openArchive();
+  };
 
   const handleShareScreen = () => {
-    closeModal()
-    onShareScreen()
-  }
+    closeModal();
+    onShareScreen();
+  };
 
   return (
-    <div className={clsx("media-type-modal", isOpen && 'open')}>
-      <div className="media-type-modal__head">
-        <span>حالت پخش رو انتخاب کنید</span>
-        <BsDisplay />
-        <IoOptionsOutline />
-      </div>
+    <div className={clsx("media-type-modal", isOpen && "open")}>
+      <header className="media-type-modal__head">
+        <div className="media-type-modal__head-left">
+          <TbPlayerPlay />
+          <div>
+            <strong>انتخاب منبع پخش</strong>
+            <span>چگونه می‌خواهید محتوا را تماشا کنید؟</span>
+          </div>
+        </div>
+        <button
+          type="button"
+          className="media-type-modal__close"
+          onClick={closeModal}
+          aria-label="بستن"
+        >
+          <IoClose />
+        </button>
+      </header>
 
       <div className="media-type-modal__body">
-        <div className="media-type-modal__body__card">
-          <span><BsLink45Deg /></span>
-          <p>پخش با لینک</p>
-        </div>
+        <button
+          type="button"
+          className="media-type-modal__option media-type-modal__option--link"
+          onClick={closeModal}
+        >
+          <div className="media-type-modal__option-icon">
+            <BsLink45Deg />
+          </div>
+          <div className="media-type-modal__option-text">
+            <strong>پخش با لینک</strong>
+            <span>لینک مستقیم ویدیو را وارد کنید</span>
+          </div>
+          <span className="media-type-modal__option-arrow">←</span>
+        </button>
 
-        <div className="media-type-modal__body__card" onClick={handleOpenArchive}>
-          <span><TbArchiveFilled /></span>
-          <p>آرشیو فیلم و سریال</p>
-        </div>
+        <button
+          type="button"
+          className="media-type-modal__option media-type-modal__option--archive"
+          onClick={handleOpenArchive}
+        >
+          <div className="media-type-modal__option-icon">
+            <TbArchiveFilled />
+          </div>
+          <div className="media-type-modal__option-text">
+            <strong>آرشیو فیلم و سریال</strong>
+            <span>از مجموعه کامل فیلم‌ها و سریال‌ها انتخاب کنید</span>
+          </div>
+          <span className="media-type-modal__option-arrow">←</span>
+        </button>
 
-        <div className="media-type-modal__body__card" onClick={handleShareScreen}>
-          <span><IoTvOutline /></span>
-          <p>اشتراک گذاری صفحه</p>
-        </div>
+        <button
+          type="button"
+          className="media-type-modal__option media-type-modal__option--screen"
+          onClick={handleShareScreen}
+        >
+          <div className="media-type-modal__option-icon">
+            <IoTvOutline />
+          </div>
+          <div className="media-type-modal__option-text">
+            <strong>اشتراک‌گذاری صفحه</strong>
+            <span>صفحه نمایش خود را با دیگران به اشتراک بگذارید</span>
+          </div>
+          <span className="media-type-modal__option-arrow">←</span>
+        </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MediaTypeModal
+export default MediaTypeModal;

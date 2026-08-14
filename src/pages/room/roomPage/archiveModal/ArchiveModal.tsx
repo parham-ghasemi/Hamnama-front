@@ -4,12 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import {
   TbArchiveFilled,
   TbArrowRight,
-  TbCheck,
   TbChevronLeft,
   TbChevronRight,
-  TbCode,
   TbDeviceTv,
-  TbExternalLink,
   TbInfoCircle,
   TbLink,
   TbLoader2,
@@ -38,14 +35,6 @@ const typeLabel = (type?: string) => {
   if (type === "series") return "سریال";
   if (type === "movie") return "فیلم";
   return type || "نامشخص";
-};
-
-const safeJson = (value: unknown) => {
-  try {
-    return JSON.stringify(value, null, 2);
-  } catch {
-    return String(value ?? "");
-  }
 };
 
 const clean = (value: unknown) => {
@@ -98,13 +87,6 @@ const MediaCard: React.FC<{
   </button>
 );
 
-const DataField: React.FC<{ label: string; value?: unknown; ltr?: boolean }> = ({ label, value, ltr }) => (
-  <div className="archive-field">
-    <span className="archive-field__label">{label}</span>
-    <span className={clsx("archive-field__value", ltr && "ltr")}>{clean(value)}</span>
-  </div>
-);
-
 const FileCard: React.FC<{
   file: MediaFileItem;
   onSelect: () => void;
@@ -112,41 +94,29 @@ const FileCard: React.FC<{
   <article className={clsx("archive-file", !file.valid && "archive-file--invalid")}>
     <div className="archive-file__topline">
       <div className="archive-file__badges">
-        {file.season != null && <span className="archive-badge">فصل {file.season}</span>}
-        {file.episode != null && <span className="archive-badge">قسمت {file.episode}</span>}
-        {file.quality_tags && <span className="archive-badge">{file.quality_tags}</span>}
+        {file.season != null && <span className="archive-badge archive-badge--season">فصل {file.season}</span>}
+        {file.episode != null && <span className="archive-badge archive-badge--season">قسمت {file.episode}</span>}
+        {file.quality_tags && <span className="archive-badge archive-badge--qual">{file.quality_tags}</span>}
         {file.version && <span className="archive-badge">{file.version}</span>}
         {file.release && <span className="archive-badge">{file.release}</span>}
-        <span className={clsx("archive-badge", file.valid ? "archive-badge--valid" : "archive-badge--invalid")}>
-          {file.valid ? "معتبر" : "نامعتبر"}
-        </span>
       </div>
 
-      <button type="button" className="archive-file__select" onClick={onSelect} disabled={!file.url}>
-        {file.valid ? <TbLink /> : <TbInfoCircle />}
+      <button type="button" className="archive-file__select" onClick={onSelect} disabled={!file.url || !file.valid}>
+        <TbLink />
         <span>انتخاب</span>
       </button>
     </div>
 
-    <div className="archive-file__filename" dir="ltr" title={file.filename}>
-      {file.filename || file.url}
-    </div>
-
-    <div className="archive-file__grid">
-      <DataField label="حجم" value={file.size} />
-      <DataField label="Content-Type" value={file.content_type} ltr />
-      <DataField label="HTTP Status" value={file.status} />
-      <DataField label="Season" value={file.season} />
-      <DataField label="Episode" value={file.episode} />
-      <DataField label="Quality Tags" value={file.quality_tags} />
-      <DataField label="Version" value={file.version} />
-      <DataField label="Release" value={file.release} />
-      <DataField label="URL" value={file.url} ltr />
-      <DataField label="Final URL" value={file.final_url} ltr />
-      <DataField label="Error" value={file.error} />
-    </div>
-
-    {file.error && <p className="archive-file__error">{file.error}</p>}
+    {(file.filename || file.size) && (
+      <div className="archive-file__meta-row">
+        {file.filename && (
+          <span className="archive-file__filename" dir="ltr" title={file.filename}>
+            {file.filename}
+          </span>
+        )}
+        {file.size && <span className="archive-file__size">{file.size}</span>}
+      </div>
+    )}
   </article>
 );
 
@@ -230,7 +200,7 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
           <TbArchiveFilled />
           <div>
             <strong>آرشیو فیلم و سریال</strong>
-            <span>تمام اطلاعات موجود، لینک‌ها و نسخه‌های قابل پخش</span>
+            <span>جستجو و انتخاب نسخه قابل پخش</span>
           </div>
         </div>
         <button type="button" className="archive-modal__close-btn" onClick={close} aria-label="بستن">
@@ -249,7 +219,7 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
             {detailQuery.isLoading ? (
               <div className="archive-modal__loading">
                 <TbLoader2 className="spinner" />
-                <span>در حال دریافت اطلاعات کامل...</span>
+                <span>در حال دریافت اطلاعات...</span>
               </div>
             ) : detail ? (
               <>
@@ -268,20 +238,31 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
                     <div className="archive-hero__badges">
                       <span className="archive-pill">{typeLabel(detail.type)}</span>
                       {detail.year && <span className="archive-pill">{detail.year}</span>}
-                      {detail.rating && <span className="archive-pill archive-pill--rating"><TbStarFilled /> {detail.rating}</span>}
-                      {detail.id && <span className="archive-pill archive-pill--mono">{detail.id}</span>}
+                      {detail.rating && (
+                        <span className="archive-pill archive-pill--rating">
+                          <TbStarFilled /> {detail.rating}
+                        </span>
+                      )}
                     </div>
                     <h1>{detail.title_en || detail.title_fa}</h1>
                     {detail.title_fa && detail.title_en && <h2>{detail.title_fa}</h2>}
                     <p className="archive-hero__plot">{clean(detail.plot || detail.omdb?.Plot)}</p>
-                    <div className="archive-hero__quick">
-                      <DataField label="IMDb Votes" value={detail.votes} />
-                      <DataField label="Rated" value={detail.rated} />
-                      <DataField label="Released" value={detail.released} />
-                      <DataField label="Runtime" value={detail.runtime} />
-                      <DataField label="Genre" value={detail.genre} />
-                      <DataField label="Language" value={detail.language} />
+                    <div className="archive-hero__meta">
+                      {detail.runtime && <span>{detail.runtime}</span>}
+                      {detail.genre && <span>{detail.genre}</span>}
+                      {detail.language && <span>{detail.language}</span>}
+                      {detail.country && <span>{detail.country}</span>}
                     </div>
+                    {(detail.director || detail.actors) && (
+                      <div className="archive-hero__credits">
+                        {detail.director && detail.director !== "N/A" && (
+                          <p><strong>کارگردان:</strong> {detail.director}</p>
+                        )}
+                        {detail.actors && detail.actors !== "N/A" && (
+                          <p><strong>بازیگران:</strong> {detail.actors}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </section>
 
@@ -290,7 +271,7 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
                     <div className="archive-section__heading">
                       <div>
                         <span className="archive-section__eyebrow">پیشنهاد برای تماشا</span>
-                        <h3>{currentPlaying && !selectedId ? "بر اساس چیزی که الان در حال پخش است" : "مرتبط با این عنوان"}</h3>
+                        <h3>مرتبط با این عنوان</h3>
                       </div>
                     </div>
                     <div className="archive-related-grid">
@@ -304,98 +285,8 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
                 <section className="archive-section">
                   <div className="archive-section__heading">
                     <div>
-                      <span className="archive-section__eyebrow">اطلاعات اصلی</span>
-                      <h3>جزئیات اثر</h3>
-                    </div>
-                  </div>
-                  <div className="archive-fields-grid">
-                    <DataField label="IMDb ID" value={detail.id} ltr />
-                    <DataField label="Type" value={detail.type} />
-                    <DataField label="عنوان انگلیسی" value={detail.title_en} />
-                    <DataField label="عنوان فارسی" value={detail.title_fa} />
-                    <DataField label="Year" value={detail.year} />
-                    <DataField label="Rating" value={detail.rating} />
-                    <DataField label="Votes" value={detail.votes} />
-                    <DataField label="Rated" value={detail.rated} />
-                    <DataField label="Released" value={detail.released} />
-                    <DataField label="Runtime" value={detail.runtime} />
-                    <DataField label="Genre" value={detail.genre} />
-                    <DataField label="Director" value={detail.director} />
-                    <DataField label="Writer" value={detail.writer} />
-                    <DataField label="Actors" value={detail.actors} />
-                    <DataField label="Language" value={detail.language} />
-                    <DataField label="Country" value={detail.country} />
-                    <DataField label="Awards" value={detail.awards} />
-                    <DataField label="Metascore" value={detail.metascore} />
-                    <DataField label="Box Office" value={detail.box_office} />
-                    <DataField label="IMDb Rating" value={detail.imdb_rating} />
-                    <DataField label="IMDb Votes" value={detail.imdb_votes} />
-                    <DataField label="Poster" value={detail.poster} ltr />
-                    <DataField label="Plot" value={detail.plot} />
-                  </div>
-                </section>
-
-                <section className="archive-section">
-                  <div className="archive-section__heading">
-                    <div>
-                      <span className="archive-section__eyebrow">OMDb</span>
-                      <h3>پاسخ کامل OMDb</h3>
-                    </div>
-                  </div>
-                  {detail.omdb ? (
-                    <div className="archive-fields-grid">
-                      <DataField label="Title" value={detail.omdb.Title} />
-                      <DataField label="Year" value={detail.omdb.Year} />
-                      <DataField label="Rated" value={detail.omdb.Rated} />
-                      <DataField label="Released" value={detail.omdb.Released} />
-                      <DataField label="Runtime" value={detail.omdb.Runtime} />
-                      <DataField label="Genre" value={detail.omdb.Genre} />
-                      <DataField label="Director" value={detail.omdb.Director} />
-                      <DataField label="Writer" value={detail.omdb.Writer} />
-                      <DataField label="Actors" value={detail.omdb.Actors} />
-                      <DataField label="Plot" value={detail.omdb.Plot} />
-                      <DataField label="Language" value={detail.omdb.Language} />
-                      <DataField label="Country" value={detail.omdb.Country} />
-                      <DataField label="Awards" value={detail.omdb.Awards} />
-                      <DataField label="Poster" value={detail.omdb.Poster} ltr />
-                      <DataField label="Metascore" value={detail.omdb.Metascore} />
-                      <DataField label="IMDb Rating" value={detail.omdb.imdbRating} />
-                      <DataField label="IMDb Votes" value={detail.omdb.imdbVotes} />
-                      <DataField label="IMDb ID" value={detail.omdb.imdbID} ltr />
-                      <DataField label="Type" value={detail.omdb.Type} />
-                      <DataField label="Box Office" value={detail.omdb.BoxOffice} />
-                      <DataField label="Response" value={detail.omdb.Response} />
-                      <DataField label="Error" value={detail.omdb.Error} />
-                    </div>
-                  ) : (
-                    <p className="archive-modal__empty archive-modal__empty--inline">اطلاعات OMDb برای این عنوان موجود نیست.</p>
-                  )}
-                </section>
-
-                <section className="archive-section">
-                  <div className="archive-section__heading">
-                    <div>
-                      <span className="archive-section__eyebrow">Source data</span>
-                      <h3>Links و Related خام</h3>
-                    </div>
-                  </div>
-                  <div className="archive-json-grid">
-                    <div className="archive-json-card">
-                      <div className="archive-json-card__head"><TbCode /> links</div>
-                      <pre>{safeJson(detail.links)}</pre>
-                    </div>
-                    <div className="archive-json-card">
-                      <div className="archive-json-card__head"><TbCode /> related</div>
-                      <pre>{safeJson(detail.related)}</pre>
-                    </div>
-                  </div>
-                </section>
-
-                <section className="archive-section">
-                  <div className="archive-section__heading">
-                    <div>
-                      <span className="archive-section__eyebrow">Files</span>
-                      <h3>{detail.files?.length ?? 0} فایل موجود</h3>
+                      <span className="archive-section__eyebrow">نسخه‌های قابل پخش</span>
+                      <h3>{detail.files?.length ?? 0} فایل</h3>
                     </div>
                   </div>
                   {detail.files?.length ? (
@@ -405,7 +296,9 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
                       ))}
                     </div>
                   ) : (
-                    <p className="archive-modal__empty archive-modal__empty--inline">هیچ فایل قابل انتخابی برای این عنوان ثبت نشده است.</p>
+                    <p className="archive-modal__empty archive-modal__empty--inline">
+                      هیچ فایل قابل انتخابی برای این عنوان ثبت نشده است.
+                    </p>
                   )}
                 </section>
               </>
@@ -449,9 +342,8 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
                 <div className="archive-section__heading">
                   <div>
                     <span className="archive-section__eyebrow">پیشنهاد هوشمند</span>
-                    <h3>چون این عنوان در حال پخش است</h3>
+                    <h3>بر اساس محتوای در حال پخش</h3>
                   </div>
-                  <span className="archive-context-url" dir="ltr">{currentPlaying}</span>
                 </div>
                 <div className="archive-related-grid archive-related-grid--list">
                   {contextRelated.map((item) => (
@@ -482,7 +374,9 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
                     <button type="button" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
                       <TbChevronRight />
                     </button>
-                    <span>صفحه {page.toLocaleString("fa-IR")} از {totalPages.toLocaleString("fa-IR")}</span>
+                    <span>
+                      صفحه {page.toLocaleString("fa-IR")} از {totalPages.toLocaleString("fa-IR")}
+                    </span>
                     <button type="button" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
                       <TbChevronLeft />
                     </button>
