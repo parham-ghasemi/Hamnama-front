@@ -1350,6 +1350,7 @@ const RoomPage = () => {
               closeModal={() => setArchiveModalOpen(false)}
               setLink={setLink}
               setQuality={setCurrentQuality}
+              currentPlaying={roomState.currently_playing}
             />
           </div>
         )}
