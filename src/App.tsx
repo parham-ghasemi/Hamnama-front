@@ -1,4 +1,3 @@
-import { Toaster } from "sonner";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 // import Home from "./pages/home/Home"
@@ -14,7 +13,6 @@ import Tickets from "./pages/userDashboard/tickets/Tickets";
 import TicketChat from "./pages/userDashboard/tickets/ticketChat/TicketChat";
 import Leaderboard from "./pages/userDashboard/leaderboard/Leaderboard";
 import Join from "./pages/room/join/Join";
-import { useTheme } from "./context/ThemeContext";
 import PlanUsers from "./pages/userDashboard/planUsers/PlanUsers";
 import { AuthProvider } from "./context/AuthContext";
 import RoomPage from "./pages/room/roomPage/RoomPage";
@@ -23,12 +21,13 @@ import AdminRoute from "./components/adminRoute/AdminRoute";
 import { AdminDashboard, AdminTickets, AdminUsers, AdminRooms, AdminSettings } from "./pages/admin";
 import { ConfirmationModalProvider } from "./context/ConfirmModalContext/ConfirmaModalContext";
 import HomeV2 from "./pages/homev2/HomeV2";
+import NotFound from "./components/notFound/NotFound";
+import { Toaster } from "./components/toast";
 
 const queryClient = new QueryClient({});
 
 
 function App() {
-  const { isLight } = useTheme()
 
   return (
     <AuthProvider>
@@ -37,7 +36,7 @@ function App() {
           <QueryClientProvider client={queryClient}>
             <BrowserRouter>
               <ScrollToTop />
-              <Toaster position="top-right" theme={isLight ? "light" : "dark"} />
+              <Toaster position="top-right" />
               <Routes>
 
 
@@ -57,7 +56,7 @@ function App() {
                   {/* <Route path="homev2" element={<HomeV2 />} /> */}
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/plan-details" element={<PlanDetails />} />
-                  <Route path="*" element={<p className="text-6xl font-black text-center my-60">THIS PAGE WAS NOT FOUND!</p>} />
+                  <Route path="*" element={<NotFound />} />
                 </Route>
 
                 <Route path="admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>

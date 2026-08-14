@@ -7,7 +7,7 @@ import {
   FiMessageSquare,
   FiMail,
 } from 'react-icons/fi';
-import { toast } from 'sonner';
+import { toast } from '../../../components/toast';
 import { adminApi } from '../../../apiCalls/adminApi';
 import './Tickets.scss';
 

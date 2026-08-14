@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FiArchive, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
-import { toast } from 'sonner';
+import { toast } from '../../../components/toast';
 import { useQuery } from '@tanstack/react-query';
 import { adminApi } from '../../../apiCalls/adminApi';
 import './Settings.scss';

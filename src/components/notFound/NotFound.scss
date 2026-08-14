@@ -1,0 +1,503 @@
+@use "../../styles/abstracts/variables" as dark;
+@use "../../styles/abstracts/variables.light" as light;
+@use "../../styles/abstracts/mixins" as mx;
+@use "sass:color";
+
+.not-found {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  padding: 40px 16px;
+  box-sizing: border-box;
+  @include mx.flex-center;
+
+  // Theme tokens consumed by the SVG mark, so one asset serves both modes.
+  --nf-accent: #{dark.$color-primary};
+  --nf-strip-top: rgba(255, 255, 255, 0.09);
+  --nf-strip-bottom: rgba(255, 255, 255, 0.03);
+  --nf-frame: rgba(10, 9, 9, 0.55);
+  --nf-edge: rgba(255, 255, 255, 0.16);
+  --nf-hole: rgba(255, 255, 255, 0.5);
+  --nf-digit: #{dark.$color-white};
+
+  --nf-spot-x: 50%;
+  --nf-spot-y: 0%;
+  --nf-tilt-x: 0deg;
+  --nf-tilt-y: 0deg;
+  --nf-shift: 0px;
+
+  @include mx.light {
+    --nf-accent: #{light.$color-primary};
+    --nf-strip-top: #ffffff;
+    --nf-strip-bottom: #f1eef1;
+    --nf-frame: #ffffff;
+    --nf-edge: rgba(9, 9, 9, 0.14);
+    --nf-hole: rgba(9, 9, 9, 0.22);
+    --nf-digit: #{light.$color-black};
+  }
+
+  // ---------------------------------------------------------------- ambience
+  &__blob {
+    @include mx.background-blob(520px, 520px);
+
+    &--one {
+      top: -160px;
+      left: -140px;
+    }
+
+    &--two {
+      bottom: -200px;
+      right: -160px;
+      background: dark.$color-yellow;
+      opacity: 6%;
+    }
+  }
+
+  &__grain {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.55;
+    background: repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.035) 0 1px,
+      transparent 1px 4px
+    );
+
+    @include mx.light {
+      display: none;
+    }
+  }
+
+  // -------------------------------------------------------------------- card
+  &__card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    width: 100%;
+    max-width: 640px;
+    padding: 44px 36px 30px;
+    box-sizing: border-box;
+    border-radius: 26px;
+    text-align: center;
+
+    @include mx.cinema-surface;
+    @include mx.ambient-shadow(1);
+
+    transform: perspective(1100px) rotateX(var(--nf-tilt-x))
+      rotateY(var(--nf-tilt-y));
+    transform-style: preserve-3d;
+    will-change: transform;
+
+    opacity: 0;
+    translate: 0 14px;
+    transition:
+      opacity mx.$dur-slow mx.$ease-out-soft,
+      translate mx.$dur-slow mx.$ease-out-soft;
+
+    &::before {
+      @include mx.gradient-border(26px);
+      z-index: 4;
+    }
+
+    @include mx.light {
+      &::before {
+        @include mx.gradient-border(
+          26px,
+          rgba(139, 91, 130, 0.3),
+          rgba(0, 0, 0, 0.04)
+        );
+      }
+    }
+
+    @include mx.max-w(768px) {
+      padding: 32px 20px 24px;
+      border-radius: 20px;
+
+      &::before {
+        border-radius: 20px;
+      }
+    }
+
+    @include mx.reduced-motion {
+      transform: none;
+      transition: none;
+    }
+  }
+
+  &--ready &__card {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  /// Projector spotlight that follows the pointer across the card.
+  &__spot {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      420px 320px at var(--nf-spot-x) var(--nf-spot-y),
+      rgba(208, 78, 47, 0.22) 0%,
+      rgba(224, 163, 64, 0.07) 40%,
+      transparent 70%
+    );
+    transition: background-position 120ms linear;
+
+    @include mx.light {
+      background: radial-gradient(
+        420px 320px at var(--nf-spot-x) var(--nf-spot-y),
+        rgba(139, 91, 130, 0.16) 0%,
+        transparent 68%
+      );
+    }
+  }
+
+  // -------------------------------------------------------------------- mark
+  &__mark {
+    position: relative;
+    z-index: 1;
+    margin: 0 auto 22px;
+    max-width: 420px;
+    transform: translateX(var(--nf-shift));
+
+    &__svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.55));
+
+      @include mx.light {
+        filter: drop-shadow(0 10px 22px rgba(9, 9, 9, 0.18));
+      }
+    }
+
+    &__glow {
+      position: absolute;
+      inset: -30% -10%;
+      z-index: -1;
+      pointer-events: none;
+      background: radial-gradient(
+        circle,
+        rgba(208, 78, 47, 0.3) 0%,
+        transparent 62%
+      );
+      filter: blur(6px);
+      animation: not-found-pulse 4.5s ease-in-out infinite;
+
+      @include mx.light {
+        background: radial-gradient(
+          circle,
+          rgba(139, 91, 130, 0.2) 0%,
+          transparent 62%
+        );
+      }
+
+      @include mx.reduced-motion {
+        animation: none;
+      }
+    }
+
+    &__digit {
+      fill: var(--nf-digit);
+      font-size: 66px;
+      font-weight: 800;
+      letter-spacing: -2px;
+    }
+
+    &__reel {
+      animation: not-found-reel 9s linear infinite;
+
+      @include mx.reduced-motion {
+        animation: none;
+      }
+    }
+
+    &__sprockets > rect {
+      animation: not-found-sprocket 2.4s ease-in-out infinite;
+
+      @include mx.reduced-motion {
+        animation: none;
+      }
+    }
+
+    &__beam {
+      animation: not-found-flicker 5s steps(1, end) infinite;
+      mix-blend-mode: screen;
+
+      @include mx.light {
+        mix-blend-mode: multiply;
+        opacity: 0.5;
+      }
+
+      @include mx.reduced-motion {
+        animation: none;
+      }
+    }
+  }
+
+  &__card:hover &__mark__reel {
+    animation-duration: 2.4s;
+  }
+
+  // -------------------------------------------------------------------- copy
+  &__title {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    font-size: 34px;
+    font-weight: 800;
+
+    > span {
+      color: dark.$color-primary;
+
+      @include mx.light {
+        color: light.$color-primary;
+      }
+    }
+
+    @include mx.max-w(768px) {
+      font-size: 25px;
+    }
+  }
+
+  &__subtitle {
+    position: relative;
+    z-index: 1;
+    margin: 12px auto 0;
+    max-width: 460px;
+    font-size: 15.5px;
+    line-height: 2;
+    color: dark.$color-gray;
+
+    @include mx.light {
+      color: light.$color-dark-gray;
+    }
+
+    @include mx.max-w(768px) {
+      font-size: 13.5px;
+      line-height: 1.9;
+    }
+  }
+
+  // ----------------------------------------------------------------- actions
+  &__actions {
+    position: relative;
+    z-index: 1;
+    margin-top: 26px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+
+    &__icon {
+      display: inline-flex;
+      font-size: 19px;
+    }
+
+    &__label {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    &__primary,
+    &__ghost {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 12px 22px;
+      border-radius: 14px;
+      cursor: pointer;
+      border: none;
+      transition:
+        transform mx.$dur-fast mx.$ease-out-soft,
+        box-shadow mx.$dur-base mx.$ease-out-soft,
+        background-color mx.$dur-base ease,
+        color mx.$dur-base ease;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+
+      &:focus-visible {
+        outline: 2px solid dark.$color-primary;
+        outline-offset: 3px;
+      }
+
+      @include mx.reduced-motion {
+        transition: none;
+      }
+    }
+
+    &__primary {
+      background: dark.$color-primary-bg;
+      color: dark.$color-white;
+      box-shadow: 0 14px 30px -16px rgba(208, 78, 47, 0.9);
+
+      &:hover {
+        background: dark.$color-primary-bg-hover;
+        box-shadow: 0 18px 38px -14px rgba(208, 78, 47, 1);
+      }
+
+      @include mx.light {
+        background: light.$color-primary-bg;
+        color: light.$color-white;
+        box-shadow: 0 12px 26px -16px rgba(104, 61, 96, 0.9);
+
+        &:hover {
+          background: light.$color-primary-bg-hover;
+        }
+      }
+    }
+
+    &__sheen {
+      position: absolute;
+      inset: -50% -20%;
+      z-index: -1;
+      pointer-events: none;
+      background: linear-gradient(
+        100deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.28) 50%,
+        transparent 60%
+      );
+      transform: translateX(-80%);
+      transition: transform 900ms mx.$ease-out-soft;
+    }
+
+    &__primary:hover &__sheen,
+    &__primary:hover .not-found__actions__sheen {
+      transform: translateX(80%);
+    }
+
+    &__ghost {
+      background: rgba(255, 255, 255, 0.05);
+      color: dark.$color-white;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: dark.$color-primary;
+      }
+
+      @include mx.light {
+        background: rgba(9, 9, 9, 0.04);
+        color: light.$color-black;
+        box-shadow: inset 0 0 0 1px rgba(9, 9, 9, 0.1);
+
+        &:hover {
+          background: rgba(9, 9, 9, 0.07);
+          color: light.$color-primary;
+        }
+      }
+    }
+  }
+
+  // -------------------------------------------------------------- error code
+  &__code {
+    position: relative;
+    z-index: 1;
+    margin-top: 26px;
+    padding-top: 16px;
+    direction: ltr;
+    font-size: 11.5px;
+    letter-spacing: 2px;
+    color: dark.$color-dark-gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    @include mx.sprockets(4px, 11px, rgba(255, 255, 255, 0.14));
+    background-position: top center;
+    background-size: 11px 11px;
+
+    @include mx.light {
+      color: light.$color-gray;
+      @include mx.sprockets(4px, 11px, rgba(9, 9, 9, 0.14));
+      background-position: top center;
+      background-size: 11px 11px;
+    }
+
+    &__dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: dark.$color-red;
+      box-shadow: 0 0 10px rgba(178, 56, 64, 0.9);
+      animation: not-found-blink 1.6s ease-in-out infinite;
+
+      @include mx.reduced-motion {
+        animation: none;
+      }
+    }
+  }
+}
+
+@keyframes not-found-reel {
+  from {
+    transform: translate(50%, 50%) rotate(0deg);
+  }
+  to {
+    transform: translate(50%, 50%) rotate(360deg);
+  }
+}
+
+@keyframes not-found-sprocket {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes not-found-flicker {
+  0%,
+  92%,
+  100% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0.35;
+  }
+  95% {
+    opacity: 0.9;
+  }
+  97% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes not-found-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes not-found-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}

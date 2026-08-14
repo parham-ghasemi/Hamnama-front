@@ -2,7 +2,7 @@ import { useState } from 'react';
 import './RegisterInfo.scss';
 import { Link } from 'react-router-dom';
 import { PiEyeBold, PiEyeSlashBold, PiUserFill, PiSpinnerGapBold, PiIdentificationBadgeFill } from 'react-icons/pi';
-import { toast } from 'sonner';
+import { toast } from '../../../components/toast';
 import clsx from 'clsx';
 
 interface RegisterInfoProps {

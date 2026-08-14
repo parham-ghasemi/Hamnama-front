@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { PiCameraLight } from 'react-icons/pi';
 import { IoPencilSharp, IoClose, IoChevronDown, IoTrashOutline, IoImageOutline } from 'react-icons/io5';
-import { toast } from 'sonner';
+import { toast } from '../../../components/toast';
 import { AxiosError } from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import {

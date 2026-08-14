@@ -4,8 +4,8 @@ import { useAuth } from '../../../context/AuthContext';
 import clsx from 'clsx';
 import './UsernameDropdown.scss';
 import { PiUserFill } from 'react-icons/pi';
-import { toast } from 'sonner';
 import { useConfirmationModal } from '../../../context/ConfirmModalContext/ConfirmaModalContext';
+import { toast } from '../../toast';
 
 // Accept isOpen as a prop
 const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {

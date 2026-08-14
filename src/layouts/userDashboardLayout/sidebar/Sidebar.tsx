@@ -1,7 +1,7 @@
 import React from 'react';
 import './Sidebar.scss';
 import { useNavigate, useLocation } from "react-router-dom";
-import { toast } from 'sonner';
+import { toast } from '../../../components/toast';
 import { useAuth } from '../../../context/AuthContext';
 import { useConfirmationModal } from '../../../context/ConfirmModalContext/ConfirmaModalContext';
 

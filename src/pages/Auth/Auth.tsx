@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import { toast } from '../../components/toast';
 import api from '../../lib/axiosConfig'; // Adjust this import to where your axios config is saved
 
 import PhoneInput from './phoneInput/PhoneInput';

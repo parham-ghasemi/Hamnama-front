@@ -1,0 +1,501 @@
+@use "../../styles/abstracts/variables" as dark;
+@use "../../styles/abstracts/variables.light" as light;
+@use "../../styles/abstracts/mixins" as mx;
+@use "sass:color";
+
+.cn-toaster {
+  position: fixed;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: min(388px, calc(100vw - 32px));
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+
+  &--top-right {
+    top: 20px;
+    right: 20px;
+  }
+  &--top-left {
+    top: 20px;
+    left: 20px;
+  }
+  &--top-center {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  &--bottom-right {
+    bottom: 20px;
+    right: 20px;
+    flex-direction: column-reverse;
+  }
+  &--bottom-left {
+    bottom: 20px;
+    left: 20px;
+    flex-direction: column-reverse;
+  }
+  &--bottom-center {
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: column-reverse;
+  }
+
+  @include mx.max-w(480px) {
+    width: calc(100vw - 24px);
+    left: 12px;
+    right: 12px;
+    transform: none;
+  }
+}
+
+.cn-toast {
+  --cn-accent: #{dark.$color-primary};
+  --cn-index: 0;
+  --cn-depth: 0;
+  --cn-swipe: 0px;
+  --cn-duration: 4000ms;
+  --cn-gap: 12px;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  color: dark.$color-white;
+  touch-action: pan-y;
+  cursor: grab;
+
+  @include mx.cinema-surface;
+  @include mx.ambient-shadow(0.8);
+  backdrop-filter: blur(14px);
+
+  // Collapsed stack: only the front toast is at full size; the rest peek out.
+  margin-top: calc(var(--cn-gap) * -1 + var(--cn-gap));
+  transform: translateY(calc(var(--cn-depth) * -6px))
+    scale(calc(1 - var(--cn-depth) * 0.045));
+  transform-origin: bottom center;
+  opacity: 0;
+  transition:
+    transform mx.$dur-base mx.$ease-out-soft,
+    opacity mx.$dur-base ease,
+    box-shadow mx.$dur-base ease,
+    margin mx.$dur-base mx.$ease-out-soft;
+
+  &:not(:first-child) {
+    margin-top: var(--cn-gap);
+  }
+
+  &::before {
+    @include mx.gradient-border(18px);
+    z-index: 4;
+  }
+
+  @include mx.light {
+    color: light.$color-black;
+    --cn-accent: #{light.$color-primary};
+    background: light.$color-card-bg;
+    box-shadow: 0 16px 34px -22px rgba(9, 9, 9, 0.45);
+
+    &::before {
+      @include mx.gradient-border(
+        18px,
+        rgba(139, 91, 130, 0.3),
+        rgba(0, 0, 0, 0.05)
+      );
+    }
+  }
+
+  // --------------------------------------------------------------- entrance
+  &--from-bottom {
+    translate: 0 22px;
+  }
+  &--from-top {
+    translate: 0 -22px;
+    transform-origin: top center;
+  }
+
+  &--in {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  &--out {
+    opacity: 0;
+    translate: 0 0;
+    transform: translateX(var(--cn-swipe)) scale(0.9);
+    filter: blur(2px);
+  }
+
+  &--hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  // Hovering the stack fans the toasts out to full size.
+  &--expanded {
+    transform: translateY(0) scale(1);
+    @include mx.ambient-shadow(1.15);
+  }
+
+  &--dragging {
+    cursor: grabbing;
+    transition: none;
+    transform: translateX(var(--cn-swipe));
+    opacity: calc(1 - min(1, (abs(var(--cn-swipe)) / 220)));
+  }
+
+  @include mx.reduced-motion {
+    transition: none;
+    translate: 0 0;
+    transform: none;
+  }
+
+  // ------------------------------------------------------------ accent tints
+  &--success {
+    --cn-accent: #{dark.$color-green};
+  }
+  &--error {
+    --cn-accent: #{dark.$color-red};
+  }
+  &--warning {
+    --cn-accent: #{dark.$color-yellow};
+  }
+  &--info {
+    --cn-accent: #{dark.$color-primary};
+  }
+  &--loading {
+    --cn-accent: #{dark.$color-light-gray};
+  }
+
+  @include mx.light {
+    &.cn-toast--success {
+      --cn-accent: #{light.$color-green};
+    }
+    &.cn-toast--error {
+      --cn-accent: #{light.$color-red};
+    }
+    &.cn-toast--warning {
+      --cn-accent: #{light.$color-yellow};
+    }
+    &.cn-toast--info {
+      --cn-accent: #{light.$color-primary};
+    }
+    &.cn-toast--loading {
+      --cn-accent: #{light.$color-dark-gray};
+    }
+  }
+
+  /// Accent hairline down the leading edge (RTL aware).
+  &__rail {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 10px;
+    bottom: 10px;
+    width: 3px;
+    border-radius: 3px;
+    background: var(--cn-accent);
+    box-shadow: 0 0 14px -2px var(--cn-accent);
+    z-index: 3;
+  }
+
+  /// Soft coloured wash behind the icon.
+  &__glow {
+    position: absolute;
+    inset-inline-start: -40px;
+    top: -60px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: var(--cn-accent);
+    opacity: 0.14;
+    filter: blur(38px);
+    pointer-events: none;
+    z-index: 0;
+
+    @include mx.light {
+      opacity: 0.16;
+    }
+  }
+
+  // -------------------------------------------------------------------- body
+  &__icon {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    @include mx.flex-center;
+    color: var(--cn-accent);
+    background: color-mix(in oklab, var(--cn-accent) 16%, transparent);
+    box-shadow: inset 0 0 0 1px
+      color-mix(in oklab, var(--cn-accent) 30%, transparent);
+  }
+
+  &__body {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-top: 2px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 700;
+    line-height: 1.7;
+    word-break: break-word;
+  }
+
+  &__description {
+    margin: 4px 0 0;
+    font-size: 12.75px;
+    line-height: 1.9;
+    color: dark.$color-gray;
+
+    @include mx.light {
+      color: light.$color-dark-gray;
+    }
+  }
+
+  &__custom {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  &__buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 11px;
+
+    &__action,
+    &__cancel {
+      border: none;
+      cursor: pointer;
+      border-radius: 10px;
+      padding: 7px 14px;
+      font-size: 12.5px;
+      font-weight: 700;
+      transition:
+        transform mx.$dur-fast mx.$ease-out-soft,
+        background-color mx.$dur-fast ease,
+        opacity mx.$dur-fast ease;
+
+      &:hover {
+        transform: translateY(-1px);
+      }
+
+      @include mx.reduced-motion {
+        transition: none;
+      }
+    }
+
+    &__action {
+      background: var(--cn-accent);
+      color: dark.$color-black;
+
+      @include mx.light {
+        color: light.$color-white;
+      }
+    }
+
+    &__cancel {
+      background: rgba(255, 255, 255, 0.08);
+      color: dark.$color-white;
+
+      @include mx.light {
+        background: rgba(9, 9, 9, 0.06);
+        color: light.$color-black;
+      }
+    }
+  }
+
+  &__close {
+    position: relative;
+    z-index: 2;
+    flex: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    background: transparent;
+    color: dark.$color-gray;
+    opacity: 0;
+    transform: scale(0.85);
+    transition:
+      opacity mx.$dur-fast ease,
+      transform mx.$dur-fast mx.$ease-out-soft,
+      background-color mx.$dur-fast ease,
+      color mx.$dur-fast ease;
+
+    > svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: dark.$color-white;
+    }
+
+    @include mx.light {
+      color: light.$color-gray;
+
+      &:hover {
+        background: rgba(9, 9, 9, 0.06);
+        color: light.$color-black;
+      }
+    }
+  }
+
+  &:hover &__close,
+  &__close:focus-visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  // Time-remaining hairline along the bottom edge.
+  &__progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    z-index: 3;
+    transform-origin: right center;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--cn-accent) 40%,
+      var(--cn-accent)
+    );
+    animation: cn-toast-progress var(--cn-duration) linear forwards;
+
+    &--paused {
+      animation-play-state: paused;
+    }
+
+    @include mx.reduced-motion {
+      animation: none;
+      opacity: 0.4;
+    }
+  }
+}
+
+// -------------------------------------------------------------------- icons
+.cn-toast-icon {
+  @include mx.flex-center;
+
+  > svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  &__check,
+  &__x {
+    stroke-dasharray: 26;
+    stroke-dashoffset: 26;
+    animation: cn-toast-draw 460ms mx.$ease-out-soft 120ms forwards;
+  }
+
+  &__clap {
+    transform-box: fill-box;
+    transform-origin: left bottom;
+    animation: cn-toast-clap 620ms mx.$ease-out-soft both;
+  }
+
+  &__bang {
+    animation: cn-toast-pop 420ms mx.$ease-out-soft both;
+  }
+
+  &__play {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: cn-toast-pop 380ms mx.$ease-out-soft both;
+  }
+
+  &__reel {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: cn-toast-spin 1.6s linear infinite;
+  }
+
+  @include mx.reduced-motion {
+    &__check,
+    &__x,
+    &__clap,
+    &__bang,
+    &__play,
+    &__reel {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+  }
+}
+
+@keyframes cn-toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes cn-toast-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes cn-toast-clap {
+  0% {
+    transform: rotate(-22deg);
+  }
+  60% {
+    transform: rotate(4deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes cn-toast-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes cn-toast-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
