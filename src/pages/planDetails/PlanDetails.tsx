@@ -1,3 +1,4 @@
+import { SEO } from '../../components/seo/SEO';
 import './PlanDetails.scss';
 import {
   PiCalendarMinus,
@@ -55,70 +56,78 @@ const PlanDetails = () => {
   ]
 
   return (
-    <div className='plan-details'>
-      {
-        plans.map((plan, ind) => (
-          <div className='plan-details__card' key={`homeplancards-${ind}`}>
-            <div className="plan-details__card__icon">
-              {plan.icon}
-            </div>
+    <>
+      <SEO
+        title="HamNama | Plans & Pricing"
+        description="Explore HamNama plans and find the right way to watch movies and series together with your friends."
+        canonical="https://hamnama.net/plan-details"
+      />
 
-            <h4 className='plan-details__card__title'>{plan.title}</h4>
+      <div className='plan-details'>
+        {
+          plans.map((plan, ind) => (
+            <div className='plan-details__card' key={`homeplancards-${ind}`}>
+              <div className="plan-details__card__icon">
+                {plan.icon}
+              </div>
 
-            <div className='plan-details__card__durations'>
-              {
-                plan.durations.map((dur, index) => (
-                  <div
-                    className={`plan-details__card__durations__card ${index === 0 ? 'plan-details__card__durations__card--selected' : ''}`}
-                    key={`duration-mont-${index}`}
-                  >
-                    <span>{dur}</span>
-                    <PiCalendarMinus />
-                  </div>
-                ))
-              }
-            </div>
+              <h4 className='plan-details__card__title'>{plan.title}</h4>
 
-            <div className='plan-details__card__current-price'>
-              {
-                plan.discount && (
-                  <div className='plan-details__card__current-price__discount'>
-                    <div className="plan-details__card__current-price__discount__old-price">
-                      {plan.price.toLocaleString('fa-IR')}
+              <div className='plan-details__card__durations'>
+                {
+                  plan.durations.map((dur, index) => (
+                    <div
+                      className={`plan-details__card__durations__card ${index === 0 ? 'plan-details__card__durations__card--selected' : ''}`}
+                      key={`duration-mont-${index}`}
+                    >
+                      <span>{dur}</span>
+                      <PiCalendarMinus />
                     </div>
+                  ))
+                }
+              </div>
 
-                    <div className="plan-details__card__current-price__discount__discount-percent">
-                      <PiCaretDownFill />
-                      {`${plan.discount.percent.toLocaleString('fa-IR')}%`}
+              <div className='plan-details__card__current-price'>
+                {
+                  plan.discount && (
+                    <div className='plan-details__card__current-price__discount'>
+                      <div className="plan-details__card__current-price__discount__old-price">
+                        {plan.price.toLocaleString('fa-IR')}
+                      </div>
+
+                      <div className="plan-details__card__current-price__discount__discount-percent">
+                        <PiCaretDownFill />
+                        {`${plan.discount.percent.toLocaleString('fa-IR')}%`}
+                      </div>
                     </div>
-                  </div>
-                )
-              }
-              <p className='plan-details__card__current-price__main'>
-                {plan.discount ? plan.discount.newPrice.toLocaleString('fa-IR') : plan.price.toLocaleString('fa-IR')}
-                <span className="plan-details__card__current-price__currency"> تومان</span>
-              </p>
+                  )
+                }
+                <p className='plan-details__card__current-price__main'>
+                  {plan.discount ? plan.discount.newPrice.toLocaleString('fa-IR') : plan.price.toLocaleString('fa-IR')}
+                  <span className="plan-details__card__current-price__currency"> تومان</span>
+                </p>
+              </div>
+
+              <button className='plan-details__card__buyBtn'>
+                خرید
+              </button>
+
+              <ul className='plan-details__card__features'>
+                {
+                  plan.features.map((feat, index) => (
+                    <li key={`planfeatureinplansrom-${index}`}>
+                      <PiCheckCircleFill className="plan-details__card__features__icon" />
+                      <span>{feat}</span>
+                    </li>
+                  ))
+                }
+              </ul>
+
             </div>
-
-            <button className='plan-details__card__buyBtn'>
-              خرید
-            </button>
-
-            <ul className='plan-details__card__features'>
-              {
-                plan.features.map((feat, index) => (
-                  <li key={`planfeatureinplansrom-${index}`}>
-                    <PiCheckCircleFill className="plan-details__card__features__icon" />
-                    <span>{feat}</span>
-                  </li>
-                ))
-              }
-            </ul>
-
-          </div>
-        ))
-      }
-    </div>
+          ))
+        }
+      </div>
+    </>
   )
 }
 

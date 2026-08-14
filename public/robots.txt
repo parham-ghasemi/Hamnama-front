@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+Disallow: /auth
+Disallow: /join-room
+Disallow: /room/
+Disallow: /user/
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://hamnama.net/sitemap.xml

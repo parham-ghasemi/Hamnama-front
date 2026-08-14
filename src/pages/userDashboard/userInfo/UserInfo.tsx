@@ -17,6 +17,7 @@ import { useAuth } from '../../../context/AuthContext'; // Adjust path
 import './UserInfo.scss';
 import { userApi } from '../../../apiCalls/userApi';
 import { toPersianNumerals } from '../../../helpers/NumberConversion';
+import { SEO } from '../../../components/seo/SEO';
 
 // --- Types --- //
 interface WatchHistoryItem {
@@ -547,205 +548,214 @@ const UserInfo = () => {
   const isProfileLoading = isUserLoading && !user;
 
   return (
-    <div className="user-info">
-      <div className="user-info__blob" />
+    <>
+      <SEO
+        title="HamNama | Your Profile"
+        description="Manage your HamNama profile."
+        canonical="https://hamnama.net/user/info"
+        noindex
+      />
 
-      <div className="user-info__top-card">
-        <span className="user-info__sprockets" aria-hidden="true" />
+      <div className="user-info">
+        <div className="user-info__blob" />
 
-        {isProfileLoading ? (
-          <>
-            <div className="user-info__top-card__right">
-              <div className="skeleton skeleton--avatar" />
-              <div className="skeleton-stack">
-                <div className="skeleton skeleton--line" style={{ width: 110 }} />
-                <div className="skeleton skeleton--line" style={{ width: 74 }} />
-              </div>
-            </div>
-            <div className="user-info__top-card__left">
-              <div className="skeleton skeleton--button" />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="user-info__top-card__right">
-              <div className="user-info__top-card__right__img" onClick={() => handleOpenModal('profilePicture')}>
-                {user?.profile_picture ? (
-                  <img src={`${import.meta.env['VITE_BASE_URL']}${user?.profile_picture}`} alt="profile image" />
-                ) : (
-                  <p>{user?.username?.[0]}</p>
-                )}
+        <div className="user-info__top-card">
+          <span className="user-info__sprockets" aria-hidden="true" />
 
-                <span>
-                  <PiCameraLight />
-                </span>
-              </div>
-              <div className="user-info__top-card__right__subinfo">
-                <p>وضعیت اشتراک</p>
-                <span>اشتراک ندارید</span>
-              </div>
-            </div>
-
-            <div className="user-info__top-card__left">
-              <button>خرید اشتراک</button>
-            </div>
-          </>
-        )}
-      </div>
-
-      <div className="user-info__info-card">
-        {isProfileLoading
-          ? [0, 1, 2].map((i) => (
-            <div className="user-info__info-card__section" key={`skeleton-${i}`}>
-              <div className="user-info__info-card__section__right">
-                <div className="skeleton skeleton--line" style={{ width: 90 }} />
-                <div className="skeleton skeleton--line" style={{ width: 150, height: 18 }} />
-              </div>
-              <div className="user-info__info-card__section__left">
-                <div className="skeleton skeleton--pill" />
-              </div>
-            </div>
-          ))
-          : sections.map((item) => (
-            <div className="user-info__info-card__section" key={item.key}>
-              <div className="user-info__info-card__section__right">
-                <p>{item.label}</p>
-                <span>{item.value}</span>
-              </div>
-
-              <div className="user-info__info-card__section__left">
-                <button onClick={() => handleOpenModal(item.key as any)}>
-                  <IoPencilSharp />
-                  ویرایش {item.label}
-                </button>
-              </div>
-            </div>
-          ))}
-      </div>
-
-      {/* --- Watch History Chart --- */}
-      <div className="user-info__chart-container">
-
-        <div className="user-info__chart-header">
-          <div className="user-info__custom-dropdown" ref={dropdownRef}>
-            <button
-              className={`user-info__custom-dropdown-toggle ${isDropdownOpen ? 'is-open' : ''}`}
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            >
-              {selectedTimeframeLabel}
-              <IoChevronDown className="dropdown-icon" />
-            </button>
-
-            <div className={`user-info__custom-dropdown-menu ${isDropdownOpen ? 'is-open' : ''}`}>
-              {TIMEFRAME_OPTIONS.map((opt) => (
-                <div
-                  key={opt.value}
-                  className={`user-info__custom-dropdown-item ${timeframe === opt.value ? 'is-active' : ''}`}
-                  onClick={() => {
-                    setTimeframe(opt.value as TimeframeOption);
-                    setIsDropdownOpen(false);
-                  }}
-                >
-                  {opt.label}
+          {isProfileLoading ? (
+            <>
+              <div className="user-info__top-card__right">
+                <div className="skeleton skeleton--avatar" />
+                <div className="skeleton-stack">
+                  <div className="skeleton skeleton--line" style={{ width: 110 }} />
+                  <div className="skeleton skeleton--line" style={{ width: 74 }} />
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="user-info__chart-title-group">
-            <span className="user-info__chart-total">
-              {isChartLoading ? (
-                <span className="skeleton skeleton--line" style={{ width: 96, display: 'inline-block' }} />
-              ) : (
-                <>مجموع: {toPersianNumerals(displayTotal)} ساعت</>
-              )}
-            </span>
-            <h3 className="user-info__chart-title">گزارش تماشا (ساعات)</h3>
-          </div>
-        </div>
-
-        <div className="user-info__chart-area">
-          {isChartLoading ? (
-            <div className="user-info__chart-loading">
-              <div className="user-info__chart-loading__bars" aria-hidden="true">
-                {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-                  <span key={i} style={{ animationDelay: `${i * 90}ms` }} />
-                ))}
               </div>
-              <p>در حال بارگذاری نمودار...</p>
-            </div>
-          ) : chartData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid-color)" vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  stroke="var(--chart-axis-color)"
-                  tick={{ fill: 'var(--chart-axis-color)', fontSize: 12, fontFamily: 'inherit' }}
-                  tickMargin={10}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  stroke="var(--chart-axis-color)"
-                  tick={{ fill: 'var(--chart-axis-color)', fontSize: 12, fontFamily: 'inherit' }}
-                  tickMargin={10}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'var(--chart-cursor-color)', strokeWidth: 2 }} />
-                <Line
-                  type="monotone"
-                  dataKey="hours"
-                  stroke="var(--chart-line-color)"
-                  strokeWidth={3}
-                  dot={{ r: 4, fill: 'var(--chart-line-color)', strokeWidth: 0 }}
-                  activeDot={{ r: 7, fill: 'var(--chart-line-color)', stroke: 'var(--chart-dot-stroke)', strokeWidth: 2 }}
-                  isAnimationActive={true}
-                  animationDuration={2000}
-                  animationEasing="ease-in-out"
-                />
-              </LineChart>
-            </ResponsiveContainer>
+              <div className="user-info__top-card__left">
+                <div className="skeleton skeleton--button" />
+              </div>
+            </>
           ) : (
-            <div className="user-info__chart-empty">
-              <p>تاریخچه تماشایی برای این بازه وجود ندارد.</p>
-            </div>
+            <>
+              <div className="user-info__top-card__right">
+                <div className="user-info__top-card__right__img" onClick={() => handleOpenModal('profilePicture')}>
+                  {user?.profile_picture ? (
+                    <img src={`${import.meta.env['VITE_BASE_URL']}${user?.profile_picture}`} alt="profile image" />
+                  ) : (
+                    <p>{user?.username?.[0]}</p>
+                  )}
+
+                  <span>
+                    <PiCameraLight />
+                  </span>
+                </div>
+                <div className="user-info__top-card__right__subinfo">
+                  <p>وضعیت اشتراک</p>
+                  <span>اشتراک ندارید</span>
+                </div>
+              </div>
+
+              <div className="user-info__top-card__left">
+                <button>خرید اشتراک</button>
+              </div>
+            </>
           )}
         </div>
-      </div>
 
-      {editingField && (
-        <div
-          className={`edit-modal-overlay ${isModalActive ? 'is-active' : ''}`}
-          onClick={handleCloseModal}
-        >
-          <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
-            <span className="edit-modal__sprockets" aria-hidden="true" />
-            <div className="edit-modal__header">
-              <h3>
-                ویرایش{' '}
-                {editingField === 'username'
-                  ? 'نام کاربری'
-                  : editingField === 'phone'
-                    ? 'شماره موبایل'
-                    : editingField === 'profilePicture'
-                      ? 'عکس پروفایل'
-                      : 'رمز عبور'}
-              </h3>
-              <button className="edit-modal__close" onClick={handleCloseModal}>
-                <IoClose />
+        <div className="user-info__info-card">
+          {isProfileLoading
+            ? [0, 1, 2].map((i) => (
+              <div className="user-info__info-card__section" key={`skeleton-${i}`}>
+                <div className="user-info__info-card__section__right">
+                  <div className="skeleton skeleton--line" style={{ width: 90 }} />
+                  <div className="skeleton skeleton--line" style={{ width: 150, height: 18 }} />
+                </div>
+                <div className="user-info__info-card__section__left">
+                  <div className="skeleton skeleton--pill" />
+                </div>
+              </div>
+            ))
+            : sections.map((item) => (
+              <div className="user-info__info-card__section" key={item.key}>
+                <div className="user-info__info-card__section__right">
+                  <p>{item.label}</p>
+                  <span>{item.value}</span>
+                </div>
+
+                <div className="user-info__info-card__section__left">
+                  <button onClick={() => handleOpenModal(item.key as any)}>
+                    <IoPencilSharp />
+                    ویرایش {item.label}
+                  </button>
+                </div>
+              </div>
+            ))}
+        </div>
+
+        {/* --- Watch History Chart --- */}
+        <div className="user-info__chart-container">
+
+          <div className="user-info__chart-header">
+            <div className="user-info__custom-dropdown" ref={dropdownRef}>
+              <button
+                className={`user-info__custom-dropdown-toggle ${isDropdownOpen ? 'is-open' : ''}`}
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              >
+                {selectedTimeframeLabel}
+                <IoChevronDown className="dropdown-icon" />
               </button>
+
+              <div className={`user-info__custom-dropdown-menu ${isDropdownOpen ? 'is-open' : ''}`}>
+                {TIMEFRAME_OPTIONS.map((opt) => (
+                  <div
+                    key={opt.value}
+                    className={`user-info__custom-dropdown-item ${timeframe === opt.value ? 'is-active' : ''}`}
+                    onClick={() => {
+                      setTimeframe(opt.value as TimeframeOption);
+                      setIsDropdownOpen(false);
+                    }}
+                  >
+                    {opt.label}
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {editingField === 'username' && <UpdateUsernameForm onClose={handleCloseModal} />}
-            {editingField === 'password' && <UpdatePasswordForm onClose={handleCloseModal} />}
-            {editingField === 'phone' && <UpdatePhoneForm onClose={handleCloseModal} />}
-            {editingField === 'profilePicture' && <UpdateProfilePictureForm onClose={handleCloseModal} />}
+            <div className="user-info__chart-title-group">
+              <span className="user-info__chart-total">
+                {isChartLoading ? (
+                  <span className="skeleton skeleton--line" style={{ width: 96, display: 'inline-block' }} />
+                ) : (
+                  <>مجموع: {toPersianNumerals(displayTotal)} ساعت</>
+                )}
+              </span>
+              <h3 className="user-info__chart-title">گزارش تماشا (ساعات)</h3>
+            </div>
+          </div>
+
+          <div className="user-info__chart-area">
+            {isChartLoading ? (
+              <div className="user-info__chart-loading">
+                <div className="user-info__chart-loading__bars" aria-hidden="true">
+                  {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+                    <span key={i} style={{ animationDelay: `${i * 90}ms` }} />
+                  ))}
+                </div>
+                <p>در حال بارگذاری نمودار...</p>
+              </div>
+            ) : chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid-color)" vertical={false} />
+                  <XAxis
+                    dataKey="date"
+                    stroke="var(--chart-axis-color)"
+                    tick={{ fill: 'var(--chart-axis-color)', fontSize: 12, fontFamily: 'inherit' }}
+                    tickMargin={10}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    stroke="var(--chart-axis-color)"
+                    tick={{ fill: 'var(--chart-axis-color)', fontSize: 12, fontFamily: 'inherit' }}
+                    tickMargin={10}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'var(--chart-cursor-color)', strokeWidth: 2 }} />
+                  <Line
+                    type="monotone"
+                    dataKey="hours"
+                    stroke="var(--chart-line-color)"
+                    strokeWidth={3}
+                    dot={{ r: 4, fill: 'var(--chart-line-color)', strokeWidth: 0 }}
+                    activeDot={{ r: 7, fill: 'var(--chart-line-color)', stroke: 'var(--chart-dot-stroke)', strokeWidth: 2 }}
+                    isAnimationActive={true}
+                    animationDuration={2000}
+                    animationEasing="ease-in-out"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="user-info__chart-empty">
+                <p>تاریخچه تماشایی برای این بازه وجود ندارد.</p>
+              </div>
+            )}
           </div>
         </div>
-      )}
-    </div>
+
+        {editingField && (
+          <div
+            className={`edit-modal-overlay ${isModalActive ? 'is-active' : ''}`}
+            onClick={handleCloseModal}
+          >
+            <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
+              <span className="edit-modal__sprockets" aria-hidden="true" />
+              <div className="edit-modal__header">
+                <h3>
+                  ویرایش{' '}
+                  {editingField === 'username'
+                    ? 'نام کاربری'
+                    : editingField === 'phone'
+                      ? 'شماره موبایل'
+                      : editingField === 'profilePicture'
+                        ? 'عکس پروفایل'
+                        : 'رمز عبور'}
+                </h3>
+                <button className="edit-modal__close" onClick={handleCloseModal}>
+                  <IoClose />
+                </button>
+              </div>
+
+              {editingField === 'username' && <UpdateUsernameForm onClose={handleCloseModal} />}
+              {editingField === 'password' && <UpdatePasswordForm onClose={handleCloseModal} />}
+              {editingField === 'phone' && <UpdatePhoneForm onClose={handleCloseModal} />}
+              {editingField === 'profilePicture' && <UpdateProfilePictureForm onClose={handleCloseModal} />}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 

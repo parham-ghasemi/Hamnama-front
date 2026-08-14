@@ -38,8 +38,6 @@ function App() {
               <ScrollToTop />
               <Toaster position="top-right" />
               <Routes>
-
-
                 <Route path="user" element={<UserDashboardLayout />}>
                   <Route index element={<Navigate to={"info"} replace />} />
                   <Route path="info" element={<UserInfo />} />
@@ -52,8 +50,6 @@ function App() {
 
                 <Route element={<DesktopLayout />}>
                   <Route index element={<HomeV2 />} />
-                  {/* <Route index element={<Home />} /> */}
-                  {/* <Route path="homev2" element={<HomeV2 />} /> */}
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/plan-details" element={<PlanDetails />} />
                   <Route path="*" element={<NotFound />} />
@@ -70,7 +66,6 @@ function App() {
 
                 <Route path="join-room" element={<Join />} />
                 <Route path="/room/:id" element={<RoomPage />} />
-
               </Routes>
             </BrowserRouter>
             {/* <ReactQueryDevtools buttonPosition="bottom-right" position="bottom" /> */}
