@@ -394,9 +394,9 @@
     font-weight: 800;
     padding: 5px 11px;
     border-radius: 99px;
-    color: dark.$color-yellow;
-    background-color: rgba(224, 163, 64, 0.12);
-    border: 1px solid rgba(224, 163, 64, 0.22);
+    color: color.adjust(dark.$color-primary, $lightness: 5%);
+    background-color: rgba(224, 136, 64, 0.12);
+    border: 1px solid rgba(224, 136, 64, 0.22);
 
     @include mx.light {
       color: light.$color-primary;

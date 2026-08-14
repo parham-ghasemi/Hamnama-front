@@ -1,6 +1,7 @@
 @use "../../../../styles//abstracts//variables" as dark;
 @use "../../../../styles/abstracts/variables.light" as light;
 @use "../../../../styles//abstracts//mixins" as mx;
+@use "../../dash" as dash;
 @use "sass:color";
 
 .user-ticket-chat {
@@ -10,22 +11,28 @@
   flex-direction: column;
   justify-content: space-between;
 
-  // Card styles moved to the main container
-  border: 1px solid color.adjust(dark.$color-white, $alpha: -0.9);
-  border-radius: 26px;
-  padding: 24px 26px;
-  background-color: color.adjust(dark.$color-white, $alpha: -0.95);
+  // Cinematic panel surface, shared with the rest of the dashboard.
+  padding: 26px 26px 24px;
+  @include dash.row(26px);
+
+  &::after {
+    @include dash.sprocket-strip(10px);
+  }
 
   @include mx.light {
-    background-color: color.adjust(light.$color-dark-gray, $alpha: -0.85);
-    border: 1px solid color.adjust(light.$color-gray, $alpha: -0.8);
+    outline: light.$card-outline;
   }
 
   // Mobile container adjustments
   @include mx.max-w(768px) {
     height: calc(100vh - 100px);
-    padding: 16px 14px;
+    padding: 18px 14px 16px;
     border-radius: 18px;
+
+    &::after {
+      left: 14px;
+      right: 14px;
+    }
   }
 
   // --- 1. HEADER STYLES ---
@@ -264,11 +271,15 @@
         &.user {
           align-self: flex-start;
           > p {
-            background-color: color.adjust(
-              dark.$color-primary-bg,
-              $alpha: -0.1,
-              $whiteness: 3%
-            );
+            background:
+              linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.14) 0%,
+                rgba(255, 255, 255, 0) 70%
+              ),
+              linear-gradient(180deg, #c0523c 0%, #a8422f 100%);
+            color: #fff;
+            box-shadow: 0 14px 26px -20px rgba(208, 78, 47, 0.9);
             @include mx.light {
               background-color: light.$color-primary-bg;
               color: light.$color-white;
@@ -280,8 +291,15 @@
           align-self: flex-end;
           align-items: flex-end;
           > p {
-            background-color: dark.$color-white;
-            color: dark.$color-black;
+            background:
+              linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.09) 0%,
+                rgba(255, 255, 255, 0.03) 100%
+              ),
+              rgba(24, 20, 19, 0.92);
+            color: dark.$color-white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
 
             @include mx.light {
               background-color: color.adjust(
@@ -337,8 +355,7 @@
       outline: none;
       width: 100%;
       height: 110px;
-      background-color: color.adjust(dark.$color-white, $alpha: -0.9);
-      border: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
+      @include dash.field;
       border-radius: 17px;
       padding: 15px 24px 15px 15px;
       color: dark.$color-white;
@@ -414,25 +431,13 @@
         }
 
         &.send-btn {
-          background-color: dark.$color-white;
-          color: dark.$color-black;
-
-          @include mx.light {
-            background-color: light.$color-primary-bg;
-            color: light.$color-white;
-          }
-          &:hover {
-            background-color: color.adjust(dark.$color-white, $alpha: -0.15);
-            @include mx.light {
-              background-color: light.$color-primary-bg-hover;
-            }
-          }
+          @include dash.primary-btn;
         }
 
         &.cancel-btn {
-          background-color: transparent;
-          color: dark.$color-white;
-          border: 1px solid color.adjust(dark.$color-white, $alpha: -0.6);
+          background-color: rgba(255, 255, 255, 0.03);
+          color: color.adjust(dark.$color-white, $alpha: -0.15);
+          border: 1px solid rgba(255, 255, 255, 0.14);
 
           @include mx.light {
             color: light.$color-primary;
@@ -475,8 +480,20 @@
     }
 
     > button {
-      background-color: color.adjust(dark.$color-white, $alpha: -0.58);
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.09) 0%,
+          rgba(255, 255, 255, 0.03) 100%
+        ),
+        rgba(24, 20, 19, 0.9);
+      color: dark.$color-white;
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 17px;
+      transition:
+        transform mx.$dur-fast mx.$ease-out-soft,
+        background-color 200ms ease,
+        border-color 200ms ease;
       font-size: 18px;
       font-weight: 700;
       height: 51px;
@@ -501,7 +518,9 @@
 
     &__answer {
       &:hover {
-        background-color: color.adjust(dark.$color-white, $alpha: -0.5);
+        transform: translateY(-2px);
+        border-color: rgba(208, 78, 47, 0.55);
+        background-color: rgba(208, 78, 47, 0.22);
         @include mx.light {
           background-color: light.$color-primary-bg-hover;
         }
@@ -510,7 +529,9 @@
 
     &__close {
       &:hover {
-        background-color: color.adjust(dark.$color-red, $alpha: -0.3);
+        transform: translateY(-2px);
+        border-color: rgba(178, 56, 64, 0.6);
+        background-color: color.adjust(dark.$color-red, $alpha: -0.5);
         @include mx.light {
           background-color: color.adjust(dark.$color-red, $alpha: -0.1);
         }
