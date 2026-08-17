@@ -3,23 +3,64 @@
 @use "../../../styles/abstracts/mixins" as mx;
 @use "sass:color";
 
+/* ---------------------------------------------------------------
+ * Join room page.
+ * Restyled to match the cinematic redesign: warm ember light on a
+ * near-black room, lit card surfaces, sprocket hairlines and soft
+ * ambient elevation instead of flat purple gradients.
+ * Markup hooks and behaviour are unchanged.
+ * --------------------------------------------------------------- */
+
 .join-page {
   min-height: 100vh;
   max-height: 100vh;
   overflow: hidden;
   width: 100vw;
-  background: #0c0517;
-  background: linear-gradient(
-    -90deg,
-    rgba(12, 5, 23, 1) 0%,
-    rgba(15, 8, 38, 1) 100%
-  );
+  position: relative;
+  isolation: isolate;
   color: dark.$color-white;
   display: flex;
 
+  background:
+    radial-gradient(
+      90% 60% at 50% -10%,
+      rgba(208, 78, 47, 0.22) 0%,
+      rgba(208, 78, 47, 0) 62%
+    ),
+    radial-gradient(
+      70% 55% at 100% 110%,
+      rgba(224, 163, 64, 0.1) 0%,
+      rgba(224, 163, 64, 0) 65%
+    ),
+    linear-gradient(180deg, #120e0d 0%, #0a0909 55%, #0d0b0a 100%);
+
+  // Soft vignette so the page reads like a darkened room.
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(
+      120% 90% at 50% 45%,
+      transparent 45%,
+      rgba(0, 0, 0, 0.55) 100%
+    );
+  }
+
   @include mx.light {
-    background: light.$color-bg;
     color: light.$color-black;
+    background:
+      radial-gradient(
+        90% 60% at 50% -10%,
+        rgba(139, 91, 130, 0.16) 0%,
+        rgba(139, 91, 130, 0) 60%
+      ),
+      light.$color-bg;
+
+    &::after {
+      display: none;
+    }
   }
 
   // Allow scrolling when content height exceeds viewport on smaller screens
@@ -36,6 +77,7 @@
     gap: 24px;
     width: 100%;
     position: relative;
+    z-index: 1;
 
     @include mx.max-w(1024px) {
       margin-top: 64px;
@@ -61,6 +103,7 @@
           $left: 50%
         );
         transform: translate(-50%, -50%);
+        opacity: 14%;
         z-index: 0;
 
         @include mx.max-w(768px) {
@@ -68,56 +111,192 @@
         }
       }
 
+      &__inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 26px;
+
+        @include mx.max-w(768px) {
+          gap: 18px;
+          width: 100%;
+        }
+      }
+
+      /* --- Page heading ------------------------------------------- */
+      &__intro {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+
+        &__title {
+          font-size: 27px;
+          font-weight: 800;
+          margin: 0;
+          position: relative;
+
+          > span {
+            color: dark.$color-primary;
+
+            @include mx.light {
+              color: light.$color-primary;
+            }
+          }
+
+          // Film sprocket hairline, same treatment as the home sections.
+          &::after {
+            content: "";
+            display: block;
+            width: 84px;
+            height: 6px;
+            margin: 14px auto 0;
+            @include mx.sprockets(4px, 11px, rgba(208, 78, 47, 0.55));
+            mask-image: linear-gradient(
+              90deg,
+              transparent,
+              #000 30%,
+              #000 70%,
+              transparent
+            );
+            -webkit-mask-image: linear-gradient(
+              90deg,
+              transparent,
+              #000 30%,
+              #000 70%,
+              transparent
+            );
+
+            @include mx.light {
+              @include mx.sprockets(4px, 11px, rgba(139, 91, 130, 0.6));
+            }
+          }
+
+          @include mx.max-w(768px) {
+            font-size: 21px;
+
+            &::after {
+              width: 66px;
+              margin-top: 10px;
+            }
+          }
+
+          @include mx.max-w(480px) {
+            font-size: 18px;
+          }
+        }
+
+        &__sub {
+          margin: 0;
+          font-size: 14.5px;
+          font-weight: 500;
+          max-width: 520px;
+          line-height: 190%;
+          color: color.adjust(dark.$color-gray, $lightness: -4%);
+
+          @include mx.light {
+            color: light.$color-dark-gray;
+          }
+
+          @include mx.max-w(768px) {
+            font-size: 13px;
+            padding: 0 12px;
+          }
+
+          @include mx.max-w(480px) {
+            display: none;
+          }
+        }
+      }
+
       &__cards {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: auto auto;
-        grid-column-gap: 49px;
-        grid-row-gap: 19px;
+        grid-template-rows: auto auto auto;
+        grid-column-gap: 30px;
+        grid-row-gap: 18px;
         z-index: 1;
 
         @include mx.max-w(1200px) {
-          grid-column-gap: 24px;
+          grid-column-gap: 22px;
           grid-row-gap: 16px;
         }
 
         @include mx.max-w(768px) {
           grid-template-columns: 1fr;
           grid-template-rows: auto;
-          grid-row-gap: 20px;
+          grid-row-gap: 16px;
           width: 100%;
           max-width: 400px;
         }
 
+        /* --- The two primary room cards --------------------------- */
         &__card {
-          width: 378px;
+          width: 352px;
           max-width: 100%;
-          height: 453px;
-          border-radius: 17px;
-          background: #7c401f;
-          background: linear-gradient(
-            0deg,
-            rgba(124, 64, 31, 0.3) 0%,
-            rgba(255, 162, 113, 0.3) 100%
-          );
-          padding: 13px;
+          height: 424px;
+          border-radius: 22px;
+          padding: 16px 15px;
+          position: relative;
+          isolation: isolate;
+          overflow: hidden;
           @include mx.flex-center;
           flex-direction: column;
           justify-content: space-between;
+          gap: 12px;
           box-sizing: border-box;
 
+          @include mx.cinema-surface;
+          @include mx.ambient-shadow(0.8);
+
+          transition:
+            transform mx.$dur-base mx.$ease-out-soft,
+            box-shadow mx.$dur-base mx.$ease-out-soft;
+
+          @include mx.reduced-motion {
+            transition: none;
+          }
+
+          // Hairline border that brightens on hover.
+          &::before {
+            @include mx.gradient-border(22px);
+            z-index: 3;
+            opacity: 0.9;
+            transition: opacity mx.$dur-base ease;
+          }
+
+          &:hover,
+          &:focus-within {
+            transform: translateY(-5px);
+            @include mx.ambient-shadow(1.3);
+
+            &::before {
+              opacity: 1;
+            }
+
+            .join-page__content__main__cards__card__i__screen > svg {
+              transform: scale(1.08);
+            }
+          }
+
           @include mx.light {
-            background: light.$color-card-bg;
+            box-shadow: 0 12px 26px -18px
+              color.adjust(light.$color-black, $alpha: -0.65);
           }
 
           @include mx.max-w(1200px) {
-            width: 320px;
-            height: 420px;
+            width: 310px;
+            height: 400px;
           }
 
           @include mx.max-w(768px) {
             width: 100%;
-            height: 390px;
+            height: auto;
+            padding: 18px 15px 15px;
+            transform: none !important;
           }
 
           &:first-of-type {
@@ -136,34 +315,131 @@
             }
           }
 
+          // Small ember-lit icon chip in the card corner.
+          &__badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            height: 34px;
+            width: 34px;
+            border-radius: 10px;
+            @include mx.flex-center;
+            font-size: 18px;
+            color: dark.$color-primary;
+            background: rgba(208, 78, 47, 0.12);
+            box-shadow: 0 0 0 1px rgba(208, 78, 47, 0.22) inset;
+            z-index: 4;
+
+            @include mx.light {
+              color: light.$color-primary;
+              background: rgba(139, 91, 130, 0.12);
+              box-shadow: 0 0 0 1px rgba(139, 91, 130, 0.2) inset;
+            }
+
+            @include mx.max-w(768px) {
+              height: 30px;
+              width: 30px;
+              font-size: 16px;
+            }
+          }
+
           > h4 {
-            font-size: 22px;
+            font-size: 21px;
             font-weight: 700;
-            margin-top: 21px;
+            margin: 18px 0 0;
+            z-index: 2;
 
             @include mx.light {
               color: light.$color-black;
             }
 
             @include mx.max-w(768px) {
-              font-size: 19px;
-              margin-top: 12px;
+              font-size: 18px;
+              margin-top: 4px;
             }
           }
 
+          /* The "screen" placeholder inside each card. */
           &__i {
-            height: 190px;
-            width: 181px;
-            background-color: color.adjust(#5f4d6e, $alpha: -0.65);
-            border-radius: 22px;
+            height: 170px;
+            width: 185px;
+            border-radius: 18px;
+            position: relative;
+            z-index: 2;
+            @include mx.flex-center;
+            background:
+              radial-gradient(
+                90% 80% at 50% 0%,
+                rgba(208, 78, 47, 0.24) 0%,
+                rgba(208, 78, 47, 0) 70%
+              ),
+              linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.06) 0%,
+                rgba(255, 255, 255, 0.015) 100%
+              ),
+              rgba(10, 9, 9, 0.55);
+            box-shadow:
+              0 0 0 1px rgba(255, 255, 255, 0.07) inset,
+              0 18px 34px -22px rgba(0, 0, 0, 0.9);
+
+            // Faint film strip perforation along the top and bottom.
+            &::before,
+            &::after {
+              content: "";
+              position: absolute;
+              left: 14px;
+              right: 14px;
+              height: 5px;
+              @include mx.sprockets(3.5px, 12px, rgba(255, 255, 255, 0.16));
+            }
+
+            &::before {
+              top: 10px;
+            }
+
+            &::after {
+              bottom: 10px;
+            }
+
+            &__screen {
+              @include mx.flex-center;
+              height: 54px;
+              width: 54px;
+              border-radius: 50%;
+              font-size: 24px;
+              color: dark.$color-primary;
+              background: rgba(208, 78, 47, 0.14);
+              box-shadow: 0 0 34px -8px rgba(208, 78, 47, 0.55);
+
+              > svg {
+                transition: transform mx.$dur-base mx.$ease-out-soft;
+
+                @include mx.reduced-motion {
+                  transition: none;
+                }
+              }
+
+              @include mx.light {
+                color: light.$color-primary;
+                background: rgba(139, 91, 130, 0.14);
+                box-shadow: none;
+              }
+            }
 
             @include mx.light {
-              background-color: light.$color-primary-bg;
+              background: rgba(139, 91, 130, 0.07);
+              box-shadow: 0 0 0 1px rgba(9, 9, 9, 0.06) inset;
+
+              &::before,
+              &::after {
+                @include mx.sprockets(3.5px, 12px, rgba(9, 9, 9, 0.12));
+              }
             }
 
             @include mx.max-w(768px) {
-              height: 150px;
-              width: 145px;
+              height: 140px;
+              width: 160px;
             }
           }
 
@@ -172,212 +448,281 @@
             width: 100%;
             display: flex;
             align-items: center;
+            z-index: 2;
+
             > span {
               position: absolute;
-              // top: 50%;
-              // transform: translateY(-50%);
-              left: 21px;
+              left: 14px;
               cursor: pointer;
-              font-size: 23px;
-              transition: all 200ms ease;
-              opacity: 0.8;
-              height: 30px;
-              width: 30px;
-              border-radius: 7px;
+              font-size: 21px;
+              transition: all mx.$dur-fast ease;
+              opacity: 0.75;
+              height: 32px;
+              width: 32px;
+              border-radius: 9px;
               @include mx.flex-center;
 
               @include mx.light {
                 color: light.$color-black;
               }
 
-              @include mx.max-w(768px) {
-                left: 14px;
-                font-size: 20px;
-              }
-
               &:hover {
                 opacity: 1;
-                transform: translateY(-2px);
-                background-color: color.adjust(
-                  dark.$color-light-gray,
-                  $alpha: -0.78
-                );
+                color: dark.$color-primary;
+                background-color: rgba(208, 78, 47, 0.14);
 
                 @include mx.light {
-                  background-color: light.$color-light-gray;
-                  color: light.$color-primary-hover;
+                  color: light.$color-primary;
+                  background-color: rgba(139, 91, 130, 0.14);
                 }
+              }
+
+              @include mx.max-w(768px) {
+                left: 10px;
+                font-size: 19px;
               }
             }
           }
+
           &__code {
             width: 100%;
-            height: 69px;
-            background-color: color.adjust(
-              dark.$color-light-gray,
-              $alpha: -0.78
-            );
+            height: 62px;
             @include mx.flex-center;
-            border-radius: 12px;
+            border-radius: 14px;
             position: relative;
-            font-size: 19px;
+            z-index: 2;
+            font-size: 18px;
             font-weight: 700;
+            color: dark.$color-white;
             border: none;
             outline: none;
             text-align: center;
             padding: 0 12px;
             box-sizing: border-box;
+            letter-spacing: 0.08em;
+            background: rgba(255, 255, 255, 0.045);
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+            transition:
+              box-shadow mx.$dur-fast ease,
+              background-color mx.$dur-fast ease;
+
+            &::placeholder {
+              color: color.adjust(dark.$color-gray, $alpha: -0.35);
+              font-weight: 500;
+              letter-spacing: normal;
+            }
+
+            &:focus {
+              background: rgba(255, 255, 255, 0.06);
+              box-shadow:
+                0 0 0 1px rgba(208, 78, 47, 0.55) inset,
+                0 0 24px -10px rgba(208, 78, 47, 0.65);
+            }
 
             @include mx.light {
-              background-color: light.$color-light-gray;
               color: light.$color-black;
-              border: 1px solid light.$color-light-gray;
+              background: rgba(9, 9, 9, 0.04);
+              box-shadow: 0 0 0 1px rgba(9, 9, 9, 0.09) inset;
+
+              &:focus {
+                box-shadow: 0 0 0 1px rgba(139, 91, 130, 0.55) inset;
+              }
             }
 
             @include mx.max-w(768px) {
-              height: 56px;
+              height: 54px;
               font-size: 16px;
             }
 
             > span {
               position: absolute;
-              left: 21px;
+              left: 14px;
               cursor: pointer;
-              font-size: 23px;
-              transition: all 200ms ease;
-              opacity: 0.8;
-              height: 30px;
-              width: 30px;
-              border-radius: 7px;
+              font-size: 21px;
+              transition: all mx.$dur-fast ease;
+              opacity: 0.75;
+              height: 32px;
+              width: 32px;
+              border-radius: 9px;
               @include mx.flex-center;
 
               @include mx.light {
                 color: light.$color-black;
               }
 
-              @include mx.max-w(768px) {
-                left: 14px;
-                font-size: 20px;
-              }
-
               &:hover {
                 opacity: 1;
-                transform: translateY(-2px);
-                background-color: color.adjust(
-                  dark.$color-light-gray,
-                  $alpha: -0.78
-                );
+                color: dark.$color-primary;
+                background-color: rgba(208, 78, 47, 0.14);
 
                 @include mx.light {
-                  background-color: light.$color-light-gray;
-                  color: light.$color-primary-hover;
+                  color: light.$color-primary;
+                  background-color: rgba(139, 91, 130, 0.14);
                 }
               }
+
+              @include mx.max-w(768px) {
+                left: 10px;
+                font-size: 19px;
+              }
             }
           }
 
+          /* Primary action of each card. */
           &__enter {
             width: 100%;
-            height: 69px;
-            background-color: color.adjust(
-              dark.$color-light-gray,
-              $alpha: -0.78
-            );
+            height: 62px;
             @include mx.flex-center;
-            border-radius: 12px;
+            border-radius: 14px;
             position: relative;
-            font-size: 19px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 200ms ease;
-
-            @include mx.light {
-              background-color: light.$color-primary-bg;
-              color: light.$color-white;
-            }
-
-            @include mx.max-w(768px) {
-              height: 56px;
-              font-size: 16px;
-            }
-
-            &:hover {
-              background-color: color.adjust(
-                dark.$color-light-gray,
-                $alpha: -0.7
-              );
-
-              @include mx.light {
-                background-color: light.$color-primary-bg-hover;
-              }
-            }
-          }
-
-          &--create {
-            width: 100%;
-            height: 116px;
-            border-radius: 17px;
-            padding: 20px 28px;
-            @include mx.flex-center;
-            justify-content: space-between;
-            grid-area: 2 / 1 / 3 / 3;
-            cursor: pointer;
-            position: relative;
+            z-index: 2;
             overflow: hidden;
-            box-sizing: border-box;
+            font-size: 18px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            color: dark.$color-white;
+            background: linear-gradient(
+              180deg,
+              dark.$color-primary-hover 0%,
+              dark.$color-primary-bg 100%
+            );
+            box-shadow:
+              0 1px 0 0 rgba(255, 255, 255, 0.16) inset,
+              0 14px 28px -16px rgba(208, 78, 47, 0.75);
+            transition:
+              transform mx.$dur-base mx.$ease-out-soft,
+              box-shadow mx.$dur-base mx.$ease-out-soft,
+              filter mx.$dur-fast ease;
 
-            @include mx.light {
-              background: light.$color-card-bg;
-              box-shadow: 0 4px 4px 0 light.$color-gray;
+            @include mx.reduced-motion {
+              transition: none;
             }
 
-            @include mx.max-w(768px) {
-              grid-area: auto;
-              height: 80px;
-              padding: 16px 20px;
-            }
-
-            &::before {
-              content: "";
-              position: absolute;
-              inset: 0;
-              background: linear-gradient(
-                0deg,
-                rgba(124, 64, 31, 0.3) 0%,
-                rgba(255, 162, 113, 0.3) 60%
-              );
-              transition: opacity 300ms ease;
-              z-index: 1;
-
-              @include mx.light {
-                display: none;
-              }
-            }
-
+            // Slow sheen that sweeps across on hover.
             &::after {
               content: "";
               position: absolute;
-              inset: 0;
+              inset: -60% -20%;
               background: linear-gradient(
-                -90deg,
-                rgba(124, 64, 31, 0.2) 0%,
-                rgba(255, 162, 113, 0.2) 100%
+                100deg,
+                transparent 40%,
+                rgba(255, 255, 255, 0.18) 50%,
+                transparent 60%
               );
+              transform: translateX(-70%);
               opacity: 0;
-              transition: opacity 300ms ease;
-              z-index: 1;
+              transition:
+                transform 900ms mx.$ease-out-soft,
+                opacity 220ms ease;
+              pointer-events: none;
 
-              @include mx.light {
+              @include mx.reduced-motion {
                 display: none;
               }
             }
 
             &:hover {
+              transform: translateY(-2px);
+              filter: brightness(1.05);
+              box-shadow:
+                0 1px 0 0 rgba(255, 255, 255, 0.2) inset,
+                0 18px 34px -14px rgba(208, 78, 47, 0.85);
+
               &::after {
+                transform: translateX(70%);
                 opacity: 1;
               }
+            }
+
+            &:active {
+              transform: translateY(0);
+            }
+
+            @include mx.light {
+              color: light.$color-white;
+              background: linear-gradient(
+                180deg,
+                light.$color-primary 0%,
+                light.$color-primary-bg 100%
+              );
+              box-shadow: 0 12px 24px -18px rgba(9, 9, 9, 0.6);
+
+              &:hover {
+                box-shadow: 0 16px 28px -16px rgba(104, 61, 96, 0.7);
+              }
+            }
+
+            @include mx.max-w(768px) {
+              height: 54px;
+              font-size: 16px;
+            }
+          }
+
+          /* --- Create room row ------------------------------------ */
+          &--create {
+            width: 100%;
+            height: 104px;
+            border-radius: 22px;
+            padding: 20px 26px;
+            @include mx.flex-center;
+            justify-content: space-between;
+            grid-area: 3 / 1 / 4 / 3;
+            cursor: pointer;
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            box-sizing: border-box;
+
+            @include mx.cinema-surface;
+            @include mx.ambient-shadow(0.6);
+
+            transition:
+              transform mx.$dur-base mx.$ease-out-soft,
+              box-shadow mx.$dur-base mx.$ease-out-soft;
+
+            @include mx.reduced-motion {
+              transition: none;
+            }
+
+            &::before {
+              @include mx.gradient-border(
+                22px,
+                rgba(208, 78, 47, 0.4),
+                rgba(255, 255, 255, 0.04)
+              );
+              z-index: 3;
+              opacity: 0.9;
+              transition: opacity mx.$dur-base ease;
+            }
+
+            // Dashed film-strip hint along the bottom edge.
+            &::after {
+              content: "";
+              position: absolute;
+              left: 26px;
+              right: 26px;
+              bottom: 9px;
+              height: 5px;
+              z-index: 2;
+              @include mx.sprockets(3.5px, 12px, rgba(208, 78, 47, 0.35));
+
+              @include mx.light {
+                @include mx.sprockets(3.5px, 12px, rgba(139, 91, 130, 0.35));
+              }
+            }
+
+            &:hover {
+              transform: translateY(-3px);
+              @include mx.ambient-shadow(1.1);
+
+              &::before {
+                opacity: 1;
+              }
+
               > span {
-                transform: scale(1.1);
+                transform: scale(1.08);
+                background: rgba(208, 78, 47, 0.2);
 
                 @include mx.light {
                   background-color: light.$color-primary-bg-hover;
@@ -385,14 +730,27 @@
               }
             }
 
+            @include mx.light {
+              box-shadow: 0 10px 22px -18px
+                color.adjust(light.$color-black, $alpha: -0.7);
+            }
+
+            @include mx.max-w(768px) {
+              grid-area: auto;
+              height: 82px;
+              padding: 16px 20px;
+              transform: none !important;
+            }
+
             > * {
               position: relative;
-              z-index: 2;
+              z-index: 4;
             }
 
             > p {
-              font-size: 20px;
+              font-size: 19px;
               font-weight: 700;
+              margin: 0;
 
               @include mx.light {
                 color: light.$color-primary;
@@ -405,33 +763,201 @@
             }
 
             > span {
-              height: 43px;
-              width: 43px;
-              border-radius: 7px;
+              height: 44px;
+              width: 44px;
+              border-radius: 12px;
               @include mx.flex-center;
-              background-color: color.adjust(
-                dark.$color-light-gray,
-                $alpha: -0.8
-              );
-              transition: transform 300ms ease;
+              color: dark.$color-primary;
+              background: rgba(208, 78, 47, 0.13);
+              box-shadow: 0 0 0 1px rgba(208, 78, 47, 0.24) inset;
+              transition:
+                transform mx.$dur-base mx.$ease-out-soft,
+                background-color mx.$dur-base ease;
+
+              @include mx.reduced-motion {
+                transition: none;
+              }
 
               @include mx.light {
                 background-color: light.$color-primary-bg;
                 color: light.$color-white;
+                box-shadow: none;
               }
 
               @include mx.max-w(768px) {
-                height: 36px;
-                width: 36px;
+                height: 38px;
+                width: 38px;
               }
 
               > svg {
-                font-size: 29px;
+                font-size: 25px;
 
                 @include mx.max-w(768px) {
-                  font-size: 22px;
+                  font-size: 21px;
                 }
               }
+            }
+          }
+        }
+
+        /* --- Last visited room (frontend only for now) ------------ */
+        &__last {
+          grid-area: 2 / 1 / 3 / 3;
+          width: 100%;
+          box-sizing: border-box;
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          padding: 16px 22px;
+          border-radius: 18px;
+          position: relative;
+          isolation: isolate;
+          overflow: hidden;
+
+          background:
+            linear-gradient(
+              90deg,
+              rgba(208, 78, 47, 0.12) 0%,
+              rgba(208, 78, 47, 0) 55%
+            ),
+            linear-gradient(
+              180deg,
+              rgba(255, 255, 255, 0.05) 0%,
+              rgba(255, 255, 255, 0.02) 100%
+            ),
+            rgba(12, 10, 10, 0.7);
+          box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+
+          @include mx.light {
+            background:
+              linear-gradient(
+                90deg,
+                rgba(139, 91, 130, 0.1) 0%,
+                rgba(139, 91, 130, 0) 55%
+              ),
+              light.$color-card-bg;
+            box-shadow: 0 0 0 1px rgba(9, 9, 9, 0.06) inset;
+          }
+
+          @include mx.max-w(768px) {
+            grid-area: auto;
+            flex-wrap: wrap;
+            padding: 14px 16px;
+            gap: 12px;
+          }
+
+          &__icon {
+            height: 42px;
+            width: 42px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            @include mx.flex-center;
+            font-size: 21px;
+            color: dark.$color-yellow;
+            background: rgba(224, 163, 64, 0.12);
+            box-shadow: 0 0 0 1px rgba(224, 163, 64, 0.22) inset;
+
+            @include mx.light {
+              color: light.$color-yellow;
+              background: rgba(175, 139, 81, 0.12);
+              box-shadow: 0 0 0 1px rgba(175, 139, 81, 0.24) inset;
+            }
+
+            @include mx.max-w(768px) {
+              height: 36px;
+              width: 36px;
+              font-size: 18px;
+            }
+          }
+
+          &__info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+
+            &__label {
+              margin: 0;
+              font-size: 12.5px;
+              font-weight: 500;
+              color: color.adjust(dark.$color-gray, $lightness: -6%);
+
+              @include mx.light {
+                color: light.$color-dark-gray;
+              }
+            }
+
+            &__name {
+              margin: 0;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              font-size: 16px;
+              font-weight: 700;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+
+              @include mx.light {
+                color: light.$color-black;
+              }
+
+              @include mx.max-w(480px) {
+                font-size: 14.5px;
+              }
+            }
+
+            &__code {
+              font-size: 12.5px;
+              font-weight: 700;
+              letter-spacing: 0.1em;
+              padding: 3px 9px;
+              border-radius: 999px;
+              color: dark.$color-primary;
+              background: rgba(208, 78, 47, 0.12);
+
+              @include mx.light {
+                color: light.$color-primary;
+                background: rgba(139, 91, 130, 0.12);
+              }
+            }
+          }
+
+          &__action {
+            flex-shrink: 0;
+            height: 44px;
+            padding: 0 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(208, 78, 47, 0.45);
+            background: rgba(208, 78, 47, 0.1);
+            color: dark.$color-white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition:
+              background-color mx.$dur-fast ease,
+              transform mx.$dur-fast ease;
+
+            &:hover:not(:disabled) {
+              background: rgba(208, 78, 47, 0.2);
+              transform: translateY(-2px);
+            }
+
+            &:disabled {
+              opacity: 0.45;
+              cursor: not-allowed;
+            }
+
+            @include mx.light {
+              color: light.$color-primary;
+              border-color: rgba(139, 91, 130, 0.45);
+              background: rgba(139, 91, 130, 0.1);
+            }
+
+            @include mx.max-w(768px) {
+              width: 100%;
+              height: 42px;
             }
           }
         }

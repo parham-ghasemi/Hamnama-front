@@ -3,6 +3,12 @@
 @use "../../../../styles/abstracts/mixins" as mx;
 @use "sass:color";
 
+/* ---------------------------------------------------------------
+ * Subscribers sidebar on the join page.
+ * Restyled to the cinematic surface language: dark lit panel,
+ * hairline separation and an ember accent on each row.
+ * --------------------------------------------------------------- */
+
 .join-sidebar-backdrop {
   display: none;
 
@@ -10,12 +16,12 @@
     display: block;
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(3px);
+    background-color: rgba(6, 5, 5, 0.66);
+    backdrop-filter: blur(4px);
     z-index: 998;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 300ms ease;
+    transition: opacity mx.$dur-base ease;
 
     &.open {
       opacity: 1;
@@ -46,10 +52,10 @@
     height: 100vh;
     width: 270px;
     max-width: 80vw;
-    background-color: rgba($color: #161222, $alpha: 0.8);
-    backdrop-filter: blur(3px);
-    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.5);
-    transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: rgba(12, 10, 10, 0.88);
+    backdrop-filter: blur(8px);
+    box-shadow: -14px 0 40px -18px rgba(0, 0, 0, 0.9);
+    transition: transform mx.$dur-base mx.$ease-out-soft;
 
     // Hidden off-screen by default
     transform: translateX(100%);
@@ -59,7 +65,7 @@
     }
 
     @include mx.light {
-      background-color: light.$color-white;
+      background-color: color.adjust(light.$color-white, $alpha: -0.05);
       border-left: 1px solid light.$color-light-gray;
     }
   }
@@ -73,55 +79,82 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 28px;
-    background-color: color.adjust(dark.$color-black, $alpha: -0.5);
+    gap: 22px;
     box-sizing: border-box;
+    position: relative;
+
+    background:
+      radial-gradient(
+        120% 45% at 50% 0%,
+        rgba(208, 78, 47, 0.12) 0%,
+        rgba(208, 78, 47, 0) 60%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.045) 0%,
+        rgba(255, 255, 255, 0.015) 100%
+      ),
+      rgba(10, 9, 9, 0.7);
+    box-shadow: -1px 0 0 0 rgba(255, 255, 255, 0.06) inset;
 
     @include mx.light {
-      background-color: color.adjust(light.$color-dark-gray, $alpha: -0.6);
-      border-right: 1px solid light.$color-light-gray;
+      background: light.$color-card-bg;
+      box-shadow: -1px 0 0 0 rgba(9, 9, 9, 0.07) inset;
     }
 
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    scrollbar-color: rgba(208, 78, 47, 0.45) transparent;
 
     @include mx.light {
-      scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+      scrollbar-color: rgba(139, 91, 130, 0.35) transparent;
     }
 
     &::-webkit-scrollbar {
       width: 4px;
     }
     &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.3);
+      background: rgba(208, 78, 47, 0.45);
       border-radius: 10px;
 
       @include mx.light {
-        background: rgba(0, 0, 0, 0.1);
+        background: rgba(139, 91, 130, 0.35);
       }
     }
 
     @include mx.max-w(1024px) {
       padding: 20px 10px;
-      gap: 20px;
+      gap: 18px;
     }
 
     @include mx.max-w(768px) {
       padding-top: 40px;
-      background-color: transparent; // Uses outer drawer background
-
-      @include mx.light {
-        border-right: none;
-      }
+      background: transparent; // Uses outer drawer background
+      box-shadow: none;
     }
 
     > h4 {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
       margin: 0;
+      color: dark.$color-white;
+      position: relative;
 
       @include mx.light {
         color: light.$color-black;
+      }
+
+      // Sprocket hairline under the title, matching the page headings.
+      &::after {
+        content: "";
+        display: block;
+        width: 62px;
+        height: 5px;
+        margin: 12px auto 0;
+        @include mx.sprockets(3.5px, 10px, rgba(208, 78, 47, 0.5));
+
+        @include mx.light {
+          @include mx.sprockets(3.5px, 10px, rgba(139, 91, 130, 0.5));
+        }
       }
     }
 
@@ -129,31 +162,45 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 14px;
+      gap: 10px;
       width: 100%;
       margin: 0;
       padding: 0;
       list-style: none;
 
       > li {
-        background-color: color.adjust(dark.$color-white, $alpha: -0.85);
-        border-radius: 10px;
+        border-radius: 12px;
         @include mx.flex-center;
         justify-content: space-between;
-        height: 50px;
+        height: 52px;
         width: 100%;
         position: relative;
-        padding: 0 17px;
+        padding: 0 15px;
         overflow: hidden;
         box-sizing: border-box;
+        background: rgba(255, 255, 255, 0.04);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+        transition:
+          background-color mx.$dur-fast ease,
+          transform mx.$dur-fast ease;
+
+        &:hover {
+          background: rgba(208, 78, 47, 0.1);
+          transform: translateX(-2px);
+        }
 
         @include mx.light {
-          background-color: color.adjust(light.$color-dark-gray, $alpha: -0.7);
+          background: rgba(9, 9, 9, 0.035);
+          box-shadow: 0 0 0 1px rgba(9, 9, 9, 0.05) inset;
+
+          &:hover {
+            background: rgba(139, 91, 130, 0.1);
+          }
         }
 
         > .join-sidebar__img {
-          height: 35px;
-          width: 35px;
+          height: 34px;
+          width: 34px;
           position: relative;
           flex-shrink: 0;
 
@@ -162,6 +209,7 @@
             width: 100%;
             border-radius: 100%;
             object-fit: cover;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
           }
 
           &::before {
@@ -171,11 +219,13 @@
             position: absolute;
             left: 0;
             bottom: 0;
-            background-color: color.adjust(dark.$color-green, $alpha: -0.5);
+            background-color: color.adjust(dark.$color-green, $alpha: -0.35);
             border-radius: 100%;
+            box-shadow: 0 0 0 2px rgba(10, 9, 9, 0.9);
 
             @include mx.light {
               background-color: light.$color-green;
+              box-shadow: 0 0 0 2px light.$color-card-bg;
             }
           }
         }
@@ -187,9 +237,10 @@
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          color: dark.$color-white;
 
           @include mx.light {
-            color: light.$color-white;
+            color: light.$color-black;
           }
         }
 
@@ -198,23 +249,27 @@
           height: 24px;
           @include mx.flex-center;
           flex-shrink: 0;
+          color: dark.$color-primary;
 
           @include mx.light {
-            color: light.$color-white;
+            color: light.$color-primary;
           }
         }
 
+        // Ember bar marking each row, glowing softly in the dark theme.
         &::before {
           content: "";
           position: absolute;
           right: 0;
-          width: 5px;
-          height: 33px;
+          width: 4px;
+          height: 30px;
           border-radius: 7px 0 0 7px;
-          background-color: dark.$color-white;
+          background-color: dark.$color-primary;
+          box-shadow: -6px 0 20px -4px rgba(208, 78, 47, 0.7);
 
           @include mx.light {
             background-color: light.$color-primary;
+            box-shadow: none;
           }
         }
       }
@@ -237,29 +292,36 @@
       transform: translateY(-50%);
       width: 46px;
       height: 52px;
-      border-radius: 12px 0 0 12px;
-      background-color: #0f0826;
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 14px 0 0 14px;
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.06) 0%,
+          rgba(255, 255, 255, 0.02) 100%
+        ),
+        rgba(12, 10, 10, 0.92);
+      border: 1px solid rgba(208, 78, 47, 0.38);
       border-right: none;
-      color: dark.$color-white;
+      color: dark.$color-primary;
       cursor: pointer;
-      box-shadow: -5px 0 12px rgba(0, 0, 0, 0.4);
+      box-shadow: -8px 0 22px -10px rgba(0, 0, 0, 0.8);
       z-index: 1000;
       padding: 0;
-      transition: flex-direction 300ms ease;
+      transition: flex-direction mx.$dur-base ease;
+
       &.open {
         flex-direction: row;
       }
 
       @include mx.light {
-        background-color: light.$color-white;
+        background: light.$color-white;
         border-color: light.$color-light-gray;
         color: light.$color-primary;
       }
 
       .toggle-arrow {
         font-size: 13px;
-        transition: transform 300ms ease;
+        transition: transform mx.$dur-base ease;
 
         &.rotated {
           transform: rotate(180deg);

@@ -3,11 +3,17 @@
 @use "../../../../styles/abstracts/mixins" as mx;
 @use "sass:color";
 
+/* ---------------------------------------------------------------
+ * Create room modal.
+ * Same structure and behaviour, restyled onto the cinema surface
+ * with ember accents and ambient (never hard) elevation.
+ * --------------------------------------------------------------- */
+
 .create-room-modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
+  background-color: rgba(6, 5, 5, 0.66);
+  backdrop-filter: blur(10px);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -15,10 +21,10 @@
 
   opacity: 0;
   pointer-events: none;
-  transition: opacity 300ms ease;
+  transition: opacity mx.$dur-base ease;
 
   @include mx.light {
-    background-color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(222, 222, 222, 0.6);
   }
 
   &.is-active {
@@ -37,38 +43,81 @@
   max-width: 95%;
   display: flex;
   flex-direction: column;
-
-  border: 1px solid color.adjust(dark.$color-white, $alpha: -0.9);
-  border-radius: 26px;
+  position: relative;
+  isolation: isolate;
+  border-radius: 24px;
   padding: 24px 26px;
-  background-color: color.adjust(dark.$color-dark-gray, $alpha: -0.4);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 
-  transform: scale(0.9) translateY(20px);
+  @include mx.cinema-surface;
+  @include mx.ambient-shadow(1.2);
+
+  transform: scale(0.94) translateY(18px);
   opacity: 0;
   transition:
     transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1),
-    opacity 300ms ease;
+    opacity mx.$dur-base ease;
+
+  @include mx.reduced-motion {
+    transition: opacity mx.$dur-base ease;
+  }
+
+  &::before {
+    @include mx.gradient-border(
+      24px,
+      rgba(208, 78, 47, 0.4),
+      rgba(255, 255, 255, 0.04)
+    );
+    z-index: 3;
+  }
+
+  > * {
+    position: relative;
+    z-index: 4;
+  }
 
   @include mx.light {
-    background-color: light.$color-card-bg;
-    border: 1px solid color.adjust(light.$color-gray, $alpha: -0.8);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 20px 44px -26px rgba(9, 9, 9, 0.4);
+
+    &::before {
+      @include mx.gradient-border(
+        24px,
+        rgba(139, 91, 130, 0.35),
+        rgba(0, 0, 0, 0.04)
+      );
+    }
   }
 
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 20px;
-    border-bottom: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
+    padding-bottom: 18px;
+    position: relative;
 
-    @include mx.light {
-      border-bottom-color: color.adjust(light.$color-light-gray, $alpha: -0.5);
+    // Sprocket hairline instead of a plain rule.
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 5px;
+      @include mx.sprockets(3.5px, 11px, rgba(208, 78, 47, 0.4));
+      mask-image: linear-gradient(90deg, #000 0%, #000 70%, transparent 100%);
+      -webkit-mask-image: linear-gradient(
+        90deg,
+        #000 0%,
+        #000 70%,
+        transparent 100%
+      );
+
+      @include mx.light {
+        @include mx.sprockets(3.5px, 11px, rgba(139, 91, 130, 0.4));
+      }
     }
 
     h3 {
-      font-size: 22px;
+      font-size: 21px;
       font-weight: 700;
       color: dark.$color-white;
       margin: 0;
@@ -79,21 +128,29 @@
     }
 
     button {
-      background: transparent;
+      background: rgba(255, 255, 255, 0.04);
       border: none;
-      color: color.adjust(dark.$color-white, $alpha: -0.4);
-      font-size: 24px;
+      height: 36px;
+      width: 36px;
+      border-radius: 10px;
+      @include mx.flex-center;
+      color: color.adjust(dark.$color-white, $alpha: -0.3);
+      font-size: 22px;
       cursor: pointer;
-      transition: color 200ms ease;
+      transition: all mx.$dur-fast ease;
 
       @include mx.light {
+        background: rgba(9, 9, 9, 0.04);
         color: light.$color-gray;
       }
 
       &:hover {
-        color: dark.$color-white;
+        color: dark.$color-primary;
+        background: rgba(208, 78, 47, 0.14);
+
         @include mx.light {
-          color: light.$color-black;
+          color: light.$color-primary;
+          background: rgba(139, 91, 130, 0.12);
         }
       }
     }
@@ -103,7 +160,7 @@
     padding: 24px 0;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 22px;
 
     .form-group {
       display: flex;
@@ -111,7 +168,7 @@
       gap: 12px;
 
       label {
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 700;
         color: dark.$color-white;
 
@@ -122,42 +179,56 @@
 
       .toggle-group {
         display: flex;
-        gap: 12px;
-        background-color: color.adjust(dark.$color-white, $alpha: -0.95);
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.035);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
         padding: 6px;
-        border-radius: 12px;
+        border-radius: 14px;
 
         @include mx.light {
-          background-color: light.$color-light-gray;
+          background: rgba(9, 9, 9, 0.04);
+          box-shadow: 0 0 0 1px rgba(9, 9, 9, 0.06) inset;
         }
 
         button {
           flex: 1;
           padding: 12px;
-          border-radius: 8px;
+          border-radius: 10px;
           border: none;
           background: transparent;
-          color: color.adjust(dark.$color-white, $alpha: -0.4);
+          color: color.adjust(dark.$color-white, $alpha: -0.35);
           font-weight: 700;
           font-size: 15px;
           cursor: pointer;
-          transition: all 200ms ease;
+          transition: all mx.$dur-fast ease;
 
           @include mx.light {
-            color: light.$color-gray;
+            color: light.$color-dark-gray;
+          }
+
+          &:hover:not(.active) {
+            color: dark.$color-white;
+
+            @include mx.light {
+              color: light.$color-black;
+            }
           }
 
           &.active {
-            background-color: color.adjust(
-              dark.$color-light-gray,
-              $alpha: -0.7
-            );
             color: dark.$color-white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(
+              180deg,
+              rgba(208, 78, 47, 0.9) 0%,
+              rgba(192, 82, 60, 0.9) 100%
+            );
+            box-shadow:
+              0 1px 0 0 rgba(255, 255, 255, 0.16) inset,
+              0 12px 24px -16px rgba(208, 78, 47, 0.8);
 
             @include mx.light {
-              background-color: light.$color-white;
-              color: light.$color-black;
+              color: light.$color-white;
+              background: light.$color-primary-bg;
+              box-shadow: 0 10px 20px -16px rgba(9, 9, 9, 0.5);
             }
           }
         }
@@ -170,53 +241,68 @@
     justify-content: flex-end;
     gap: 12px;
     padding-top: 20px;
-    border-top: 1px solid color.adjust(dark.$color-white, $alpha: -0.85);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
 
     @include mx.light {
-      border-top-color: color.adjust(light.$color-light-gray, $alpha: -0.5);
+      border-top-color: rgba(9, 9, 9, 0.08);
     }
 
     button {
-      height: 45px;
+      height: 46px;
       padding: 0 24px;
       border-radius: 12px;
       font-size: 16px;
       font-weight: 700;
       cursor: pointer;
-      transition: all 200ms ease;
+      transition: all mx.$dur-fast ease;
 
       &.cancel-btn {
         background-color: transparent;
-        color: dark.$color-white;
-        border: 1px solid color.adjust(dark.$color-white, $alpha: -0.6);
+        color: color.adjust(dark.$color-white, $alpha: -0.15);
+        border: 1px solid rgba(255, 255, 255, 0.14);
 
         @include mx.light {
-          color: light.$color-primary;
+          color: light.$color-dark-gray;
           border-color: light.$color-light-gray;
         }
 
-        &:hover {
-          background-color: color.adjust(dark.$color-red, $alpha: -0.8);
+        &:hover:not(:disabled) {
+          color: dark.$color-white;
+          border-color: rgba(178, 56, 64, 0.6);
+          background-color: rgba(178, 56, 64, 0.14);
+
+          @include mx.light {
+            color: light.$color-red;
+            background-color: rgba(178, 56, 64, 0.08);
+          }
         }
       }
 
       &.create-btn {
-        background-color: dark.$color-white;
-        color: dark.$color-black;
         border: none;
+        color: dark.$color-white;
+        background: linear-gradient(
+          180deg,
+          dark.$color-primary-hover 0%,
+          dark.$color-primary-bg 100%
+        );
+        box-shadow:
+          0 1px 0 0 rgba(255, 255, 255, 0.16) inset,
+          0 14px 28px -18px rgba(208, 78, 47, 0.8);
 
         @include mx.light {
-          background-color: light.$color-primary-bg;
           color: light.$color-white;
+          background: linear-gradient(
+            180deg,
+            light.$color-primary 0%,
+            light.$color-primary-bg 100%
+          );
+          box-shadow: 0 12px 24px -18px rgba(9, 9, 9, 0.5);
         }
 
         &:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 6px 16px rgba(255, 255, 255, 0.1);
-
-          @include mx.light {
-            box-shadow: 0 6px 16px rgba(light.$color-primary-bg, 0.3);
-          }
+          filter: brightness(1.05);
         }
 
         &:disabled {
