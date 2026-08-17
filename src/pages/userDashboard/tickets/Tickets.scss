@@ -197,12 +197,12 @@
 
   &__new-ticket {
     position: sticky;
-    top: calc(100vh - 32px);
+    top: 17px;
+    @include dash.primary-btn;
     @include mx.flex-center;
     border-radius: 250px;
     height: 62px;
     width: 239px;
-    @include dash.primary-btn;
     font-size: 18px;
     font-weight: 700;
     outline: none;

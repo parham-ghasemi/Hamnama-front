@@ -4,8 +4,6 @@
 @use "sass:color";
 @use "../_dash" as dash;
 
-$row-odd-bg: color.adjust(dark.$color-light-gray, $alpha: -0.87);
-
 .user-leaderboard {
   @include mx.flex-center;
   align-items: start;
