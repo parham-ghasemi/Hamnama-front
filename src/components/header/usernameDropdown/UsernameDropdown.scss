@@ -23,6 +23,10 @@
     @include mx.gradient-border(20px);
   }
 
+  @include mx.max-w(320px) {
+    width: 90%;
+  }
+
   // Animation base states (Hidden by default)
   opacity: 0;
   visibility: hidden;
