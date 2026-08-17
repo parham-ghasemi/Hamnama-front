@@ -2,6 +2,7 @@ import { PiCaretDownBold } from 'react-icons/pi';
 import './Faq.scss';
 import clsx from 'clsx';
 import { useEffect, useRef, useState } from 'react';
+import Reveal from '../reveal/Reveal';
 
 const Faq = () => {
   const questions = [
@@ -36,6 +37,13 @@ const Faq = () => {
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
+    // The pointer-tracked border light is decorative: skip it entirely for
+    // touch devices and for users who asked for reduced motion.
+    const supportsGlow = window.matchMedia(
+      "(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)"
+    );
+    if (!supportsGlow.matches) return;
+
     const handler = (e: MouseEvent) => {
       itemRefs.current.forEach(item => {
         if (!item) return;
@@ -69,7 +77,7 @@ const Faq = () => {
       });
     };
 
-    window.addEventListener("mousemove", handler);
+    window.addEventListener("mousemove", handler, { passive: true });
 
     return () => window.removeEventListener("mousemove", handler);
   }, []);
@@ -79,30 +87,52 @@ const Faq = () => {
       <div className='home-faq__blob'></div>
 
       {
-        questions.map((ques, ind) => (
-          <div
-            className="home-faq__item"
-            onClick={() => toggleShow(ind)}
-            key={`homefaq-${ind}`}
-            // @ts-ignore
-            ref={(el) => (itemRefs.current[ind] = el)}
-          >
-            <div className="home-faq__glow" />
-            <div className={clsx(show.indexOf(ind) >= 0 && 'home-faq__item__trigger--show', 'home-faq__item__trigger')}>
-              {ques.q}
-              <PiCaretDownBold />
-            </div>
+        questions.map((ques, ind) => {
+          const isOpen = show.indexOf(ind) >= 0;
 
-            {/* <div className={clsx(show.indexOf(ind) >= 0 ? 'home-faq__item__answer home-faq__item__answer--show' : 'home-faq__item__answer')}>
-              {ques.a}
-            </div> */}
-            <div className={clsx(show.indexOf(ind) >= 0 ? 'home-faq__item__answer home-faq__item__answer--show' : 'home-faq__item__answer')}>
-              <div> {/* <-- Inner wrapper ensures smooth calculation */}
-                {ques.a}
+          return (
+            <Reveal
+              className="home-faq__item"
+              key={`homefaq-${ind}`}
+              delay={ind * 70}
+            >
+              <div
+                // @ts-ignore
+                ref={(el) => (itemRefs.current[ind] = el)}
+                className='home-faq__item__inner'
+                onClick={() => toggleShow(ind)}
+              >
+                <div className="home-faq__glow" />
+
+                <div
+                  role='button'
+                  tabIndex={0}
+                  aria-expanded={isOpen}
+                  aria-controls={`homefaq-answer-${ind}`}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      toggleShow(ind);
+                    }
+                  }}
+                  className={clsx(isOpen && 'home-faq__item__trigger--show', 'home-faq__item__trigger')}
+                >
+                  {ques.q}
+                  <PiCaretDownBold />
+                </div>
+
+                <div
+                  id={`homefaq-answer-${ind}`}
+                  className={clsx(isOpen ? 'home-faq__item__answer home-faq__item__answer--show' : 'home-faq__item__answer')}
+                >
+                  <div> {/* <-- Inner wrapper ensures smooth calculation */}
+                    {ques.a}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        ))
+            </Reveal>
+          )
+        })
       }
     </div>
   )

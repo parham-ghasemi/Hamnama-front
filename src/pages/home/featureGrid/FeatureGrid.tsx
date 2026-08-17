@@ -1,6 +1,7 @@
 import { PiArchiveFill, PiChatsCircleFill, PiClockFill, PiDevicesFill, PiFilmReelFill, PiFilmStripBold, PiFolderOpenFill, PiHexagonFill } from 'react-icons/pi';
 import './FeatureGrid.scss';
 import { BsMusicPlayerFill } from 'react-icons/bs';
+import Reveal from '../reveal/Reveal';
 
 const FeatureGrid = () => {
   const gridItems = [
@@ -56,7 +57,11 @@ const FeatureGrid = () => {
       {/* <div className="home-feature-grid__blob"></div> */}
       {
         gridItems.map((item, indx) => (
-          <div className="home-feature-grid__item" key={`homefeature-grid-${indx}`}>
+          <Reveal
+            className="home-feature-grid__item"
+            key={`homefeature-grid-${indx}`}
+            delay={(indx % 3) * 70}
+          >
             <div className="home-feature-grid__item__right">
               <div className="home-feature-grid__item__right__glow"></div>
               {item.icon}
@@ -71,7 +76,7 @@ const FeatureGrid = () => {
                 {item.desc}
               </p>
             </div>
-          </div>
+          </Reveal>
         ))
       }
     </div>

@@ -8,7 +8,7 @@ import PhoneInput from './phoneInput/PhoneInput';
 import LoginPassword from './LoginPassword/LoginPassword';
 import OtpInput from './otpInput/OtpInput';
 import RegisterInfo from './registerInfo/RegisterInfo';
-import CinemaAmbience from '../homev2/ambience/CinemaAmbience';
+import CinemaAmbience from '../home/ambience/CinemaAmbience';
 
 import './Auth.scss';
 import { useAuth } from '../../context/AuthContext';

@@ -3,6 +3,7 @@ import { useTheme } from '../../../context/ThemeContext';
 import './Steps.scss';
 import StepAnimation from './stepAnimation/StepAnimation';
 import { toPersianNumerals } from '../../../helpers/NumberConversion';
+import Reveal from '../reveal/Reveal';
 
 const Steps = () => {
   const steps = ['ساخت حساب کاربری', "ساخت اتاق سینما", "انتخاب فیلم و تماشا"]
@@ -16,22 +17,22 @@ const Steps = () => {
       <ul className="home-steps__steps-container">
         <div className={clsx("img", isLight && "img--light")}>
           <img
-            src="/homepage/lightglowlights.png"
+            src="/homepage/lightglowlights.webp"
             className='light'
             alt=""
           />
           <img
-            src="/homepage/glowlights.png"
+            src="/homepage/glowlights.webp"
             className='dark'
             alt=""
           />
         </div>
         {
           steps.map((step, ind) => (
-            <li key={`home-step-item-${ind}`}>
+            <Reveal as='li' key={`home-step-item-${ind}`} delay={ind * 110}>
               <span>{toPersianNumerals(ind + 1)}</span>
               <p>{step}</p>
-            </li>
+            </Reveal>
           ))
         }
       </ul>

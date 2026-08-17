@@ -1,8 +1,9 @@
-import { PiCaretDownFill, PiHeartFill } from 'react-icons/pi';
+import { PiCaretDownFill, PiHeartFill, PiTicketFill } from 'react-icons/pi';
 import './PlanCards.scss';
 import { BsPeopleFill, BsPersonFill } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import { toPersianNumerals } from '../../../helpers/NumberConversion';
+import Reveal from '../reveal/Reveal';
 
 const PlanCards = () => {
   const plans = [
@@ -33,7 +34,7 @@ const PlanCards = () => {
   ]
 
   return (
-    <div className='home-planCards'>
+    <Reveal className='home-planCards' variant='fade'>
       {/* <div className='home-planCards__blob-top'></div> */}
       <div className='home-planCards__blob-bottom'></div>
 
@@ -88,6 +89,7 @@ const PlanCards = () => {
             </div>
 
             <button className='home-planCards__card__buyBtn'>
+              <PiTicketFill aria-hidden='true' />
               خرید
             </button>
 
@@ -95,7 +97,7 @@ const PlanCards = () => {
           </div>
         ))
       }
-    </div>
+    </Reveal>
   )
 }
 

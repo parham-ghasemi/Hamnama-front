@@ -8,6 +8,13 @@
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  isolation: isolate;
+
+  // Everything except the fixed ambience layer sits above it.
+  > *:not(.cinema-ambience) {
+    position: relative;
+    z-index: 1;
+  }
 
   &__hero {
     position: absolute;
@@ -24,10 +31,37 @@
       height: 350px;
       max-height: 350px;
     }
-    // @include mx.max-w(768px) {
-    //   height: 300px;
-    //   max-height: 300px;
-    // }
+
+    // Small consistency tweak only: the hero now melts into the page
+    // background instead of ending on a hard edge.
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 32vh;
+      pointer-events: none;
+      // background: linear-gradient(
+      //   180deg,
+      //   transparent 0%,
+      //   rgba(10, 9, 9, 0.75) 65%,
+      //   #0a0909 100%
+      // );
+
+      @include mx.light {
+        background: linear-gradient(
+          180deg,
+          transparent 0%,
+          color.adjust(light.$color-bg, $alpha: -0.3) 65%,
+          light.$color-bg 100%
+        );
+      }
+
+      @include mx.max-w(768px) {
+        height: 120px;
+      }
+    }
 
     > .img {
       height: 100%;
@@ -76,6 +110,7 @@
       font-weight: 700;
       max-width: 660px;
       text-align: center;
+      z-index: 1;
 
       // Typewriter animation
       overflow: hidden; /* Ensures content is not revealed until animation */
@@ -103,6 +138,11 @@
         }
       }
 
+      @include mx.reduced-motion {
+        animation: none;
+        border-left-color: transparent;
+      }
+
       @include mx.max-w(1024px) {
         font-size: 34px;
         max-width: 520px;
@@ -121,19 +161,104 @@
     }
   }
 
+  /* ------------------------------------------------------------------
+   * Shared section heading treatment.
+   * A hairline of sprocket holes under each title ties the whole page
+   * back to the film metaphor without any literal decoration.
+   * ------------------------------------------------------------------ */
+  &__steps-title,
+  &__features-title,
+  &__plans-title,
+  &__faq-title {
+    position: relative;
+
+    &::after {
+      content: "";
+      display: block;
+      width: 92px;
+      height: 6px;
+      margin: 18px auto 0;
+      @include mx.sprockets(4px, 11px, rgba(208, 78, 47, 0.55));
+      mask-image: linear-gradient(
+        90deg,
+        transparent,
+        #000 30%,
+        #000 70%,
+        transparent
+      );
+      -webkit-mask-image: linear-gradient(
+        90deg,
+        transparent,
+        #000 30%,
+        #000 70%,
+        transparent
+      );
+
+      @include mx.light {
+        @include mx.sprockets(4px, 11px, rgba(139, 91, 130, 0.6));
+      }
+
+      @include mx.max-w(768px) {
+        width: 72px;
+        margin-top: 12px;
+      }
+    }
+  }
+
   &__button-title {
     text-align: center;
     font-size: 20.4px;
     padding: 0 16px;
+    color: color.adjust(dark.$color-white, $alpha: -0.15);
+    font-weight: 500;
+
+    @include mx.light {
+      color: light.$color-dark-gray;
+    }
+
+    &__text {
+      display: inline-block;
+      position: relative;
+      padding: 10px 22px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.035);
+      backdrop-filter: blur(6px);
+
+      &::before {
+        @include mx.gradient-border(
+          999px,
+          rgba(208, 78, 47, 0.45),
+          rgba(255, 255, 255, 0.05)
+        );
+      }
+
+      @include mx.light {
+        background: rgba(255, 255, 255, 0.75);
+        box-shadow: 0 4px 14px -8px rgba(9, 9, 9, 0.4);
+
+        &::before {
+          @include mx.gradient-border(
+            999px,
+            rgba(139, 91, 130, 0.4),
+            rgba(0, 0, 0, 0.05)
+          );
+        }
+      }
+
+      @include mx.max-w(480px) {
+        padding: 8px 14px;
+        font-size: 12px;
+      }
+    }
 
     &::before {
       content: "";
-      height: 100vh;
+      height: 62px;
       width: 8.5px;
       display: block;
 
       @include mx.max-w(768px) {
-        height: 400px;
+        height: 40px;
       }
     }
 
@@ -146,9 +271,15 @@
     }
   }
 
+  /* ------------------------------------------------------------------
+   * Primary calls to action.
+   * Two deliberately different objects: a ticket (buy) and a play
+   * control (watch), so the choice reads instantly.
+   * ------------------------------------------------------------------ */
   &__buttons {
     display: flex;
     justify-content: center;
+    flex-direction: row-reverse;
     gap: 69.7px;
     margin-top: 44.2px;
     padding: 0 16px;
@@ -165,10 +296,17 @@
     }
 
     > button {
-      background-color: dark.$color-primary-bg;
-      transition:
-        background 150ms ease,
-        transform 150ms ease;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+
+      border: 0;
+      color: dark.$color-white;
+      font-family: inherit;
       font-size: 35.7px;
       font-weight: 600;
       border-radius: 26px;
@@ -177,17 +315,27 @@
       width: 340px;
       text-shadow: 0 4px 4px #00000067;
 
-      @include mx.light {
-        background-color: light.$color-primary-bg;
-        color: light.$color-white;
+      transition:
+        transform mx.$dur-base mx.$ease-out-soft,
+        box-shadow mx.$dur-base mx.$ease-out-soft,
+        filter mx.$dur-fast ease;
+
+      @include mx.reduced-motion {
+        transition: none;
+      }
+
+      &:focus-visible {
+        outline: 2px solid dark.$color-yellow;
+        outline-offset: 4px;
       }
 
       &:hover {
-        background: dark.$color-primary-bg-hover;
+        transform: translateY(-3px);
+      }
 
-        @include mx.light {
-          background: light.$color-primary-bg-hover;
-        }
+      &:active {
+        transform: translateY(-1px) scale(0.995);
+        filter: brightness(0.96);
       }
 
       @include mx.max-w(1024px) {
@@ -195,6 +343,7 @@
         height: 95px;
         font-size: 26px;
         border-radius: 20px;
+        gap: 14px;
       }
 
       @include mx.max-w(768px) {
@@ -209,6 +358,213 @@
         max-width: 280px;
         height: 56px;
         font-size: 18px;
+        gap: 10px;
+      }
+    }
+
+    &__icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.86em;
+      line-height: 0;
+      transition: transform mx.$dur-base mx.$ease-out-soft;
+
+      @include mx.reduced-motion {
+        transition: none;
+      }
+    }
+
+    &__label {
+      position: relative;
+    }
+
+    // A slow light sweep, like a projector beam crossing the button.
+    &__sheen {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(
+        105deg,
+        transparent 35%,
+        rgba(255, 255, 255, 0.28) 50%,
+        transparent 65%
+      );
+      transform: translateX(-120%);
+      opacity: 0;
+      transition:
+        transform 900ms mx.$ease-out-soft,
+        opacity 200ms ease;
+
+      @include mx.reduced-motion {
+        display: none;
+      }
+    }
+
+    button:hover .home-page__buttons__sheen {
+      transform: translateX(120%);
+      opacity: 1;
+    }
+
+    /* ---- Buy subscription: a ticket ---------------------------------- */
+    &__subs {
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.14) 0%,
+          rgba(255, 255, 255, 0) 55%
+        ),
+        linear-gradient(135deg, #d0512f 0%, #b8402a 55%, #9c3524 100%);
+      box-shadow:
+        0 1px 0 0 rgba(255, 255, 255, 0.22) inset,
+        0 18px 40px -20px rgba(208, 78, 47, 0.85),
+        0 0 0 1px rgba(255, 255, 255, 0.06);
+
+      @include mx.light {
+        background:
+          linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.16) 0%,
+            rgba(255, 255, 255, 0) 55%
+          ),
+          linear-gradient(
+            135deg,
+            light.$color-primary 0%,
+            light.$color-primary-bg 100%
+          );
+        color: light.$color-white;
+        box-shadow:
+          0 1px 0 0 rgba(255, 255, 255, 0.3) inset,
+          0 16px 30px -20px rgba(104, 61, 96, 0.9);
+      }
+
+      // Ticket perforation punched out of both short edges.
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #0a0909;
+        transform: translateY(-50%);
+        pointer-events: none;
+
+        @include mx.light {
+          background: light.$color-bg;
+        }
+
+        @include mx.max-w(768px) {
+          width: 16px;
+          height: 16px;
+        }
+      }
+
+      &::before {
+        left: -13px;
+
+        @include mx.max-w(768px) {
+          left: -8px;
+        }
+      }
+
+      &::after {
+        right: -13px;
+
+        @include mx.max-w(768px) {
+          right: -8px;
+        }
+      }
+
+      &:hover {
+        box-shadow:
+          0 1px 0 0 rgba(255, 255, 255, 0.28) inset,
+          0 26px 54px -22px rgba(208, 78, 47, 1),
+          0 0 0 1px rgba(255, 255, 255, 0.1);
+      }
+
+      &:hover .home-page__buttons__icon {
+        transform: rotate(-9deg) scale(1.08);
+      }
+    }
+
+    /* ---- Start watching: a play control ------------------------------ */
+    &__watch {
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.015) 100%
+        ),
+        linear-gradient(
+          180deg,
+          rgba(24, 20, 20, 0.9) 0%,
+          rgba(14, 12, 12, 0.95) 100%
+        );
+      box-shadow:
+        0 1px 0 0 rgba(255, 255, 255, 0.08) inset,
+        0 18px 40px -22px rgba(0, 0, 0, 0.9);
+
+      &::before {
+        @include mx.gradient-border(
+          26px,
+          rgba(208, 78, 47, 0.65),
+          rgba(255, 255, 255, 0.06)
+        );
+        z-index: 2;
+
+        @include mx.max-w(1024px) {
+          border-radius: 20px;
+        }
+
+        @include mx.max-w(768px) {
+          border-radius: 16px;
+        }
+      }
+
+      .home-page__buttons__icon {
+        width: 1.35em;
+        height: 1.35em;
+        border-radius: 50%;
+        font-size: 0.44em;
+        color: dark.$color-primary;
+        background: rgba(208, 78, 47, 0.14);
+        box-shadow: 0 0 0 1px rgba(208, 78, 47, 0.4);
+        padding-left: 0.08em; // optical centering of the play triangle
+
+        @include mx.light {
+          color: light.$color-white;
+          background: light.$color-primary;
+          box-shadow: none;
+        }
+      }
+
+      @include mx.light {
+        background: light.$color-card-bg;
+        color: light.$color-primary-bg;
+        text-shadow: none;
+        box-shadow: 0 10px 24px -16px rgba(9, 9, 9, 0.5);
+
+        &::before {
+          @include mx.gradient-border(
+            26px,
+            rgba(139, 91, 130, 0.5),
+            rgba(0, 0, 0, 0.06)
+          );
+        }
+      }
+
+      &:hover {
+        box-shadow:
+          0 1px 0 0 rgba(255, 255, 255, 0.12) inset,
+          0 26px 52px -24px rgba(0, 0, 0, 1),
+          0 0 44px -18px rgba(208, 78, 47, 0.75);
+      }
+
+      &:hover .home-page__buttons__icon {
+        transform: scale(1.12);
+        background: rgba(208, 78, 47, 0.24);
       }
     }
   }

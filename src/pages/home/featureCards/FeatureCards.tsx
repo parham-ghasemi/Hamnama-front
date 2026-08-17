@@ -1,5 +1,6 @@
 import { PiArrowsCounterClockwiseBold, PiChatsTeardropDuotone, PiFileVideoFill, PiProjectorScreenFill } from 'react-icons/pi';
 import './FeatureCards.scss';
+import Reveal from '../reveal/Reveal';
 
 const FeatureCards = () => {
   const cards = [
@@ -25,7 +26,12 @@ const FeatureCards = () => {
     <div className='home-feature-cards'>
       {
         cards.map((card, ind) => (
-          <div className="home-feature-cards__card" key={`home-f-card-${ind}`}>
+          <Reveal
+            className="home-feature-cards__card"
+            key={`home-f-card-${ind}`}
+            delay={ind * 90}
+            variant='up'
+          >
             <div className='home-feature-cards__card__glow'></div>
             <div className="home-feature-cards__card__icon">
               {card.icon}
@@ -34,7 +40,7 @@ const FeatureCards = () => {
             <div className="home-feature-cards__card__title">
               {card.title}
             </div>
-          </div>
+          </Reveal>
         ))
       }
     </div>

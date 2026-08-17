@@ -20,15 +20,13 @@ import AdminLayout from "./layouts/adminLayout/AdminLayout";
 import AdminRoute from "./components/adminRoute/AdminRoute";
 import { AdminDashboard, AdminTickets, AdminUsers, AdminRooms, AdminSettings } from "./pages/admin";
 import { ConfirmationModalProvider } from "./context/ConfirmModalContext/ConfirmaModalContext";
-import HomeV2 from "./pages/homev2/HomeV2";
+import Home from "./pages/home/Home";
 import NotFound from "./components/notFound/NotFound";
 import { Toaster } from "./components/toast";
 
 const queryClient = new QueryClient({});
 
-
 function App() {
-
   return (
     <AuthProvider>
       <div className="w-full min-h-screen font-fa cursor-default" dir="rtl" >
@@ -49,7 +47,7 @@ function App() {
                 </Route>
 
                 <Route element={<DesktopLayout />}>
-                  <Route index element={<HomeV2 />} />
+                  <Route index element={<Home />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/plan-details" element={<PlanDetails />} />
                   <Route path="*" element={<NotFound />} />
