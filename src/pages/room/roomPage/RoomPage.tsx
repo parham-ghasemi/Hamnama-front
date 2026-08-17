@@ -1140,7 +1140,7 @@ const RoomPage = () => {
           />
 
           <button className="room-page__main__top__choose" onClick={() => setMediaTypeModalOpen(true)}>
-            انتخاب حالت پخش
+            انتخاب فیلم
           </button>
         </div>
 

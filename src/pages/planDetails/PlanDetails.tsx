@@ -58,8 +58,8 @@ const PlanDetails = () => {
   return (
     <>
       <SEO
-        title="HamNama | Plans & Pricing"
-        description="Explore HamNama plans and find the right way to watch movies and series together with your friends."
+        title="هم‌نما | پلن‌ها و قیمت‌ها"
+        description="پلن‌های هم‌نما را بررسی کنید و بهترین گزینه را برای تماشای فیلم و سریال به همراه دوستانتان انتخاب کنید."
         canonical="https://hamnama.net/plan-details"
       />
 

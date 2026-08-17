@@ -550,8 +550,8 @@ const UserInfo = () => {
   return (
     <>
       <SEO
-        title="HamNama | Your Profile"
-        description="Manage your HamNama profile."
+        title="هم‌نما | پروفایل شما"
+        description="پروفایل هم‌نما خود را مدیریت و اطلاعات حساب کاربری‌تان را ویرایش کنید."
         canonical="https://hamnama.net/user/info"
         noindex
       />

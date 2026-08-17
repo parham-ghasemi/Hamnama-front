@@ -24,8 +24,8 @@ const Payments = () => {
   return (
     <>
       <SEO
-        title="HamNama | Your Payments"
-        description="Manage your Payments on HamNama."
+        title="هم‌نما | پرداخت‌های شما"
+        description="پرداخت‌های خود را در هم‌نما مدیریت و بررسی کنید."
         canonical="https://hamnama.net/user/payments"
         noindex
       />

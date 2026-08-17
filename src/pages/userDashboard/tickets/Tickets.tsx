@@ -82,8 +82,8 @@ const Tickets = () => {
   return (
     <>
       <SEO
-        title="HamNama | Your Tickets"
-        description="Manage your Tickets on HamNama."
+        title="هم‌نما | تیکت‌های شما"
+        description="تیکت‌های پشتیبانی خود را در هم‌نما مدیریت و بررسی کنید."
         canonical="https://hamnama.net/user/ticket"
         noindex
       />

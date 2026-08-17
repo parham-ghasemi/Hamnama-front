@@ -20,8 +20,8 @@ const Home = () => {
   return (
     <>
       <SEO
-        title="HamNama | Watch Movies & Series Together"
-        description="Watch movies and series together with your friends on HamNama. Create shared rooms, chat, and enjoy your favorite content together."
+        title="هم‌نما | تماشای فیلم و سریال با دوستان"
+        description="در هم‌نما فیلم‌ها و سریال‌های مورد علاقه‌تان را به همراه دوستانتان تماشا کنید. اتاق مشترک بسازید، گفتگو کنید و از تماشای محتوا در کنار یکدیگر لذت ببرید."
         canonical="https://hamnama.net/"
       />
       <div className='home-page'>
