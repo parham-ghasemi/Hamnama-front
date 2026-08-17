@@ -196,18 +196,18 @@
   }
 
   &__new-ticket {
+    position: sticky;
+    top: calc(100vh - 32px);
     @include mx.flex-center;
-    @include dash.primary-btn;
     border-radius: 250px;
     height: 62px;
     width: 239px;
+    @include dash.primary-btn;
     font-size: 18px;
     font-weight: 700;
     outline: none;
     cursor: pointer;
     padding: 12px;
-    position: sticky;
-    top: calc(100vh - 32px);
 
     // Full width on mobile
     @include mx.max-w(768px) {

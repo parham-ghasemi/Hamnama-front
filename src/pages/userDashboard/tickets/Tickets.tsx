@@ -8,7 +8,6 @@ import { BsPlusLg } from 'react-icons/bs';
 import { IoCloseOutline } from 'react-icons/io5';
 import clsx from 'clsx';
 import TicketChat from './ticketChatModal/TicketChatModal';
-import { SEO } from '../../../components/seo/SEO';
 
 // Helper to convert English statuses to Persian and matching CSS classes
 const getStatusInfo = (status: string) => {
@@ -80,117 +79,108 @@ const Tickets = () => {
   };
 
   return (
-    <>
-      <SEO
-        title="هم‌نما | تیکت‌های شما"
-        description="تیکت‌های پشتیبانی خود را در هم‌نما مدیریت و بررسی کنید."
-        canonical="https://hamnama.net/user/ticket"
-        noindex
-      />
+    <div className="user-tickets">
+      <div className="user-tickets__blob" />
 
-      <div className="user-tickets">
-        <div className="user-tickets__blob" />
-
-        <div className="user-tickets__list-container">
-          <div className="user-tickets__list-container__header">
-            <div className="user-tickets__list-container__header__cell">موضوع</div>
-            <div className="user-tickets__list-container__header__cell">شماره تیکت</div>
-            <div className="user-tickets__list-container__header__cell">وضعیت</div>
-            <div className="user-tickets__list-container__header__cell">تاریخ</div>
-            <div className="user-tickets__list-container__header__cell icon" />
-          </div>
-
-          <div className="user-tickets__list-container__body-wrapper">
-            {isLoading ? (
-              <p style={{ textAlign: 'center', padding: '1rem' }}>در حال بارگذاری...</p>
-            ) : (
-              ticketsData?.map((ticket: any) => {
-                const statusInfo = getStatusInfo(ticket.status);
-                return (
-                  <div
-                    key={ticket.id}
-                    className="user-tickets__list-container__body-wrapper__row"
-                    onClick={() => handleTicketClick(ticket.id)}
-                  >
-                    <div className="user-tickets__list-container__body-wrapper__row__cell">{ticket.subject}</div>
-                    <div className="user-tickets__list-container__body-wrapper__row__cell">{ticket.id}</div>
-                    <div className={`user-tickets__list-container__body-wrapper__row__cell ${statusInfo.colorClass}`}>
-                      {statusInfo.text}
-                    </div>
-                    <div className="user-tickets__list-container__body-wrapper__row__cell">{formatDate(ticket.created_at)}</div>
-                    <div className="user-tickets__list-container__body-wrapper__row__cell icon">
-                      <FiChevronLeft strokeWidth={4} />
-                    </div>
-                  </div>
-                );
-              })
-            )}
-            {!isLoading && ticketsData?.length === 0 && (
-              <p style={{ textAlign: 'center', padding: '1rem' }}>تیکتی یافت نشد.</p>
-            )}
-          </div>
+      <div className="user-tickets__list-container">
+        <div className="user-tickets__list-container__header">
+          <div className="user-tickets__list-container__header__cell">موضوع</div>
+          <div className="user-tickets__list-container__header__cell">شماره تیکت</div>
+          <div className="user-tickets__list-container__header__cell">وضعیت</div>
+          <div className="user-tickets__list-container__header__cell">تاریخ</div>
+          <div className="user-tickets__list-container__header__cell icon" />
         </div>
 
-        <button className="user-tickets__new-ticket" onClick={() => setIsModalOpen(true)}>
-          <p>
-            ثبت تیکت جدید
-          </p>
-          <span><BsPlusLg strokeWidth={1} /></span>
-        </button>
+        <div className="user-tickets__list-container__body-wrapper">
+          {isLoading ? (
+            <p style={{ textAlign: 'center', padding: '1rem' }}>در حال بارگذاری...</p>
+          ) : (
+            ticketsData?.map((ticket: any) => {
+              const statusInfo = getStatusInfo(ticket.status);
+              return (
+                <div
+                  key={ticket.id}
+                  className="user-tickets__list-container__body-wrapper__row"
+                  onClick={() => handleTicketClick(ticket.id)}
+                >
+                  <div className="user-tickets__list-container__body-wrapper__row__cell">{ticket.subject}</div>
+                  <div className="user-tickets__list-container__body-wrapper__row__cell">{ticket.id}</div>
+                  <div className={`user-tickets__list-container__body-wrapper__row__cell ${statusInfo.colorClass}`}>
+                    {statusInfo.text}
+                  </div>
+                  <div className="user-tickets__list-container__body-wrapper__row__cell">{formatDate(ticket.created_at)}</div>
+                  <div className="user-tickets__list-container__body-wrapper__row__cell icon">
+                    <FiChevronLeft strokeWidth={4} />
+                  </div>
+                </div>
+              );
+            })
+          )}
+          {!isLoading && ticketsData?.length === 0 && (
+            <p style={{ textAlign: 'center', padding: '1rem' }}>تیکتی یافت نشد.</p>
+          )}
+        </div>
+      </div>
 
-        {/* Modal Overlay */}
-        <div className={clsx('user-tickets__modal-overlay', { 'is-active': isModalOpen })} onClick={() => setIsModalOpen(false)}>
-          <div className="user-tickets__modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="user-tickets__modal-content__header">
-              <h3>ثبت تیکت جدید</h3>
-              <span className="close-icon" onClick={() => setIsModalOpen(false)}>
-                <IoCloseOutline />
-              </span>
+      <button className="user-tickets__new-ticket" onClick={() => setIsModalOpen(true)}>
+        <p>
+          ثبت تیکت جدید
+        </p>
+        <span><BsPlusLg strokeWidth={1} /></span>
+      </button>
+
+      {/* Modal Overlay */}
+      <div className={clsx('user-tickets__modal-overlay', { 'is-active': isModalOpen })} onClick={() => setIsModalOpen(false)}>
+        <div className="user-tickets__modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="user-tickets__modal-content__header">
+            <h3>ثبت تیکت جدید</h3>
+            <span className="close-icon" onClick={() => setIsModalOpen(false)}>
+              <IoCloseOutline />
+            </span>
+          </div>
+
+          <form onSubmit={handleCreateTicket} className="user-tickets__modal-content__form">
+            <div className="input-group">
+              <label>موضوع تیکت</label>
+              <input
+                type="text"
+                required
+                value={ticketSubject}
+                onChange={(e) => setTicketSubject(e.target.value)}
+                placeholder="عنوان مشکل خود را وارد کنید..."
+              />
             </div>
 
-            <form onSubmit={handleCreateTicket} className="user-tickets__modal-content__form">
-              <div className="input-group">
-                <label>موضوع تیکت</label>
-                <input
-                  type="text"
-                  required
-                  value={ticketSubject}
-                  onChange={(e) => setTicketSubject(e.target.value)}
-                  placeholder="عنوان مشکل خود را وارد کنید..."
-                />
-              </div>
+            <div className="input-group">
+              <label>توضیحات</label>
+              <textarea
+                required
+                value={ticketDescription}
+                onChange={(e) => setTicketDescription(e.target.value)}
+                placeholder="جزئیات مشکل خود را بنویسید..."
+              />
+            </div>
 
-              <div className="input-group">
-                <label>توضیحات</label>
-                <textarea
-                  required
-                  value={ticketDescription}
-                  onChange={(e) => setTicketDescription(e.target.value)}
-                  placeholder="جزئیات مشکل خود را بنویسید..."
-                />
-              </div>
-
-              <div className="form-actions">
-                <button
-                  type="submit"
-                  className="submit-btn"
-                  disabled={createTicketMutation.isPending}
-                >
-                  {createTicketMutation.isPending ? 'در حال ارسال...' : 'ارسال تیکت'}
-                </button>
-                <button type="button" className="cancel-btn" onClick={() => setIsModalOpen(false)}>انصراف</button>
-              </div>
-            </form>
-          </div>
+            <div className="form-actions">
+              <button
+                type="submit"
+                className="submit-btn"
+                disabled={createTicketMutation.isPending}
+              >
+                {createTicketMutation.isPending ? 'در حال ارسال...' : 'ارسال تیکت'}
+              </button>
+              <button type="button" className="cancel-btn" onClick={() => setIsModalOpen(false)}>انصراف</button>
+            </div>
+          </form>
         </div>
-
-        <TicketChat
-          isOpen={!!activeChatTicketId}
-          onClose={() => setActiveChatTicketId(null)}
-          ticketId={activeChatTicketId}
-        />
       </div>
-    </>
+
+      <TicketChat
+        isOpen={!!activeChatTicketId}
+        onClose={() => setActiveChatTicketId(null)}
+        ticketId={activeChatTicketId}
+      />
+    </div>
   );
 };
 

@@ -460,3 +460,33 @@
     }
   }
 }
+
+// Loading placeholder for the ticket subject in the modal header.
+.user-ticket-chat-modal__header > .subject.is-loading {
+  display: flex;
+  align-items: center;
+
+  .subject-skeleton {
+    display: block;
+    width: 190px;
+    max-width: 45vw;
+    height: 18px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    animation: ticket-subject-pulse-modal 1.4s ease-in-out infinite;
+
+    @include mx.light {
+      background: rgba(0, 0, 0, 0.09);
+    }
+  }
+}
+
+@keyframes ticket-subject-pulse-modal {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}

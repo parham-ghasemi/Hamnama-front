@@ -4,6 +4,8 @@ import { IoCloseOutline } from 'react-icons/io5';
 import './TicketChatModal.scss';
 import clsx from 'clsx';
 import { userApi } from '../../../../apiCalls/userApi';
+import ChatSkeleton from '../chatSkeleton/ChatSkeleton';
+
 
 interface TicketChatModalProps {
   isOpen: boolean;
@@ -24,7 +26,7 @@ const TicketChatModal = ({ isOpen, onClose, ticketId }: TicketChatModalProps) =>
   }, [isOpen]);
 
   // Fetch Ticket Detail
-  const { data: ticketDetail, isLoading } = useQuery({
+  const { data: ticketDetail, isPending, isFetching } = useQuery({
     queryKey: ['ticket', ticketId],
     queryFn: async () => {
       const response = await userApi.getTicket(ticketId!);
@@ -32,6 +34,9 @@ const TicketChatModal = ({ isOpen, onClose, ticketId }: TicketChatModalProps) =>
     },
     enabled: !!ticketId && isOpen, // Only run query if we have an ID and modal is open
   });
+
+  const isLoading = isPending && isFetching;
+
 
   // Send Message Mutation
   const sendMessageMutation = useMutation({
@@ -74,7 +79,11 @@ const TicketChatModal = ({ isOpen, onClose, ticketId }: TicketChatModalProps) =>
             <p className="id">شماره تیکت: <span>{ticketId}#</span></p>
             <p className="date">{formattedDate}</p>
           </div>
-          <h2 className="subject">{ticketDetail?.subject || 'در حال بارگذاری...'}</h2>
+          {isLoading ? (
+            <h2 className="subject is-loading"><span className="subject-skeleton" /></h2>
+          ) : (
+            <h2 className="subject">{ticketDetail?.subject || 'تیکت'}</h2>
+          )}
           <button className="close-btn" onClick={onClose}>
             <IoCloseOutline />
           </button>
@@ -83,7 +92,7 @@ const TicketChatModal = ({ isOpen, onClose, ticketId }: TicketChatModalProps) =>
         {/* 2. CHAT BODY SECTION */}
         <div className="user-ticket-chat-modal__body">
           {isLoading ? (
-            <p style={{ textAlign: 'center', padding: '2rem' }}>در حال بارگذاری پیام‌ها...</p>
+            <ChatSkeleton />
           ) : (
             <div className='user-ticket-chat-modal__body__chat-container'>
               {ticketDetail?.messages?.map((message: any) => (
@@ -95,8 +104,12 @@ const TicketChatModal = ({ isOpen, onClose, ticketId }: TicketChatModalProps) =>
                   <p>{message.message}</p>
                 </div>
               ))}
+              {!ticketDetail?.messages?.length && (
+                <p style={{ textAlign: 'center', padding: '2rem', opacity: 0.7 }}>پیامی وجود ندارد.</p>
+              )}
             </div>
           )}
+
         </div>
 
         {/* 3. FOOTER SECTION */}

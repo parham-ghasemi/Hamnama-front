@@ -1,21 +1,28 @@
 import { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { IoChevronForwardOutline } from 'react-icons/io5';
 import './TicketChat.scss';
 import clsx from 'clsx';
 import { userApi } from '../../../../apiCalls/userApi';
+import ChatSkeleton from '../chatSkeleton/ChatSkeleton';
 
 const TicketChat = () => {
-  const { ticketId } = useParams<{ ticketId: string }>();
+  const params = useParams<{ ticketId?: string; id?: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  // Fall back to the last URL segment so the page never gets stuck waiting on a
+  // param that is named differently in the route definition.
+  const ticketId =
+    params.ticketId ?? params.id ?? location.pathname.split('/').filter(Boolean).pop();
 
   const [showInput, setShowInput] = useState(false);
   const [replyText, setReplyText] = useState('');
 
   // Fetch Ticket Detail
-  const { data: ticketDetail, isLoading } = useQuery({
+  const { data: ticketDetail, isPending, isFetching } = useQuery({
     queryKey: ['ticket', ticketId],
     queryFn: async () => {
       const response = await userApi.getTicket(ticketId!);
@@ -23,6 +30,10 @@ const TicketChat = () => {
     },
     enabled: !!ticketId,
   });
+
+  // Only show loading while a request is actually in flight.
+  const isLoading = isPending && isFetching;
+
 
   // Send Message Mutation
   const sendMessageMutation = useMutation({
@@ -64,7 +75,11 @@ const TicketChat = () => {
           <p className="id">شماره تیکت: <span>{ticketId}#</span></p>
           <p className="date">{formattedDate}</p>
         </div>
-        <h2 className="subject">{ticketDetail?.subject || 'در حال بارگذاری...'}</h2>
+        {isLoading ? (
+          <h2 className="subject is-loading"><span className="subject-skeleton" /></h2>
+        ) : (
+          <h2 className="subject">{ticketDetail?.subject || 'تیکت'}</h2>
+        )}
         <Link to={'/user/ticket'} className="back-btn">
           <IoChevronForwardOutline />
           <span>بازگشت</span>
@@ -74,7 +89,7 @@ const TicketChat = () => {
       {/* 2. CHAT BODY SECTION */}
       <div className="user-ticket-chat__body">
         {isLoading ? (
-          <p style={{ textAlign: 'center', padding: '2rem' }}>در حال بارگذاری پیام‌ها...</p>
+          <ChatSkeleton />
         ) : (
           <div className='user-ticket-chat__body__chat-container'>
             {ticketDetail?.messages?.map((message: any) => (
@@ -86,9 +101,13 @@ const TicketChat = () => {
                 <p>{message.message}</p>
               </div>
             ))}
+            {!ticketDetail?.messages?.length && (
+              <p style={{ textAlign: 'center', padding: '2rem', opacity: 0.7 }}>پیامی وجود ندارد.</p>
+            )}
           </div>
         )}
       </div>
+
 
       {/* 3. FOOTER SECTION */}
       <div className='user-ticket-chat__footer'>
