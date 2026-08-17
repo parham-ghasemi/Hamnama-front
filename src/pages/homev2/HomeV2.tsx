@@ -31,12 +31,12 @@ const HomeV2 = () => {
         <div className={clsx("home-v2-page__hero", isLight && "home-v2-page__hero--light")}>
           <div className="img">
             <img
-              src="/homepage/lightheroimg.png"
+              src="/homepage/lightheroimg.webp"
               className='light'
               alt=""
             />
             <img
-              src="/homepage/heroimg.png"
+              src="/homepage/heroimg.webp"
               className='dark'
               alt=""
             />

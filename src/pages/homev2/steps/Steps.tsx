@@ -17,12 +17,12 @@ const Steps = () => {
       <ul className="home-v2-steps__steps-container">
         <div className={clsx("img", isLight && "img--light")}>
           <img
-            src="/homepage/lightglowlights.png"
+            src="/homepage/lightglowlights.webp"
             className='light'
             alt=""
           />
           <img
-            src="/homepage/glowlights.png"
+            src="/homepage/glowlights.webp"
             className='dark'
             alt=""
           />

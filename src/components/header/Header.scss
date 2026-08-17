@@ -79,15 +79,16 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    height: 100%;
   }
 
   &__logo {
-    height: 44px;
+    height: 70%;
     width: auto;
     display: flex;
     align-items: center;
     color: inherit;
-    transition: opacity mx.$dur-fast mx.$ease-out-soft;
+    transition: opacity 200ms ease;
 
     &:hover {
       opacity: 0.85;

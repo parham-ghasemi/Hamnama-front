@@ -1,9 +1,7 @@
 import './Header.scss';
 import { PiCaretRightBold, PiUserFill, PiListBold } from "react-icons/pi";
-import clsx from 'clsx';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import UsernameDropdown from './usernameDropdown/UsernameDropdown';
 
@@ -12,7 +10,6 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
-  const { setTheme, isLight } = useTheme();
   const { user, isAuthenticated, isLoading: isUserLoading } = useAuth();
   const nav = useNavigate();
   const location = useLocation();
@@ -47,7 +44,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           </button>
         )}
         <Link to="/" className="header__logo" aria-label="Home">
-          <img src="/Logo.svg" alt="Logo" />
+          <img src="/logo/transparentBg/hamnama1-8-04-cropped.webp" alt="HamNama Logo" />
         </Link>
       </div>
 
@@ -97,7 +94,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           )}
         </div>
 
-        <button
+        {/* <button
           className={clsx(
             "header__left__new-theme-btn",
             isLight && "header__left__new-theme-btn--light"
@@ -105,7 +102,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           onClick={() => setTheme(isLight ? "dark" : "light")}
           aria-label="Toggle theme"
         >
-        </button>
+        </button> */}
       </div>
     </header>
   );
