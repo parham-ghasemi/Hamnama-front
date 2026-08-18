@@ -26,7 +26,9 @@ import {
   updateRoomMemberRole,
   type ConnectionStatus,
   type RoomMessageResponse,
+  type RoomReactionResponse,
   type RoomResponse,
+  type RoomSocketUserPresence,
 } from "../../../apiCalls/roomApi";
 import { useAuth } from "../../../context/AuthContext";
 import AnimatedParticle from '../../../components/animatedParticle/AnimatedParticle';
@@ -46,15 +48,15 @@ type SocketEvent =
   }
   | {
     type: "user_joined";
-    payload: {
-      user_id: string;
-    };
+    payload: RoomSocketUserPresence;
   }
   | {
     type: "user_left";
-    payload: {
-      user_id: string;
-    };
+    payload: RoomSocketUserPresence;
+  }
+  | {
+    type: "reaction";
+    payload: RoomReactionResponse;
   }
   | {
     type: "user_kicked";
@@ -126,6 +128,13 @@ const RoomPage = () => {
   const [messageText, setMessageText] = useState("");
   const [replyingTo, setReplyingTo] = useState<{ id: string, message: string }>({ id: "", message: "" });
   const [roomState, setRoomState] = useState<RoomResponse | null>(null);
+  const [systemMessages, setSystemMessages] = useState<Array<{
+    id: string;
+    user_id: string;
+    user_name: string;
+    kind: "joined" | "left";
+    created_at: string;
+  }>>([]);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -141,33 +150,39 @@ const RoomPage = () => {
 
   // ========== Start Reaction Particles ===========
 
-  let particleIdCounter = 0;
+  const reactionParticleIdRef = useRef(0);
+  const reactionTriggerRef = useRef<HTMLButtonElement | null>(null);
   interface ParticleData {
     id: number;
     emoji: string;
     x: number;
     y: number;
   }
-  const handleReactionClick = (e: React.MouseEvent<HTMLButtonElement>, emoji: string) => {
-    // Get the exact center of the button relative to the viewport
-    const rect = e.currentTarget.getBoundingClientRect();
-    const startX = rect.left + rect.width / 2;
-    const startY = rect.top + rect.height / 2;
 
-    // Generate 10 new particles
+  const spawnReactionParticles = (emoji: string, originElement?: HTMLElement) => {
+    const rect = originElement?.getBoundingClientRect() ?? reactionTriggerRef.current?.getBoundingClientRect();
+    const startX = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+    const startY = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
+
     const newParticles: ParticleData[] = Array.from({ length: 10 }).map(() => ({
-      id: particleIdCounter++,
-      emoji: emoji,
+      id: reactionParticleIdRef.current++,
+      emoji,
       x: startX,
       y: startY,
     }));
 
-    // Add them to the existing state
     setParticles((prev) => [...prev, ...newParticles]);
   };
 
+  const handleReactionClick = (e: React.MouseEvent<HTMLButtonElement>, emoji: string) => {
+    sendSocketEvent({
+      type: "reaction",
+      payload: { emoji },
+    });
+    spawnReactionParticles(emoji, e.currentTarget);
+  };
+
   const removeParticle = (idToRemove: number) => {
-    // Clean up the particle from state once GSAP finishes animating it
     setParticles((prev) => prev.filter((p) => p.id !== idToRemove));
   };
 
@@ -542,7 +557,7 @@ const RoomPage = () => {
     setRoomState(roomQuery.data);
     setLink(roomQuery.data.currently_playing ?? "");
     setCurrentTime(roomQuery.data.playback_time ?? 0);
-    setIsPlaying(false);
+    setIsPlaying(roomQuery.data.is_playing ?? false);
     const statuses: Record<string, ConnectionStatus> = {};
 
     roomQuery.data.members.forEach((member) => {
@@ -565,9 +580,21 @@ const RoomPage = () => {
   }, [screenShareStream]);
 
   const groupedMessages = useMemo(() => {
-    const messages = roomState?.messages ?? [];
-    return [...messages].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-  }, [roomState?.messages]);
+    const messages = (roomState?.messages ?? []).map((message) => ({
+      kind: "message" as const,
+      created_at: message.created_at,
+      message,
+    }));
+    const events = systemMessages.map((event) => ({
+      kind: "system" as const,
+      created_at: event.created_at,
+      event,
+    }));
+
+    return [...messages, ...events].sort(
+      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+    );
+  }, [roomState?.messages, systemMessages]);
 
   // Auto-scroll to the newest message.
   useEffect(() => {
@@ -618,7 +645,7 @@ const RoomPage = () => {
           break;
 
         case "user_left": {
-          const leavingId = parsed.payload.user_id as string;
+          const leavingId = parsed.payload.user_id;
           console.log("voice: user_left for", leavingId);
           closePeer(leavingId);
           setRemoteVoiceEnabled((prev) => {
@@ -626,11 +653,31 @@ const RoomPage = () => {
             delete copy[leavingId];
             return copy;
           });
+          setSystemMessages((prev) => [
+            ...prev,
+            {
+              id: `left-${leavingId}-${Date.now()}`,
+              user_id: leavingId,
+              user_name: parsed.payload.name,
+              kind: "left",
+              created_at: new Date().toISOString(),
+            },
+          ]);
           refreshRoom();
           break;
         }
 
         case "user_joined": {
+          setSystemMessages((prev) => [
+            ...prev,
+            {
+              id: `joined-${parsed.payload.user_id}-${Date.now()}`,
+              user_id: parsed.payload.user_id,
+              user_name: parsed.payload.name,
+              kind: "joined",
+              created_at: new Date().toISOString(),
+            },
+          ]);
           refreshRoom();
           // announce our voice state to the newcomer so they can initiate if needed
           if (voiceEnabledRef.current) {
@@ -643,6 +690,12 @@ const RoomPage = () => {
           }
           break;
         }
+
+        case "reaction":
+          if (parsed.payload.user_id !== localUserIdRef.current) {
+            spawnReactionParticles(parsed.payload.emoji);
+          }
+          break;
 
         case "user_kicked":
           if (parsed.payload.user_id === user?.id) {
@@ -1041,6 +1094,18 @@ const RoomPage = () => {
         <IoChevronBack />
       </button>
 
+      <div className="room-page__reaction-particles" aria-hidden="true">
+        {particles.map((p) => (
+          <AnimatedParticle
+            key={p.id}
+            emoji={p.emoji}
+            x={p.x}
+            y={p.y}
+            onFinish={() => removeParticle(p.id)}
+          />
+        ))}
+      </div>
+
       <div className={clsx("room-page__side-bar", sidebarOpen && "open")}>
         <div className="room-page__side-bar__item">
           <button className="room-page__side-bar__item__settings" onClick={() => setSettingsModalOpen(true)}>
@@ -1105,19 +1170,13 @@ const RoomPage = () => {
               🔥
             </button>
 
-            {particles.map((p) => (
-              <AnimatedParticle
-                key={p.id}
-                emoji={p.emoji}
-                x={p.x}
-                y={p.y}
-                onFinish={() => removeParticle(p.id)}
-              />
-            ))}
-
           </div>
 
-          <button className="room-page__side-bar__reaction__trigger" onClick={() => setReactionDrawerOpen((prev) => !prev)}>
+          <button
+            ref={reactionTriggerRef}
+            className="room-page__side-bar__reaction__trigger"
+            onClick={() => setReactionDrawerOpen((prev) => !prev)}
+          >
             <span>
               <BsEmojiLaughing />
             </span>
@@ -1198,20 +1257,38 @@ const RoomPage = () => {
             </div>
           )}
 
-          {groupedMessages.map((message, index) => {
+          {groupedMessages.map((item, index) => {
+            if (item.kind === "system") {
+              const time = new Date(item.event.created_at).toLocaleTimeString("fa-IR", {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+
+              return (
+                <div key={item.event.id} className="room-page__chat-container__day">
+                  <span>
+                    {item.event.user_name} {item.event.kind === "joined" ? "به اتاق پیوست" : "از اتاق خارج شد"} · {time}
+                  </span>
+                </div>
+              );
+            }
+
+            const message = item.message;
             const prev = groupedMessages[index - 1];
             const next = groupedMessages[index + 1];
+            const prevMessage = prev?.kind === "message" ? prev.message : null;
+            const nextMessage = next?.kind === "message" ? next.message : null;
             const isOwn = message.sender_id === user?.id;
 
             const dayLabel = new Date(message.created_at).toLocaleDateString("fa-IR", {
               day: "numeric",
               month: "long",
             });
-            const prevDayLabel = prev
-              ? new Date(prev.created_at).toLocaleDateString("fa-IR", { day: "numeric", month: "long" })
+            const prevDayLabel = prevMessage
+              ? new Date(prevMessage.created_at).toLocaleDateString("fa-IR", { day: "numeric", month: "long" })
               : null;
 
-            const showAvatar = !next || next.sender_id !== message.sender_id;
+            const showAvatar = !nextMessage || nextMessage.sender_id !== message.sender_id;
 
             return (
               <div key={message.id}>

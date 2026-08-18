@@ -1,4 +1,5 @@
 import api from "../lib/axiosConfig";
+import axios from "axios";
 
 export type ConnectionStatus = "good" | "medium" | "bad" | "offline";
 
@@ -20,6 +21,33 @@ export interface RoomMessageResponse {
   created_at: string;
 }
 
+export interface CreateRoomRequest {
+  is_public: boolean;
+  media_control_permission: "admin" | "everyone";
+}
+
+export interface CreateRoomResponse {
+  id: string;
+  code: number;
+}
+
+export interface JoinRoomResponse {
+  id: string;
+}
+
+export interface RoomReactionResponse {
+  user_id: string;
+  emoji: string;
+}
+
+export interface RoomSocketUserPresence {
+  user_id: string;
+  name: string;
+  avatar: string;
+  role: "admin" | "member";
+  joined_at: string;
+}
+
 export interface RoomResponse {
   id: string;
   code: number;
@@ -28,11 +56,32 @@ export interface RoomResponse {
   created_by_avatar: string;
   currently_playing?: string | null;
   playback_time: number;
+  is_playing: boolean;
   is_public: boolean;
   media_control_permission: "admin" | "everyone";
   created_at: string;
   members: RoomMemberResponse[];
   messages: RoomMessageResponse[];
+}
+
+export async function createRoom(request: CreateRoomRequest) {
+  const { data } = await api.post<CreateRoomResponse>(`/rooms`, request);
+  return data;
+}
+
+export async function joinRoom(code: number) {
+  const { data } = await api.post<JoinRoomResponse>(`/rooms/join`, { code });
+  return data;
+}
+
+export async function getCurrentRoom() {
+  const { data } = await api.get<RoomResponse>(`/rooms/current`);
+  return data;
+}
+
+export async function getLastActiveRoom() {
+  const { data } = await api.get<RoomResponse>(`/rooms/last-active`);
+  return data;
 }
 
 export async function getRoom(roomId: string) {
@@ -43,7 +92,7 @@ export async function getRoom(roomId: string) {
 export async function sendRoomMessage(roomId: string, content: string, replyingTo?: string) {
   const { data } = await api.post<RoomMessageResponse>(`/rooms/${roomId}/messages`, {
     content,
-    replying_to: !!replyingTo ? replyingTo : null,
+    replying_to: replyingTo || null,
   });
   return data;
 }
@@ -64,11 +113,7 @@ export async function kickRoomMember(roomId: string, userId: string) {
   await api.delete(`/rooms/${roomId}/members/${userId}`);
 }
 
-interface JoinRoomResponse {
-  id: string;
-}
 
-export async function joinRoom(code: number) {
-  const { data } = await api.post<JoinRoomResponse>(`/rooms/join`, { code });
-  return data;
+export function getRoomApiErrorStatus(error: unknown): number | undefined {
+  return axios.isAxiosError(error) ? error.response?.status : undefined;
 }

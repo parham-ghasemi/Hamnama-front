@@ -52,7 +52,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       <div className="header__left">
         <button
           className="header__left__watchbtn"
-          onClick={() => nav('/join-room')}
+          onClick={() => { isAuthenticated ? nav('/join-room') : nav('/auth') }}
         >
           <PiCaretRightBold className="header__left__watchbtn__Icon" style={{ strokeWidth: 10 }} />
           <p className="header__left__watchbtn__text">

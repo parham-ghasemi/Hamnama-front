@@ -1,35 +1,34 @@
 import { useState } from 'react';
 import { IoClose } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import './CreateRoomModal.scss';
-import { useCreateRoom } from '../../../../hooks/useCreateRoom';
+import { createRoom } from '../../../../apiCalls/roomApi';
 
 const CreateRoomModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
   const [isPublic, setIsPublic] = useState(false);
   const [mediaControl, setMediaControl] = useState('admin');
 
   const navigate = useNavigate();
-  const { mutate: createRoom, isPending } = useCreateRoom();
+  const createRoomMutation = useMutation({
+    mutationFn: createRoom,
+    onSuccess: (newRoom) => {
+      onClose();
+      navigate(`/room/${newRoom.id}`);
+    },
+    onError: (error) => {
+      console.error("Failed to create room:", error);
+    },
+  });
 
   const handleCreate = () => {
-    createRoom(
-      {
-        is_public: isPublic,
-        media_control_permission: mediaControl,
-      },
-      {
-        onSuccess: (newRoom) => {
-          onClose();
-          // Navigate to the newly created room using its ID
-          navigate(`/room/${newRoom.id}`);
-        },
-        onError: (err) => {
-          console.error("Failed to create room:", err);
-          // Handle error toast/UI here
-        }
-      }
-    );
+    createRoomMutation.mutate({
+      is_public: isPublic,
+      media_control_permission: mediaControl as "admin" | "everyone",
+    });
   };
+
+  const isPending = createRoomMutation.isPending;
 
   return (
     <div className={`create-room-modal-overlay ${isOpen ? 'is-active' : ''}`}>

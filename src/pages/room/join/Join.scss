@@ -20,6 +20,26 @@
   isolation: isolate;
   color: dark.$color-white;
   display: flex;
+  justify-content: center;
+  flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(208, 78, 47, 0.45) transparent;
+
+  @include mx.light {
+    scrollbar-color: rgba(139, 91, 130, 0.35) transparent;
+  }
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(208, 78, 47, 0.45);
+    border-radius: 10px;
+
+    @include mx.light {
+      background: rgba(139, 91, 130, 0.35);
+    }
+  }
 
   background:
     radial-gradient(
@@ -63,16 +83,21 @@
     }
   }
 
-  // Allow scrolling when content height exceeds viewport on smaller screens
-  @include mx.max-w(1024px) {
-    max-height: none;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding-bottom: 32px;
+  // The header occupies a fixed 77px above this page.
+  // Keep the page itself constrained to the remaining viewport height.
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &::before {
+    content: "";
+    display: block;
+    width: 1px;
+    height: 77px;
   }
 
   &__content {
-    margin-top: 76.5px;
+    height: 100%;
+    max-height: calc(100vh - 77px);
     display: flex;
     gap: 24px;
     width: 100%;
@@ -80,12 +105,7 @@
     z-index: 1;
 
     @include mx.max-w(1024px) {
-      margin-top: 64px;
       gap: 16px;
-    }
-
-    @include mx.max-w(768px) {
-      margin-top: 60px;
     }
 
     &__main {
@@ -118,6 +138,7 @@
         flex-direction: column;
         align-items: center;
         gap: 26px;
+        height: 100%;
 
         @include mx.max-w(768px) {
           gap: 18px;
@@ -726,6 +747,31 @@
 
                 @include mx.light {
                   background-color: light.$color-primary-bg-hover;
+                }
+              }
+            }
+
+            &.is-disabled {
+              cursor: not-allowed;
+              opacity: 0.5;
+              filter: saturate(0.45);
+              box-shadow: none;
+
+              &:hover {
+                transform: none;
+                box-shadow: none;
+
+                &::before {
+                  opacity: 0.65;
+                }
+
+                > span {
+                  transform: none;
+                  background: rgba(255, 255, 255, 0.05);
+
+                  @include mx.light {
+                    background-color: rgba(9, 9, 9, 0.05);
+                  }
                 }
               }
             }

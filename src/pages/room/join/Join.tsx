@@ -1,32 +1,90 @@
 import { BsPlusLg } from 'react-icons/bs';
 import Header from '../../../components/header/Header';
 import './Join.scss';
-import Sidebar from './sidebar/Sidebar';
 import { IoCopyOutline } from 'react-icons/io5';
 import { PiFilmSlateFill, PiUsersThreeFill, PiClockCounterClockwiseFill, PiPlayFill } from 'react-icons/pi';
 import CreateRoomModal from './createRoomModal/CreateRoomModal';
-import { useState } from 'react';
-import { joinRoom } from '../../../apiCalls/roomApi';
+import { useEffect, useState } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { getCurrentRoom, getLastActiveRoom, getRoomApiErrorStatus, joinRoom } from '../../../apiCalls/roomApi';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
 
 
 const Join = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [code, setCode] = useState<number | string>("")
-  const nav = useNavigate()
+  const [code, setCode] = useState<number | string>("");
+  const nav = useNavigate();
 
-  const handleJoin = async () => {
-    const data = await joinRoom(Number(code))
-    nav(`/room/${data.id}`)
-  }
+  const { isAuthenticated } = useAuth();
+  useEffect(() => {
+    if (!isAuthenticated) {
+      nav('/');
+    }
+  }, [isAuthenticated])
+
+
+  const currentRoomQuery = useQuery({
+    queryKey: ["current-room"],
+    queryFn: getCurrentRoom,
+    retry: (failureCount, error) => {
+      const status = getRoomApiErrorStatus(error);
+      return status !== 404 && status !== 410 && failureCount < 2;
+    },
+  });
+
+  const lastRoomQuery = useQuery({
+    queryKey: ["last-active-room"],
+    queryFn: getLastActiveRoom,
+    retry: (failureCount, error) => {
+      const status = getRoomApiErrorStatus(error);
+      return status !== 404 && status !== 410 && failureCount < 2;
+    },
+  });
+
+  const joinRoomMutation = useMutation({
+    mutationFn: (roomCode: number) => joinRoom(roomCode),
+    onSuccess: (data) => {
+      nav(`/room/${data.id}`);
+    },
+    onError: (error) => {
+      console.error("Failed to join room:", error);
+    },
+  });
+
+  const joinLastRoomMutation = useMutation({
+    mutationFn: (roomCode: number) => joinRoom(roomCode),
+    onSuccess: (data) => {
+      nav(`/room/${data.id}`);
+    },
+    onError: (error) => {
+      console.error("Failed to join last active room:", error);
+    },
+  });
+
+  const handleJoin = () => {
+    const roomCode = Number(code);
+    if (!Number.isInteger(roomCode) || roomCode <= 0 || joinRoomMutation.isPending) return;
+
+    joinRoomMutation.mutate(roomCode);
+  };
+
+  const activeRoom = currentRoomQuery.data ?? null;
+  const activeRoomLoading = currentRoomQuery.isLoading || currentRoomQuery.isFetching;
+  const activeRoomLookupFailed = !!currentRoomQuery.error && getRoomApiErrorStatus(currentRoomQuery.error) !== 404;
+  const createRoomDisabled = activeRoomLoading || !!activeRoom || activeRoomLookupFailed;
+  const lastRoom = lastRoomQuery.data ?? null;
+  const lastRoomLabel = lastRoom?.created_by_name || "آخرین اتاق شما";
+
+  useEffect(() => {
+    if (activeRoom) setIsModalOpen(false);
+  }, [activeRoom]);
 
   return (
     <div className='join-page'>
       <Header />
 
       <div className="join-page__content">
-
-        <Sidebar />
 
         <div className="join-page__content__main">
 
@@ -58,13 +116,22 @@ const Join = () => {
                 </div>
 
                 <div className="join-page__content__main__cards__card__code">
-                  کد شما: ---
-                  <span>
+                  کد شما: {activeRoom ? activeRoom.code.toLocaleString("fa-IR") : "---"}
+                  <span
+                    onClick={() => activeRoom && navigator.clipboard.writeText(String(activeRoom.code))}
+                    aria-hidden={!activeRoom}
+                  >
                     <IoCopyOutline />
                   </span>
                 </div>
 
-                <button className="join-page__content__main__cards__card__enter">ورود</button>
+                <button
+                  className="join-page__content__main__cards__card__enter"
+                  disabled={!activeRoom || activeRoomLoading}
+                  onClick={() => activeRoom && nav(`/room/${activeRoom.id}`)}
+                >
+                  ورود
+                </button>
               </div>
 
               <div className="join-page__content__main__cards__card">
@@ -86,10 +153,15 @@ const Join = () => {
                     <IoCopyOutline />
                   </span>
                 </div>
-                <button className="join-page__content__main__cards__card__enter" onClick={handleJoin}>پیوستن</button>
+                <button
+                  className="join-page__content__main__cards__card__enter"
+                  onClick={handleJoin}
+                  disabled={joinRoomMutation.isPending}
+                >
+                  {joinRoomMutation.isPending ? "در حال ورود..." : "پیوستن"}
+                </button>
               </div>
 
-              {/* Last visited room — UI only for now, no data wired up yet. */}
               <div className="join-page__content__main__cards__last">
                 <span className="join-page__content__main__cards__last__icon" aria-hidden="true">
                   <PiClockCounterClockwiseFill />
@@ -98,18 +170,39 @@ const Join = () => {
                 <div className="join-page__content__main__cards__last__info">
                   <p className="join-page__content__main__cards__last__info__label">آخرین اتاق شما</p>
                   <p className="join-page__content__main__cards__last__info__name">
-                    اتاق پرهام
-                    <span className="join-page__content__main__cards__last__info__code">۴۵۲۹۱۸</span>
+                    {lastRoom ? lastRoomLabel : "اتاقی برای بازگشت وجود ندارد"}
+                    {lastRoom && (
+                      <span className="join-page__content__main__cards__last__info__code">
+                        {lastRoom.code.toLocaleString("fa-IR")}
+                      </span>
+                    )}
                   </p>
                 </div>
 
-                <button className="join-page__content__main__cards__last__action" type="button" disabled>
-                  بازگشت به اتاق
+                <button
+                  className="join-page__content__main__cards__last__action"
+                  type="button"
+                  disabled={!lastRoom || joinLastRoomMutation.isPending || lastRoomQuery.isLoading}
+                  onClick={() => lastRoom && joinLastRoomMutation.mutate(lastRoom.code)}
+                >
+                  {joinLastRoomMutation.isPending ? "در حال ورود..." : "بازگشت به اتاق"}
                 </button>
               </div>
 
-              <div className="join-page__content__main__cards__card--create" onClick={() => setIsModalOpen(true)}>
-                <p>ساخت اتاق شخصی</p>
+              <div
+                className={`join-page__content__main__cards__card--create${createRoomDisabled ? " is-disabled" : ""}`}
+                role="button"
+                tabIndex={createRoomDisabled ? -1 : 0}
+                aria-disabled={createRoomDisabled}
+                onClick={() => !createRoomDisabled && setIsModalOpen(true)}
+                onKeyDown={(event) => {
+                  if (!createRoomDisabled && (event.key === "Enter" || event.key === " ")) {
+                    event.preventDefault();
+                    setIsModalOpen(true);
+                  }
+                }}
+              >
+                <p>{activeRoomLoading ? "در حال بررسی اتاق..." : "ساخت اتاق شخصی"}</p>
                 <span><BsPlusLg strokeWidth={1} /></span>
               </div>
             </div>
