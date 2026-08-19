@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './Footer.scss';
 import { PiFacebookLogoFill, PiInstagramLogoFill, PiPinterestLogoFill, PiTelegramLogoFill } from "react-icons/pi"
 
@@ -23,7 +24,11 @@ const Footer = () => {
           <p className="footer__section-title">لینک های مفید</p>
 
           <li>پشتیبانی</li>
-          <li>درباره ما</li>
+          <li>
+            <Link to={"/about"}>
+              درباره ما
+            </Link>
+          </li>
           <li>گزارش مشکل</li>
         </ul>
 

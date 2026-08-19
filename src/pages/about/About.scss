@@ -1,0 +1,475 @@
+@use "../../styles/abstracts/variables" as dark;
+@use "../../styles/abstracts/variables.light" as light;
+@use "../../styles/abstracts/mixins" as mx;
+@use "sass:color";
+
+.about-page {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  isolation: isolate;
+  padding-bottom: 90px;
+
+  > *:not(.cinema-ambience) {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ---- Hero ---------------------------------------------------------- */
+  &__hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+    padding: 120px 16px 0;
+    box-sizing: border-box;
+
+    @include mx.max-w(768px) {
+      padding-top: 70px;
+      gap: 14px;
+    }
+
+    &__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 600;
+      color: dark.$color-primary;
+      background: rgba(208, 78, 47, 0.12);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+
+      > svg {
+        font-size: 18px;
+      }
+
+      @include mx.light {
+        color: light.$color-primary;
+        background: rgba(139, 91, 130, 0.12);
+      }
+    }
+
+    &__title {
+      font-size: 45px;
+      font-weight: 700;
+      color: dark.$color-white;
+
+      > span {
+        color: dark.$color-primary;
+        font-weight: 800;
+
+        @include mx.light {
+          color: light.$color-primary;
+        }
+      }
+
+      @include mx.light {
+        color: light.$color-black;
+      }
+
+      @include mx.max-w(768px) {
+        font-size: 30px;
+      }
+
+      // Same sprocket hairline as the landing page titles.
+      &::after {
+        content: "";
+        display: block;
+        width: 92px;
+        height: 6px;
+        margin: 18px auto 0;
+        @include mx.sprockets(4px, 11px, rgba(208, 78, 47, 0.55));
+        mask-image: linear-gradient(
+          90deg,
+          transparent,
+          #000 30%,
+          #000 70%,
+          transparent
+        );
+        -webkit-mask-image: linear-gradient(
+          90deg,
+          transparent,
+          #000 30%,
+          #000 70%,
+          transparent
+        );
+
+        @include mx.light {
+          @include mx.sprockets(4px, 11px, rgba(139, 91, 130, 0.6));
+        }
+
+        @include mx.max-w(768px) {
+          width: 72px;
+          margin-top: 12px;
+        }
+      }
+    }
+
+    &__text {
+      max-width: 720px;
+      font-size: 18.7px;
+      line-height: 2.1;
+      color: color.adjust(dark.$color-gray, $lightness: -8%);
+
+      @include mx.light {
+        color: light.$color-dark-gray;
+      }
+
+      @include mx.max-w(768px) {
+        font-size: 15px;
+        line-height: 1.95;
+      }
+    }
+
+    &__stats {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 10px;
+
+      &__item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        min-width: 150px;
+        padding: 16px 20px;
+        border-radius: 18px;
+        box-sizing: border-box;
+
+        @include mx.cinema-surface;
+
+        &::before {
+          @include mx.gradient-border(
+            18px,
+            rgba(255, 255, 255, 0.18),
+            rgba(255, 255, 255, 0.03)
+          );
+        }
+
+        > strong {
+          font-size: 24px;
+          font-weight: 800;
+          color: dark.$color-primary;
+
+          @include mx.light {
+            color: light.$color-primary;
+          }
+        }
+
+        > span {
+          font-size: 14px;
+          color: dark.$color-gray;
+
+          @include mx.light {
+            color: light.$color-dark-gray;
+          }
+        }
+
+        @include mx.light {
+          background: light.$color-card-bg;
+
+          &::before {
+            @include mx.gradient-border(
+              18px,
+              rgba(139, 91, 130, 0.28),
+              rgba(0, 0, 0, 0.04)
+            );
+          }
+        }
+      }
+    }
+  }
+
+  /* ---- Team ---------------------------------------------------------- */
+  &__team-title {
+    text-align: center;
+    font-size: 45px;
+    font-weight: 700;
+    margin-top: 110px;
+    padding: 0 16px;
+    color: dark.$color-white;
+
+    > span {
+      color: dark.$color-primary;
+      font-weight: 800;
+
+      @include mx.light {
+        color: light.$color-primary;
+      }
+    }
+
+    @include mx.light {
+      color: light.$color-black;
+    }
+
+    @include mx.max-w(768px) {
+      font-size: 28px;
+      margin-top: 64px;
+    }
+  }
+
+  &__team {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 23.8px;
+    margin-top: 48px;
+    padding: 0 16px;
+    box-sizing: border-box;
+
+    @include mx.max-w(768px) {
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      margin-top: 32px;
+    }
+
+    &__blob {
+      @include mx.background-blob(1100px, 520px, -20%, auto, auto, -10%);
+
+      @include mx.max-w(768px) {
+        display: none;
+      }
+    }
+  }
+
+  &__person {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+
+    width: 375.7px;
+    max-width: 100%;
+    padding: 30px 24px 28px;
+    border-radius: 26px;
+
+    @include mx.cinema-surface;
+    @include mx.ambient-shadow(0.8);
+
+    transition:
+      transform mx.$dur-slow mx.$ease-out-soft,
+      box-shadow mx.$dur-slow mx.$ease-out-soft;
+
+    @include mx.reduced-motion {
+      transition: none;
+    }
+
+    &::before {
+      @include mx.gradient-border(
+        26px,
+        rgba(255, 255, 255, 0.2),
+        rgba(255, 255, 255, 0.03)
+      );
+      z-index: 4;
+    }
+
+    @include mx.light {
+      background: light.$color-card-bg;
+      box-shadow: 0 14px 30px -22px color.adjust(light.$color-black, $alpha: -0.6);
+
+      &::before {
+        @include mx.gradient-border(
+          26px,
+          rgba(139, 91, 130, 0.28),
+          rgba(0, 0, 0, 0.04)
+        );
+      }
+    }
+
+    &:hover {
+      transform: translateY(-8px);
+      @include mx.ambient-shadow(1.2);
+
+      .about-page__person__sheen {
+        transform: translateX(130%);
+      }
+    }
+
+    &__role {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: dark.$color-primary;
+      background: rgba(208, 78, 47, 0.14);
+
+      @include mx.light {
+        color: light.$color-primary;
+        background: rgba(139, 91, 130, 0.13);
+      }
+    }
+
+    &__avatar {
+      width: 132px;
+      height: 132px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-top: 4px;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.12),
+        0 0 0 6px rgba(208, 78, 47, 0.14);
+
+      > img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      @include mx.light {
+        box-shadow:
+          0 0 0 1px rgba(0, 0, 0, 0.06),
+          0 0 0 6px rgba(139, 91, 130, 0.14);
+      }
+    }
+
+    &__name {
+      font-size: 24px;
+      font-weight: 800;
+      color: dark.$color-white;
+
+      @include mx.light {
+        color: light.$color-black;
+      }
+    }
+
+    &__desc {
+      font-size: 15.5px;
+      line-height: 1.9;
+      color: dark.$color-gray;
+
+      @include mx.light {
+        color: light.$color-dark-gray;
+      }
+    }
+
+    &__contact {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      margin-top: 8px;
+
+      &__row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        text-decoration: none;
+        direction: ltr;
+
+        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+        color: color.adjust(dark.$color-white, $alpha: -0.1);
+
+        transition:
+          background mx.$dur-base mx.$ease-out-soft,
+          transform mx.$dur-base mx.$ease-out-soft;
+
+        &:hover {
+          background: rgba(208, 78, 47, 0.16);
+          transform: translateY(-2px);
+        }
+
+        &__icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 34px;
+          width: 34px;
+          flex: 0 0 34px;
+          border-radius: 12px;
+          background: rgba(208, 78, 47, 0.18);
+
+          > svg {
+            font-size: 17px;
+            color: dark.$color-primary;
+          }
+
+          @include mx.light {
+            background: rgba(139, 91, 130, 0.16);
+
+            > svg {
+              color: light.$color-primary;
+            }
+          }
+        }
+
+        &__value {
+          font-size: 15px;
+          font-weight: 600;
+          overflow-wrap: anywhere;
+        }
+
+        @include mx.light {
+          background: rgba(0, 0, 0, 0.035);
+          box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05) inset;
+          color: light.$color-dark-gray;
+
+          &:hover {
+            background: rgba(139, 91, 130, 0.12);
+          }
+        }
+
+        @include mx.reduced-motion {
+          transition: none;
+        }
+      }
+    }
+
+    &__sheen {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      background: linear-gradient(
+        105deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 60%
+      );
+      transform: translateX(-130%);
+      transition: transform 1200ms mx.$ease-out-soft;
+
+      @include mx.reduced-motion {
+        display: none;
+      }
+    }
+  }
+
+  &__note {
+    max-width: 640px;
+    margin: 48px auto 0;
+    padding: 0 16px;
+    text-align: center;
+    font-size: 16px;
+    line-height: 2;
+    color: dark.$color-gray;
+
+    @include mx.light {
+      color: light.$color-dark-gray;
+    }
+
+    @include mx.max-w(768px) {
+      font-size: 14px;
+      margin-top: 32px;
+    }
+  }
+}

@@ -23,7 +23,18 @@
     margin-top: 40px;
   }
 
-  &__card:nth-child(odd) {
+  // The launch-offer gate wraps each card, so the staggered elevation is
+  // matched on the wrapper as well.
+  &__gate {
+    display: block;
+    max-width: 100%;
+    transition: transform mx.$dur-slow mx.$ease-out-soft;
+  }
+
+  // Only cards that are direct children of the row get the stagger; a card
+  // nested inside a gate wrapper must not translate again (the wrapper does).
+  &__gate:nth-child(odd),
+  & > &__card:nth-child(odd) {
     transform: translateY(-50px);
 
     &:hover {

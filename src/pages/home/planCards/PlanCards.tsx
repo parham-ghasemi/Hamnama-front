@@ -4,6 +4,7 @@ import { BsPeopleFill, BsPersonFill } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import { toPersianNumerals } from '../../../helpers/NumberConversion';
 import Reveal from '../reveal/Reveal';
+import FreeGate from '../freeGate/FreeGate';
 
 const PlanCards = () => {
   const plans = [
@@ -40,7 +41,12 @@ const PlanCards = () => {
 
       {
         plans.map((plan, ind) => (
-          <div className='home-planCards__card' key={`homeplancards-${ind}`}>
+          <FreeGate
+            className='home-planCards__gate'
+            key={`homeplancards-${ind}`}
+            radius={26}
+          >
+          <div className='home-planCards__card'>
             <div className="home-planCards__card__icon">
               {plan.icon}
             </div>
@@ -95,6 +101,7 @@ const PlanCards = () => {
 
             <Link to={'/plan-details'} className="home-planCards__card__more">مشاهده تمام ویژگی ها</Link>
           </div>
+          </FreeGate>
         ))
       }
     </Reveal>

@@ -1,0 +1,356 @@
+@use "../../../styles/abstracts/variables" as dark;
+@use "../../../styles/abstracts/variables.light" as light;
+@use "sass:color";
+@use "../../../styles/abstracts/mixins" as mx;
+
+.home-download {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 34px;
+  margin-top: 44px;
+  padding: 0 16px;
+  box-sizing: border-box;
+
+  @include mx.max-w(768px) {
+    gap: 24px;
+    margin-top: 28px;
+  }
+
+  &__blob {
+    @include mx.background-blob(1100px, 460px, 0, auto, auto, 0);
+    transform: translate(-50%, -20%);
+
+    @include mx.max-w(768px) {
+      display: none;
+    }
+  }
+
+  &__subtitle {
+    text-align: center;
+    font-size: 18.7px;
+    line-height: 2;
+    max-width: 620px;
+    color: color.adjust(dark.$color-gray, $lightness: -12%);
+
+    @include mx.light {
+      color: light.$color-dark-gray;
+    }
+
+    @include mx.max-w(768px) {
+      font-size: 15px;
+    }
+  }
+
+  &__cards {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 23.8px;
+    width: 100%;
+
+    @include mx.max-w(1024px) {
+      gap: 16px;
+    }
+
+    @include mx.max-w(768px) {
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+  }
+
+  &__card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+
+    width: 320px;
+    max-width: 100%;
+    padding: 30px 22px 26px;
+    border-radius: 22px;
+
+    @include mx.cinema-surface;
+    @include mx.ambient-shadow(0.7);
+
+    transition:
+      transform mx.$dur-slow mx.$ease-out-soft,
+      box-shadow mx.$dur-slow mx.$ease-out-soft;
+
+    @include mx.reduced-motion {
+      transition: none;
+    }
+
+    &::before {
+      @include mx.gradient-border(
+        22px,
+        rgba(255, 255, 255, 0.2),
+        rgba(255, 255, 255, 0.03)
+      );
+      z-index: 4;
+    }
+
+    @include mx.light {
+      background: light.$color-card-bg;
+      box-shadow: 0 14px 30px -22px color.adjust(light.$color-black, $alpha: -0.6);
+
+      &::before {
+        @include mx.gradient-border(
+          22px,
+          rgba(139, 91, 130, 0.28),
+          rgba(0, 0, 0, 0.04)
+        );
+      }
+    }
+
+    &:hover {
+      transform: translateY(-8px);
+      @include mx.ambient-shadow(1.2);
+
+      .home-download__card__icon > svg {
+        transform: scale(1.08);
+      }
+
+      .home-download__card__sheen {
+        animation: home-download-sheen 1200ms mx.$ease-out-soft;
+      }
+    }
+
+    @include mx.max-w(1024px) {
+      width: 280px;
+      padding: 26px 18px 22px;
+    }
+
+    @include mx.max-w(768px) {
+      width: 100%;
+      max-width: 360px;
+    }
+
+    &__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: dark.$color-primary;
+      background: rgba(208, 78, 47, 0.14);
+      box-shadow: 0 0 0 1px rgba(208, 78, 47, 0.28) inset;
+      z-index: 1;
+
+      > svg {
+        font-size: 15px;
+        animation: home-download-hourglass 3.2s ease-in-out infinite;
+
+        @include mx.reduced-motion {
+          animation: none;
+        }
+      }
+
+      @include mx.light {
+        color: light.$color-primary;
+        background: rgba(139, 91, 130, 0.12);
+        box-shadow: 0 0 0 1px rgba(139, 91, 130, 0.25) inset;
+      }
+    }
+
+    &__icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 68px;
+      width: 68px;
+      margin-top: 6px;
+      border-radius: 17px;
+      background-color: rgba(255, 255, 255, 0.06);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+        0 10px 26px -18px rgba(208, 78, 47, 0.9);
+      z-index: 1;
+
+      > svg {
+        font-size: 34px;
+        color: dark.$color-primary;
+        transition: transform mx.$dur-base mx.$ease-out-soft;
+        filter: drop-shadow(0 4px 12px rgba(208, 78, 47, 0.35));
+
+        @include mx.reduced-motion {
+          transition: none;
+        }
+      }
+
+      @include mx.light {
+        background-color: light.$color-primary;
+
+        > svg {
+          color: light.$color-white;
+          filter: none;
+        }
+      }
+
+      @include mx.max-w(768px) {
+        height: 58px;
+        width: 58px;
+
+        > svg {
+          font-size: 28px;
+        }
+      }
+    }
+
+    &__title {
+      font-size: 26px;
+      font-weight: 700;
+      z-index: 1;
+
+      @include mx.max-w(768px) {
+        font-size: 22px;
+      }
+    }
+
+    &__desc {
+      font-size: 15.5px;
+      line-height: 1.9;
+      color: color.adjust(dark.$color-gray, $lightness: -18%);
+      z-index: 1;
+
+      @include mx.light {
+        color: color.adjust(light.$color-gray, $lightness: -20%);
+      }
+
+      @include mx.max-w(768px) {
+        font-size: 14px;
+      }
+    }
+
+    // Indeterminate progress hint: the app is being built, not waiting.
+    &__status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 6px;
+      font-size: 13.5px;
+      color: color.adjust(dark.$color-gray, $lightness: -25%);
+      z-index: 1;
+
+      @include mx.light {
+        color: color.adjust(light.$color-gray, $lightness: -22%);
+      }
+
+      &__bar {
+        position: relative;
+        display: block;
+        width: 92px;
+        height: 4px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.09);
+
+        @include mx.light {
+          background: rgba(0, 0, 0, 0.08);
+        }
+
+        &__fill {
+          position: absolute;
+          inset: 0 auto 0 0;
+          width: 40%;
+          border-radius: 999px;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            dark.$color-primary,
+            transparent
+          );
+          animation: home-download-progress 2.4s mx.$ease-out-soft infinite;
+
+          @include mx.light {
+            background: linear-gradient(
+              90deg,
+              transparent,
+              light.$color-primary,
+              transparent
+            );
+          }
+
+          @include mx.reduced-motion {
+            animation: none;
+            width: 45%;
+          }
+        }
+      }
+    }
+
+    &__sheen {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        105deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 60%
+      );
+      transform: translateX(-130%);
+      pointer-events: none;
+      z-index: 3;
+
+      @include mx.reduced-motion {
+        display: none;
+      }
+    }
+  }
+
+  &__note {
+    text-align: center;
+    font-size: 15.5px;
+    color: color.adjust(dark.$color-gray, $lightness: -25%);
+
+    @include mx.light {
+      color: color.adjust(light.$color-gray, $lightness: -20%);
+    }
+
+    @include mx.max-w(768px) {
+      font-size: 13.5px;
+    }
+  }
+}
+
+@keyframes home-download-sheen {
+  from {
+    transform: translateX(-130%);
+  }
+  to {
+    transform: translateX(130%);
+  }
+}
+
+@keyframes home-download-progress {
+  0% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(260%);
+  }
+}
+
+@keyframes home-download-hourglass {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0deg);
+  }
+  80% {
+    transform: rotate(180deg);
+  }
+  90% {
+    transform: rotate(180deg);
+  }
+}

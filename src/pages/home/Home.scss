@@ -169,6 +169,7 @@
   &__steps-title,
   &__features-title,
   &__plans-title,
+  &__download-title,
   &__faq-title {
     position: relative;
 
@@ -295,8 +296,9 @@
       margin-top: 28px;
     }
 
-    > button {
-      position: relative;
+    // Buttons may be wrapped by the launch-offer gate, so this stays a
+    // descendant selector instead of a direct child one.
+    button {
       overflow: hidden;
       isolation: isolate;
       display: flex;
@@ -491,6 +493,7 @@
 
     /* ---- Start watching: a play control ------------------------------ */
     &__watch {
+      position: relative;
       background:
         linear-gradient(
           180deg,
@@ -662,6 +665,37 @@
     @include mx.max-w(480px) {
       font-size: 22px;
       margin: 35px 0;
+    }
+  }
+
+  &__download-title {
+    text-align: center;
+    font-size: 45px;
+    font-weight: 700;
+    margin-top: 103.7px;
+    padding: 0 16px;
+
+    > span {
+      color: dark.$color-primary;
+      font-weight: 800;
+
+      @include mx.light {
+        color: light.$color-primary;
+      }
+    }
+
+    @include mx.max-w(1024px) {
+      font-size: 36px;
+      margin-top: 70px;
+    }
+
+    @include mx.max-w(768px) {
+      font-size: 28px;
+      margin-top: 56px;
+    }
+
+    @include mx.max-w(480px) {
+      font-size: 23px;
     }
   }
 

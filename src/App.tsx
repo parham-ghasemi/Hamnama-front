@@ -23,6 +23,7 @@ import { ConfirmationModalProvider } from "./context/ConfirmModalContext/Confirm
 import Home from "./pages/home/Home";
 import NotFound from "./components/notFound/NotFound";
 import { Toaster } from "./components/toast";
+import About from "./pages/about/About";
 
 const queryClient = new QueryClient({});
 
@@ -49,6 +50,7 @@ function App() {
                 <Route element={<DesktopLayout />}>
                   <Route index element={<Home />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/about" element={<About />} />
                   <Route path="/plan-details" element={<PlanDetails />} />
                   <Route path="*" element={<NotFound />} />
                 </Route>

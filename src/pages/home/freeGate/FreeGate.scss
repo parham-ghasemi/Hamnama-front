@@ -1,0 +1,310 @@
+@use "../../../styles/abstracts/variables" as dark;
+@use "../../../styles/abstracts/variables.light" as light;
+@use "sass:color";
+@use "../../../styles/abstracts/mixins" as mx;
+
+.free-gate {
+  position: relative;
+  isolation: isolate;
+
+  // `display: contents` keeps the existing flex/grid layout of plan cards and
+  // buttons untouched; the shield and overlay are positioned against the
+  // wrapped element instead.
+  &--card,
+  &--button {
+    position: relative;
+    border-radius: var(--free-gate-radius, 26px);
+    // No inline baseline strut: the wrapper must be exactly as tall as the
+    // control it wraps, otherwise the overlay overflows it.
+    line-height: 0;
+    font-size: 0;
+
+    > .free-gate__target {
+      position: relative;
+      line-height: normal;
+      // font-size: 1rem;
+      transition: filter mx.$dur-slow mx.$ease-out-soft;
+    }
+  }
+
+  &--button {
+    display: inline-flex;
+    width: fit-content;
+    height: fit-content;
+    vertical-align: top;
+
+    > .free-gate__target {
+      display: flex;
+      // width: fit-content;
+      // height: fit-content;
+      // align-items: stretch;
+    }
+  }
+
+  &--card {
+    display: block;
+    width: auto;
+  }
+
+  &__shield {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    border-radius: inherit;
+    cursor: default;
+    appearance: none;
+
+    &:focus-visible {
+      outline: 2px solid dark.$color-primary;
+      outline-offset: 3px;
+
+      @include mx.light {
+        outline-color: light.$color-primary;
+      }
+    }
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 22px 20px;
+    box-sizing: border-box;
+    text-align: center;
+    border-radius: inherit;
+    overflow: hidden;
+    pointer-events: none;
+
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+    backdrop-filter: blur(0px);
+    transition:
+      opacity mx.$dur-base mx.$ease-out-soft,
+      transform mx.$dur-slow mx.$ease-out-soft,
+      backdrop-filter mx.$dur-slow ease;
+
+    background:
+      radial-gradient(
+        120% 90% at 50% 0%,
+        rgba(208, 78, 47, 0.32) 0%,
+        transparent 62%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(16, 13, 12, 0.9) 0%,
+        rgba(10, 9, 9, 0.94) 100%
+      );
+
+    &::before {
+      @include mx.gradient-border(
+        var(--free-gate-radius, 26px),
+        rgba(208, 78, 47, 0.75),
+        rgba(255, 255, 255, 0.06)
+      );
+      z-index: 1;
+    }
+
+    @include mx.light {
+      background:
+        radial-gradient(
+          120% 90% at 50% 0%,
+          rgba(139, 91, 130, 0.28) 0%,
+          transparent 62%
+        ),
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.93) 0%,
+          rgba(255, 255, 255, 0.97) 100%
+        );
+
+      &::before {
+        @include mx.gradient-border(
+          var(--free-gate-radius, 26px),
+          rgba(139, 91, 130, 0.55),
+          rgba(0, 0, 0, 0.05)
+        );
+      }
+    }
+
+    @include mx.reduced-motion {
+      transition: opacity 120ms linear;
+      transform: none;
+    }
+
+    &__icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 52px;
+      width: 52px;
+      border-radius: 16px;
+      background: rgba(208, 78, 47, 0.16);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+      transform: translateY(6px) scale(0.9) rotate(-8deg);
+      opacity: 0;
+      transition:
+        transform 420ms mx.$ease-out-soft 60ms,
+        opacity 260ms ease 60ms;
+
+      > svg {
+        font-size: 28px;
+        color: dark.$color-primary;
+      }
+
+      @include mx.light {
+        background: rgba(139, 91, 130, 0.14);
+
+        > svg {
+          color: light.$color-primary;
+        }
+      }
+
+      @include mx.reduced-motion {
+        transition: opacity 120ms linear;
+        transform: none;
+      }
+    }
+
+    &__title {
+      font-size: 24px;
+      font-weight: 800;
+      color: dark.$color-primary;
+      transform: translateY(8px);
+      opacity: 0;
+      transition:
+        transform 420ms mx.$ease-out-soft 100ms,
+        opacity 260ms ease 100ms;
+
+      @include mx.light {
+        color: light.$color-primary;
+      }
+
+      @include mx.reduced-motion {
+        transition: opacity 120ms linear;
+        transform: none;
+      }
+    }
+
+    &__text {
+      font-size: 16px;
+      line-height: 2;
+      max-width: 300px;
+      color: color.adjust(dark.$color-white, $alpha: -0.12);
+      transform: translateY(10px);
+      opacity: 0;
+      transition:
+        transform 460ms mx.$ease-out-soft 150ms,
+        opacity 300ms ease 150ms;
+
+      @include mx.light {
+        color: light.$color-dark-gray;
+      }
+
+      @include mx.reduced-motion {
+        transition: opacity 120ms linear;
+        transform: none;
+      }
+    }
+
+    // Slow warm sweep, same language as the CTA buttons.
+    &__sheen {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        105deg,
+        transparent 38%,
+        rgba(255, 255, 255, 0.12) 50%,
+        transparent 62%
+      );
+      transform: translateX(-130%);
+      pointer-events: none;
+
+      @include mx.reduced-motion {
+        display: none;
+      }
+    }
+  }
+
+  &--button {
+    .free-gate__overlay {
+      gap: 4px;
+      padding: 8px 14px;
+      flex-direction: row;
+
+      &__icon {
+        height: 30px;
+        width: 30px;
+        border-radius: 10px;
+
+        > svg {
+          font-size: 17px;
+        }
+      }
+
+      &__title {
+        font-size: 16px;
+      }
+
+      &__text {
+        display: none;
+      }
+    }
+  }
+
+  &:hover,
+  &:focus-within {
+    > .free-gate__target {
+      filter: saturate(0.75) brightness(0.9);
+    }
+
+    .free-gate__overlay {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      backdrop-filter: blur(6px);
+
+      &__icon,
+      &__title,
+      &__text {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotate(0deg);
+      }
+
+      &__sheen {
+        animation: free-gate-sheen 1400ms mx.$ease-out-soft 220ms;
+      }
+    }
+  }
+
+  @include mx.max-w(768px) {
+    &__overlay {
+      padding: 18px 16px;
+
+      &__title {
+        font-size: 20px;
+      }
+
+      &__text {
+        font-size: 14px;
+        line-height: 1.9;
+      }
+    }
+  }
+}
+
+@keyframes free-gate-sheen {
+  from {
+    transform: translateX(-130%);
+  }
+  to {
+    transform: translateX(130%);
+  }
+}

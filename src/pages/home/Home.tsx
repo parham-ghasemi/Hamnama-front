@@ -6,6 +6,8 @@ import FeatureGrid from './featureGrid/FeatureGrid'
 import Faq from './faq/Faq'
 import CinemaAmbience from './ambience/CinemaAmbience'
 import Reveal from './reveal/Reveal'
+import DownloadApp from './download/DownloadApp'
+import FreeGate from './freeGate/FreeGate'
 import { useTheme } from '../../context/ThemeContext'
 import clsx from 'clsx'
 import { useNavigate } from 'react-router-dom'
@@ -52,11 +54,13 @@ const Home = () => {
         </h2>
 
         <Reveal className="home-page__buttons" delay={80}>
-          <button className='home-page__buttons__subs' onClick={() => nav('/plan-details')}>
-            <span className='home-page__buttons__icon' aria-hidden='true'><PiTicketFill /></span>
-            <span className='home-page__buttons__label'>خرید اشتراک</span>
-            <span className='home-page__buttons__sheen' aria-hidden='true' />
-          </button>
+          <FreeGate size='button' radius={26} className='home-page__buttons__gate'>
+            <button className='home-page__buttons__subs' onClick={() => nav('/plan-details')}>
+              <span className='home-page__buttons__icon' aria-hidden='true'><PiTicketFill /></span>
+              <span className='home-page__buttons__label'>خرید اشتراک</span>
+              <span className='home-page__buttons__sheen' aria-hidden='true' />
+            </button>
+          </FreeGate>
 
           <button className='home-page__buttons__watch' onClick={() => nav('/join-room')}>
             <span className='home-page__buttons__icon' aria-hidden='true'><PiPlayFill /></span>
@@ -81,6 +85,11 @@ const Home = () => {
         <PlanCards />
 
         <FeatureGrid />
+
+        <Reveal as='h2' className='home-page__download-title'>
+          اپلیکیشن <span>هم‌نما</span> در راه است!
+        </Reveal>
+        <DownloadApp />
 
         <Reveal as='h2' className='home-page__faq-title'>سوالات متداول</Reveal>
         <h3 className='home-page__faq-subtitle'>آموزش قدم به قدم استفاده از سایت هم‌نما</h3>
