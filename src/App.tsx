@@ -50,7 +50,7 @@ function App() {
                 <Route element={<DesktopLayout />}>
                   <Route index element={<Home />} />
                   <Route path="/auth" element={<Auth />} />
-                  <Route path="/about" element={<About />} />
+                  <Route path="/about-us" element={<About />} />
                   <Route path="/plan-details" element={<PlanDetails />} />
                   <Route path="*" element={<NotFound />} />
                 </Route>

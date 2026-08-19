@@ -41,7 +41,7 @@ const About = () => {
       <SEO
         title="درباره ما | هم‌نما"
         description="با تیم هم‌نما آشنا شوید؛ بنیان‌گذار و توسعه‌دهنده‌ای که هم‌نما را ساخته‌اند و راه‌های ارتباط مستقیم با آن‌ها."
-        canonical="https://hamnama.net/about"
+        canonical="https://hamnama.net/about-us"
       />
 
       <div className={clsx('about-page', isLight && 'about-page--light')}>

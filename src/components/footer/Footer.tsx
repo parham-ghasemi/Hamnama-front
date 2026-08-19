@@ -25,7 +25,7 @@ const Footer = () => {
 
           <li>پشتیبانی</li>
           <li>
-            <Link to={"/about"}>
+            <Link to={"/about-us"}>
               درباره ما
             </Link>
           </li>
