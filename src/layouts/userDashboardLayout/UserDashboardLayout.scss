@@ -40,6 +40,10 @@
     display: flex;
     justify-content: end;
 
+    @include mx.max-w(789px) {
+      margin-top: 64px;
+    }
+
     &__glow {
       position: absolute;
       pointer-events: none;
@@ -85,6 +89,9 @@
           pointer-events: auto;
         }
       }
+      @include mx.max-w(789px) {
+        top: 64px;
+      }
     }
 
     &__sidebar-container {
@@ -102,6 +109,9 @@
         &.is-open {
           transform: translateX(0);
         }
+      }
+      @include mx.max-w(789px) {
+        top: 64px;
       }
     }
 

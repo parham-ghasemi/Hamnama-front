@@ -78,13 +78,86 @@
     cursor: pointer;
     overflow: hidden;
     z-index: 1;
+    isolation: isolate;
     transition:
       color mx.$dur-fast mx.$ease-out-soft,
-      transform mx.$dur-fast mx.$ease-out-soft;
+      transform mx.$dur-fast mx.$ease-out-soft,
+      opacity mx.$dur-fast mx.$ease-out-soft,
+      box-shadow mx.$dur-base mx.$ease-out-soft;
 
     @include mx.light {
       border-radius: 12px;
       color: light.$color-dark-gray;
+    }
+
+    &-label {
+      position: relative;
+      z-index: 3;
+      display: block;
+      width: 100%;
+      transition:
+        opacity mx.$dur-base mx.$ease-out-soft,
+        transform mx.$dur-base mx.$ease-out-soft;
+    }
+
+    /* Disabled-item "under construction" message */
+    &-notice {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 0 12px;
+      color: rgba(255, 255, 255, 0.95);
+      background:
+        linear-gradient(
+          90deg,
+          rgba(0, 0, 0, 0.08) 0%,
+          rgba(0, 0, 0, 0.28) 100%
+        ),
+        rgba(208, 78, 47, 0.18);
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(7px) scale(0.985);
+      filter: blur(2px);
+      pointer-events: none;
+      transition:
+        opacity 280ms mx.$ease-out-soft,
+        visibility 280ms mx.$ease-out-soft,
+        transform 360ms mx.$ease-out-soft,
+        filter 360ms mx.$ease-out-soft;
+
+      @include mx.light {
+        color: color.adjust(light.$color-black, $lightness: -8%);
+        background:
+          linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.06) 0%,
+            rgba(255, 255, 255, 0.2) 100%
+          ),
+          rgba(139, 91, 130, 0.13);
+      }
+    }
+
+    &-notice-icon {
+      flex: 0 0 auto;
+      width: 15px;
+      height: 15px;
+      opacity: 0.95;
+      animation: sidebar-hourglass-spin 1.8s ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    &-notice-text {
+      display: block;
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: -0.1px;
     }
 
     /* Right-side vertical indicator line */
@@ -103,7 +176,9 @@
       );
       border-radius: 7px 0 0 7px;
       z-index: 2;
-      transition: height mx.$dur-base mx.$ease-out-soft;
+      transition:
+        height mx.$dur-base mx.$ease-out-soft,
+        opacity mx.$dur-fast mx.$ease-out-soft;
 
       @include mx.light {
         background: light.$color-primary;
@@ -181,6 +256,112 @@
             rgba(139, 91, 130, 0) 0%,
             light.$color-primary-bg-hover 100%
           );
+        }
+      }
+    }
+
+    /*
+     * Disabled state
+     *
+     * We intentionally keep pointer-events enabled so React can detect
+     * clicks and show the construction notice.
+     */
+    &.disabled {
+      cursor: not-allowed;
+      color: color.adjust(dark.$color-white, $alpha: -0.58);
+      opacity: 0.62;
+      transform: none;
+      box-shadow: none;
+
+      @include mx.light {
+        color: color.adjust(light.$color-dark-gray, $alpha: -0.42);
+      }
+
+      &::before {
+        height: 0;
+        opacity: 0;
+      }
+
+      &::after {
+        opacity: 0;
+      }
+
+      .user-sidebar__item-label {
+        opacity: 0.78;
+      }
+
+      /* Hover feedback */
+      &:hover {
+        color: color.adjust(dark.$color-white, $alpha: -0.2);
+        transform: translateX(-1px);
+        opacity: 0.9;
+
+        @include mx.light {
+          color: color.adjust(light.$color-black, $alpha: -0.2);
+        }
+
+        &::before {
+          height: 0;
+        }
+
+        &::after {
+          opacity: 0;
+        }
+
+        .user-sidebar__item-label {
+          opacity: 0;
+          transform: translateY(-5px);
+        }
+
+        .user-sidebar__item-notice {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0) scale(1);
+          filter: blur(0);
+        }
+      }
+
+      /* Click-triggered state */
+      &.show-notice {
+        opacity: 0.94;
+        transform: translateX(-1px);
+        box-shadow:
+          0 10px 24px -18px rgba(0, 0, 0, 0.8),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+
+        .user-sidebar__item-label {
+          opacity: 0;
+          transform: translateY(-5px);
+        }
+
+        .user-sidebar__item-notice {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0) scale(1);
+          filter: blur(0);
+        }
+      }
+
+      /*
+       * Make the disabled item completely ignore active styling.
+       * This matters when its route prefix happens to match the current URL.
+       */
+      &.active {
+        font-weight: 600;
+        color: color.adjust(dark.$color-white, $alpha: -0.58);
+        box-shadow: none;
+
+        @include mx.light {
+          color: color.adjust(light.$color-dark-gray, $alpha: -0.42);
+        }
+
+        &::before {
+          height: 0;
+          opacity: 0;
+        }
+
+        &::after {
+          opacity: 0;
         }
       }
     }
@@ -287,12 +468,51 @@
     &__modal-btn {
       background-color: dark.$color-red !important;
       transition: opacity 200ms ease !important;
+
       &:hover {
         opacity: 0.85;
       }
+
       @include mx.light {
         background-color: light.$color-red !important;
       }
+    }
+  }
+}
+
+/* Smooth, subtle hourglass rotation rather than a harsh constant spin. */
+@keyframes sidebar-hourglass-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  35% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(180deg);
+  }
+
+  85% {
+    transform: rotate(180deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .user-sidebar {
+    &__item,
+    &__item-label,
+    &__item-notice {
+      transition: none !important;
+    }
+
+    &__item-notice-icon {
+      animation: none !important;
     }
   }
 }
