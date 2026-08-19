@@ -44,6 +44,12 @@
   &--card {
     display: block;
     width: auto;
+
+    @include mx.max-w(765px) {
+      display: flex;
+      width: 100%;
+      justify-content: center;
+    }
   }
 
   &__shield {
