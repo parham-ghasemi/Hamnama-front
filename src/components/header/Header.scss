@@ -240,8 +240,11 @@
         margin: 0;
       }
 
-      @include mx.max-w(640px) {
-        display: none; // Hide on mobile to give room for profile & theme buttons
+      @include mx.max-w(576px) {
+        min-width: 45px;
+        max-width: 50px;
+        padding: 0;
+        font-size: 16px;
       }
     }
 

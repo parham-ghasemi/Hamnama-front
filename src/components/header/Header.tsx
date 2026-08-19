@@ -4,6 +4,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import UsernameDropdown from './usernameDropdown/UsernameDropdown';
+import { FaPlay } from 'react-icons/fa6';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -54,10 +55,18 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           className="header__left__watchbtn"
           onClick={() => { isAuthenticated ? nav('/join-room') : nav('/auth') }}
         >
-          <PiCaretRightBold className="header__left__watchbtn__Icon" style={{ strokeWidth: 10 }} />
-          <p className="header__left__watchbtn__text">
-            شروع به تماشا
-          </p>
+          {
+            window.innerWidth >= 576 ? (
+              <>
+                <PiCaretRightBold className="header__left__watchbtn__Icon" style={{ strokeWidth: 10 }} />
+                <p className="header__left__watchbtn__text">
+                  شروع به تماشا
+                </p>
+              </>
+            ) : (
+              <FaPlay />
+            )
+          }
         </button>
 
         <div className="header__left__user">
