@@ -141,6 +141,7 @@
         padding: 16px 20px;
         border-radius: 18px;
         box-sizing: border-box;
+        position: relative;
 
         @include mx.cinema-surface;
 
@@ -165,22 +166,6 @@
         > span {
           font-size: 14px;
           color: dark.$color-gray;
-
-          @include mx.light {
-            color: light.$color-dark-gray;
-          }
-        }
-
-        @include mx.light {
-          background: light.$color-card-bg;
-
-          &::before {
-            @include mx.gradient-border(
-              18px,
-              rgba(139, 91, 130, 0.28),
-              rgba(0, 0, 0, 0.04)
-            );
-          }
         }
       }
     }
@@ -279,7 +264,8 @@
 
     @include mx.light {
       background: light.$color-card-bg;
-      box-shadow: 0 14px 30px -22px color.adjust(light.$color-black, $alpha: -0.6);
+      box-shadow: 0 14px 30px -22px
+        color.adjust(light.$color-black, $alpha: -0.6);
 
       &::before {
         @include mx.gradient-border(

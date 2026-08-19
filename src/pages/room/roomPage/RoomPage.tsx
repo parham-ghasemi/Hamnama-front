@@ -34,7 +34,51 @@ import { useAuth } from "../../../context/AuthContext";
 import AnimatedParticle from '../../../components/animatedParticle/AnimatedParticle';
 import { useConfirmationModal } from '../../../context/ConfirmModalContext/ConfirmaModalContext';
 
-type SocketEvent =
+type ClientSocketEvent =
+  | {
+    type: "reaction";
+    payload: {
+      emoji: string;
+    };
+  }
+  | {
+    type: "voice_offer";
+    payload: any;
+  }
+  | {
+    type: "voice_answer";
+    payload: any;
+  }
+  | {
+    type: "voice_ice";
+    payload: any;
+  }
+  | {
+    type: "voice_state";
+    payload: {
+      user_id: string;
+      enabled: boolean;
+    };
+  }
+  | {
+    type: "sync_playback";
+    payload: {
+      action: "play" | "pause" | "seek" | "sync" | "load";
+      playback_time: number;
+      currently_playing?: string | null;
+      is_playing: boolean;
+      user_id: string;
+    };
+  }
+  | {
+    type: "update_settings";
+    payload: {
+      is_public?: boolean;
+      media_control_permission?: "admin" | "everyone";
+    };
+  };
+
+type ServerSocketEvent =
   | {
     type: "chat_message";
     payload: RoomMessageResponse;
@@ -60,16 +104,11 @@ type SocketEvent =
   }
   | {
     type: "user_kicked";
-    payload: {
-      user_id: string;
-    };
+    payload: { user_id: string };
   }
   | {
     type: "update_role";
-    payload: {
-      user_id: string;
-      role: "admin" | "member";
-    };
+    payload: { user_id: string; role: "admin" | "member" };
   }
   | {
     type: "sync_playback";
@@ -94,9 +133,7 @@ type SocketEvent =
   }
   | {
     type: "error";
-    payload: {
-      message: string;
-    };
+    payload: { message: string };
   };
 
 function buildWsUrl(baseUrl: string, roomId: string, token?: string) {
@@ -603,7 +640,7 @@ const RoomPage = () => {
 
   const isCreator = roomState?.created_by === user?.id;
 
-  const sendSocketEvent = (event: SocketEvent) => {
+  const sendSocketEvent = (event: ClientSocketEvent) => {
     const socket = socketRef.current;
     if (!socket || socket.readyState !== WebSocket.OPEN) return;
     socket.send(JSON.stringify(event));
@@ -621,7 +658,7 @@ const RoomPage = () => {
     socket.onerror = (e) => console.log("WS ERROR", e);
 
     socket.onmessage = (event) => {
-      let parsed: SocketEvent;
+      let parsed: ServerSocketEvent;
       try {
         parsed = JSON.parse(event.data);
       } catch {

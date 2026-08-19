@@ -17,19 +17,19 @@ const people = [
     key: 'founder',
     role: 'بنیان‌گذار',
     roleDesc: 'ایده‌پرداز و مسئول مسیر محصول',
-    name: 'نام بنیان‌گذار',
+    name: 'محمدرضا سلیمانی',
     image: '/about/founder.webp',
     phone: '09120000000',
-    email: 'founder@hamnama.net',
+    email: '---@hamnama.net',
   },
   {
     key: 'developer',
     role: 'توسعه‌دهنده',
     roleDesc: 'طراحی و پیاده‌سازی فنی هم‌نما',
-    name: 'نام توسعه‌دهنده',
+    name: 'پرهام قاسمی',
     image: '/about/developer.webp',
-    phone: '09130000000',
-    email: 'dev@hamnama.net',
+    phone: '09912525964',
+    email: 'parham.ghasemi.1388@gmail.com',
   },
 ];
 
@@ -65,7 +65,7 @@ const About = () => {
 
           <div className="about-page__hero__stats">
             <div className="about-page__hero__stats__item">
-              <strong>{toPersianNumerals(2)}</strong>
+              <strong>{toPersianNumerals(3)}</strong>
               <span>نفر تیم اصلی</span>
             </div>
             <div className="about-page__hero__stats__item">
