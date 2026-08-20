@@ -587,6 +587,12 @@
                 font-size: 19px;
               }
             }
+
+            &.copied {
+              > span {
+                color: dark.$color-green;
+              }
+            }
           }
 
           /* Primary action of each card. */

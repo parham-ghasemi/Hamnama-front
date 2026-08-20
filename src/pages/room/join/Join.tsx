@@ -9,10 +9,13 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { getCurrentRoom, getLastActiveRoom, getRoomApiErrorStatus, joinRoom } from '../../../apiCalls/roomApi';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
+import { FaCheck } from 'react-icons/fa6';
+import clsx from 'clsx';
 
 
 const Join = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [code, setCode] = useState<number | string>("");
   const nav = useNavigate();
 
@@ -69,6 +72,17 @@ const Join = () => {
     joinRoomMutation.mutate(roomCode);
   };
 
+  const handleCopy = () => {
+    if (activeRoom) {
+      navigator.clipboard.writeText(String(activeRoom.code))
+      setCopied(true)
+
+      setInterval(() => {
+        setCopied(false);
+      }, 4000);
+    }
+  }
+
   const activeRoom = currentRoomQuery.data ?? null;
   const activeRoomLoading = currentRoomQuery.isLoading || currentRoomQuery.isFetching;
   const activeRoomLookupFailed = !!currentRoomQuery.error && getRoomApiErrorStatus(currentRoomQuery.error) !== 404;
@@ -115,13 +129,20 @@ const Join = () => {
                   </span>
                 </div>
 
-                <div className="join-page__content__main__cards__card__code">
+                <div className={clsx("join-page__content__main__cards__card__code", copied && 'copied')}>
                   کد شما: {activeRoom ? activeRoom.code.toLocaleString("fa-IR").replace('٬', " ") : "---"}
                   <span
-                    onClick={() => activeRoom && navigator.clipboard.writeText(String(activeRoom.code))}
+                    onClick={handleCopy}
                     aria-hidden={!activeRoom}
                   >
-                    <IoCopyOutline />
+                    {
+                      copied ? (
+                        <FaCheck />
+                      )
+                        : (
+                          <IoCopyOutline />
+                        )
+                    }
                   </span>
                 </div>
 
