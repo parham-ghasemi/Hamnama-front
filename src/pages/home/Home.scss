@@ -19,89 +19,38 @@
   &__hero {
     position: absolute;
     width: 100vw;
-    height: 97vh;
-    max-height: 97vh;
+    height: 100vh;
+    max-height: 100vh;
     top: 0;
     left: 0;
     right: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 30px;
     @include mx.max-w(768px) {
       height: 350px;
       max-height: 350px;
     }
 
-    // Small consistency tweak only: the hero now melts into the page
-    // background instead of ending on a hard edge.
-    &::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 32vh;
-      pointer-events: none;
-      // background: linear-gradient(
-      //   180deg,
-      //   transparent 0%,
-      //   rgba(10, 9, 9, 0.75) 65%,
-      //   #0a0909 100%
-      // );
-
-      @include mx.light {
-        background: linear-gradient(
-          180deg,
-          transparent 0%,
-          color.adjust(light.$color-bg, $alpha: -0.3) 65%,
-          light.$color-bg 100%
-        );
-      }
-
-      @include mx.max-w(768px) {
-        height: 120px;
-      }
-    }
-
     > .img {
-      height: 100%;
+      height: 86vh;
       width: 100%;
 
+      @include mx.max-w(768px) {
+        height: 285px;
+        max-height: 285px;
+      }
+
       > img {
-        position: absolute;
-        top: 0;
         width: 100%;
+        height: 100%;
         object-fit: cover;
         transition: opacity ease 300ms !important;
 
         @include mx.max-w(768px) {
           top: 50px;
         }
-
-        &.light {
-          opacity: 0;
-          height: 86vh;
-
-          @include mx.max-w(768px) {
-            height: 285px;
-            max-height: 285px;
-          }
-        }
-
-        &.dark {
-          @include mx.max-w(768px) {
-            height: 285px;
-            max-height: 285px;
-          }
-        }
-      }
-    }
-    &--light {
-      > .img > img.light {
-        opacity: 1;
-      }
-      > .img > img.dark {
-        opacity: 0;
       }
     }
 

@@ -32,11 +32,11 @@ const Home = () => {
 
         <div className={clsx("home-page__hero", isLight && "home-page__hero--light")}>
           <div className="img">
-            <img
+            {/* <img
               src="/homepage/lightheroimg.webp"
               className='light'
               alt=""
-            />
+            /> */}
             <img
               src="/homepage/heroimg.webp"
               className='dark'
