@@ -4,6 +4,10 @@
 @use "./styles/abstracts/font";
 @use "./styles/base/globals";
 
+:root {
+  color-scheme: dark;
+}
+
 img {
   width: 100%;
   height: 100%;
