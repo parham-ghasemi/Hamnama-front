@@ -95,13 +95,29 @@ const getNextEpisodeFile = (files: MediaFileItem[], current: MediaFileItem) => {
       Number(file.episode) === Number(nextEpisodeNumber.episode),
   );
 
+  const currentQualityTags = String(current.quality_tags || "").trim().toLowerCase();
+  const currentVersion = String(current.version || "").trim().toLowerCase();
   const currentScore = qualityScore(current.quality_tags || current.version);
+
   return sameEpisodeCandidates.sort((a, b) => {
+    const aQualityTags = String(a.quality_tags || "").trim().toLowerCase();
+    const bQualityTags = String(b.quality_tags || "").trim().toLowerCase();
+    const aVersion = String(a.version || "").trim().toLowerCase();
+    const bVersion = String(b.version || "").trim().toLowerCase();
+
+    // Preserve the variant the user is currently watching first (e.g. softsub
+    // should beat dubbed), then prefer the same source/version (e.g. BluRay),
+    // and only then fall back to the closest resolution.
+    const aQualityTagsExact = Boolean(currentQualityTags) && aQualityTags === currentQualityTags;
+    const bQualityTagsExact = Boolean(currentQualityTags) && bQualityTags === currentQualityTags;
+    if (aQualityTagsExact !== bQualityTagsExact) return aQualityTagsExact ? -1 : 1;
+
+    const aVersionExact = Boolean(currentVersion) && aVersion === currentVersion;
+    const bVersionExact = Boolean(currentVersion) && bVersion === currentVersion;
+    if (aVersionExact !== bVersionExact) return aVersionExact ? -1 : 1;
+
     const aQuality = qualityScore(a.quality_tags || a.version);
     const bQuality = qualityScore(b.quality_tags || b.version);
-    const aExact = a.quality_tags === current.quality_tags || a.version === current.version;
-    const bExact = b.quality_tags === current.quality_tags || b.version === current.version;
-    if (aExact !== bExact) return aExact ? -1 : 1;
     return Math.abs(aQuality - currentScore) - Math.abs(bQuality - currentScore);
   })[0] ?? null;
 };

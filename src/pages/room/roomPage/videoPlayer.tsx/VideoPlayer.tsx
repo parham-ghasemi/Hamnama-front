@@ -11,6 +11,7 @@ import {
   Minimize,
   PictureInPicture2,
   Keyboard,
+  X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -381,20 +382,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             exit={{ opacity: 0, y: 8 }}
             role="dialog"
             aria-label="راهنمای میانبرهای پخش ویدیو"
-            className="absolute bottom-20 right-4 z-40 w-[min(320px,calc(100%-2rem))] rounded-xl border border-white/15 bg-black/90 p-4 text-sm text-white shadow-2xl backdrop-blur-md"
+            className="absolute bottom-20 right-4 z-40 w-[min(320px,calc(100%-2rem))] rounded-xl border border-white/15 bg-black/40 p-4 text-sm text-white shadow-2xl backdrop-blur-md"
+            dir="rtl"
           >
-            <div className="mb-3 flex items-center justify-between gap-3">
+            <div className="mb-4 pb-1 flex items-center justify-between gap-3 border-b border-[#ffffff4f]">
               <strong>میانبرهای دسترسی</strong>
               <button
                 type="button"
                 onClick={() => setShowShortcutHints(false)}
                 aria-label="بستن راهنمای میانبرها"
-                className="rounded-md px-2 py-1 text-white/70 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/60"
+                className="rounded-md px-2 py-1 text-white/70 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/60 cursor-pointer"
               >
-                ×
+                <X size={20} />
               </button>
             </div>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-white/80">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-white/80" dir="rtl">
               <span><b className="text-white">J</b> / <b className="text-white">L</b></span><span>۱۰ ثانیه عقب / جلو</span>
               <span><b className="text-white">K</b> / <b className="text-white">Space</b></span><span>پخش / توقف</span>
               <span><b className="text-white">←</b> / <b className="text-white">→</b></span><span>۵ ثانیه عقب / جلو</span>
