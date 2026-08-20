@@ -350,9 +350,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.2 }}
             onClick={togglePlay}
-            className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform pointer-events-auto z-10"
+            className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform pointer-events-auto z-10 max-[410px]:w-10 max-[410px]:h-10"
           >
-            <Play className="w-8 h-8 fill-white text-white translate-x-0.5" />
+            <Play className="w-8 h-8 fill-white text-white max-[410px]:w-4 max-[410px]:h-4 " />
           </motion.div>
         )}
       </AnimatePresence>
@@ -366,9 +366,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             exit={{ opacity: 0, y: 10 }}
             onClick={onNextEpisodeRequest}
             aria-label={`پخش قسمت بعدی${nextEpisode.title ? `: ${nextEpisode.title}` : ""}`}
-            className="absolute bottom-24 right-4 z-30 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-black shadow-xl transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white/80"
+            className="absolute bottom-24 right-4 z-30 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm max-[420px]:text-xs font-semibold text-black shadow-xl transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white/80"
           >
-            <Play className="h-4 w-4 fill-current" />
+            <Play className="h-4 w-4 fill-current max-[420px]:w-3 max-[420px]:h-3" />
             قسمت بعدی
           </motion.button>
         )}
@@ -444,9 +444,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   className="p-2 rounded-full bg-white/10 hover:bg-white/25 transition-all text-white backdrop-blur-sm"
                 >
                   {playing ? (
-                    <Pause className="w-5 h-5 fill-white" />
+                    <Pause className="w-5 h-5 fill-white max-[420px]:w-3 max-[420px]:h-3" />
                   ) : (
-                    <Play className="w-5 h-5 fill-white translate-x-0.5" />
+                    <Play className="w-5 h-5 fill-white max-[420px]:w-3 max-[420px]:h-3" />
                   )}
                 </button>
 
