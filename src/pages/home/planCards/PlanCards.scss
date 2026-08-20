@@ -12,12 +12,12 @@
   position: relative;
   padding: 0 16px;
 
-  @include mx.max-w(1024px) {
+  @include mx.max-w(1194px) {
     gap: 16px;
     margin-top: 60px;
   }
 
-  @include mx.max-w(768px) {
+  @include mx.max-w(932px) {
     flex-direction: column;
     gap: 36px;
     margin-top: 40px;
@@ -41,7 +41,7 @@
       transform: translateY(-62px);
     }
 
-    @include mx.max-w(1024px) {
+    @include mx.max-w(1194px) {
       transform: translateY(-20px);
 
       &:hover {
@@ -50,7 +50,7 @@
     }
 
     // Reset staggered elevation when stacked vertically on tablets and mobile
-    @include mx.max-w(768px) {
+    @include mx.max-w(932px) {
       transform: none;
 
       &:hover {
@@ -62,7 +62,7 @@
   &__blob-top {
     @include mx.background-blob(900px, 600px, -70%, auto, auto, -10%);
 
-    @include mx.max-w(768px) {
+    @include mx.max-w(932px) {
       display: none; // Prevent horizontal scrollbar on mobile
     }
   }
@@ -70,7 +70,7 @@
   &__blob-bottom {
     @include mx.background-blob(1100px, 520px, auto, -8%, -25%, auto);
 
-    @include mx.max-w(768px) {
+    @include mx.max-w(932px) {
       display: none; // Prevent horizontal scrollbar on mobile
     }
   }
@@ -175,12 +175,12 @@
         }
       }
 
-      @include mx.max-w(768px) {
+      @include mx.max-w(932px) {
         transform: translateY(-8px);
       }
     }
 
-    @include mx.max-w(1024px) {
+    @include mx.max-w(1194px) {
       width: 300px;
       min-height: 520px;
       padding: 16px 0;
@@ -191,7 +191,7 @@
       }
     }
 
-    @include mx.max-w(768px) {
+    @include mx.max-w(932px) {
       width: 100%;
       max-width: 360px;
       min-height: auto;
@@ -244,12 +244,12 @@
           filter: none;
         }
 
-        @include mx.max-w(768px) {
+        @include mx.max-w(932px) {
           font-size: 32px;
         }
       }
 
-      @include mx.max-w(768px) {
+      @include mx.max-w(932px) {
         height: 60px;
         width: 60px;
         border-radius: 14px;
@@ -267,12 +267,12 @@
         color: light.$color-primary;
       }
 
-      @include mx.max-w(1024px) {
+      @include mx.max-w(1194px) {
         font-size: 32px;
         margin-top: 18px;
       }
 
-      @include mx.max-w(768px) {
+      @include mx.max-w(932px) {
         font-size: 28px;
         margin-top: 16px;
       }
@@ -292,7 +292,7 @@
         color: color.adjust(light.$color-gray, $lightness: -20%);
       }
 
-      @include mx.max-w(1024px) {
+      @include mx.max-w(1194px) {
         font-size: 16px;
       }
 
@@ -329,7 +329,7 @@
         @include mx.sprockets(4px, 12px, rgba(0, 0, 0, 0.22));
       }
 
-      @include mx.max-w(768px) {
+      @include mx.max-w(932px) {
         margin: 14px 0;
       }
     }
@@ -339,7 +339,7 @@
       font-size: 27.2px;
       z-index: 1;
 
-      @include mx.max-w(1024px) {
+      @include mx.max-w(1194px) {
         font-size: 22px;
       }
 
@@ -358,7 +358,7 @@
         color: light.$color-dark-gray;
       }
 
-      @include mx.max-w(1024px) {
+      @include mx.max-w(1194px) {
         font-size: 22px;
       }
 
@@ -395,7 +395,7 @@
           color: light.$color-white;
         }
 
-        @include mx.max-w(768px) {
+        @include mx.max-w(932px) {
           height: 30px;
         }
 
@@ -406,7 +406,7 @@
           font-size: 17px;
           opacity: 0.75;
 
-          @include mx.max-w(768px) {
+          @include mx.max-w(932px) {
             font-size: 14px;
           }
         }
@@ -424,7 +424,7 @@
             }
           }
 
-          @include mx.max-w(768px) {
+          @include mx.max-w(932px) {
             font-size: 13px;
           }
         }
@@ -455,7 +455,7 @@
           box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05) inset;
         }
 
-        @include mx.max-w(1024px) {
+        @include mx.max-w(1194px) {
           height: 75px;
         }
 
@@ -490,7 +490,7 @@
             }
           }
 
-          @include mx.max-w(1024px) {
+          @include mx.max-w(1194px) {
             font-size: 30px;
             gap: 6px;
           }
@@ -509,7 +509,7 @@
             color: rgba(0, 0, 0, 0.35);
           }
 
-          @include mx.max-w(1024px) {
+          @include mx.max-w(1194px) {
             font-size: 13px;
           }
 
@@ -633,7 +633,7 @@
         outline-offset: 3px;
       }
 
-      @include mx.max-w(1024px) {
+      @include mx.max-w(1194px) {
         height: 50px;
         font-size: 24px;
         border-radius: 14px;
@@ -693,7 +693,7 @@
         }
       }
 
-      @include mx.max-w(1024px) {
+      @include mx.max-w(1194px) {
         font-size: 16px;
         margin-top: 14px;
       }
