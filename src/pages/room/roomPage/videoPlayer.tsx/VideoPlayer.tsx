@@ -26,6 +26,11 @@ export interface VideoPlayerProps {
   onPauseRequest?: () => void;
   onSeekRequest?: (time: number) => void;
   onLocalTimeUpdate?: (time: number) => void;
+  nextEpisode?: {
+    title: string;
+    quality?: string;
+  } | null;
+  onNextEpisodeRequest?: () => void;
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -40,6 +45,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   onPauseRequest,
   onSeekRequest,
   onLocalTimeUpdate,
+  nextEpisode,
+  onNextEpisodeRequest,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -54,6 +61,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [isPip, setIsPip] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [isHoveringVolume, setIsHoveringVolume] = useState(false);
+  const lastTouchRef = useRef<{ time: number; x: number } | null>(null);
 
   const playing = isPlaying ?? internalPlaying;
   const time = currentTime ?? internalCurrentTime;
@@ -89,6 +97,51 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     else {
       setInternalCurrentTime(next);
       onLocalTimeUpdate?.(next);
+    }
+  };
+
+  const handleKeyboardSeek = useCallback((seconds: number) => {
+    handleSeekBy(seconds);
+  }, [duration]);
+
+  const handlePlayerKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) {
+      return;
+    }
+
+    const key = e.key.toLowerCase();
+    let handled = true;
+
+    switch (key) {
+      case "j":
+        handleKeyboardSeek(-10);
+        break;
+      case "l":
+        handleKeyboardSeek(10);
+        break;
+      case "k":
+        togglePlay();
+        break;
+      case " ":
+      case "spacebar":
+        togglePlay();
+        break;
+      case "arrowleft":
+        handleKeyboardSeek(-5);
+        break;
+      case "arrowright":
+        handleKeyboardSeek(5);
+        break;
+      case "f":
+        void toggleFullscreen();
+        break;
+      default:
+        handled = false;
+    }
+
+    if (handled) {
+      e.preventDefault();
+      e.stopPropagation();
     }
   };
 
@@ -146,6 +199,32 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     } catch (err) {
       console.error("PiP error:", err);
     }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    const touch = e.changedTouches[0];
+    if (!touch) return;
+
+    const target = e.target as HTMLElement;
+    if (target.closest("button, input, select, textarea") && target !== videoRef.current) {
+      lastTouchRef.current = null;
+      return;
+    }
+
+    const now = Date.now();
+    const lastTouch = lastTouchRef.current;
+    const isDoubleTap = lastTouch && now - lastTouch.time < 320 && Math.abs(touch.clientX - lastTouch.x) < 80;
+
+    if (isDoubleTap) {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (rect) {
+        handleSeekBy(touch.clientX - rect.left < rect.width / 2 ? -10 : 10);
+      }
+      lastTouchRef.current = null;
+      return;
+    }
+
+    lastTouchRef.current = { time: now, x: touch.clientX };
   };
 
   const handleMouseMove = () => {
@@ -212,6 +291,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     <div
       ref={containerRef}
       dir="ltr"
+      tabIndex={0}
+      aria-label="پخش‌کننده ویدیو"
+      onKeyDown={handlePlayerKeyDown}
+      onMouseDown={() => containerRef.current?.focus()}
+      onTouchEnd={handleTouchEnd}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => playing && setShowControls(false)}
       className={`relative group overflow-hidden bg-black rounded-2xl shadow-2xl select-none font-sans text-white h-full w-full ${className}`}
@@ -251,7 +335,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           }
         }}
         onEnded={() => setInternalPlaying(false)}
-        className="w-full h-full object-contain cursor-pointer"
+        className="w-full h-full object-contain cursor-pointer outline-none! border-none!"
       />
 
       <AnimatePresence>
@@ -266,6 +350,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           >
             <Play className="w-8 h-8 fill-white text-white translate-x-0.5" />
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {nextEpisode && duration > 0 && time >= Math.max(0, duration - 20) && (
+          <motion.button
+            type="button"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            onClick={onNextEpisodeRequest}
+            aria-label={`پخش قسمت بعدی${nextEpisode.title ? `: ${nextEpisode.title}` : ""}`}
+            className="absolute bottom-24 right-4 z-30 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-black shadow-xl transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white/80"
+          >
+            <Play className="h-4 w-4 fill-current" />
+            قسمت بعدی
+          </motion.button>
         )}
       </AnimatePresence>
 

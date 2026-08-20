@@ -1482,6 +1482,19 @@ const RoomPage = () => {
     emitPlayback("load", 0, media.url);
   };
 
+  const handleNextEpisode = () => {
+    const nextEpisode = selectedMedia?.nextEpisode;
+    if (!nextEpisode) return;
+
+    setCurrentId(nextEpisode.id);
+    setSelectedMedia(nextEpisode);
+    setCurrentQuality(nextEpisode.quality ?? "quality");
+    setPlaybackSrc(nextEpisode.url);
+    setCurrentTime(0);
+    setIsPlaying(true);
+    emitPlayback("load", 0, nextEpisode.url);
+  };
+
   const handleShareScreen = async () => {
     try {
       setScreenShareError(null);
@@ -1770,6 +1783,12 @@ const RoomPage = () => {
                 setCurrentTime(t);
                 currentTimeRef.current = t;
               }}
+              nextEpisode={
+                selectedMedia?.type === "series" && selectedMedia.season != null && selectedMedia.episode != null
+                  ? selectedMedia.nextEpisode ?? null
+                  : null
+              }
+              onNextEpisodeRequest={handleNextEpisode}
             />
           ) : (
             <div className="room-page__main__player__empty">
@@ -1778,6 +1797,24 @@ const RoomPage = () => {
               </span>
               <strong>هنوز چیزی برای پخش انتخاب نشده</strong>
               <p>با زدن «انتخاب فیلم» یک عنوان از آرشیو انتخاب کنید یا لینک مستقیم ویدیو را وارد کنید.</p>
+              <div className="mt-4 max-w-xl rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs leading-6 text-gray-300 flex flex-col items-start">
+                <strong className="mr-1 text-white">راهنمای کنترل:</strong>
+                <span>
+                  J / L = عقب یا جلو ۱۰ ثانیه
+                </span>
+                <span>
+                  K / Space = پخش یا توقف
+                </span>
+                <span>
+                  ← / → = عقب یا جلو ۵ ثانیه
+                </span>
+                <span>
+                  F = تمام‌صفحه
+                </span>
+                <span>
+                  موبایل: دو ضربه روی نیمه چپ یا راست = عقب/جلو ۱۰ ثانیه
+                </span>
+              </div>
               <button type="button" onClick={() => setMediaTypeModalOpen(true)}>
                 انتخاب منبع پخش
               </button>

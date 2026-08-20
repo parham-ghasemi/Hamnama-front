@@ -31,6 +31,7 @@ export interface SelectedArchiveMedia {
   quality?: string;
   season?: number | null;
   episode?: number | null;
+  nextEpisode?: SelectedArchiveMedia | null;
 }
 
 interface ArchiveModalProps {
@@ -51,6 +52,82 @@ const clean = (value: unknown) => {
   if (value === null || value === undefined || value === "" || value === "N/A") return "—";
   return String(value);
 };
+
+const qualityScore = (value?: string | null) => {
+  if (!value) return 0;
+  const normalized = value.toLowerCase();
+  const resolution = normalized.match(/(\d{3,4})p/);
+  if (resolution) return Number(resolution[1]);
+  const sourceRank = [
+    { token: "2160", value: 2160 },
+    { token: "4k", value: 2160 },
+    { token: "1440", value: 1440 },
+    { token: "1080", value: 1080 },
+    { token: "720", value: 720 },
+    { token: "576", value: 576 },
+    { token: "480", value: 480 },
+    { token: "360", value: 360 },
+  ];
+  return sourceRank.find((item) => normalized.includes(item.token))?.value ?? 0;
+};
+
+const getNextEpisodeFile = (files: MediaFileItem[], current: MediaFileItem) => {
+  if (current.season == null || current.episode == null) return null;
+
+  const ordered = files
+    .filter((file) => file.valid && !!(file.final_url || file.url) && file.season != null && file.episode != null)
+    .sort((a, b) => {
+      const seasonDiff = Number(a.season) - Number(b.season);
+      return seasonDiff || Number(a.episode) - Number(b.episode);
+    });
+
+  const nextEpisodeNumber = ordered.find(
+    (file) =>
+      Number(file.season) > Number(current.season) ||
+      (Number(file.season) === Number(current.season) && Number(file.episode) > Number(current.episode)),
+  );
+
+  if (!nextEpisodeNumber) return null;
+
+  const sameEpisodeCandidates = ordered.filter(
+    (file) =>
+      Number(file.season) === Number(nextEpisodeNumber.season) &&
+      Number(file.episode) === Number(nextEpisodeNumber.episode),
+  );
+
+  const currentScore = qualityScore(current.quality_tags || current.version);
+  return sameEpisodeCandidates.sort((a, b) => {
+    const aQuality = qualityScore(a.quality_tags || a.version);
+    const bQuality = qualityScore(b.quality_tags || b.version);
+    const aExact = a.quality_tags === current.quality_tags || a.version === current.version;
+    const bExact = b.quality_tags === current.quality_tags || b.version === current.version;
+    if (aExact !== bExact) return aExact ? -1 : 1;
+    return Math.abs(aQuality - currentScore) - Math.abs(bQuality - currentScore);
+  })[0] ?? null;
+};
+
+const buildNextEpisode = (
+  detail: MediaDetailResponse,
+  file: MediaFileItem,
+  depth = 0,
+): SelectedArchiveMedia | null => {
+  if (detail.type !== "series" || depth > 20) return null;
+
+  const nextFile = getNextEpisodeFile(detail.files ?? [], file);
+  if (!nextFile) return null;
+
+  return {
+    id: detail.id,
+    title: `${detail.title_en} (${detail.title_fa})`,
+    type: detail.type,
+    url: nextFile.final_url || nextFile.url,
+    quality: nextFile.quality_tags || nextFile.version || "quality",
+    season: nextFile.season ?? null,
+    episode: nextFile.episode ?? null,
+    nextEpisode: buildNextEpisode(detail, nextFile, depth + 1),
+  };
+};
+
 
 const MediaCard: React.FC<{
   item: MediaListItem;
@@ -189,6 +266,8 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
   const selectFile = (file: MediaFileItem) => {
     if (!detail) return;
 
+    const nextEpisode = buildNextEpisode(detail, file);
+
     onSelectMedia({
       id: detail.id,
       title: `${detail.title_en} (${detail.title_fa})`,
@@ -197,6 +276,7 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
       quality: file.quality_tags || file.version || "quality",
       season: file.season ?? null,
       episode: file.episode ?? null,
+      nextEpisode,
     });
     close();
   };
