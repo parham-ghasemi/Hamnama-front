@@ -38,6 +38,7 @@ interface ArchiveModalProps {
   closeModal: () => void;
   onSelectMedia: (media: SelectedArchiveMedia) => void;
   currentPlaying?: string | null;
+  currentPlayingId?: string;
 }
 
 const typeLabel = (type?: string) => {
@@ -129,8 +130,9 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
   closeModal,
   onSelectMedia,
   currentPlaying,
+  currentPlayingId
 }) => {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(currentPlayingId || null);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [sortBy, setSortBy] = useState("rates_desc");
@@ -181,7 +183,6 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
   }, [contextRelated, relatedFromDetail, selectedId]);
 
   const close = () => {
-    setSelectedId(null);
     closeModal();
   };
 

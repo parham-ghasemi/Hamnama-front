@@ -165,6 +165,7 @@ const RoomPage = () => {
   const [particles, setParticles] = useState<ParticleData[]>([]);
 
   const [currentQuality, setCurrentQuality] = useState("quality");
+  const [currentId, setCurrentId] = useState('')
   const [link, setLink] = useState("");
   // The link input is locked until the user picks "پخش با لینک" in the media type modal.
   const [linkModeEnabled, setLinkModeEnabled] = useState(false);
@@ -1066,6 +1067,7 @@ const RoomPage = () => {
   };
 
   const handleArchiveSelect = (media: SelectedArchiveMedia) => {
+    setCurrentId(media.id)
     setSelectedMedia(media);
     setLinkModeEnabled(false);
     setLink("");
@@ -1549,6 +1551,7 @@ const RoomPage = () => {
               closeModal={() => setArchiveModalOpen(false)}
               onSelectMedia={handleArchiveSelect}
               currentPlaying={roomState.currently_playing}
+              currentPlayingId={currentId}
             />
           </div>
         )}
