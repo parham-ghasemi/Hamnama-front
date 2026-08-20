@@ -116,7 +116,7 @@ const Join = () => {
                 </div>
 
                 <div className="join-page__content__main__cards__card__code">
-                  کد شما: {activeRoom ? activeRoom.code.toLocaleString("fa-IR") : "---"}
+                  کد شما: {activeRoom ? activeRoom.code.toLocaleString("fa-IR").replace('٬', " ") : "---"}
                   <span
                     onClick={() => activeRoom && navigator.clipboard.writeText(String(activeRoom.code))}
                     aria-hidden={!activeRoom}
@@ -173,7 +173,7 @@ const Join = () => {
                     {lastRoom ? lastRoomLabel : "اتاقی برای بازگشت وجود ندارد"}
                     {lastRoom && (
                       <span className="join-page__content__main__cards__last__info__code">
-                        {lastRoom.code.toLocaleString("fa-IR")}
+                        {lastRoom.code.toLocaleString("fa-IR").replace('٬', " ")}
                       </span>
                     )}
                   </p>
