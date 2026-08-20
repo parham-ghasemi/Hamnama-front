@@ -24,6 +24,7 @@ const ChatMessage = ({ message, isOwn, showAvatar, onReply }: Props) => {
 
   const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0];
+    if (!touch) return;
     startX.current = touch.clientX;
     startY.current = touch.clientY;
     locked.current = "none";
@@ -32,6 +33,7 @@ const ChatMessage = ({ message, isOwn, showAvatar, onReply }: Props) => {
 
   const handleTouchMove = (e: React.TouchEvent) => {
     const touch = e.touches[0];
+    if (!touch) return;
     const dx = touch.clientX - startX.current;
     const dy = touch.clientY - startY.current;
 
@@ -125,7 +127,7 @@ const ChatMessage = ({ message, isOwn, showAvatar, onReply }: Props) => {
             {showAvatar ? (
               message.sender_avatar ? (
                 <img
-                  src={`${import.meta.env.VITE_BASE_URL}${message.sender_avatar}`}
+                  src={`${import.meta.env['VITE_BASE_URL'] ?? ''}${message.sender_avatar}`}
                   alt={message.sender_name}
                   onError={(e) => {
                     (e.currentTarget as HTMLImageElement).style.visibility = "hidden";

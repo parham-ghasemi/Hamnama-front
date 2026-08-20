@@ -9,11 +9,13 @@ const MediaTypeModal = ({
   isOpen,
   closeModal,
   onShareScreen,
+  onChooseLink,
 }: {
   isOpen: boolean;
   openArchive: () => void;
   closeModal: () => void;
   onShareScreen: () => void;
+  onChooseLink: () => void;
 }) => {
   const handleOpenArchive = () => {
     closeModal();
@@ -49,7 +51,7 @@ const MediaTypeModal = ({
         <button
           type="button"
           className="media-type-modal__option media-type-modal__option--link"
-          onClick={closeModal}
+          onClick={onChooseLink}
         >
           <div className="media-type-modal__option-icon">
             <BsLink45Deg />

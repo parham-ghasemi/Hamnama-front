@@ -23,11 +23,20 @@ import {
 } from "../../../../apiCalls/archiveApi";
 import "./ArchiveModal.scss";
 
+export interface SelectedArchiveMedia {
+  id: string;
+  title: string;
+  type: "movie" | "series";
+  url: string;
+  quality?: string;
+  season?: number | null;
+  episode?: number | null;
+}
+
 interface ArchiveModalProps {
   isOpen: boolean;
   closeModal: () => void;
-  setLink: React.Dispatch<React.SetStateAction<string>>;
-  setQuality: React.Dispatch<React.SetStateAction<string>>;
+  onSelectMedia: (media: SelectedArchiveMedia) => void;
   currentPlaying?: string | null;
 }
 
@@ -107,13 +116,8 @@ const FileCard: React.FC<{
       </button>
     </div>
 
-    {(file.filename || file.size) && (
+    {file.size && (
       <div className="archive-file__meta-row">
-        {file.filename && (
-          <span className="archive-file__filename" dir="ltr" title={file.filename}>
-            {file.filename}
-          </span>
-        )}
         {file.size && <span className="archive-file__size">{file.size}</span>}
       </div>
     )}
@@ -123,8 +127,7 @@ const FileCard: React.FC<{
 const ArchiveModal: React.FC<ArchiveModalProps> = ({
   isOpen,
   closeModal,
-  setLink,
-  setQuality,
+  onSelectMedia,
   currentPlaying,
 }) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -183,8 +186,17 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
   };
 
   const selectFile = (file: MediaFileItem) => {
-    setLink(file.final_url || file.url);
-    setQuality(file.quality_tags || file.version || "quality");
+    if (!detail) return;
+
+    onSelectMedia({
+      id: detail.id,
+      title: `${detail.title_en} (${detail.title_fa})`,
+      type: detail.type,
+      url: file.final_url || file.url,
+      quality: file.quality_tags || file.version || "quality",
+      season: file.season ?? null,
+      episode: file.episode ?? null,
+    });
     close();
   };
 

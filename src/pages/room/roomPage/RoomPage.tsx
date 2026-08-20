@@ -2,20 +2,19 @@ import './RoomPage.scss'
 import './themse/Themes.scss'
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
 import clsx from "clsx";
 import { AiTwotoneSetting } from "react-icons/ai";
 import { BsEmojiLaughing, BsFillPeopleFill, BsFillShareFill, BsMicFill, BsMicMuteFill, BsReplyFill } from "react-icons/bs";
 import { IoChatbubblesSharp, IoChevronBack, IoClose, IoExitOutline } from "react-icons/io5";
 import { FaArrowRight } from "react-icons/fa6";
-import { TbSticker } from "react-icons/tb";
+import { TbSticker, TbMovieOff, TbPlayerPlayFilled } from "react-icons/tb";
 
 import SettingsModal from "./settingsModal/SettingsModal";
 import ChatMessage from "./ChatMessage";
 import EmojiPicker from "./EmojiePicker";
 import UsersModal from "./usersModal/UsersModal";
 import MediaTypeModal from "./mediaTypeModal/MediaTypeModal";
-import ArchiveModal from "./archiveModal/ArchiveModal";
+import ArchiveModal, { type SelectedArchiveMedia } from "./archiveModal/ArchiveModal";
 import VideoPlayer from "./videoPlayer.tsx/VideoPlayer";
 
 import {
@@ -33,6 +32,8 @@ import {
 import { useAuth } from "../../../context/AuthContext";
 import AnimatedParticle from '../../../components/animatedParticle/AnimatedParticle';
 import { useConfirmationModal } from '../../../context/ConfirmModalContext/ConfirmaModalContext';
+import { useAppViewport } from '../../../hooks/useAppViewPort';
+import { useNavigate, useParams } from 'react-router-dom';
 
 type ClientSocketEvent =
   | {
@@ -150,6 +151,9 @@ const RoomPage = () => {
   const { user } = useAuth();
   const { openConfirmation } = useConfirmationModal();
 
+  // Keeps the layout locked to one screen while mobile keyboards open and close.
+  useAppViewport();
+
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [usersModalOpen, setUsersModalOpen] = useState(false);
   const [mediaTypeModalOpen, setMediaTypeModalOpen] = useState(false);
@@ -162,6 +166,11 @@ const RoomPage = () => {
 
   const [currentQuality, setCurrentQuality] = useState("quality");
   const [link, setLink] = useState("");
+  // The link input is locked until the user picks "پخش با لینک" in the media type modal.
+  const [linkModeEnabled, setLinkModeEnabled] = useState(false);
+  // What the video element actually plays. Only updated on submit / archive pick.
+  const [playbackSrc, setPlaybackSrc] = useState("");
+  const [selectedMedia, setSelectedMedia] = useState<SelectedArchiveMedia | null>(null);
   const [messageText, setMessageText] = useState("");
   const [replyingTo, setReplyingTo] = useState<{ id: string, message: string }>({ id: "", message: "" });
   const [roomState, setRoomState] = useState<RoomResponse | null>(null);
@@ -592,7 +601,7 @@ const RoomPage = () => {
     console.log("ROOM QUERY MEMBERS:", roomQuery.data.members);
 
     setRoomState(roomQuery.data);
-    setLink(roomQuery.data.currently_playing ?? "");
+    setPlaybackSrc(roomQuery.data.currently_playing ?? "");
     setCurrentTime(roomQuery.data.playback_time ?? 0);
     setIsPlaying(roomQuery.data.is_playing ?? false);
     const statuses: Record<string, ConnectionStatus> = {};
@@ -649,9 +658,14 @@ const RoomPage = () => {
   useEffect(() => {
     if (!roomId || !user?.id) return;
 
+    const wsBaseUrl = import.meta.env['VITE_WS_BASE_URL'];
+    // No realtime backend configured (e.g. local/preview): run in offline mode.
+    if (!wsBaseUrl) return;
+
     const token = localStorage.getItem("token") ?? undefined;
-    const socket = new WebSocket(buildWsUrl(import.meta.env.VITE_WS_BASE_URL, roomId, token));
+    const socket = new WebSocket(buildWsUrl(wsBaseUrl, roomId, token));
     socketRef.current = socket;
+
 
     socket.onopen = () => console.log("WS OPEN");
 
@@ -774,7 +788,7 @@ const RoomPage = () => {
           );
 
           if (typeof parsed.payload.currently_playing === "string") {
-            setLink(parsed.payload.currently_playing);
+            setPlaybackSrc(parsed.payload.currently_playing);
           }
 
           setCurrentTime(parsed.payload.playback_time);
@@ -865,7 +879,7 @@ const RoomPage = () => {
         socketRef.current = null;
       }
       if (e.code === 4003) {
-        navigate("/", { replace: true });
+        navigate("/");
       }
     };
 
@@ -897,7 +911,7 @@ const RoomPage = () => {
         payload: {
           action: "sync",
           playback_time: currentTimeRef.current,
-          currently_playing: link || null,
+          currently_playing: playbackSrc || null,
           is_playing: true,
           user_id: user?.id ? user.id : "",
         },
@@ -910,7 +924,7 @@ const RoomPage = () => {
         syncIntervalRef.current = null;
       }
     };
-  }, [isCreator, isPlaying, currentTime, link, user?.id]);
+  }, [isCreator, isPlaying, currentTime, playbackSrc, user?.id]);
 
   const sendMessageMutation = useMutation({
     mutationFn: (content: string) => sendRoomMessage(roomId!, content, replyingTo.id),
@@ -967,7 +981,7 @@ const RoomPage = () => {
   };
 
   const emitPlayback = (action: "play" | "pause" | "seek" | "sync" | "load", nextTime: number, nextSrc?: string) => {
-    const source = nextSrc ?? link;
+    const source = nextSrc ?? playbackSrc;
     const payload = {
       action,
       playback_time: nextTime,
@@ -1033,9 +1047,33 @@ const RoomPage = () => {
     });
   };
 
+  // The link is only handed to the player once the user submits it.
   const handleSubmitPlayback = () => {
-    emitPlayback("load", 0, link.trim());
+    const nextSrc = link.trim();
+    if (!nextSrc) return;
+
+    setSelectedMedia(null);
+    setPlaybackSrc(nextSrc);
     setCurrentTime(0);
+    setIsPlaying(false);
+    emitPlayback("load", 0, nextSrc);
+  };
+
+  const handleChooseLinkMode = () => {
+    setSelectedMedia(null);
+    setLinkModeEnabled(true);
+    setMediaTypeModalOpen(false);
+  };
+
+  const handleArchiveSelect = (media: SelectedArchiveMedia) => {
+    setSelectedMedia(media);
+    setLinkModeEnabled(false);
+    setLink("");
+    setCurrentQuality(media.quality ?? "quality");
+    setPlaybackSrc(media.url);
+    setCurrentTime(0);
+    setIsPlaying(false);
+    emitPlayback("load", 0, media.url);
   };
 
   const handleShareScreen = async () => {
@@ -1131,6 +1169,15 @@ const RoomPage = () => {
         <IoChevronBack />
       </button>
 
+      <button
+        type="button"
+        className="room-page__side-bar-backdrop"
+        aria-hidden={!sidebarOpen}
+        tabIndex={sidebarOpen ? 0 : -1}
+        aria-label="بستن نوار ابزار"
+        onClick={() => setSidebarOpen(false)}
+      />
+
       <div className="room-page__reaction-particles" aria-hidden="true">
         {particles.map((p) => (
           <AnimatedParticle
@@ -1223,17 +1270,42 @@ const RoomPage = () => {
 
       <div className="room-page__main">
         <div className="room-page__main__top">
-          <button className="room-page__main__top__submit" onClick={handleSubmitPlayback}>
+          <button className="room-page__main__top__submit" onClick={handleSubmitPlayback} disabled={!linkModeEnabled || !link.trim()}>
             ثبت
           </button>
 
-          <input
-            type="text"
-            placeholder="لینک مورد نظر را وارد کنید "
-            dir="ltr"
-            onChange={(e) => setLink(e.target.value)}
-            value={link}
-          />
+          {selectedMedia ? (
+            <div className="room-page__main__top__now-playing" dir="rtl">
+              <span className="room-page__main__top__now-playing__icon">
+                <TbPlayerPlayFilled />
+              </span>
+
+              <div className="room-page__main__top__now-playing__body">
+                <strong>{selectedMedia.title}</strong>
+
+                {selectedMedia.type === "series" ? (
+                  <div className="room-page__main__top__now-playing__meta">
+                    {selectedMedia.season != null && <span>فصل {selectedMedia.season}</span>}
+                    {selectedMedia.episode != null && <span>قسمت {selectedMedia.episode}</span>}
+                  </div>
+                ) : (
+                  <div className="room-page__main__top__now-playing__meta">
+                    <span>فیلم</span>
+                    {selectedMedia.quality && <span>{selectedMedia.quality}</span>}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <input
+              type="text"
+              placeholder={linkModeEnabled ? "لینک مورد نظر را وارد کنید" : "برای وارد کردن لینک، «انتخاب فیلم» را بزنید"}
+              dir={linkModeEnabled ? "ltr" : "rtl"}
+              onChange={(e) => setLink(e.target.value)}
+              value={link}
+              disabled={!linkModeEnabled}
+            />
+          )}
 
           <button className="room-page__main__top__choose" onClick={() => setMediaTypeModalOpen(true)}>
             انتخاب فیلم
@@ -1249,9 +1321,9 @@ const RoomPage = () => {
                 {screenShareError && <p>{screenShareError}</p>}
               </div>
             </div>
-          ) : (
+          ) : playbackSrc ? (
             <VideoPlayer
-              src={link}
+              src={playbackSrc}
               quality={currentQuality}
               isPlaying={isPlaying}
               currentTime={currentTime}
@@ -1273,9 +1345,21 @@ const RoomPage = () => {
                 currentTimeRef.current = t;
               }}
             />
+          ) : (
+            <div className="room-page__main__player__empty">
+              <span className="room-page__main__player__empty__icon">
+                <TbMovieOff />
+              </span>
+              <strong>هنوز چیزی برای پخش انتخاب نشده</strong>
+              <p>با زدن «انتخاب فیلم» یک عنوان از آرشیو انتخاب کنید یا لینک مستقیم ویدیو را وارد کنید.</p>
+              <button type="button" onClick={() => setMediaTypeModalOpen(true)}>
+                انتخاب منبع پخش
+              </button>
+            </div>
           )}
         </div>
       </div>
+
 
       <div className={clsx("room-page__chat-container", sidebarOpen && "sidebar-open")}>
         <div className="room-page__chat-container__head">
@@ -1452,6 +1536,7 @@ const RoomPage = () => {
               isOpen={mediaTypeModalOpen}
               closeModal={() => setMediaTypeModalOpen(false)}
               openArchive={() => setArchiveModalOpen(true)}
+              onChooseLink={handleChooseLinkMode}
               onShareScreen={handleShareScreen}
             />
           </div>
@@ -1462,8 +1547,7 @@ const RoomPage = () => {
             <ArchiveModal
               isOpen={archiveModalOpen}
               closeModal={() => setArchiveModalOpen(false)}
-              setLink={setLink}
-              setQuality={setCurrentQuality}
+              onSelectMedia={handleArchiveSelect}
               currentPlaying={roomState.currently_playing}
             />
           </div>

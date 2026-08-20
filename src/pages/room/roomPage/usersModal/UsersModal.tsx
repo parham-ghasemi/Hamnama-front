@@ -54,9 +54,9 @@ const UsersModal = ({
             <div className="room-users-modal__body__card" key={user.userId}>
               <div className="room-users-modal__body__card__profile">
                 {user.avatar ? (
-                  <img src={`${import.meta.env.VITE_BASE_URL}${user.avatar}`} alt={user.name} />
+                  <img src={`${import.meta.env['VITE_BASE_URL'] ?? ''}${user.avatar}`} alt={user.name} />
                 ) : (
-                  <span>{user.name[0].toUpperCase()}</span>
+                  <span>{user.name[0]?.toUpperCase()}</span>
                 )}
 
                 <div>

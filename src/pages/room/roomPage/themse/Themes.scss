@@ -29,10 +29,18 @@
   /* Chat Component */
   --chat-container-bg: rgba(255, 255, 255, 0.03);
   --component-bg:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(14, 12, 12, 0.4) 100%),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(14, 12, 12, 0.4) 100%
+    ),
     rgba(20, 18, 16, 0.6);
   --msg-in-bg:
-    linear-gradient(120deg, rgba(255, 255, 255, 0.08) 0%, rgba(80, 70, 60, 0.12) 100%),
+    linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(80, 70, 60, 0.12) 100%
+    ),
     rgba(208, 78, 47, 0.12);
   --msg-out-bg: rgba(255, 255, 255, 0.1);
   --msg-reply-bg: rgba(180, 160, 140, 0.18);
@@ -141,7 +149,11 @@
   --chat-container-bg: #f0ece6;
   --component-bg: #e8e2da;
   --msg-in-bg:
-    linear-gradient(-60deg, rgba(255, 255, 255, 0.7) 0%, rgba(200, 180, 160, 0.4) 100%),
+    linear-gradient(
+      -60deg,
+      rgba(255, 255, 255, 0.7) 0%,
+      rgba(200, 180, 160, 0.4) 100%
+    ),
     rgba(255, 255, 255, 0.65);
   --msg-out-bg: rgba(208, 78, 47, 0.12);
   --msg-reply-bg: rgba(180, 160, 140, 0.25);
@@ -222,10 +234,18 @@
 
   --chat-container-bg: #12110f;
   --component-bg:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(12, 11, 10, 0.5) 100%),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(12, 11, 10, 0.5) 100%
+    ),
     rgba(18, 16, 14, 0.7);
   --msg-in-bg:
-    linear-gradient(-104deg, rgba(255, 255, 255, 0.12) 0%, rgba(80, 70, 60, 0.2) 100%),
+    linear-gradient(
+      -104deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(80, 70, 60, 0.2) 100%
+    ),
     rgba(255, 255, 255, 0.06);
   --msg-out-bg: rgba(255, 255, 255, 0.09);
   --msg-reply-bg: rgba(160, 140, 120, 0.15);

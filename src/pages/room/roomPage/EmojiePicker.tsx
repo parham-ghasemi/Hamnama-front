@@ -43,7 +43,7 @@ const GROUPS: { id: string; icon: string; emojis: string[] }[] = [
 ];
 
 const EmojiPicker = ({ onSelect, onClose }: Props) => {
-  const [group, setGroup] = useState(GROUPS[0].id);
+  const [group, setGroup] = useState(GROUPS[0]!.id);
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -85,7 +85,7 @@ const EmojiPicker = ({ onSelect, onClose }: Props) => {
       </div>
 
       <div className="room-page__chat-container__foot__emoji-popover__grid">
-        {active.emojis.map((emoji, i) => (
+        {active!.emojis.map((emoji, i) => (
           <button key={`${emoji}-${i}`} type="button" onClick={() => onSelect(emoji)}>
             {emoji}
           </button>

@@ -182,7 +182,9 @@
   &__option-arrow {
     font-size: 16px;
     opacity: 0.35;
-    transition: opacity 180ms ease, transform 180ms ease;
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease;
   }
 
   &__option:hover .media-type-modal__option-arrow {

@@ -276,7 +276,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 15 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="absolute inset-x-0 bottom-0 z-20 p-4 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col gap-3"
+            className="absolute inset-x-0 bottom-0 z-20 p-4 bg-linear-to-t from-black/90 via-black/40 to-transparent flex flex-col gap-3"
           >
             <div className="relative flex items-center group/scrubber w-full h-3 cursor-pointer">
               <input

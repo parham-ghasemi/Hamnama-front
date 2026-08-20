@@ -43,7 +43,7 @@ export interface OmdbResponse {
 
 export interface MediaListItem {
   id: string;
-  type: "movie" | "series" | string;
+  type: "movie" | "series";
   title_en: string;
   title_fa: string;
   year: string;

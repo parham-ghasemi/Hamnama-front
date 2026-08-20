@@ -106,7 +106,8 @@
             &.active {
               background: var(--set-item-active-bg);
               border-color: var(--set-item-active-border);
-              box-shadow: 0 0 0 1px var(--set-item-active-border),
+              box-shadow:
+                0 0 0 1px var(--set-item-active-border),
                 0 4px 16px -4px var(--accent-glow);
             }
           }
@@ -148,7 +149,9 @@
           svg {
             font-size: 22px;
             opacity: 0.75;
-            transition: opacity 160ms ease, color 160ms ease;
+            transition:
+              opacity 160ms ease,
+              color 160ms ease;
           }
 
           span {
