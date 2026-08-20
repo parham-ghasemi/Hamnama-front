@@ -1738,6 +1738,7 @@ const RoomPage = () => {
           ) : (
             <input
               type="text"
+              data-video-link-input
               placeholder={linkModeEnabled ? "لینک مورد نظر را وارد کنید" : "برای وارد کردن لینک، «انتخاب فیلم» را بزنید"}
               dir={linkModeEnabled ? "ltr" : "rtl"}
               onChange={(e) => setLink(e.target.value)}
@@ -1797,23 +1798,9 @@ const RoomPage = () => {
               </span>
               <strong>هنوز چیزی برای پخش انتخاب نشده</strong>
               <p>با زدن «انتخاب فیلم» یک عنوان از آرشیو انتخاب کنید یا لینک مستقیم ویدیو را وارد کنید.</p>
-              <div className="mt-4 max-w-xl rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs leading-6 text-gray-300 flex flex-col items-start">
+              <div className="mt-4 max-w-xl rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs leading-6 text-gray-300">
                 <strong className="mr-1 text-white">راهنمای کنترل:</strong>
-                <span>
-                  J / L = عقب یا جلو ۱۰ ثانیه
-                </span>
-                <span>
-                  K / Space = پخش یا توقف
-                </span>
-                <span>
-                  ← / → = عقب یا جلو ۵ ثانیه
-                </span>
-                <span>
-                  F = تمام‌صفحه
-                </span>
-                <span>
-                  موبایل: دو ضربه روی نیمه چپ یا راست = عقب/جلو ۱۰ ثانیه
-                </span>
+                <span>J / L = عقب یا جلو ۱۰ ثانیه · K / Space = پخش یا توقف · ← / → = عقب یا جلو ۵ ثانیه · F = تمام‌صفحه · موبایل: دو ضربه روی نیمه چپ یا راست = عقب/جلو ۱۰ ثانیه</span>
               </div>
               <button type="button" onClick={() => setMediaTypeModalOpen(true)}>
                 انتخاب منبع پخش

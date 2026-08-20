@@ -10,6 +10,7 @@ import {
   Maximize,
   Minimize,
   PictureInPicture2,
+  Keyboard,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -61,6 +62,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [isPip, setIsPip] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [isHoveringVolume, setIsHoveringVolume] = useState(false);
+  const [showShortcutHints, setShowShortcutHints] = useState(false);
   const lastTouchRef = useRef<{ time: number; x: number } | null>(null);
 
   const playing = isPlaying ?? internalPlaying;
@@ -103,47 +105,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const handleKeyboardSeek = useCallback((seconds: number) => {
     handleSeekBy(seconds);
   }, [duration]);
-
-  const handlePlayerKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) {
-      return;
-    }
-
-    const key = e.key.toLowerCase();
-    let handled = true;
-
-    switch (key) {
-      case "j":
-        handleKeyboardSeek(-10);
-        break;
-      case "l":
-        handleKeyboardSeek(10);
-        break;
-      case "k":
-        togglePlay();
-        break;
-      case " ":
-      case "spacebar":
-        togglePlay();
-        break;
-      case "arrowleft":
-        handleKeyboardSeek(-5);
-        break;
-      case "arrowright":
-        handleKeyboardSeek(5);
-        break;
-      case "f":
-        void toggleFullscreen();
-        break;
-      default:
-        handled = false;
-    }
-
-    if (handled) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  };
 
   const handleScrub = (e: React.ChangeEvent<HTMLInputElement>) => {
     const targetTime = parseFloat(e.target.value);
@@ -261,6 +222,51 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   }, [currentTime]);
 
   useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+
+      if (target?.closest('#room-chat-input, [data-video-link-input]')) {
+        return;
+      }
+
+      const key = e.key.toLowerCase();
+      let handled = true;
+
+      switch (key) {
+        case "j":
+          handleKeyboardSeek(-10);
+          break;
+        case "l":
+          handleKeyboardSeek(10);
+          break;
+        case "k":
+        case " ":
+        case "spacebar":
+          togglePlay();
+          break;
+        case "arrowleft":
+          handleKeyboardSeek(-5);
+          break;
+        case "arrowright":
+          handleKeyboardSeek(5);
+          break;
+        case "f":
+          void toggleFullscreen();
+          break;
+        default:
+          handled = false;
+      }
+
+      if (handled) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("keydown", handleGlobalKeyDown);
+    return () => document.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [handleKeyboardSeek, togglePlay]);
+
+  useEffect(() => {
     const handleFsChange = () => setIsFullscreen(!!document.fullscreenElement);
     const handlePipChange = () => setIsPip(document.pictureInPictureElement === videoRef.current);
 
@@ -291,10 +297,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     <div
       ref={containerRef}
       dir="ltr"
-      tabIndex={0}
       aria-label="پخش‌کننده ویدیو"
-      onKeyDown={handlePlayerKeyDown}
-      onMouseDown={() => containerRef.current?.focus()}
       onTouchEnd={handleTouchEnd}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => playing && setShowControls(false)}
@@ -335,7 +338,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           }
         }}
         onEnded={() => setInternalPlaying(false)}
-        className="w-full h-full object-contain cursor-pointer outline-none! border-none!"
+        className="w-full h-full object-contain cursor-pointer focus:outline-none"
       />
 
       <AnimatePresence>
@@ -367,6 +370,38 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             <Play className="h-4 w-4 fill-current" />
             قسمت بعدی
           </motion.button>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showShortcutHints && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            role="dialog"
+            aria-label="راهنمای میانبرهای پخش ویدیو"
+            className="absolute bottom-20 right-4 z-40 w-[min(320px,calc(100%-2rem))] rounded-xl border border-white/15 bg-black/90 p-4 text-sm text-white shadow-2xl backdrop-blur-md"
+          >
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <strong>میانبرهای دسترسی</strong>
+              <button
+                type="button"
+                onClick={() => setShowShortcutHints(false)}
+                aria-label="بستن راهنمای میانبرها"
+                className="rounded-md px-2 py-1 text-white/70 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/60"
+              >
+                ×
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-white/80">
+              <span><b className="text-white">J</b> / <b className="text-white">L</b></span><span>۱۰ ثانیه عقب / جلو</span>
+              <span><b className="text-white">K</b> / <b className="text-white">Space</b></span><span>پخش / توقف</span>
+              <span><b className="text-white">←</b> / <b className="text-white">→</b></span><span>۵ ثانیه عقب / جلو</span>
+              <span><b className="text-white">F</b></span><span>تمام‌صفحه</span>
+              <span><b className="text-white">Double tap</b></span><span>۱۰ ثانیه عقب / جلو در موبایل</span>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -471,6 +506,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 <span className="px-2 py-0.5 text-[11px] font-semibold tracking-wide uppercase bg-white/10 text-gray-200 border border-white/15 rounded backdrop-blur-sm">
                   {quality}
                 </span>
+
+                <button
+                  type="button"
+                  onClick={() => setShowShortcutHints((prev) => !prev)}
+                  title="Keyboard shortcuts"
+                  aria-label="نمایش میانبرهای صفحه‌کلید و لمس"
+                  aria-expanded={showShortcutHints}
+                  className={`p-1.5 rounded-full hover:bg-white/20 transition-colors text-gray-200 hover:text-white ${showShortcutHints ? "bg-white/15 text-white" : ""}`}
+                >
+                  <Keyboard className="w-4 h-4" />
+                </button>
 
                 <button
                   onClick={togglePip}
