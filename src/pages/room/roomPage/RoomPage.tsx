@@ -1010,6 +1010,11 @@ const RoomPage = () => {
     sendMessageMutation.mutate(trimmed);
   };
 
+  const handleReply = (to: { id: string, message: string }) => {
+    setReplyingTo(to);
+    document.getElementById('room-chat-input')?.focus();
+  }
+
   const handleSelectEmoji = (emoji: string) => {
     const input = messageInputRef.current;
 
@@ -1425,7 +1430,7 @@ const RoomPage = () => {
                   message={message}
                   isOwn={isOwn}
                   showAvatar={showAvatar}
-                  onReply={() => setReplyingTo({ id: message.id, message: message.content })}
+                  onReply={() => handleReply({ id: message.id, message: message.content })}
                 />
               </div>
             );
@@ -1478,6 +1483,7 @@ const RoomPage = () => {
                   <TbSticker />
                 </button>
                 <textarea
+                  id='room-chat-input'
                   ref={messageInputRef}
                   rows={1}
                   placeholder="پیام خود را بنویسید..."
