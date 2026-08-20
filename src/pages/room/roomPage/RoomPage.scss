@@ -1535,3 +1535,15 @@
     background-color: light.$color-red !important;
   }
 }
+
+/* Voice chat join action */
+.room-page__side-bar__voice-join {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  ~ span {
+    text-align: center;
+    font-size: 12px;
+  }
+}
