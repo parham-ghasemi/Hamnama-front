@@ -1439,10 +1439,6 @@ const RoomPage = () => {
     onSuccess: () => {
       setMessageText("");
       setReplyingTo({ message: "", id: "" });
-
-      requestAnimationFrame(() => {
-        messageInputRef.current?.focus();
-      })
     },
   });
 
@@ -2075,6 +2071,7 @@ const RoomPage = () => {
               className={clsx("room-page__chat-container__foot__send", editingMessageId && "is-editing")}
               onClick={handleSendMessage}
               disabled={!messageText.trim() || sendMessageMutation.isPending || editMessageMutation.isPending}
+              onPointerDown={(e) => e.preventDefault()}
               aria-label={editingMessageId ? "ذخیره ویرایش" : "ارسال پیام"}
             >
               {editingMessageId ? <FaCheck /> : <FaArrowRight />}
