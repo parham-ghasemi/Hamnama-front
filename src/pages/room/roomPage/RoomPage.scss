@@ -135,6 +135,21 @@
         margin-bottom: 14px;
       }
 
+      &.is-highlighted {
+        z-index: 2;
+
+        .room-page__chat-container__message-block__messages__message {
+          outline: 1px solid
+            color-mix(in srgb, var(--send-btn-bg) 70%, transparent);
+
+          box-shadow:
+            0 0 0 2px color-mix(in srgb, var(--send-btn-bg) 18%, transparent),
+            0 8px 24px color-mix(in srgb, var(--send-btn-bg) 16%, transparent);
+
+          animation: room-message-highlight 5000ms ease-out;
+        }
+      }
+
       &:hover {
         .room-page__chat-container__message-block__reply {
           opacity: 1;
@@ -234,10 +249,16 @@
             transition: background 160ms ease;
 
             &:hover:not(:disabled) {
-              background: color-mix(in srgb, var(--send-btn-bg) 10%, var(--msg-reply-bg));
+              background: color-mix(
+                in srgb,
+                var(--send-btn-bg) 10%,
+                var(--msg-reply-bg)
+              );
             }
 
-            &:disabled { cursor: default; }
+            &:disabled {
+              cursor: default;
+            }
 
             &__label {
               display: block;
@@ -245,7 +266,7 @@
               font-size: 9px;
               font-weight: 800;
               color: var(--send-btn-bg);
-              opacity: .9;
+              opacity: 0.9;
             }
           }
           &__text {
@@ -272,7 +293,7 @@
             font-size: 8px;
             font-weight: 700;
             color: var(--send-btn-bg);
-            opacity: .85;
+            opacity: 0.85;
           }
         }
       }
@@ -285,16 +306,24 @@
         height: 26px;
         width: 26px;
         border-radius: 100%;
-        transition: opacity 200ms ease, background 200ms ease;
+        transition:
+          opacity 200ms ease,
+          background 200ms ease;
         font-size: 14px;
 
-        &:hover { background: var(--msg-reply-bg); }
+        &:hover {
+          background: var(--msg-reply-bg);
+        }
 
-        @media (hover: none) { display: none; }
+        @media (hover: none) {
+          display: none;
+        }
       }
 
       &:hover {
-        .room-page__chat-container__message-block__edit { opacity: 1; }
+        .room-page__chat-container__message-block__edit {
+          opacity: 1;
+        }
       }
 
       &__reply {
@@ -413,9 +442,14 @@
         gap: 10px;
         width: 100%;
         padding: 8px 11px;
-        border: 1px solid color-mix(in srgb, var(--send-btn-bg) 18%, var(--border-subtle));
+        border: 1px solid
+          color-mix(in srgb, var(--send-btn-bg) 18%, var(--border-subtle));
         border-radius: 12px;
-        background: color-mix(in srgb, var(--send-btn-bg) 7%, var(--send-input-bg));
+        background: color-mix(
+          in srgb,
+          var(--send-btn-bg) 7%,
+          var(--send-input-bg)
+        );
 
         > div {
           min-width: 0;
@@ -424,8 +458,17 @@
           flex-direction: column;
           gap: 1px;
 
-          > strong { font-size: 10px; color: var(--send-btn-bg); }
-          > span { font-size: 9px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+          > strong {
+            font-size: 10px;
+            color: var(--send-btn-bg);
+          }
+          > span {
+            font-size: 9px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
         }
 
         > button {
@@ -437,7 +480,10 @@
           color: var(--text-muted);
           cursor: pointer;
 
-          &:hover { color: var(--text-primary); background: var(--msg-reply-bg); }
+          &:hover {
+            color: var(--text-primary);
+            background: var(--msg-reply-bg);
+          }
         }
       }
 
@@ -1633,7 +1679,6 @@
   }
 }
 
-
 .room-page__connection-lost {
   position: fixed;
   top: 18px;
@@ -1647,7 +1692,7 @@
   border: 1px solid color-mix(in srgb, #e07159 35%, var(--border-subtle));
   border-radius: 14px;
   background: color-mix(in srgb, var(--component-bg) 92%, #e07159 8%);
-  box-shadow: 0 14px 32px rgba(0,0,0,.25);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.25);
   color: var(--text-primary);
   font-size: 12px;
   font-weight: 750;
@@ -1664,7 +1709,13 @@
 }
 
 @keyframes room-message-highlight {
-  0% { transform: scale(1); }
-  25% { transform: scale(1.01); }
-  100% { transform: scale(1); }
+  0% {
+    transform: translateY(0px);
+  }
+  25% {
+    transform: scale(-2px);
+  }
+  100% {
+    transform: scale(0px);
+  }
 }
