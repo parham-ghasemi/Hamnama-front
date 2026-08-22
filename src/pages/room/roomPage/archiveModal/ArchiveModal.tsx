@@ -29,6 +29,7 @@ export interface SelectedArchiveMedia {
   type: "movie" | "series";
   url: string;
   quality?: string;
+  softsub?: boolean;
   season?: number | null;
   episode?: number | null;
   nextEpisode?: SelectedArchiveMedia | null;
@@ -69,6 +70,21 @@ const qualityScore = (value?: string | null) => {
     { token: "360", value: 360 },
   ];
   return sourceRank.find((item) => normalized.includes(item.token))?.value ?? 0;
+};
+
+const isSoftsubFile = (file: MediaFileItem) => {
+  const searchable = [
+    file.quality_tags,
+    file.version,
+    file.release,
+    (file as MediaFileItem & { filename?: string; name?: string }).filename,
+    (file as MediaFileItem & { filename?: string; name?: string }).name,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return searchable.replace(/[\s._-]/g, "").includes("softsub");
 };
 
 const getNextEpisodeFile = (files: MediaFileItem[], current: MediaFileItem) => {
@@ -138,6 +154,7 @@ const buildNextEpisode = (
     type: detail.type,
     url: nextFile.final_url || nextFile.url,
     quality: nextFile.quality_tags || nextFile.version || "quality",
+    softsub: isSoftsubFile(nextFile),
     season: nextFile.season ?? null,
     episode: nextFile.episode ?? null,
     nextEpisode: buildNextEpisode(detail, nextFile, depth + 1),
@@ -290,6 +307,7 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
       type: detail.type,
       url: file.final_url || file.url,
       quality: file.quality_tags || file.version || "quality",
+      softsub: isSoftsubFile(file),
       season: file.season ?? null,
       episode: file.episode ?? null,
       nextEpisode,
@@ -375,22 +393,6 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
                   </div>
                 </section>
 
-                {suggested.length > 0 && (
-                  <section className="archive-section">
-                    <div className="archive-section__heading">
-                      <div>
-                        <span className="archive-section__eyebrow">پیشنهاد برای تماشا</span>
-                        <h3>مرتبط با این عنوان</h3>
-                      </div>
-                    </div>
-                    <div className="archive-related-grid">
-                      {suggested.map((item) => (
-                        <MediaCard key={item.id} item={item} onClick={() => setSelectedId(item.id)} compact />
-                      ))}
-                    </div>
-                  </section>
-                )}
-
                 <section className="archive-section">
                   <div className="archive-section__heading">
                     <div>
@@ -410,6 +412,22 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
                     </p>
                   )}
                 </section>
+                {suggested.length > 0 && (
+                  <section className="archive-section">
+                    <div className="archive-section__heading">
+                      <div>
+                        <span className="archive-section__eyebrow">پیشنهاد برای تماشا</span>
+                        <h3>مرتبط با این عنوان</h3>
+                      </div>
+                    </div>
+                    <div className="archive-related-grid">
+                      {suggested.map((item) => (
+                        <MediaCard key={item.id} item={item} onClick={() => setSelectedId(item.id)} compact />
+                      ))}
+                    </div>
+                  </section>
+                )}
+
               </>
             ) : (
               <p className="archive-modal__empty">اطلاعات یافت نشد.</p>

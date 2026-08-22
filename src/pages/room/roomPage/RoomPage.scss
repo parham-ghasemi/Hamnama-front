@@ -298,53 +298,9 @@
         }
       }
 
-      &__edit {
-        cursor: pointer;
-        opacity: 0;
-        align-self: center;
-        @include mx.flex-center;
-        height: 26px;
-        width: 26px;
-        border-radius: 100%;
-        transition:
-          opacity 200ms ease,
-          background 200ms ease;
-        font-size: 14px;
-
-        &:hover {
-          background: var(--msg-reply-bg);
-        }
-
-        @media (hover: none) {
-          display: none;
-        }
-      }
-
       &:hover {
         .room-page__chat-container__message-block__edit {
           opacity: 1;
-        }
-      }
-
-      &__reply {
-        cursor: pointer;
-        opacity: 0;
-        align-self: center;
-        @include mx.flex-center;
-        height: 26px;
-        width: 26px;
-        border-radius: 100%;
-        transition:
-          opacity 200ms ease,
-          background 200ms ease;
-        font-size: 15px;
-
-        &:hover {
-          background: var(--msg-reply-bg);
-        }
-
-        @media (hover: none) {
-          display: none;
         }
       }
 
@@ -365,6 +321,74 @@
           &__message {
             background: var(--msg-out-bg);
             border-radius: 14px 14px 4px 14px;
+          }
+        }
+      }
+
+      &__context-menu {
+        position: fixed;
+        z-index: 5000;
+        width: 176px;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        direction: rtl;
+        border: 1px solid
+          color-mix(in srgb, var(--text-primary) 8%, transparent);
+        border-radius: 12px;
+        background: var(--component-bg);
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
+        backdrop-filter: blur(14px);
+        animation: room-chat-context-menu-in 120ms ease-out;
+
+        button {
+          width: 100%;
+          min-height: 40px;
+          padding: 0 11px;
+
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          border: 0;
+          border-radius: 8px;
+
+          background: transparent;
+          color: var(--text-primary);
+
+          cursor: pointer;
+
+          font: inherit;
+          font-size: 12px;
+          font-weight: 700;
+
+          text-align: right;
+
+          transition:
+            background 140ms ease,
+            color 140ms ease;
+
+          svg {
+            flex-shrink: 0;
+            font-size: 16px;
+          }
+
+          &:hover,
+          &:focus-visible {
+            outline: none;
+
+            background: color-mix(
+              in srgb,
+              var(--send-btn-bg) 12%,
+              var(--msg-reply-bg)
+            );
+
+            color: var(--send-btn-bg);
+          }
+
+          &:active {
+            transform: scale(0.985);
           }
         }
       }
@@ -1341,6 +1365,38 @@
       }
     }
 
+      // When the native mobile keyboard opens, dedicate the available viewport to chat
+      // instead of squeezing the player and controls into the reduced visual viewport.
+      &.keyboard-open {
+        gap: 0;
+        padding-top: 0;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+
+        .room-page__main {
+          display: none;
+        }
+
+        .room-page__chat-container {
+          flex: 1 1 auto;
+          min-height: 0;
+          height: 100%;
+          border-radius: 0;
+
+          &__head {
+            height: 42px;
+          }
+
+          &__chat-main {
+            padding-bottom: 6px;
+          }
+
+          &__foot {
+            padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+            background: var(--chat-foot-bg);
+          }
+        }
+      }
+
     // ---- 4. Sidebar as a proper right-side drawer ----
     &__side-bar {
       position: fixed;
@@ -1486,6 +1542,13 @@
 
     &__chat-container {
       border-radius: 12px;
+
+      &__foot__input__row > textarea {
+        // iOS Safari zooms focused form controls below 16px.
+        font-size: 16px;
+        line-height: 1.45;
+        -webkit-text-size-adjust: 100%;
+      }
 
       &__message-block__messages {
         max-width: 88%;
@@ -1691,11 +1754,13 @@
   padding: 10px 12px 10px 14px;
   border: 1px solid color-mix(in srgb, #e07159 35%, var(--border-subtle));
   border-radius: 14px;
-  background: color-mix(in srgb, var(--component-bg) 92%, #e07159 8%);
+  backdrop-filter: blur(14px);
+  background: var(--component-bg);
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.25);
   color: var(--text-primary);
   font-size: 12px;
   font-weight: 750;
+  animation: room-chat-context-menu-in 120ms ease-out;
 
   > button {
     border-radius: 9px;
@@ -1717,5 +1782,17 @@
   }
   100% {
     transform: scale(0px);
+  }
+}
+
+@keyframes room-chat-context-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }

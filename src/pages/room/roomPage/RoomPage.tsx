@@ -178,6 +178,7 @@ const RoomPage = () => {
   const [playbackSrc, setPlaybackSrc] = useState("");
   const [selectedMedia, setSelectedMedia] = useState<SelectedArchiveMedia | null>(null);
   const [messageText, setMessageText] = useState("");
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const [replyingTo, setReplyingTo] = useState<{ id: string, message: string }>({ id: "", message: "" });
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
@@ -202,7 +203,48 @@ const RoomPage = () => {
   const screenVideoRef = useRef<HTMLVideoElement | null>(null);
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
   const messageInputRef = useRef<HTMLTextAreaElement | null>(null);
+  const viewportBaseHeightRef = useRef<number | null>(null);
+  const previousKeyboardOpenRef = useRef(false);
   const intentionalSocketCloseRef = useRef(false);
+
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+
+    viewportBaseHeightRef.current = viewport.height;
+
+    const updateKeyboardState = () => {
+      const currentHeight = viewport.height;
+      const baseHeight = viewportBaseHeightRef.current ?? currentHeight;
+      const keyboardOpen = baseHeight - currentHeight > 150;
+
+      if (!keyboardOpen) {
+        viewportBaseHeightRef.current = Math.max(
+          viewportBaseHeightRef.current ?? currentHeight,
+          currentHeight,
+        );
+      }
+
+      setIsKeyboardOpen(keyboardOpen);
+
+      if (keyboardOpen && !previousKeyboardOpenRef.current) {
+        window.requestAnimationFrame(() => {
+          chatBottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+        });
+      }
+
+      previousKeyboardOpenRef.current = keyboardOpen;
+    };
+
+    updateKeyboardState();
+    viewport.addEventListener("resize", updateKeyboardState);
+    viewport.addEventListener("scroll", updateKeyboardState);
+
+    return () => {
+      viewport.removeEventListener("resize", updateKeyboardState);
+      viewport.removeEventListener("scroll", updateKeyboardState);
+    };
+  }, []);
 
   // ========== Start Reaction Particles ===========
 
@@ -1658,7 +1700,7 @@ const RoomPage = () => {
 
 
   return (
-    <div className={clsx("room-page", sidebarOpen && "sidebar-open")}>
+    <div className={clsx("room-page", sidebarOpen && "sidebar-open", isKeyboardOpen && "keyboard-open")}>
       {connectionLost && (
         <div className="room-page__connection-lost" role="alert">
           <span>اتصال شما به اتاق قطع شد.</span>

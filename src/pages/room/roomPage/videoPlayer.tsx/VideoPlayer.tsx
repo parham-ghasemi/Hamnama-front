@@ -11,6 +11,7 @@ import {
   Minimize,
   PictureInPicture2,
   Keyboard,
+  Captions,
   X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,7 +22,6 @@ export interface VideoPlayerProps {
   quality?: string;
   autoPlay?: boolean;
   className?: string;
-
   isPlaying?: boolean;
   currentTime?: number;
   onPlayRequest?: () => void;
@@ -64,6 +64,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [showControls, setShowControls] = useState(true);
   const [isHoveringVolume, setIsHoveringVolume] = useState(false);
   const [showShortcutHints, setShowShortcutHints] = useState(false);
+  const [activeSubtitle, setActiveSubtitle] = useState(-1);
   const lastTouchRef = useRef<{ time: number; x: number } | null>(null);
 
   const playing = isPlaying ?? internalPlaying;
@@ -140,6 +141,51 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       videoRef.current.volume = volume || 1;
     }
   };
+
+  const getSubtitleTracks = useCallback(() => {
+    const video = videoRef.current;
+    if (!video) return [] as TextTrack[];
+
+    return Array.from(video.textTracks)
+  }, []);
+
+  const syncSubtitleTracks = useCallback(() => {
+    const tracks = getSubtitleTracks();
+    const visibleIndex = tracks.findIndex((track) => track.mode === "showing");
+    setActiveSubtitle(visibleIndex);
+  }, [getSubtitleTracks]);
+
+  const toggleSubtitles = useCallback(() => {
+    const tracks = getSubtitleTracks();
+
+    if (!tracks.length) {
+      // Some MKV demuxers expose embedded captions slightly after the media
+      // metadata is ready, so give the element one more chance to populate
+      // textTracks before treating the click as unavailable.
+      window.setTimeout(() => {
+        const delayedTracks = getSubtitleTracks();
+        if (!delayedTracks.length) {
+          console.warn("No browser text tracks are exposed by this media:", videoRef.current?.currentSrc || src);
+          return;
+        }
+
+        delayedTracks.forEach((track, index) => {
+          track.mode = index === 0 ? "showing" : "disabled";
+        });
+        setActiveSubtitle(0);
+      }, 120);
+      return;
+    }
+
+    const visibleIndex = tracks.findIndex((track) => track.mode === "showing");
+    const nextIndex = visibleIndex >= 0 ? -1 : 0;
+
+    tracks.forEach((track, index) => {
+      track.mode = index === nextIndex ? "showing" : "disabled";
+    });
+
+    setActiveSubtitle(nextIndex);
+  }, [getSubtitleTracks, src]);
 
   const toggleFullscreen = async () => {
     if (!containerRef.current) return;
@@ -221,6 +267,30 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       videoRef.current.currentTime = currentTime;
     }
   }, [currentTime]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    setActiveSubtitle(-1);
+    syncSubtitleTracks();
+
+    const textTracks = video.textTracks;
+    textTracks.addEventListener("addtrack", syncSubtitleTracks);
+    textTracks.addEventListener("removetrack", syncSubtitleTracks);
+    textTracks.addEventListener("change", syncSubtitleTracks);
+
+    const rescans = [120, 500, 1200].map((delay) =>
+      window.setTimeout(syncSubtitleTracks, delay),
+    );
+
+    return () => {
+      textTracks.removeEventListener("addtrack", syncSubtitleTracks);
+      textTracks.removeEventListener("removetrack", syncSubtitleTracks);
+      textTracks.removeEventListener("change", syncSubtitleTracks);
+      rescans.forEach((id) => window.clearTimeout(id));
+    };
+  }, [src, syncSubtitleTracks]);
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -331,6 +401,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           onLocalTimeUpdate?.(t);
         }}
         onLoadedMetadata={() => {
+          syncSubtitleTracks();
           if (videoRef.current) {
             setDuration(videoRef.current.duration);
             if (typeof currentTime === "number") {
@@ -358,7 +429,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       </AnimatePresence>
 
       <AnimatePresence>
-        {nextEpisode && duration > 0 && time >= Math.max(0, duration - 20) && (
+        {nextEpisode && duration > 0 && time >= Math.max(0, duration - 60) && (
           <motion.button
             type="button"
             initial={{ opacity: 0, y: 10 }}
@@ -514,6 +585,20 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 <span className="px-2 py-0.5 text-[11px] font-semibold tracking-wide uppercase bg-white/10 text-gray-200 border border-white/15 rounded backdrop-blur-sm">
                   {quality}
                 </span>
+
+                <button
+                  type="button"
+                  onClick={toggleSubtitles}
+                  title={activeSubtitle >= 0 ? "Hide subtitles" : "Show subtitles"}
+                  aria-label={activeSubtitle >= 0 ? "Hide subtitles" : "Show subtitles"}
+                  aria-pressed={activeSubtitle >= 0}
+                  className={`p-1.5 rounded-full hover:bg-white/20 transition-colors ${activeSubtitle >= 0
+                      ? "bg-white/15 text-white"
+                      : "text-gray-200 hover:text-white"
+                    }`}
+                >
+                  <Captions className="w-4 h-4" />
+                </button>
 
                 <button
                   type="button"
