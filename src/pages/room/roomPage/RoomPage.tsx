@@ -1439,6 +1439,10 @@ const RoomPage = () => {
     onSuccess: () => {
       setMessageText("");
       setReplyingTo({ message: "", id: "" });
+
+      requestAnimationFrame(() => {
+        messageInputRef.current?.focus();
+      })
     },
   });
 
@@ -2124,7 +2128,7 @@ const RoomPage = () => {
                     });
                   }}
                   onBlur={() => setIsKeyboardOpen(false)}
-                  disabled={sendMessageMutation.isPending || editMessageMutation.isPending}
+                  disabled={false}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
