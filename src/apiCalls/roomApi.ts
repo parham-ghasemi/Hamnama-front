@@ -43,6 +43,19 @@ export interface RoomReactionResponse {
   emoji: string;
 }
 
+export interface RoomAnnouncement {
+  id: string;
+  type: "room";
+  message: string;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RoomAnnouncementsResponse {
+  announcements: RoomAnnouncement[];
+}
+
 export interface RoomSocketUserPresence {
   user_id: string;
   name: string;
@@ -74,6 +87,11 @@ export async function createRoom(request: CreateRoomRequest) {
 
 export async function joinRoom(code: number) {
   const { data } = await api.post<JoinRoomResponse>(`/rooms/join`, { code });
+  return data;
+}
+
+export async function getRoomAnnouncements() {
+  const { data } = await api.get<RoomAnnouncementsResponse>('/announcements/room');
   return data;
 }
 

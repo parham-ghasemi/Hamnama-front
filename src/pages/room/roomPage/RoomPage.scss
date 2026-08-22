@@ -4,6 +4,116 @@
 @use "sass:color";
 
 .room-page {
+  &--loading {
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--send-btn-bg) 14%, transparent), transparent 38%),
+      var(--bg-main);
+  }
+
+  &__loader {
+    width: min(420px, calc(100vw - 40px));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    text-align: center;
+
+    &__film {
+      width: min(260px, 72vw);
+      filter: drop-shadow(0 20px 36px color-mix(in srgb, var(--send-btn-bg) 18%, transparent));
+
+      svg {
+        width: 100%;
+        height: auto;
+        overflow: visible;
+      }
+
+      .frame {
+        fill: color-mix(in srgb, var(--component-bg) 78%, transparent);
+        stroke: var(--border-subtle);
+        stroke-width: 2;
+      }
+
+      .sprockets rect {
+        fill: var(--send-btn-bg);
+        opacity: 0.65;
+        animation: film-sprocket 900ms ease-in-out infinite alternate;
+      }
+
+      .sprockets rect:nth-child(even) {
+        animation-delay: 120ms;
+      }
+
+      .frames rect {
+        fill: color-mix(in srgb, var(--send-btn-bg) 12%, var(--msg-reply-bg));
+        stroke: color-mix(in srgb, var(--send-btn-bg) 35%, var(--border-subtle));
+        stroke-width: 1.5;
+        animation: film-frame 1200ms ease-in-out infinite;
+      }
+
+      .frames rect:nth-child(2) { animation-delay: 120ms; }
+      .frames rect:nth-child(3) { animation-delay: 240ms; }
+      .frames rect:nth-child(4) { animation-delay: 360ms; }
+      .frames rect:nth-child(5) { animation-delay: 480ms; }
+      .frames rect:nth-child(6) { animation-delay: 600ms; }
+
+      .play {
+        fill: var(--send-btn-bg);
+        transform-origin: center;
+        animation: film-play 1200ms ease-in-out infinite;
+      }
+    }
+
+    &__copy {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+
+      > svg {
+        font-size: 22px;
+        color: var(--send-btn-bg);
+        animation: film-icon 1100ms ease-in-out infinite;
+      }
+
+      > strong {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--text-primary);
+      }
+
+      > span {
+        max-width: 300px;
+        font-size: 11px;
+        line-height: 1.8;
+        color: var(--text-muted);
+      }
+    }
+  }
+
+  @keyframes film-sprocket {
+    from { transform: translateX(-1px); opacity: 0.45; }
+    to { transform: translateX(1px); opacity: 0.95; }
+  }
+
+  @keyframes film-frame {
+    0%, 100% { opacity: 0.45; transform: scale(0.985); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes film-play {
+    0%, 100% { opacity: 0.55; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.03); }
+  }
+
+  @keyframes film-icon {
+    0%, 100% { transform: rotate(-7deg) translateY(0); }
+    50% { transform: rotate(7deg) translateY(-2px); }
+  }
+
+
   // --app-height is kept in sync with visualViewport so mobile keyboards
   // cannot leave a blank strip under the page.
   height: var(--app-height, 100dvh);
@@ -61,6 +171,93 @@
       > span {
         font-size: 35px;
         color: var(--text-muted);
+      }
+    }
+
+    &__announcement {
+      position: sticky;
+      top: 0;
+      z-index: 12;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 0 0 12px;
+      padding: 11px 12px;
+      border-radius: 14px;
+      border: 1px solid color-mix(in srgb, var(--send-btn-bg) 28%, var(--border-subtle));
+      background:
+        linear-gradient(
+          135deg,
+          color-mix(in srgb, var(--send-btn-bg) 12%, var(--component-bg)),
+          var(--component-bg)
+        );
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+      backdrop-filter: blur(14px);
+      animation: room-announcement-in 220ms ease-out;
+
+      &__icon {
+        width: 30px;
+        height: 30px;
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        border-radius: 10px;
+        color: var(--send-btn-bg);
+        background: color-mix(in srgb, var(--send-btn-bg) 14%, transparent);
+        border: 1px solid color-mix(in srgb, var(--send-btn-bg) 24%, transparent);
+        font-size: 16px;
+      }
+
+      &__body {
+        min-width: 0;
+        flex: 1;
+
+        > strong {
+          display: block;
+          margin-bottom: 3px;
+          font-size: 10px;
+          font-weight: 800;
+          color: var(--send-btn-bg);
+        }
+
+        > p {
+          margin: 0;
+          font-size: 11.5px;
+          line-height: 1.75;
+          color: var(--text-primary);
+          white-space: pre-wrap;
+          overflow-wrap: anywhere;
+        }
+      }
+
+      > button {
+        width: 28px;
+        height: 28px;
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        border: 0;
+        border-radius: 9px;
+        color: var(--text-muted);
+        background: transparent;
+        cursor: pointer;
+        transition: background 160ms ease, color 160ms ease;
+
+        &:hover {
+          color: var(--text-primary);
+          background: var(--msg-reply-bg);
+        }
+      }
+    }
+
+    @keyframes room-announcement-in {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
 

@@ -17,6 +17,7 @@ const Join = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [code, setCode] = useState<number | string>("");
+  const [joinError, setJoinError] = useState<string | null>(null);
   const nav = useNavigate();
 
   const { isAuthenticated } = useAuth();
@@ -48,9 +49,15 @@ const Join = () => {
   const joinRoomMutation = useMutation({
     mutationFn: (roomCode: number) => joinRoom(roomCode),
     onSuccess: (data) => {
+      setJoinError(null);
       nav(`/room/${data.id}`);
     },
     onError: (error) => {
+      if (getRoomApiErrorStatus(error) === 409) {
+        setJoinError("شما در حال حاضر در یک اتاق دیگر هستید. ابتدا از آن اتاق خارج شوید و سپس دوباره تلاش کنید.");
+        return;
+      }
+      setJoinError("پیوستن به اتاق با خطا مواجه شد. کد اتاق را بررسی کنید و دوباره تلاش کنید.");
       console.error("Failed to join room:", error);
     },
   });
@@ -58,9 +65,15 @@ const Join = () => {
   const joinLastRoomMutation = useMutation({
     mutationFn: (roomCode: number) => joinRoom(roomCode),
     onSuccess: (data) => {
+      setJoinError(null);
       nav(`/room/${data.id}`);
     },
     onError: (error) => {
+      if (getRoomApiErrorStatus(error) === 409) {
+        setJoinError("شما در حال حاضر در یک اتاق دیگر هستید. ابتدا از آن اتاق خارج شوید و سپس دوباره تلاش کنید.");
+        return;
+      }
+      setJoinError("بازگشت به اتاق با خطا مواجه شد. لطفاً دوباره تلاش کنید.");
       console.error("Failed to join last active room:", error);
     },
   });
@@ -69,6 +82,7 @@ const Join = () => {
     const roomCode = Number(code);
     if (!Number.isInteger(roomCode) || roomCode <= 0 || joinRoomMutation.isPending) return;
 
+    setJoinError(null);
     joinRoomMutation.mutate(roomCode);
   };
 
@@ -97,6 +111,17 @@ const Join = () => {
   return (
     <div className='join-page'>
       <Header />
+      {joinError && (
+        <div className="join-page__error" role="alert">
+          <div>
+            <strong>امکان ورود نیست</strong>
+            <span>{joinError}</span>
+          </div>
+          <button type="button" onClick={() => setJoinError(null)} aria-label="بستن پیام">
+            ×
+          </button>
+        </div>
+      )}
 
       <div className="join-page__content">
 

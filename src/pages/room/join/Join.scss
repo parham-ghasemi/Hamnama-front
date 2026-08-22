@@ -12,6 +12,72 @@
  * --------------------------------------------------------------- */
 
 .join-page {
+  &__error {
+    position: fixed;
+    top: 84px;
+    inset-inline: 20px;
+    z-index: 1000;
+    max-width: 680px;
+    margin-inline: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    justify-content: space-between;
+    padding: 13px 15px;
+    border-radius: 14px;
+    border: 1px solid color-mix(in srgb, var(--send-btn-bg) 28%, var(--border-subtle));
+    background: color-mix(in srgb, var(--send-btn-bg) 10%, var(--component-bg));
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
+    backdrop-filter: blur(14px);
+    animation: join-error-in 180ms ease-out;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+
+      > strong {
+        font-size: 12px;
+        color: var(--text-primary);
+      }
+
+      > span {
+        font-size: 11px;
+        line-height: 1.7;
+        color: var(--text-muted);
+      }
+    }
+
+    > button {
+      flex: 0 0 auto;
+      width: 28px;
+      height: 28px;
+      border: 0;
+      border-radius: 9px;
+      background: var(--msg-reply-bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+
+      &:hover {
+        color: var(--text-primary);
+      }
+    }
+  }
+
+  @keyframes join-error-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   min-height: 100vh;
   max-height: 100vh;
   overflow: hidden;

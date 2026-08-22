@@ -1,7 +1,7 @@
 import './RoomPage.scss'
 import './themse/Themes.scss'
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { AiTwotoneSetting } from "react-icons/ai";
 import { BsEmojiLaughing, BsFillPeopleFill, BsFillShareFill, BsMicFill, BsMicMuteFill, BsReplyFill } from "react-icons/bs";
@@ -19,6 +19,7 @@ import VideoPlayer from "./videoPlayer.tsx/VideoPlayer";
 
 import {
   getRoom,
+  getRoomAnnouncements,
   leaveRoom,
   sendRoomMessage,
   editRoomMessage,
@@ -29,6 +30,8 @@ import {
   type RoomReactionResponse,
   type RoomResponse,
   type RoomSocketUserPresence,
+  type RoomAnnouncement,
+  type RoomAnnouncementsResponse,
 } from "../../../apiCalls/roomApi";
 import { useAuth } from "../../../context/AuthContext";
 import AnimatedParticle from '../../../components/animatedParticle/AnimatedParticle';
@@ -140,6 +143,14 @@ type ServerSocketEvent =
   | {
     type: "error";
     payload: { message: string };
+  }
+  | {
+    type: "room_announcement";
+    payload: {
+      action: "upsert" | "remove";
+      announcement?: RoomAnnouncement;
+      id?: string;
+    };
   };
 
 function buildWsUrl(baseUrl: string, roomId: string, token?: string) {
@@ -154,6 +165,7 @@ const RoomPage = () => {
   const { id: roomId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { openConfirmation } = useConfirmationModal();
 
   // Keeps the layout locked to one screen while mobile keyboards open and close.
@@ -191,6 +203,13 @@ const RoomPage = () => {
     kind: "joined" | "left";
     created_at: string;
   }>>([]);
+  const [hiddenAnnouncementIds, setHiddenAnnouncementIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+
+  useEffect(() => {
+    setHiddenAnnouncementIds(new Set());
+  }, [roomId]);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -1055,6 +1074,14 @@ const RoomPage = () => {
     queryFn: () => getRoom(roomId!),
   });
 
+  const roomAnnouncementsQuery = useQuery({
+    queryKey: ["room-announcements", roomId],
+    enabled: !!roomId,
+    queryFn: getRoomAnnouncements,
+    staleTime: 0,
+  });
+
+
   useEffect(() => {
     if (!roomQuery.data) return;
 
@@ -1172,6 +1199,26 @@ const RoomPage = () => {
       }
 
       switch (parsed.type) {
+        case "room_announcement": {
+          queryClient.setQueryData<RoomAnnouncementsResponse>(["room-announcements", roomId], (current) => {
+            const announcements = current?.announcements ?? [];
+
+            if (parsed.payload.action === "remove") {
+              if (!parsed.payload.id) return current;
+              return {
+                announcements: announcements.filter((announcement) => announcement.id !== parsed.payload.id),
+              };
+            }
+
+            const announcement = parsed.payload.announcement;
+            if (!announcement) return current;
+
+            const withoutAnnouncement = announcements.filter((item) => item.id !== announcement.id);
+            return { announcements: [announcement, ...withoutAnnouncement] };
+          });
+          break;
+        }
+
         case "chat_message":
           setRoomState((prev) => {
             if (!prev) return prev;
@@ -1688,8 +1735,52 @@ const RoomPage = () => {
     }
   };
 
+  const visibleRoomAnnouncements = (roomAnnouncementsQuery.data?.announcements ?? []).filter(
+    (announcement) => !hiddenAnnouncementIds.has(announcement.id),
+  );
+
+  const hideAnnouncement = (announcementId: string) => {
+    setHiddenAnnouncementIds((previous) => {
+      const next = new Set(previous);
+      next.add(announcementId);
+      return next;
+    });
+  };
+
   if (roomQuery.isLoading) {
-    return <div className="room-page">در حال دریافت اطلاعات اتاق...</div>;
+    return (
+      <div className="room-page room-page--loading" aria-live="polite">
+        <div className="room-page__loader">
+          <div className="room-page__loader__film" aria-hidden="true">
+            <svg viewBox="0 0 240 150" role="img">
+              <rect x="30" y="25" width="180" height="100" rx="18" className="frame" />
+              <g className="sprockets">
+                <rect x="10" y="35" width="14" height="22" rx="4" />
+                <rect x="10" y="68" width="14" height="22" rx="4" />
+                <rect x="10" y="101" width="14" height="14" rx="4" />
+                <rect x="216" y="35" width="14" height="22" rx="4" />
+                <rect x="216" y="68" width="14" height="22" rx="4" />
+                <rect x="216" y="101" width="14" height="14" rx="4" />
+              </g>
+              <g className="frames">
+                <rect x="54" y="43" width="38" height="25" rx="6" />
+                <rect x="101" y="43" width="38" height="25" rx="6" />
+                <rect x="148" y="43" width="38" height="25" rx="6" />
+                <rect x="54" y="76" width="38" height="25" rx="6" />
+                <rect x="101" y="76" width="38" height="25" rx="6" />
+                <rect x="148" y="76" width="38" height="25" rx="6" />
+              </g>
+              <path className="play" d="M112 42 L112 108 L163 75 Z" />
+            </svg>
+          </div>
+          <div className="room-page__loader__copy">
+            <TbPlayerPlayFilled aria-hidden="true" />
+            <strong>در حال آماده‌سازی اتاق</strong>
+            <span>صحنه را آماده می‌کنیم؛ چند لحظه دیگر وارد چت می‌شوید.</span>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (roomQuery.isError || !roomState) {
@@ -1984,6 +2075,28 @@ const RoomPage = () => {
         </div>
 
         <div className="room-page__chat-container__chat-main">
+          {visibleRoomAnnouncements.map((announcement) => (
+            <aside
+              key={announcement.id}
+              className="room-page__chat-container__announcement"
+              aria-label="اعلان مدیریت"
+            >
+              <div className="room-page__chat-container__announcement__icon">
+                <TbPlayerPlayFilled aria-hidden="true" />
+              </div>
+              <div className="room-page__chat-container__announcement__body">
+                <strong>اعلان مدیریت</strong>
+                <p>{announcement.message}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => hideAnnouncement(announcement.id)}
+                aria-label="بستن اعلان"
+              >
+                <IoClose />
+              </button>
+            </aside>
+          ))}
           {groupedMessages.length === 0 && (
             <div className="room-page__chat-container__empty">
               <IoChatbubblesSharp />

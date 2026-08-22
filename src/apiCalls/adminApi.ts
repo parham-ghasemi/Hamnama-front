@@ -94,6 +94,21 @@ export interface AdminRoomsResponse {
   };
 }
 
+export type AnnouncementType = 'room' | 'website';
+
+export interface AdminAnnouncement {
+  id: string;
+  type: AnnouncementType;
+  message: string;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AdminAnnouncementsResponse {
+  announcements: AdminAnnouncement[];
+}
+
 export interface ArchiveJobResponse {
   job_id: string;
   status: string;
@@ -136,6 +151,15 @@ export const adminApi = {
   listRooms: (params: Record<string, string | number | boolean | undefined>) => api.get<AdminRoomsResponse>('/admin/rooms', { params }),
   closeRoom: (id: string) => api.post(`/admin/rooms/${id}/close`),
   reopenRoom: (id: string) => api.post(`/admin/rooms/${id}/reopen`),
+
+  listAnnouncements: (type: AnnouncementType) =>
+    api.get<AdminAnnouncementsResponse>('/admin/announcements', { params: { type } }),
+  createAnnouncement: (type: AnnouncementType, message: string) =>
+    api.post<AdminAnnouncement>('/admin/announcements', { type, message }),
+  setAnnouncementActive: (id: string, active: boolean) =>
+    api.patch<{ success: boolean; active: boolean }>(`/admin/announcements/${id}/active`, { active }),
+  deleteAnnouncement: (id: string) =>
+    api.delete<{ success: boolean }>(`/admin/announcements/${id}`),
 
   triggerArchiveScrape: (url: string) => api.post<ArchiveJobResponse>('/admin/scrape', { url }),
   getArchiveJobStatus: (id: string) => api.get<ArchiveJobStatusResponse>(`/admin/scrape/${id}`),
