@@ -521,7 +521,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   className="p-2 rounded-full bg-[#d04e2f]/15 hover:bg-[#d04e2f]/25 transition-all text-[#d04e2f] backdrop-blur-sm"
                 >
                   {playing ? (
-                    <Pause className="w-5 h-5 fill-white max-[420px]:w-3 max-[420px]:h-3" />
+                    <Pause className="w-5 h-5 fill-white text-white max-[420px]:w-3 max-[420px]:h-3" />
                   ) : (
                     <Play className="w-5 h-5 fill-[#d04e2f] text-[#d04e2f] max-[420px]:w-3 max-[420px]:h-3" />
                   )}
@@ -593,8 +593,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   aria-label={activeSubtitle >= 0 ? "Hide subtitles" : "Show subtitles"}
                   aria-pressed={activeSubtitle >= 0}
                   className={`p-1.5 rounded-full hover:bg-white/20 transition-colors ${activeSubtitle >= 0
-                      ? "bg-white/15 text-white"
-                      : "text-gray-200 hover:text-white"
+                    ? "bg-white/15 text-white"
+                    : "text-gray-200 hover:text-white"
                     }`}
                 >
                   <Captions className="w-4 h-4" />
@@ -606,7 +606,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   title="Keyboard shortcuts"
                   aria-label="نمایش میانبرهای صفحه‌کلید و لمس"
                   aria-expanded={showShortcutHints}
-                  className={`p-1.5 rounded-full hover:bg-white/20 transition-colors text-gray-200 hover:text-white ${showShortcutHints ? "bg-white/15 text-white" : ""}`}
+                  className={`p-1.5 rounded-full hover:bg-white/20 transition-colors text-gray-200 hover:text-white sm:block hidden ${showShortcutHints ? "bg-white/15 text-white" : ""}`}
                 >
                   <Keyboard className="w-4 h-4" />
                 </button>
