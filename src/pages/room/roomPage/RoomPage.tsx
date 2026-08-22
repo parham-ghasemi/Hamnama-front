@@ -211,14 +211,38 @@ const RoomPage = () => {
     const viewport = window.visualViewport;
     if (!viewport) return;
 
+    // A reduced visual viewport is only a keyboard signal when the chat textarea
+    // is actually focused. Without this guard, rotating the phone or focusing
+    // the video/link input can look exactly like a keyboard opening.
+    const isChatInputFocused = () => document.activeElement === messageInputRef.current;
+
     viewportBaseHeightRef.current = viewport.height;
+
+    const resetViewportBaseline = () => {
+      // Orientation changes can produce a large visualViewport resize even
+      // though no keyboard opened. Re-baseline after the browser settles.
+      window.requestAnimationFrame(() => {
+        viewportBaseHeightRef.current = viewport.height;
+        previousKeyboardOpenRef.current = false;
+        setIsKeyboardOpen(false);
+      });
+    };
 
     const updateKeyboardState = () => {
       const currentHeight = viewport.height;
+
+      if (!isChatInputFocused()) {
+        viewportBaseHeightRef.current = currentHeight;
+        previousKeyboardOpenRef.current = false;
+        setIsKeyboardOpen(false);
+        return;
+      }
+
       const baseHeight = viewportBaseHeightRef.current ?? currentHeight;
       const keyboardOpen = baseHeight - currentHeight > 150;
 
       if (!keyboardOpen) {
+        // Keep the largest observed height as the keyboard-free baseline.
         viewportBaseHeightRef.current = Math.max(
           viewportBaseHeightRef.current ?? currentHeight,
           currentHeight,
@@ -239,10 +263,22 @@ const RoomPage = () => {
     updateKeyboardState();
     viewport.addEventListener("resize", updateKeyboardState);
     viewport.addEventListener("scroll", updateKeyboardState);
+    window.addEventListener("orientationchange", resetViewportBaseline);
+
+    // focusin/focusout catches the transition into/out of the chat input even
+    // when the browser does not emit a visualViewport resize event.
+    const handleFocusChange = () => {
+      window.requestAnimationFrame(updateKeyboardState);
+    };
+    document.addEventListener("focusin", handleFocusChange);
+    document.addEventListener("focusout", handleFocusChange);
 
     return () => {
       viewport.removeEventListener("resize", updateKeyboardState);
       viewport.removeEventListener("scroll", updateKeyboardState);
+      window.removeEventListener("orientationchange", resetViewportBaseline);
+      document.removeEventListener("focusin", handleFocusChange);
+      document.removeEventListener("focusout", handleFocusChange);
     };
   }, []);
 
@@ -2076,6 +2112,18 @@ const RoomPage = () => {
                   placeholder="پیام خود را بنویسید..."
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
+                  onFocus={() => {
+                    window.requestAnimationFrame(() => {
+                      const viewport = window.visualViewport;
+                      if (!viewport) return;
+                      const currentHeight = viewport.height;
+                      viewportBaseHeightRef.current = Math.max(
+                        viewportBaseHeightRef.current ?? currentHeight,
+                        currentHeight,
+                      );
+                    });
+                  }}
+                  onBlur={() => setIsKeyboardOpen(false)}
                   disabled={sendMessageMutation.isPending || editMessageMutation.isPending}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
