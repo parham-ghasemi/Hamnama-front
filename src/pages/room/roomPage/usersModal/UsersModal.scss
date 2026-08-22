@@ -1,341 +1,395 @@
 @use "../../../../styles/abstracts/mixins" as mx;
 
 .room-users-modal {
-  width: 1300px;
-  max-width: 95%; /* Responsive width limit */
-  max-height: 90vh; /* Keeps it inside viewport on small screens */
+  width: min(860px, 94vw);
+  max-height: min(760px, 88vh);
   display: flex;
   flex-direction: column;
-  border-radius: 18px;
-  background-color: var(--modal-bg);
-  opacity: 0;
-  transition: opacity ease 200ms;
   overflow: hidden;
-  margin: 0 auto;
-
-  @include mx.max-w(768px) {
-    border-radius: 18px;
-  }
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 70%, white 8%);
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--modal-bg) 94%, black 6%);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.38);
+  opacity: 0;
+  transform: translateY(12px) scale(0.985);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
 
   &.open {
     opacity: 1;
+    transform: translateY(0) scale(1);
   }
 
   &__head {
-    width: 100%;
-    height: auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
     padding: 22px 24px;
-    flex-shrink: 0; /* Prevents header from shrinking when body scrolls */
-    background-color: var(--modal-head-bg);
-    @include mx.flex-center;
-    gap: 9px;
-  }
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--component-bg) 96%, white 4%),
+      var(--component-bg)
+    );
+    border-bottom: 1px solid var(--border-subtle);
 
-  > span {
-    font-size: 31px;
-    font-weight: 800;
-
-    @include mx.max-w(768px) {
-      font-size: 24px;
+    &__icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: var(--send-btn-bg);
+      background: color-mix(in srgb, var(--send-btn-bg) 12%, transparent);
+      font-size: 22px;
     }
 
-    @include mx.max-w(480px) {
-      font-size: 20px;
+    &__content {
+      min-width: 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      > strong {
+        font-size: 18px;
+        font-weight: 850;
+      }
+
+      > span {
+        color: var(--text-muted);
+        font-size: 12px;
+      }
     }
-  }
 
-  > svg {
-    font-size: 49px;
+    &__live {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: color-mix(in srgb, #33b26b 12%, transparent);
+      color: #53c980;
+      font-size: 11px;
+      font-weight: 800;
 
-    @include mx.max-w(768px) {
-      font-size: 38px;
-    }
-
-    @include mx.max-w(480px) {
-      font-size: 30px;
+      > span {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: currentColor;
+        box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 13%, transparent);
+      }
     }
   }
 
   &__body {
-    padding: 71px 108px;
-    @include mx.flex-center;
-    flex-wrap: wrap; /* CRITICAL: Allows cards to stack in rows */
-    overflow-y: auto; /* CRITICAL: Allows scrolling if there are many users */
-    align-content: flex-start; /* Ensures items start from the top when wrapping */
-    gap: 93px;
-    background-color: var(--modal-body-bg);
-    color: var(--modal-text);
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 14px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    background: var(--modal-body-bg);
 
-    @include mx.max-w(1200px) {
-      padding: 50px 60px;
-      gap: 50px;
+    &::-webkit-scrollbar {
+      width: 5px;
     }
-
-    @include mx.max-w(768px) {
-      padding: 30px 20px;
-      gap: 25px;
-    }
-
-    @include mx.max-w(480px) {
-      padding: 20px 10px;
-      gap: 15px;
+    &::-webkit-scrollbar-thumb {
+      background: color-mix(in srgb, var(--text-muted) 22%, transparent);
+      border-radius: 999px;
     }
 
     &__card {
-      background-color: var(--user-card-bg);
-      border-radius: 17px;
-      min-height: 271px;
-      width: 201px;
-      padding: 17px;
+      position: relative;
+      min-width: 0;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid color-mix(in srgb, var(--border-subtle) 78%, white 4%);
+      border-radius: 18px;
+      background: color-mix(in srgb, var(--user-card-bg) 92%, white 8%);
+      transition:
+        transform 160ms ease,
+        border-color 160ms ease,
+        box-shadow 160ms ease;
 
-      @include mx.max-w(768px) {
-        width: 180px;
-        min-height: 250px;
-        border-radius: 14px;
+      &:hover {
+        transform: translateY(-1px);
+        border-color: color-mix(
+          in srgb,
+          var(--send-btn-bg) 24%,
+          var(--border-subtle)
+        );
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.14);
       }
+    }
+  }
 
-      @include mx.max-w(480px) {
-        width: 155px; /* Ensures 2 cards fit side-by-side easily on phone screens */
-        min-height: 235px;
-        padding: 12px;
+  &__body__card__identity {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+
+    &__avatar {
+      position: relative;
+      flex: 0 0 auto;
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      overflow: visible;
+      display: grid;
+      place-items: center;
+      background: var(--icon-color);
+      color: var(--text-primary);
+      font-size: 17px;
+      font-weight: 850;
+
+      > img,
+      > span {
+        width: 100%;
+        height: 100%;
+        border-radius: inherit;
       }
-
-      &__profile {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-        gap: 6px;
-
-        > img {
-          height: 71px;
-          width: 71px;
-          border-radius: 100%;
-
-          @include mx.max-w(480px) {
-            height: 60px;
-            width: 60px;
-          }
-        }
-        > span {
-          height: 71px;
-          width: 71px;
-          border-radius: 100%;
-          @include mx.flex-center;
-          background-color: var(--icon-color);
-          font-size: 26px;
-          font-weight: 900;
-
-          @include mx.max-w(480px) {
-            height: 60px;
-            width: 60px;
-            font-size: 22px;
-          }
-        }
-        > p {
-          font-size: 18px;
-          font-weight: 800;
-
-          @include mx.max-w(480px) {
-            font-size: 16px;
-          }
-        }
+      > img {
+        object-fit: cover;
       }
-
-      &__body {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-        gap: 7px;
-
-        &__role {
-          cursor: pointer;
-
-          &.open {
-            .room-users-modal__body__card__body__role__trigger {
-              border-radius: 7px 7px 0 0;
-              > span {
-                border-radius: 7px 7px 0 0;
-              }
-            }
-            .room-users-modal__body__card__body__role__drop-down {
-              opacity: 1 !important;
-              transform: translateY(0);
-
-              &:hover {
-                opacity: 0.9;
-              }
-            }
-          }
-
-          &__trigger {
-            display: flex;
-            border-radius: 7px;
-            width: 120px;
-            height: 26px;
-            align-items: center;
-            justify-content: space-between;
-            padding-left: 6px;
-            background-color: var(--role-trigger-bg);
-            transition:
-              opacity 200ms ease,
-              border-radius 200ms ease;
-
-            &.current {
-              background-color: var(--role-trigger-current-bg);
-              > svg {
-                opacity: 0;
-              }
-
-              & ~ .room-users-modal__body__card__body__role__drop-down {
-                opacity: 0;
-              }
-            }
-            &.current-not-admin {
-              background-color: var(--role-trigger-current-bg);
-              > svg {
-                opacity: 0;
-              }
-
-              & ~ .room-users-modal__body__card__body__role__drop-down {
-                opacity: 0;
-              }
-            }
-
-            &:hover {
-              opacity: 0.9;
-            }
-
-            > span {
-              background-color: var(--role-icon-bg);
-              border-radius: 7px;
-              height: 26px;
-              width: 26px;
-              @include mx.flex-center;
-              > svg {
-                font-size: 17px;
-              }
-            }
-            > p {
-              font-size: 11px;
-              font-weight: 600;
-              width: 74px;
-              text-align: center;
-            }
-            > svg {
-              width: 10px;
-            }
-          }
-
-          &__drop-down {
-            display: flex;
-            border-radius: 0 0 7px 7px;
-            width: 120px;
-            align-items: center;
-            justify-content: space-between;
-            padding-left: 6px;
-            background-color: var(--role-trigger-bg);
-            transition:
-              opacity 200ms ease,
-              transform 200ms ease;
-            opacity: 0;
-            transform: translateY(-10px);
-            position: absolute; /* PREVENTS layout jumping when opened */
-            z-index: 10;
-
-            > span {
-              background-color: var(--role-icon-bg);
-              border-radius: 0 0 7px 7px;
-              height: 26px;
-              width: 26px;
-              @include mx.flex-center;
-              > svg {
-                font-size: 17px;
-              }
-            }
-            > p {
-              font-size: 11px;
-              font-weight: 600;
-              width: 74px;
-              text-align: center;
-            }
-          }
-        }
-
-        &__connection {
-          width: 119px;
-          height: 26px;
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          border-radius: 7px;
-
-          > span {
-            height: 26px;
-            width: 26px;
-            border-radius: 7px;
-            @include mx.flex-center;
-            > svg {
-              font-size: 18px;
-            }
-          }
-          > p {
-            font-size: 12px;
-            font-weight: 600;
-            text-align: center;
-            width: calc(100% - 26px);
-          }
-
-          &.good {
-            background-color: var(--conn-good-bg);
-            > span {
-              background-color: var(--conn-good-icon);
-            }
-          }
-          &.medium {
-            background-color: var(--conn-med-bg);
-            > span {
-              background-color: var(--conn-med-icon);
-            }
-          }
-          &.bad {
-            background-color: var(--conn-bad-bg);
-            > span {
-              background-color: var(--conn-bad-icon);
-            }
-          }
-        }
-      }
-
-      &__foot {
-        height: 25px;
-        width: 95px;
-        border-radius: 5px;
+      > span {
         @include mx.flex-center;
-        font-size: 12px;
-        font-weight: 600;
-        background-color: var(--kick-btn-bg);
-        cursor: pointer;
-        transition: opacity 200ms ease;
+      }
 
-        &:hover {
-          opacity: 0.9;
-        }
+      &__dot {
+        position: absolute;
+        left: -2px;
+        bottom: -1px;
+        width: 11px;
+        height: 11px;
+        border: 2px solid var(--user-card-bg);
+        border-radius: 50%;
+        background: #7c8490;
 
-        &.current {
-          font-size: 14px;
-          background-color: var(--kick-btn-current-bg);
-          cursor: default;
-          &:hover {
-            opacity: 1;
-          }
+        &.online {
+          background: #4dc47a;
         }
       }
+    }
+
+    &__text {
+      min-width: 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      > div {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      strong {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 14px;
+        font-weight: 850;
+      }
+
+      > span {
+        color: var(--text-muted);
+        font-size: 11px;
+      }
+    }
+  }
+
+  &__admin-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    flex: 0 0 auto;
+    padding: 3px 6px;
+    border-radius: 999px;
+    color: var(--send-btn-bg);
+    background: color-mix(in srgb, var(--send-btn-bg) 11%, transparent);
+    font-size: 9px;
+    font-weight: 800;
+
+    svg {
+      font-size: 10px;
+    }
+  }
+
+  &__body__card__details {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 9px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 750;
+
+    svg {
+      font-size: 14px;
+    }
+    &.good {
+      color: #53c980;
+      background: color-mix(in srgb, #53c980 10%, transparent);
+    }
+    &.medium {
+      color: #e3ad56;
+      background: color-mix(in srgb, #e3ad56 10%, transparent);
+    }
+    &.bad {
+      color: #e77a63;
+      background: color-mix(in srgb, #e77a63 10%, transparent);
+    }
+    &.offline {
+      color: var(--text-muted);
+      background: color-mix(in srgb, var(--text-muted) 10%, transparent);
+    }
+  }
+
+  &__role {
+    position: relative;
+
+    &__trigger,
+    &__static {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 9px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background: var(--component-bg);
+      color: var(--text-primary);
+      font-size: 10px;
+      font-weight: 750;
+    }
+
+    &__trigger {
+      cursor: pointer;
+
+      &:hover,
+      &.open {
+        border-color: color-mix(
+          in srgb,
+          var(--send-btn-bg) 28%,
+          var(--border-subtle)
+        );
+        color: var(--send-btn-bg);
+      }
+
+      svg {
+        font-size: 9px;
+      }
+    }
+
+    &__menu {
+      position: absolute;
+      top: calc(100% + 0px);
+      right: 0;
+      z-index: 30;
+      width: 60px;
+      padding: 5px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      background: var(--modal-bg);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+
+      > button {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 9px;
+        border-radius: 8px;
+        font-size: 10px;
+        cursor: pointer;
+
+        &:hover,
+        &.selected {
+          background: color-mix(in srgb, var(--send-btn-bg) 10%, transparent);
+          color: var(--send-btn-bg);
+        }
+      }
+    }
+  }
+
+  &__body__card__kick {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 34px;
+    border-radius: 11px;
+    border: 1px solid
+      color-mix(in srgb, var(--kick-btn-bg) 40%, var(--border-subtle));
+    background: color-mix(in srgb, var(--kick-btn-bg) 84%, transparent);
+    color: var(--text-primary);
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+      transform 140ms ease,
+      opacity 140ms ease;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+    &:disabled {
+      opacity: 0.55;
+      cursor: wait;
+    }
+  }
+
+  &__body__card__current {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: color-mix(in srgb, var(--component-bg) 90%, white 10%);
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  @include mx.max-w(760px) {
+    width: min(94vw, 600px);
+    &__body {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @include mx.max-w(480px) {
+    max-height: 90vh;
+    border-radius: 18px;
+    &__head {
+      padding: 17px;
+    }
+    &__head__icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+    }
+    &__head__content > strong {
+      font-size: 16px;
+    }
+    &__body {
+      padding: 10px;
     }
   }
 }

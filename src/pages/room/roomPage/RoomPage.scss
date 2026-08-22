@@ -214,6 +214,10 @@
           max-width: 100%;
 
           &__top {
+            width: 100%;
+            border: 0;
+            text-align: start;
+            cursor: pointer;
             background-color: var(--msg-reply-bg);
             border-inline-start: 3px solid var(--send-btn-bg);
             border-radius: 6px;
@@ -227,6 +231,22 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
             word-break: break-word;
+            transition: background 160ms ease;
+
+            &:hover:not(:disabled) {
+              background: color-mix(in srgb, var(--send-btn-bg) 10%, var(--msg-reply-bg));
+            }
+
+            &:disabled { cursor: default; }
+
+            &__label {
+              display: block;
+              margin-bottom: 1px;
+              font-size: 9px;
+              font-weight: 800;
+              color: var(--send-btn-bg);
+              opacity: .9;
+            }
           }
           &__text {
             font-size: 14px;
@@ -236,14 +256,45 @@
             white-space: pre-wrap;
             overflow-wrap: anywhere;
           }
+          &__meta {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            width: 100%;
+          }
           &__time {
             font-size: 9px;
             font-weight: 600;
-            width: 100%;
             opacity: 0.65;
-            text-align: end;
+          }
+          &__edited {
+            font-size: 8px;
+            font-weight: 700;
+            color: var(--send-btn-bg);
+            opacity: .85;
           }
         }
+      }
+
+      &__edit {
+        cursor: pointer;
+        opacity: 0;
+        align-self: center;
+        @include mx.flex-center;
+        height: 26px;
+        width: 26px;
+        border-radius: 100%;
+        transition: opacity 200ms ease, background 200ms ease;
+        font-size: 14px;
+
+        &:hover { background: var(--msg-reply-bg); }
+
+        @media (hover: none) { display: none; }
+      }
+
+      &:hover {
+        .room-page__chat-container__message-block__edit { opacity: 1; }
       }
 
       &__reply {
@@ -353,6 +404,40 @@
           &:hover {
             opacity: 1;
           }
+        }
+      }
+
+      &__editing {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 8px 11px;
+        border: 1px solid color-mix(in srgb, var(--send-btn-bg) 18%, var(--border-subtle));
+        border-radius: 12px;
+        background: color-mix(in srgb, var(--send-btn-bg) 7%, var(--send-input-bg));
+
+        > div {
+          min-width: 0;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 1px;
+
+          > strong { font-size: 10px; color: var(--send-btn-bg); }
+          > span { font-size: 9px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        }
+
+        > button {
+          width: 24px;
+          height: 24px;
+          flex: 0 0 auto;
+          border-radius: 8px;
+          @include mx.flex-center;
+          color: var(--text-muted);
+          cursor: pointer;
+
+          &:hover { color: var(--text-primary); background: var(--msg-reply-bg); }
         }
       }
 
@@ -1546,4 +1631,40 @@
     text-align: center;
     font-size: 12px;
   }
+}
+
+
+.room-page__connection-lost {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 10px 14px;
+  border: 1px solid color-mix(in srgb, #e07159 35%, var(--border-subtle));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--component-bg) 92%, #e07159 8%);
+  box-shadow: 0 14px 32px rgba(0,0,0,.25);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 750;
+
+  > button {
+    border-radius: 9px;
+    padding: 7px 10px;
+    background: var(--send-btn-bg);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+}
+
+@keyframes room-message-highlight {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.01); }
+  100% { transform: scale(1); }
 }

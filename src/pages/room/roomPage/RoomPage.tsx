@@ -6,8 +6,8 @@ import clsx from "clsx";
 import { AiTwotoneSetting } from "react-icons/ai";
 import { BsEmojiLaughing, BsFillPeopleFill, BsFillShareFill, BsMicFill, BsMicMuteFill, BsReplyFill } from "react-icons/bs";
 import { IoChatbubblesSharp, IoChevronBack, IoClose, IoExitOutline } from "react-icons/io5";
-import { FaArrowRight } from "react-icons/fa6";
-import { TbSticker, TbMovieOff, TbPlayerPlayFilled } from "react-icons/tb";
+import { FaArrowRight, FaCheck } from "react-icons/fa6";
+import { TbSticker, TbMovieOff, TbPlayerPlayFilled, TbX } from "react-icons/tb";
 
 import SettingsModal from "./settingsModal/SettingsModal";
 import ChatMessage from "./ChatMessage";
@@ -21,6 +21,7 @@ import {
   getRoom,
   leaveRoom,
   sendRoomMessage,
+  editRoomMessage,
   kickRoomMember,
   updateRoomMemberRole,
   type ConnectionStatus,
@@ -82,6 +83,10 @@ type ClientSocketEvent =
 type ServerSocketEvent =
   | {
     type: "chat_message";
+    payload: RoomMessageResponse;
+  }
+  | {
+    type: "chat_message_updated";
     payload: RoomMessageResponse;
   }
   | {
@@ -174,6 +179,9 @@ const RoomPage = () => {
   const [selectedMedia, setSelectedMedia] = useState<SelectedArchiveMedia | null>(null);
   const [messageText, setMessageText] = useState("");
   const [replyingTo, setReplyingTo] = useState<{ id: string, message: string }>({ id: "", message: "" });
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
+  const [connectionLost, setConnectionLost] = useState(false);
   const [roomState, setRoomState] = useState<RoomResponse | null>(null);
   const [systemMessages, setSystemMessages] = useState<Array<{
     id: string;
@@ -194,6 +202,7 @@ const RoomPage = () => {
   const screenVideoRef = useRef<HTMLVideoElement | null>(null);
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
   const messageInputRef = useRef<HTMLTextAreaElement | null>(null);
+  const intentionalSocketCloseRef = useRef(false);
 
   // ========== Start Reaction Particles ===========
 
@@ -974,6 +983,7 @@ const RoomPage = () => {
     console.log("ROOM QUERY MEMBERS:", roomQuery.data.members);
 
     setRoomState(roomQuery.data);
+    setConnectionLost(false);
     setPlaybackSrc(roomQuery.data.currently_playing ?? "");
     setCurrentTime(roomQuery.data.playback_time ?? 0);
     setIsPlaying(roomQuery.data.is_playing ?? false);
@@ -1092,6 +1102,19 @@ const RoomPage = () => {
           });
           break;
 
+        case "chat_message_updated":
+          setRoomState((prev) =>
+            prev
+              ? {
+                ...prev,
+                messages: prev.messages.map((message) =>
+                  message.id === parsed.payload.id ? parsed.payload : message,
+                ),
+              }
+              : prev,
+          );
+          break;
+
         case "member_status":
           setConnectionStatuses((prev) => ({
             ...prev,
@@ -1154,6 +1177,7 @@ const RoomPage = () => {
 
         case "user_kicked":
           if (parsed.payload.user_id === user?.id) {
+            intentionalSocketCloseRef.current = true;
             socket.close();
             navigate("/");
             return;
@@ -1279,11 +1303,17 @@ const RoomPage = () => {
         socketRef.current = null;
       }
       if (e.code === 4003) {
+        intentionalSocketCloseRef.current = true;
         navigate("/");
+        return;
+      }
+      if (!intentionalSocketCloseRef.current) {
+        setConnectionLost(true);
       }
     };
 
     return () => {
+      intentionalSocketCloseRef.current = true;
       socket.close();
     };
   }, [roomId, user?.id]);
@@ -1334,9 +1364,29 @@ const RoomPage = () => {
     },
   });
 
+  const editMessageMutation = useMutation({
+    mutationFn: ({ messageId, content }: { messageId: string; content: string }) =>
+      editRoomMessage(roomId!, messageId, content),
+    onSuccess: (updatedMessage) => {
+      setRoomState((prev) =>
+        prev
+          ? {
+            ...prev,
+            messages: prev.messages.map((message) =>
+              message.id === updatedMessage.id ? updatedMessage : message,
+            ),
+          }
+          : prev,
+      );
+      setMessageText("");
+      setEditingMessageId(null);
+    },
+  });
+
   const leaveMutation = useMutation({
     mutationFn: () => leaveRoom(roomId!),
     onSuccess: () => {
+      intentionalSocketCloseRef.current = true;
       socketRef.current?.close();
       navigate("/");
     },
@@ -1404,15 +1454,45 @@ const RoomPage = () => {
   };
 
   const handleSendMessage = () => {
-    const trimmed = messageText.trim();
-    if (!trimmed || !roomId) return;
-    sendMessageMutation.mutate(trimmed);
+    const content = messageText.trim();
+    if (!content || sendMessageMutation.isPending || editMessageMutation.isPending) return;
+
+    if (editingMessageId) {
+      editMessageMutation.mutate({ messageId: editingMessageId, content });
+      return;
+    }
+
+    sendMessageMutation.mutate(content);
   };
 
   const handleReply = (to: { id: string, message: string }) => {
+    setEditingMessageId(null);
     setReplyingTo(to);
     document.getElementById('room-chat-input')?.focus();
-  }
+  };
+
+  const handleEditMessage = (message: RoomMessageResponse) => {
+    setReplyingTo({ id: "", message: "" });
+    setEditingMessageId(message.id);
+    setMessageText(message.content);
+    requestAnimationFrame(() => document.getElementById('room-chat-input')?.focus());
+  };
+
+  const handleCancelEdit = () => {
+    setEditingMessageId(null);
+    setMessageText("");
+  };
+
+  const handleNavigateToMessage = (messageId: string) => {
+    const element = document.getElementById(`chat-message-${messageId}`);
+    if (!element) return;
+
+    element.scrollIntoView({ behavior: "smooth", block: "center" });
+    setHighlightedMessageId(messageId);
+    window.setTimeout(() => {
+      setHighlightedMessageId((current) => current === messageId ? null : current);
+    }, 1400);
+  };
 
   const handleSelectEmoji = (emoji: string) => {
     const input = messageInputRef.current;
@@ -1579,6 +1659,12 @@ const RoomPage = () => {
 
   return (
     <div className={clsx("room-page", sidebarOpen && "sidebar-open")}>
+      {connectionLost && (
+        <div className="room-page__connection-lost" role="alert">
+          <span>اتصال شما به اتاق قطع شد.</span>
+          <button type="button" onClick={() => window.location.reload()}>تلاش مجدد</button>
+        </div>
+      )}
       <button
         type="button"
         className="room-page__side-bar-toggle"
@@ -1873,7 +1959,10 @@ const RoomPage = () => {
                   message={message}
                   isOwn={isOwn}
                   showAvatar={showAvatar}
+                  isHighlighted={highlightedMessageId === message.id}
                   onReply={() => handleReply({ id: message.id, message: message.content })}
+                  onReplyNavigate={message.replying_to_id ? () => handleNavigateToMessage(message.replying_to_id as string) : undefined}
+                  onEdit={isOwn ? () => handleEditMessage(message) : undefined}
                 />
               </div>
             );
@@ -1887,14 +1976,26 @@ const RoomPage = () => {
             <EmojiPicker onSelect={handleSelectEmoji} onClose={() => setEmojiPickerOpen(false)} />
           )}
 
+          {editingMessageId && (
+            <div className="room-page__chat-container__foot__editing">
+              <div>
+                <strong>ویرایش پیام</strong>
+                <span>متن پیام را اصلاح کنید و ذخیره را بزنید.</span>
+              </div>
+              <button type="button" onClick={handleCancelEdit} aria-label="لغو ویرایش">
+                <TbX />
+              </button>
+            </div>
+          )}
+
           <div className="room-page__chat-container__foot__row">
             <button
-              className="room-page__chat-container__foot__send"
+              className={clsx("room-page__chat-container__foot__send", editingMessageId && "is-editing")}
               onClick={handleSendMessage}
-              disabled={!messageText.trim() || sendMessageMutation.isPending}
-              aria-label="ارسال پیام"
+              disabled={!messageText.trim() || sendMessageMutation.isPending || editMessageMutation.isPending}
+              aria-label={editingMessageId ? "ذخیره ویرایش" : "ارسال پیام"}
             >
-              <FaArrowRight />
+              {editingMessageId ? <FaCheck /> : <FaArrowRight />}
             </button>
 
             <div className="room-page__chat-container__foot__input">
@@ -1922,6 +2023,7 @@ const RoomPage = () => {
                   data-emoji-trigger
                   className={clsx(emojiPickerOpen && "is-active")}
                   onClick={() => setEmojiPickerOpen((prev) => !prev)}
+                  disabled={sendMessageMutation.isPending || editMessageMutation.isPending}
                 >
                   <TbSticker />
                 </button>
@@ -1932,6 +2034,7 @@ const RoomPage = () => {
                   placeholder="پیام خود را بنویسید..."
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
+                  disabled={sendMessageMutation.isPending || editMessageMutation.isPending}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();

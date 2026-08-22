@@ -17,8 +17,11 @@ export interface RoomMessageResponse {
   sender_name: string;
   sender_avatar: string;
   replying_to: string;
+  replying_to_id?: string;
   content: string;
   created_at: string;
+  updated_at: string;
+  edited: boolean;
 }
 
 export interface CreateRoomRequest {
@@ -86,6 +89,13 @@ export async function getLastActiveRoom() {
 
 export async function getRoom(roomId: string) {
   const { data } = await api.get<RoomResponse>(`/rooms/${roomId}`);
+  return data;
+}
+
+export async function editRoomMessage(roomId: string, messageId: string, content: string) {
+  const { data } = await api.patch<RoomMessageResponse>(`/rooms/${roomId}/messages/${messageId}`, {
+    content,
+  });
   return data;
 }
 

@@ -422,6 +422,7 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
                 <TbSearch />
                 <input
                   type="search"
+                  data-video-keyboard-ignore
                   placeholder="نام فارسی، انگلیسی یا IMDb ID..."
                   value={search}
                   onChange={(e) => {

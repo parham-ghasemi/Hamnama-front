@@ -226,7 +226,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
 
-      if (target?.closest('#room-chat-input, [data-video-link-input]')) {
+      if (target?.closest('#room-chat-input, [data-video-link-input], [data-video-keyboard-ignore], .archive-modal input, .archive-modal select, .archive-modal textarea')) {
         return;
       }
 
@@ -352,7 +352,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             onClick={togglePlay}
             className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform pointer-events-auto z-10 max-[410px]:w-10 max-[410px]:h-10"
           >
-            <Play className="w-8 h-8 fill-white text-white max-[410px]:w-4 max-[410px]:h-4 " />
+            <Play className="w-8 h-8 fill-[#d04e2f] text-[#d04e2f] max-[410px]:w-4 max-[410px]:h-4 " />
           </motion.div>
         )}
       </AnimatePresence>
@@ -424,7 +424,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 step="0.1"
                 value={time}
                 onChange={handleScrub}
-                className="absolute inset-0 w-full h-1 bg-white/30 rounded-lg appearance-none cursor-pointer accent-red-500 hover:h-2 transition-all duration-150 focus:outline-none"
+                className="absolute inset-0 w-full h-1 rounded-lg appearance-none cursor-pointer hover:h-2 transition-all duration-150 focus:outline-none"
+                style={{
+                  background: duration > 0
+                    ? `linear-gradient(to right, #d04e2f 0%, #d04e2f ${Math.min(100, Math.max(0, (time / duration) * 100))}%, rgba(255,255,255,.28) ${Math.min(100, Math.max(0, (time / duration) * 100))}%, rgba(255,255,255,.28) 100%)`
+                    : "rgba(255,255,255,.28)",
+                  accentColor: "#d04e2f",
+                }}
               />
             </div>
 
@@ -441,12 +447,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 <button
                   onClick={togglePlay}
                   title={playing ? "Pause" : "Play"}
-                  className="p-2 rounded-full bg-white/10 hover:bg-white/25 transition-all text-white backdrop-blur-sm"
+                  className="p-2 rounded-full bg-[#d04e2f]/15 hover:bg-[#d04e2f]/25 transition-all text-[#d04e2f] backdrop-blur-sm"
                 >
                   {playing ? (
                     <Pause className="w-5 h-5 fill-white max-[420px]:w-3 max-[420px]:h-3" />
                   ) : (
-                    <Play className="w-5 h-5 fill-white max-[420px]:w-3 max-[420px]:h-3" />
+                    <Play className="w-5 h-5 fill-[#d04e2f] text-[#d04e2f] max-[420px]:w-3 max-[420px]:h-3" />
                   )}
                 </button>
 

@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import clsx from "clsx";
 import { BsReplyFill } from "react-icons/bs";
+import { TbPencil } from "react-icons/tb";
 
 import type { RoomMessageResponse } from "../../../apiCalls/roomApi";
 
@@ -8,13 +9,16 @@ type Props = {
   message: RoomMessageResponse;
   isOwn: boolean;
   showAvatar: boolean;
+  isHighlighted?: boolean;
   onReply: () => void;
+  onReplyNavigate?: () => void;
+  onEdit?: () => void;
 };
 
 const SWIPE_TRIGGER = 56;
 const SWIPE_MAX = 84;
 
-const ChatMessage = ({ message, isOwn, showAvatar, onReply }: Props) => {
+const ChatMessage = ({ message, isOwn, showAvatar, isHighlighted, onReply, onReplyNavigate, onEdit }: Props) => {
   const [offset, setOffset] = useState(0);
   const [swiping, setSwiping] = useState(false);
   const startX = useRef(0);
@@ -45,7 +49,6 @@ const ChatMessage = ({ message, isOwn, showAvatar, onReply }: Props) => {
 
     if (locked.current !== "x") return;
 
-    // Telegram-like: drag toward the start of the bubble, resistance at the end.
     const raw = Math.max(0, Math.abs(dx));
     const next = Math.min(SWIPE_MAX, raw * (raw > SWIPE_TRIGGER ? 0.45 : 1));
     setOffset(next);
@@ -63,15 +66,17 @@ const ChatMessage = ({ message, isOwn, showAvatar, onReply }: Props) => {
     locked.current = "none";
   };
 
-  // Outgoing bubbles sit on the right, so they drag left; incoming drag right.
   const direction = isOwn ? -1 : 1;
 
   return (
     <div
+      id={`chat-message-${message.id}`}
+      data-message-id={message.id}
       className={clsx(
         "room-page__chat-container__message-block",
         isOwn && "outgoing",
         showAvatar && "has-avatar",
+        isHighlighted && "is-highlighted",
         offset >= SWIPE_TRIGGER && "swipe-armed",
       )}
       onTouchStart={handleTouchStart}
@@ -94,6 +99,17 @@ const ChatMessage = ({ message, isOwn, showAvatar, onReply }: Props) => {
           transition: swiping ? "none" : "transform 220ms cubic-bezier(0.22, 1, 0.36, 1)",
         }}
       >
+        {isOwn && onEdit && (
+          <button
+            type="button"
+            className="room-page__chat-container__message-block__edit"
+            onClick={onEdit}
+            aria-label="ویرایش پیام"
+          >
+            <TbPencil />
+          </button>
+        )}
+
         <button
           type="button"
           className="room-page__chat-container__message-block__reply"
@@ -106,18 +122,31 @@ const ChatMessage = ({ message, isOwn, showAvatar, onReply }: Props) => {
         <div className="room-page__chat-container__message-block__messages">
           <div className="room-page__chat-container__message-block__messages__message">
             {!!message.replying_to && (
-              <span className="room-page__chat-container__message-block__messages__message__top">
-                {message.replying_to}
-              </span>
+              <button
+                type="button"
+                className="room-page__chat-container__message-block__messages__message__top"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onReplyNavigate?.();
+                }}
+                disabled={!onReplyNavigate}
+                title={onReplyNavigate ? "رفتن به پیام اصلی" : undefined}
+              >
+                <span className="room-page__chat-container__message-block__messages__message__top__label">پاسخ به</span>
+                <span>{message.replying_to}</span>
+              </button>
             )}
             <span className="room-page__chat-container__message-block__messages__message__text">
               {message.content}
             </span>
-            <span className="room-page__chat-container__message-block__messages__message__time">
-              {new Date(message.created_at).toLocaleTimeString("fa-IR", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+            <span className="room-page__chat-container__message-block__messages__message__meta">
+              <span className="room-page__chat-container__message-block__messages__message__time">
+                {new Date(message.created_at).toLocaleTimeString("fa-IR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+              {message.edited && <span className="room-page__chat-container__message-block__messages__message__edited">ویرایش شد</span>}
             </span>
           </div>
         </div>
