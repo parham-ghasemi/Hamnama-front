@@ -19,23 +19,35 @@
   &__hero {
     position: absolute;
     width: 100vw;
-    height: 100vh;
-    max-height: 100vh;
-    top: 0;
+    height: calc(100vh - 80px);
+    max-height: calc(100vh - 80px);
+    top: 80px;
     left: 0;
     right: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 30px;
+    gap: 1vh;
+
+    @include mx.max-w(1300px) {
+      top: 0;
+      gap: 30px;
+      height: 100vh;
+      max-height: 100vh;
+    }
+
     @include mx.max-w(768px) {
       height: 350px;
       max-height: 350px;
     }
 
     > .img {
-      height: 86vh;
+      height: calc(90vh - 80px);
       width: 100%;
+
+      @include mx.max-w(1300px) {
+        height: 86vh;
+      }
 
       @include mx.max-w(768px) {
         height: 285px;
@@ -203,9 +215,13 @@
 
     &::before {
       content: "";
-      height: 62px;
+      height: 120px;
       width: 8.5px;
       display: block;
+
+      @include mx.max-w(1300px) {
+        height: 62px;
+      }
 
       @include mx.max-w(768px) {
         height: 40px;
