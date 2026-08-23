@@ -155,7 +155,7 @@ const Join = () => {
                 </div>
 
                 <div className={clsx("join-page__content__main__cards__card__code", copied && 'copied')}>
-                  کد شما: {activeRoom ? activeRoom.code.toLocaleString("fa-IR").replace('٬', " ") : "---"}
+                  کد شما: {activeRoom ? activeRoom.code.toLocaleString("fa-IR").replace('٬', "") : "---"}
                   <span
                     onClick={handleCopy}
                     aria-hidden={!activeRoom}
@@ -219,7 +219,7 @@ const Join = () => {
                     {lastRoom ? lastRoomLabel : "اتاقی برای بازگشت وجود ندارد"}
                     {lastRoom && (
                       <span className="join-page__content__main__cards__last__info__code">
-                        {lastRoom.code.toLocaleString("fa-IR").replace('٬', " ")}
+                        {lastRoom.code.toLocaleString("fa-IR").replace('٬', "")}
                       </span>
                     )}
                   </p>
