@@ -44,11 +44,6 @@
     opacity: var(--glow-opacity);
     z-index: 0;
 
-    /*
-   * The trick:
-   * the glow is behind the actual FAQ content, and the
-   * content/background of the trigger covers its center.
-   */
     background: radial-gradient(
       200px circle at var(--mx) var(--my),
       rgba(255, 210, 190, 0.85),
@@ -83,9 +78,7 @@
     &__inner {
       position: relative;
       border-radius: 17px;
-
-      // The actual subtle border.
-      border: 2px solid transparent;
+      // border: 2px solid transparent;
     }
 
     @include mx.max-w(1024px) {
@@ -97,6 +90,9 @@
     }
 
     &__trigger {
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
       min-height: 83.3px;
       font-size: 20.4px;
       font-weight: 600;
@@ -127,7 +123,7 @@
         color: dark.$color-primary;
         transition: transform mx.$dur-base mx.$ease-out-soft;
         position: relative;
-        z-index: 1;
+        z-index: 2;
 
         @include mx.light {
           color: light.$color-primary;
@@ -242,9 +238,13 @@
     }
 
     &__answer {
+      position: relative;
+      z-index: 1;
+
       display: grid;
       grid-template-rows: 0fr;
       overflow: hidden;
+
       transition: grid-template-rows mx.$dur-base mx.$ease-out-soft;
 
       @include mx.reduced-motion {
@@ -256,9 +256,11 @@
         line-height: 200%;
         opacity: 0;
         padding: 0;
+
         transition:
           opacity ease 150ms,
           padding ease 150ms;
+
         font-size: 15px;
         color: color.adjust(dark.$color-gray, $lightness: -6%);
 
@@ -280,17 +282,15 @@
     &__answer--show {
       grid-template-rows: 1fr;
       border-radius: 0 0 17px 17px;
+
       background:
         linear-gradient(
           180deg,
           rgba(255, 255, 255, 0.05) 0%,
           rgba(255, 255, 255, 0.02) 100%
         ),
-        linear-gradient(
-          180deg,
-          rgba(12, 10, 10, 0.9) 0%,
-          rgba(10, 9, 10, 0.94) 100%
-        );
+        linear-gradient(180deg, rgba(12, 10, 10, 1) 0%, rgba(10, 9, 10, 1) 100%);
+
       box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 
       @include mx.light {
