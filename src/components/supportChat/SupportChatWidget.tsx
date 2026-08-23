@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import {
-  FiMessageCircle,
   FiSend,
   FiWifi,
   FiWifiOff,
@@ -25,8 +24,61 @@ const formatTime = (value: string) =>
     minute: "2-digit",
   }).format(new Date(value));
 
+const SupportChatIcon = ({ open }: { open: boolean }) => (
+  <svg
+    className={`support-chat-fab__icon ${open ? "is-open" : ""}`}
+    viewBox="0 0 32 32"
+    aria-hidden="true"
+  >
+    {/* Chat icon */}
+    <g className="support-chat-fab__icon-chat">
+      <path
+        d="M8 7.75h16a5 5 0 0 1 5 5v5.75a5 5 0 0 1-5 5H15l-5.75 3.75.85-3.75H8a5 5 0 0 1-5-5v-5.75a5 5 0 0 1 5-5Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.85"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M10.5 14h11M10.5 18h6.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.85"
+        strokeLinecap="round"
+      />
+      <circle
+        cx="24"
+        cy="11"
+        r="1.15"
+        fill="currentColor"
+      />
+    </g>
+
+    {/* Close icon */}
+    <g className="support-chat-fab__icon-close">
+      <path
+        d="M10.5 10.5 21.5 21.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M21.5 10.5 10.5 21.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </g>
+  </svg>
+);
+
 const SupportChatWidget = () => {
   const [open, setOpen] = useState(false);
+  const [rendered, setRendered] = useState(false);
+  const closeAnimationTimer = useRef<number | null>(null);
   const [conversation, setConversation] = useState<SupportConversation | null>(null);
   const [name, setName] = useState(getStored(NAME_KEY));
   const [message, setMessage] = useState("");
@@ -38,6 +90,33 @@ const SupportChatWidget = () => {
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimer = useRef<number | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  const toggleOpen = () => {
+    if (open) {
+      setOpen(false);
+      if (closeAnimationTimer.current) {
+        window.clearTimeout(closeAnimationTimer.current);
+      }
+      closeAnimationTimer.current = window.setTimeout(() => {
+        setRendered(false);
+        closeAnimationTimer.current = null;
+      }, 260);
+      return;
+    }
+
+    if (closeAnimationTimer.current) {
+      window.clearTimeout(closeAnimationTimer.current);
+      closeAnimationTimer.current = null;
+    }
+    setRendered(true);
+    requestAnimationFrame(() => setOpen(true));
+  };
+
+  useEffect(() => () => {
+    if (closeAnimationTimer.current) {
+      window.clearTimeout(closeAnimationTimer.current);
+    }
+  }, []);
 
   const closeSocket = useCallback(() => {
     if (reconnectTimer.current) {
@@ -230,20 +309,21 @@ const SupportChatWidget = () => {
         className={`support-chat-fab ${open ? "is-open" : ""}`}
         type="button"
         aria-label={open ? "بستن پشتیبانی" : "باز کردن پشتیبانی"}
-        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        onClick={toggleOpen}
       >
-        {open ? <FiX /> : <FiMessageCircle />}
+        <SupportChatIcon open={open} />
         {!open && conversation?.messages.length ? <span className="support-chat-fab__dot" /> : null}
       </button>
 
-      {open && (
-        <section className="support-chat" dir="rtl">
+      {rendered && (
+        <section className={`support-chat ${open ? "is-open" : "is-closing"}`} dir="rtl">
           <header className="support-chat__header">
             <div>
               <span className="support-chat__eyebrow">پشتیبانی هم‌نما</span>
               <h2>کنارتون هستیم</h2>
             </div>
-            <button type="button" onClick={() => setOpen(false)} aria-label="بستن">
+            <button type="button" onClick={toggleOpen} aria-label="بستن">
               <FiX />
             </button>
           </header>
