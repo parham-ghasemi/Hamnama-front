@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
-import { BsReplyFill } from "react-icons/bs";
+import { BsReplyFill, BsThreeDotsVertical } from "react-icons/bs";
 import { TbPencil } from "react-icons/tb";
 
 import type { RoomMessageResponse } from "../../../apiCalls/roomApi";
@@ -225,6 +225,17 @@ const ChatMessage = ({
     );
   };
 
+  const handleMoreAction = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+
+    const rect = event.currentTarget.getBoundingClientRect();
+
+    openContextMenu(
+      rect.left + rect.width / 2,
+      rect.bottom + 6,
+    );
+  };
+
   const handleReplyAction = () => {
     setContextMenu(null);
     onReply();
@@ -308,20 +319,35 @@ const ChatMessage = ({
             </span>
 
             <span className="room-page__chat-container__message-block__messages__message__meta">
-              <span className="room-page__chat-container__message-block__messages__message__time">
-                {new Date(
-                  message.created_at,
-                ).toLocaleTimeString("fa-IR", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </span>
+              <button
+                type="button"
+                className="room-page__chat-container__message-block__messages__message__more"
+                onClick={handleMoreAction}
+                onContextMenu={(event) => event.stopPropagation()}
+                aria-label="گزینه‌های پیام"
+                aria-haspopup="menu"
+                aria-expanded={!!contextMenu}
+                title="گزینه‌های پیام"
+              >
+                <BsThreeDotsVertical />
+              </button>
 
-              {message.edited && (
-                <span className="room-page__chat-container__message-block__messages__message__edited">
-                  ویرایش شد
+              <div className={clsx("flex gap-1", !isOwn && "flex-row-reverse")}>
+                {message.edited && (
+                  <span className="room-page__chat-container__message-block__messages__message__edited">
+                    <TbPencil size={12} />
+                  </span>
+                )}
+
+                <span className="room-page__chat-container__message-block__messages__message__time">
+                  {new Date(
+                    message.created_at,
+                  ).toLocaleTimeString("fa-IR", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </span>
-              )}
+              </div>
             </span>
           </div>
         </div>

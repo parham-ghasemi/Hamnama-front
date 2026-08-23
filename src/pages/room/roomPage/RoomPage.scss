@@ -736,7 +736,8 @@
           &__meta {
             display: flex;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: space-between;
+            flex-direction: row-reverse;
             gap: 6px;
             width: 100%;
           }
@@ -744,6 +745,42 @@
             font-size: 9px;
             font-weight: 600;
             opacity: 0.65;
+          }
+
+          &__more {
+            width: 20px;
+            height: 20px;
+            padding: 0;
+            flex: 0 0 auto;
+            display: inline-grid;
+            place-items: center;
+            border: 0;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            opacity: 0.7;
+            transform: translateX(-8px);
+            transition:
+              background 140ms ease,
+              color 140ms ease,
+              opacity 140ms ease;
+
+            svg {
+              font-size: 13px;
+            }
+
+            &:hover,
+            &:focus-visible {
+              outline: none;
+              opacity: 1;
+              color: var(--text-primary);
+              background: var(--msg-reply-bg);
+            }
+
+            &:active {
+              transform: scale(0.94);
+            }
           }
           &__edited {
             font-size: 8px;
@@ -769,6 +806,13 @@
         .room-page__chat-container__message-block__swipe-hint {
           left: auto;
           right: 4px;
+        }
+
+        .room-page__chat-container__message-block__messages__message__meta {
+          flex-direction: row;
+        }
+        .room-page__chat-container__message-block__messages__message__more {
+          transform: translateX(8px);
         }
 
         .room-page__chat-container__message-block__messages {
