@@ -25,6 +25,7 @@ import NotFound from "./components/notFound/NotFound";
 import { Toaster } from "./components/toast";
 import About from "./pages/about/About";
 import { AdminSupport } from "./pages/admin";
+import WebsiteAnnouncements from "./components/websiteAnnouncements/WebsiteAnnouncements";
 
 const queryClient = new QueryClient({});
 
@@ -37,6 +38,7 @@ function App() {
             <BrowserRouter>
               <ScrollToTop />
               <Toaster position="top-right" />
+              <WebsiteAnnouncements />
               <Routes>
                 <Route path="user" element={<UserDashboardLayout />}>
                   <Route index element={<Navigate to={"info"} replace />} />
