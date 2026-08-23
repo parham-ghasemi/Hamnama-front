@@ -1,3 +1,4 @@
+import { getAccessToken } from "../../../lib/authToken";
 import './RoomPage.scss'
 import './themse/Themes.scss'
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -1172,7 +1173,7 @@ const RoomPage = () => {
     // No realtime backend configured (e.g. local/preview): run in offline mode.
     if (!wsBaseUrl) return;
 
-    const token = localStorage.getItem("token") ?? undefined;
+    const token = getAccessToken() ?? undefined;
     const socket = new WebSocket(buildWsUrl(wsBaseUrl, roomId, token));
     socketRef.current = socket;
 

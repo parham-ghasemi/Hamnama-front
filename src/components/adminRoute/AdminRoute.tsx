@@ -10,17 +10,16 @@ interface AdminRouteProps {
 }
 
 const AdminRoute = ({ children }: AdminRouteProps) => {
-  const { isLoading, logout } = useAuth();
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const { isLoading, isAuthenticated, logout } = useAuth();
 
   const { isFetching, isError, error } = useQuery({
     queryKey: ['admin-access'],
     queryFn: () => adminApi.getDashboard(),
-    enabled: !isLoading && !!token,
+    enabled: !isLoading && isAuthenticated,
     retry: false,
   });
 
-  if (isLoading || (token && isFetching)) {
+  if (isLoading || (isAuthenticated && isFetching)) {
     return (
       <div className="admin-route__loading">
         <div className="admin-route__loading__spinner" />
@@ -29,7 +28,7 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
     );
   }
 
-  if (!token) {
+  if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
   }
 

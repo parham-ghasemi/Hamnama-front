@@ -1,4 +1,5 @@
 import api from "../lib/axiosConfig";
+import { getAccessToken } from "../lib/authToken";
 
 export interface SupportMessage {
   id: string;
@@ -43,7 +44,7 @@ export function getSupportWsUrl(
   if (role === "visitor") {
     params.set("visitor_id", visitorId || "");
   } else {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (token) params.set("access_token", token);
   }
   const path =

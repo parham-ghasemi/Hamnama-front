@@ -67,7 +67,7 @@ const Auth = () => {
       });
 
       // Save session token and redirect
-      await login(data.token);
+      await login(data.access_token);
 
       toast.success('با موفقیت وارد شدید');
       navigate('/');
@@ -100,7 +100,7 @@ const Auth = () => {
           code,
         });
 
-        await login(data.token);
+        await login(data.access_token);
         toast.success('با موفقیت وارد شدید');
         navigate('/');
       } else {
@@ -129,7 +129,7 @@ const Auth = () => {
       });
 
       // Save final session token and redirect
-      await login(data.token);
+      await login(data.access_token);
       toast.success('حساب کاربری با موفقیت ساخته شد');
       navigate('/');
     } catch (error) {

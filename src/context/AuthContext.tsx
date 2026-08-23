@@ -1,7 +1,11 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import api from '../lib/axiosConfig';
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import api from "../lib/axiosConfig";
+import {
+  clearAccessToken,
+  refreshAccessToken,
+  setAccessToken,
+} from "../lib/authToken";
 
-// Adjust these fields based on what your back-end returns for a user
 export interface User {
   id: string;
   username: string;
@@ -13,9 +17,9 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (token: string) => Promise<void>;
-  logout: () => void;
-  fetchUser: () => Promise<void>; // Add this!
+  login: (accessToken: string) => Promise<void>;
+  logout: () => Promise<void>;
+  fetchUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,10 +28,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch user data if a token exists on mount
+  const clearSession = () => {
+    clearAccessToken();
+    setUser(null);
+  };
+
+  const fetchUser = async () => {
+    try {
+      const { data } = await api.get<User>("/users/me");
+      setUser(data);
+    } catch (error) {
+      console.error("Failed to fetch user", error);
+      clearSession();
+    }
+  };
+
   useEffect(() => {
+    let cancelled = false;
+
     const initializeAuth = async () => {
-      const token = localStorage.getItem('token');
+      const token = await refreshAccessToken();
+
+      if (cancelled) return;
+
       if (token) {
         await fetchUser();
       } else {
@@ -35,32 +58,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
-    initializeAuth();
+    initializeAuth().finally(() => {
+      if (!cancelled) setIsLoading(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const fetchUser = async () => {
-    try {
-      const { data } = await api.get('/users/me');
-      setUser(data);
-    } catch (error) {
-      console.error('Failed to fetch user', error);
-      // If token is invalid/expired, clear it
-      logout();
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  useEffect(() => {
+    if (!user) return;
 
-  const login = async (token: string) => {
-    localStorage.setItem('token', token);
-    // Since your axios interceptor reads from localStorage directly,
-    // subsequent requests will automatically include the new token.
+    // Refresh the access JWT slightly before its five-minute lifetime expires.
+    const interval = window.setInterval(async () => {
+      const token = await refreshAccessToken();
+      if (!token) clearSession();
+    }, 4 * 60 * 1000);
+
+    return () => window.clearInterval(interval);
+  }, [user]);
+
+  const login = async (accessToken: string) => {
+    setAccessToken(accessToken);
     await fetchUser();
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
+  const logout = async () => {
+    try {
+      await api.post("/auth/logout");
+    } catch {
+      // The local session must still be cleared even if the network is unavailable.
+    } finally {
+      clearSession();
+    }
   };
 
   return (
@@ -71,7 +102,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isLoading,
         login,
         logout,
-        fetchUser
+        fetchUser,
       }}
     >
       {children}
@@ -79,11 +110,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Custom hook to use the Auth context easily
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
+

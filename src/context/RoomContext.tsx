@@ -1,4 +1,5 @@
 // contexts/RoomContext.tsx
+import { getAccessToken } from "../lib/authToken";
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 // Define the payload structures matching your Go backend
@@ -40,7 +41,10 @@ export const RoomProvider = ({ roomId, currentUserId, children }: { roomId: stri
 
   useEffect(() => {
     // Connect to your Go WebSocket endpoint
-    const socket = new WebSocket(`${import.meta.env.VITE_WS_URL}/rooms/${roomId}/ws?userId=${currentUserId}`);
+    const token = getAccessToken();
+    const query = new URLSearchParams({ userId: String(currentUserId) });
+    if (token) query.set("token", token);
+    const socket = new WebSocket(`${import.meta.env.VITE_WS_URL}/rooms/${roomId}/ws?${query.toString()}`);
     ws.current = socket;
 
     socket.onopen = () => console.log(`Connected to room ${roomId}`);
