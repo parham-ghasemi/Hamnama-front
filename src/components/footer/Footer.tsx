@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import './Footer.scss';
-import { PiFacebookLogoFill, PiInstagramLogoFill, PiPinterestLogoFill, PiTelegramLogoFill } from "react-icons/pi"
+import { PiInstagramLogoFill, PiTelegramLogoFill } from "react-icons/pi"
+import { SiGmail } from "react-icons/si";
+
 
 const Footer = () => {
   return (
@@ -35,10 +37,11 @@ const Footer = () => {
         <div className="footer__social">
           <p className="footer__section-title">مارا در شبکات اجتماعی دنبال کنید :</p>
           <div className="footer__social-links">
-            <PiInstagramLogoFill />
-            <PiTelegramLogoFill />
-            <PiFacebookLogoFill />
-            <PiPinterestLogoFill />
+
+            <PiInstagramLogoFill style={{ fill: "#bf3058" }} />
+            <PiTelegramLogoFill style={{ fill: "#2e84c7" }} />
+            <SiGmail style={{ fill: "#d04e2f" }} />
+            <img src='/bale.png' />
           </div>
         </div>
       </div>

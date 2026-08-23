@@ -113,8 +113,9 @@
       justify-content: center;
     }
 
-    > svg {
-      background-color: dark.$color-gray;
+    > svg,
+    > img {
+      background-color: color.adjust(dark.$color-dark-gray, $lightness: 8%);
       color: dark.$color-black;
       width: 42.5px;
       height: 42.5px;
