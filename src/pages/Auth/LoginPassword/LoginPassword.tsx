@@ -38,7 +38,7 @@ const LoginPassword = ({ setPassword, goOtp, isLoading = false }: LoginPasswordP
       </h1>
 
       <h2 className='login-password__subtitle'>
-        برای ورود در هم نما رمز عبور خود را وارد کنید.
+        برای ورود در هم‌نما رمز عبور خود را وارد کنید.
       </h2>
 
       <div className='login-password__input-wrapper'>

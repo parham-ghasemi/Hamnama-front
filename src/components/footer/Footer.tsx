@@ -44,7 +44,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-rights">
-        © 2026 هم نما . تمامی حقوق محفوظ است.
+        © 2026 هم‌نما . تمامی حقوق محفوظ است.
       </div>
     </div>
   )

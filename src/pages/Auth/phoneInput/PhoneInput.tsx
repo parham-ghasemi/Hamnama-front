@@ -50,7 +50,7 @@ const PhoneInput = ({ setPhoneNumber, isLoading = false }: PhoneInputProps) => {
       </h1>
 
       <h2 className='auth-phone-input__subtitle'>
-        برای ورود یا ثبت نام در هم نما شماره همراه خود را وارد کنید.
+        برای ورود یا ثبت نام در هم‌نما شماره همراه خود را وارد کنید.
       </h2>
 
       <input
