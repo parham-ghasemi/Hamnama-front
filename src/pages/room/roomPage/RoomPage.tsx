@@ -1751,33 +1751,170 @@ const RoomPage = () => {
   if (roomQuery.isLoading) {
     return (
       <div className="room-page room-page--loading" aria-live="polite">
-        <div className="room-page__loader">
-          <div className="room-page__loader__film" aria-hidden="true">
-            <svg viewBox="0 0 240 150" role="img">
-              <rect x="30" y="25" width="180" height="100" rx="18" className="frame" />
-              <g className="sprockets">
-                <rect x="10" y="35" width="14" height="22" rx="4" />
-                <rect x="10" y="68" width="14" height="22" rx="4" />
-                <rect x="10" y="101" width="14" height="14" rx="4" />
-                <rect x="216" y="35" width="14" height="22" rx="4" />
-                <rect x="216" y="68" width="14" height="22" rx="4" />
-                <rect x="216" y="101" width="14" height="14" rx="4" />
-              </g>
-              <g className="frames">
-                <rect x="54" y="43" width="38" height="25" rx="6" />
-                <rect x="101" y="43" width="38" height="25" rx="6" />
-                <rect x="148" y="43" width="38" height="25" rx="6" />
-                <rect x="54" y="76" width="38" height="25" rx="6" />
-                <rect x="101" y="76" width="38" height="25" rx="6" />
-                <rect x="148" y="76" width="38" height="25" rx="6" />
-              </g>
-              <path className="play" d="M112 42 L112 108 L163 75 Z" />
-            </svg>
-          </div>
-          <div className="room-page__loader__copy">
-            <TbPlayerPlayFilled aria-hidden="true" />
+        <div className="room-page__loading-grain" aria-hidden="true" />
+        <div className="room-page__loading-glow" aria-hidden="true" />
+
+        <div className="room-page__loading-card">
+          <div className="room-page__loading-card__beam" aria-hidden="true" />
+
+          <svg
+            className="room-page__loading-card__film"
+            viewBox="0 0 420 200"
+            role="img"
+            aria-label="در حال آماده‌سازی اتاق"
+            focusable="false"
+          >
+            <defs>
+              <linearGradient id="room-loader-strip" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--room-loader-strip-top)" />
+                <stop offset="100%" stopColor="var(--room-loader-strip-bottom)" />
+              </linearGradient>
+
+              <linearGradient id="room-loader-beam" x1="0.5" y1="0" x2="0.5" y2="1">
+                <stop
+                  offset="0%"
+                  stopColor="var(--send-btn-bg)"
+                  stopOpacity="0.45"
+                />
+                <stop
+                  offset="100%"
+                  stopColor="var(--send-btn-bg)"
+                  stopOpacity="0"
+                />
+              </linearGradient>
+
+              <clipPath id="room-loader-frame-clip">
+                <rect x="34" y="45" width="352" height="110" rx="10" />
+              </clipPath>
+            </defs>
+
+            {/* Moving projector light */}
+            <g
+              className="room-page__loading-card__beam"
+              clipPath="url(#room-loader-frame-clip)"
+            >
+              <polygon
+                points="110,-30 220,-30 430,250 -20,250"
+                fill="url(#room-loader-beam)"
+              />
+            </g>
+
+            {/* Film strip */}
+            <rect
+              x="18"
+              y="24"
+              width="384"
+              height="152"
+              rx="16"
+              fill="url(#room-loader-strip)"
+              stroke="var(--room-loader-edge)"
+              strokeWidth="1.5"
+            />
+
+            {/* Sprocket holes */}
+            <g
+              className="room-page__loading-card__sprockets"
+              fill="var(--room-loader-hole)"
+            >
+              {Array.from({ length: 9 }).map((_, index) => (
+                <rect
+                  key={`top-${index}`}
+                  x={36 + index * 42}
+                  y="31"
+                  width="20"
+                  height="11"
+                  rx="3.5"
+                  style={{ animationDelay: `${index * 80}ms` }}
+                />
+              ))}
+
+              {Array.from({ length: 9 }).map((_, index) => (
+                <rect
+                  key={`bottom-${index}`}
+                  x={36 + index * 42}
+                  y="158"
+                  width="20"
+                  height="11"
+                  rx="3.5"
+                  style={{ animationDelay: `${index * 80 + 40}ms` }}
+                />
+              ))}
+            </g>
+
+            {/* Frames */}
+            <g
+              className="room-page__loading-card__frames"
+              fill="var(--room-loader-frame)"
+              stroke="var(--room-loader-edge)"
+              strokeWidth="1.25"
+            >
+              <rect x="34" y="48" width="112" height="104" rx="9" />
+              <rect x="154" y="48" width="112" height="104" rx="9" />
+              <rect x="274" y="48" width="112" height="104" rx="9" />
+            </g>
+
+            {/* Left frame — camera/play mark */}
+            <g className="room-page__loading-card__scene-mark">
+              <path d="M68 77v50l39-25z" />
+            </g>
+
+            {/* Center — spinning reel */}
+            <g
+              className="room-page__loading-card__reel"
+              transform="translate(210 100)"
+            >
+              <circle
+                r="34"
+                fill="none"
+                stroke="var(--send-btn-bg)"
+                strokeWidth="8"
+              />
+
+              <circle
+                r="6.5"
+                fill="var(--send-btn-bg)"
+              />
+
+              {[0, 60, 120, 180, 240, 300].map((angle) => (
+                <circle
+                  key={angle}
+                  cx={Math.cos((angle * Math.PI) / 180) * 18}
+                  cy={Math.sin((angle * Math.PI) / 180) * 18}
+                  r="5"
+                  fill="var(--send-btn-bg)"
+                  opacity="0.72"
+                />
+              ))}
+            </g>
+
+            {/* Right frame — subtle progress scan */}
+            <g className="room-page__loading-card__scan">
+              <rect x="295" y="67" width="70" height="7" rx="3.5" />
+              <rect x="295" y="82" width="52" height="7" rx="3.5" />
+              <rect x="295" y="97" width="62" height="7" rx="3.5" />
+              <rect x="295" y="112" width="40" height="7" rx="3.5" />
+            </g>
+          </svg>
+
+          <div className="room-page__loading-card__copy">
+            <span className="room-page__loading-card__eyebrow">
+              NOW PLAYING
+            </span>
+
             <strong>در حال آماده‌سازی اتاق</strong>
-            <span>صحنه را آماده می‌کنیم؛ چند لحظه دیگر وارد چت می‌شوید.</span>
+
+            <span className="room-page__loading-card__hint">
+              صحنه را آماده می‌کنیم؛ چند لحظه دیگر وارد چت می‌شوید.
+            </span>
+
+            <span
+              className="room-page__loading-card__status"
+              aria-hidden="true"
+            >
+              <i />
+              <i />
+              <i />
+            </span>
           </div>
         </div>
       </div>

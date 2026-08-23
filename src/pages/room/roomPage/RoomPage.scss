@@ -5,114 +5,370 @@
 
 .room-page {
   &--loading {
+    position: relative;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
+    isolation: isolate;
     background:
-      radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--send-btn-bg) 14%, transparent), transparent 38%),
+      radial-gradient(
+        circle at 50% 42%,
+        color-mix(in srgb, var(--send-btn-bg) 10%, transparent),
+        transparent 34%
+      ),
       var(--bg-main);
   }
 
-  &__loader {
-    width: min(420px, calc(100vw - 40px));
+  &__loading-grain {
+    position: absolute;
+    inset: -50%;
+    pointer-events: none;
+    opacity: 0.035;
+    z-index: -1;
+    background-image:
+      radial-gradient(
+        circle at 20% 30%,
+        var(--text-primary) 0 0.6px,
+        transparent 0.8px
+      ),
+      radial-gradient(
+        circle at 70% 60%,
+        var(--text-primary) 0 0.5px,
+        transparent 0.8px
+      ),
+      radial-gradient(
+        circle at 40% 80%,
+        var(--text-primary) 0 0.45px,
+        transparent 0.75px
+      );
+    background-size:
+      7px 7px,
+      11px 11px,
+      13px 13px;
+    animation: room-loader-grain 0.8s steps(2) infinite;
+  }
+
+  &__loading-glow {
+    position: absolute;
+    width: min(560px, 90vw);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--send-btn-bg) 13%, transparent) 0%,
+      transparent 68%
+    );
+    filter: blur(18px);
+    opacity: 0.65;
+    animation: room-loader-glow 4.5s ease-in-out infinite;
+  }
+
+  &__loading-card {
+    position: relative;
+    width: min(560px, calc(100vw - 40px));
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 18px;
     text-align: center;
+    padding: 24px;
+    transform: translateY(10px);
+    opacity: 0;
+    animation: room-loader-enter 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+
+    &__beam {
+      position: absolute;
+      inset: 4% 10% 34%;
+      border-radius: 50%;
+      background: radial-gradient(
+        ellipse at center,
+        color-mix(in srgb, var(--send-btn-bg) 11%, transparent),
+        transparent 70%
+      );
+      filter: blur(30px);
+      opacity: 0.45;
+      pointer-events: none;
+      animation: room-loader-beam-glow 2.8s ease-in-out infinite;
+    }
 
     &__film {
-      width: min(260px, 72vw);
-      filter: drop-shadow(0 20px 36px color-mix(in srgb, var(--send-btn-bg) 18%, transparent));
+      position: relative;
+      width: min(420px, 84vw);
+      height: auto;
+      overflow: visible;
+      filter: drop-shadow(
+        0 26px 46px color-mix(in srgb, var(--send-btn-bg) 13%, transparent)
+      );
+    }
 
-      svg {
-        width: 100%;
-        height: auto;
-        overflow: visible;
+    &__sprockets {
+      rect {
+        animation: room-loader-sprocket 2.4s ease-in-out infinite;
+      }
+    }
+
+    &__frames {
+      rect {
+        transform-origin: center;
+        animation: room-loader-frame 2.6s ease-in-out infinite;
       }
 
-      .frame {
-        fill: color-mix(in srgb, var(--component-bg) 78%, transparent);
-        stroke: var(--border-subtle);
-        stroke-width: 2;
+      rect:nth-child(2) {
+        animation-delay: 160ms;
       }
 
-      .sprockets rect {
-        fill: var(--send-btn-bg);
-        opacity: 0.65;
-        animation: film-sprocket 900ms ease-in-out infinite alternate;
+      rect:nth-child(3) {
+        animation-delay: 320ms;
+      }
+    }
+
+    &__reel {
+      display: none;
+      // animation: room-loader-reel 7s linear infinite;
+    }
+
+    &__scene-mark {
+      fill: var(--send-btn-bg);
+      opacity: 0.65;
+      animation: room-loader-scene 2.4s ease-in-out infinite;
+    }
+
+    &__scan {
+      rect {
+        // fill: color-mix(
+        //   in srgb,
+        //   var(--send-btn-bg) 55%,
+        //   var(--room-loader-frame)
+        // );
+        fill: white;
+        transform-origin: left center;
+        animation: room-loader-scan 2.2s ease-in-out infinite;
       }
 
-      .sprockets rect:nth-child(even) {
+      rect:nth-child(2) {
         animation-delay: 120ms;
       }
 
-      .frames rect {
-        fill: color-mix(in srgb, var(--send-btn-bg) 12%, var(--msg-reply-bg));
-        stroke: color-mix(in srgb, var(--send-btn-bg) 35%, var(--border-subtle));
-        stroke-width: 1.5;
-        animation: film-frame 1200ms ease-in-out infinite;
+      rect:nth-child(3) {
+        animation-delay: 240ms;
       }
 
-      .frames rect:nth-child(2) { animation-delay: 120ms; }
-      .frames rect:nth-child(3) { animation-delay: 240ms; }
-      .frames rect:nth-child(4) { animation-delay: 360ms; }
-      .frames rect:nth-child(5) { animation-delay: 480ms; }
-      .frames rect:nth-child(6) { animation-delay: 600ms; }
-
-      .play {
-        fill: var(--send-btn-bg);
-        transform-origin: center;
-        animation: film-play 1200ms ease-in-out infinite;
+      rect:nth-child(4) {
+        animation-delay: 360ms;
       }
     }
 
     &__copy {
+      margin-top: -4px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
+    }
 
-      > svg {
-        font-size: 22px;
-        color: var(--send-btn-bg);
-        animation: film-icon 1100ms ease-in-out infinite;
+    &__eyebrow {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.24em;
+      color: color-mix(in srgb, var(--send-btn-bg) 78%, var(--text-muted));
+    }
+
+    &__copy strong {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    &__hint {
+      max-width: 320px;
+      font-size: 11px;
+      line-height: 1.9;
+      color: var(--text-muted);
+    }
+
+    &__status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 2px;
+
+      i {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--send-btn-bg);
+        opacity: 0.28;
+        animation: room-loader-dot 1.4s ease-in-out infinite;
       }
 
-      > strong {
-        font-size: 16px;
-        font-weight: 800;
-        color: var(--text-primary);
+      i:nth-child(2) {
+        animation-delay: 160ms;
       }
 
-      > span {
-        max-width: 300px;
-        font-size: 11px;
-        line-height: 1.8;
-        color: var(--text-muted);
+      i:nth-child(3) {
+        animation-delay: 320ms;
       }
     }
   }
 
-  @keyframes film-sprocket {
-    from { transform: translateX(-1px); opacity: 0.45; }
-    to { transform: translateX(1px); opacity: 0.95; }
+  @keyframes room-loader-enter {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(0.975);
+      filter: blur(5px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
   }
 
-  @keyframes film-frame {
-    0%, 100% { opacity: 0.45; transform: scale(0.985); }
-    50% { opacity: 1; transform: scale(1); }
+  @keyframes room-loader-glow {
+    0%,
+    100% {
+      transform: scale(0.92);
+      opacity: 0.42;
+    }
+
+    50% {
+      transform: scale(1.06);
+      opacity: 0.72;
+    }
   }
 
-  @keyframes film-play {
-    0%, 100% { opacity: 0.55; transform: scale(0.9); }
-    50% { opacity: 1; transform: scale(1.03); }
+  @keyframes room-loader-beam-glow {
+    0%,
+    100% {
+      transform: translateX(-8px) scaleX(0.94);
+      opacity: 0.3;
+    }
+
+    50% {
+      transform: translateX(10px) scaleX(1.04);
+      opacity: 0.52;
+    }
   }
 
-  @keyframes film-icon {
-    0%, 100% { transform: rotate(-7deg) translateY(0); }
-    50% { transform: rotate(7deg) translateY(-2px); }
+  @keyframes room-loader-sprocket {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+
+    50% {
+      opacity: 0.85;
+    }
   }
 
+  @keyframes room-loader-frame {
+    0%,
+    100% {
+      opacity: 0.52;
+      transform: scale(0.988);
+    }
+
+    50% {
+      opacity: 0.95;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes room-loader-reel {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes room-loader-scene {
+    0%,
+    100% {
+      opacity: 0.42;
+      transform: translateX(0);
+    }
+
+    50% {
+      opacity: 0.9;
+      transform: translateX(2px);
+    }
+  }
+
+  @keyframes room-loader-scan {
+    0%,
+    100% {
+      opacity: 0;
+      transform: scaleX(0.72);
+    }
+
+    60% {
+      opacity: 0;
+    }
+
+    50% {
+      opacity: 0.55;
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes room-loader-dot {
+    0%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.2;
+    }
+
+    50% {
+      transform: translateY(-2px);
+      opacity: 0.9;
+    }
+  }
+
+  @keyframes room-loader-grain {
+    0% {
+      transform: translate(0, 0);
+    }
+
+    25% {
+      transform: translate(-1%, 1%);
+    }
+
+    50% {
+      transform: translate(1%, -1%);
+    }
+
+    75% {
+      transform: translate(1%, 1%);
+    }
+
+    100% {
+      transform: translate(-1%, -1%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__loading-grain,
+    &__loading-glow,
+    &__loading-card,
+    &__loading-card__beam,
+    &__loading-card__sprockets rect,
+    &__loading-card__frames rect,
+    &__loading-card__reel,
+    &__loading-card__scene-mark,
+    &__loading-card__scan rect,
+    &__loading-card__status i {
+      animation: none !important;
+    }
+
+    &__loading-card {
+      opacity: 1;
+      transform: none;
+    }
+  }
 
   // --app-height is kept in sync with visualViewport so mobile keyboards
   // cannot leave a blank strip under the page.
@@ -184,13 +440,13 @@
       margin: 0 0 12px;
       padding: 11px 12px;
       border-radius: 14px;
-      border: 1px solid color-mix(in srgb, var(--send-btn-bg) 28%, var(--border-subtle));
-      background:
-        linear-gradient(
-          135deg,
-          color-mix(in srgb, var(--send-btn-bg) 12%, var(--component-bg)),
-          var(--component-bg)
-        );
+      border: 1px solid
+        color-mix(in srgb, var(--send-btn-bg) 28%, var(--border-subtle));
+      background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--send-btn-bg) 12%, var(--component-bg)),
+        var(--component-bg)
+      );
       box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
       backdrop-filter: blur(14px);
       animation: room-announcement-in 220ms ease-out;
@@ -204,7 +460,8 @@
         border-radius: 10px;
         color: var(--send-btn-bg);
         background: color-mix(in srgb, var(--send-btn-bg) 14%, transparent);
-        border: 1px solid color-mix(in srgb, var(--send-btn-bg) 24%, transparent);
+        border: 1px solid
+          color-mix(in srgb, var(--send-btn-bg) 24%, transparent);
         font-size: 16px;
       }
 
@@ -241,7 +498,9 @@
         color: var(--text-muted);
         background: transparent;
         cursor: pointer;
-        transition: background 160ms ease, color 160ms ease;
+        transition:
+          background 160ms ease,
+          color 160ms ease;
 
         &:hover {
           color: var(--text-primary);
@@ -1562,37 +1821,37 @@
       }
     }
 
-      // When the native mobile keyboard opens, dedicate the available viewport to chat
-      // instead of squeezing the player and controls into the reduced visual viewport.
-      &.keyboard-open {
-        gap: 0;
-        padding-top: 0;
-        padding-bottom: env(safe-area-inset-bottom, 0px);
+    // When the native mobile keyboard opens, dedicate the available viewport to chat
+    // instead of squeezing the player and controls into the reduced visual viewport.
+    &.keyboard-open {
+      gap: 0;
+      padding-top: 0;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
 
-        .room-page__main {
-          display: none;
+      .room-page__main {
+        display: none;
+      }
+
+      .room-page__chat-container {
+        flex: 1 1 auto;
+        min-height: 0;
+        height: 100%;
+        border-radius: 0;
+
+        &__head {
+          height: 42px;
         }
 
-        .room-page__chat-container {
-          flex: 1 1 auto;
-          min-height: 0;
-          height: 100%;
-          border-radius: 0;
+        &__chat-main {
+          padding-bottom: 6px;
+        }
 
-          &__head {
-            height: 42px;
-          }
-
-          &__chat-main {
-            padding-bottom: 6px;
-          }
-
-          &__foot {
-            padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
-            background: var(--chat-foot-bg);
-          }
+        &__foot {
+          padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+          background: var(--chat-foot-bg);
         }
       }
+    }
 
     // ---- 4. Sidebar as a proper right-side drawer ----
     &__side-bar {
