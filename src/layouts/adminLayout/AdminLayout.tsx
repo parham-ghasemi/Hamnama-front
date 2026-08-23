@@ -5,6 +5,7 @@ import {
   FiUsers,
   FiMonitor,
   FiSettings,
+  FiMessageCircle,
 } from 'react-icons/fi';
 import Header from '../../components/header/Header';
 import './AdminLayout.scss';
@@ -12,6 +13,7 @@ import './AdminLayout.scss';
 const navItems = [
   { to: '/admin/dashboard', label: 'داشبورد', icon: FiLayout },
   { to: '/admin/tickets', label: 'تیکت‌ها', icon: FiMessageSquare },
+  { to: '/admin/support', label: 'گفتگوهای پشتیبانی', icon: FiMessageCircle },
   { to: '/admin/users', label: 'کاربران', icon: FiUsers },
   { to: '/admin/rooms', label: 'اتاق‌ها', icon: FiMonitor },
   { to: '/admin/settings', label: 'تنظیمات', icon: FiSettings },

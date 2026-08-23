@@ -24,6 +24,7 @@ import Home from "./pages/home/Home";
 import NotFound from "./components/notFound/NotFound";
 import { Toaster } from "./components/toast";
 import About from "./pages/about/About";
+import { AdminSupport } from "./pages/admin";
 
 const queryClient = new QueryClient({});
 
@@ -62,6 +63,7 @@ function App() {
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="rooms" element={<AdminRooms />} />
                   <Route path="settings" element={<AdminSettings />} />
+                  <Route path="support" element={<AdminSupport />} />
                 </Route>
 
                 <Route path="join-room" element={<Join />} />
