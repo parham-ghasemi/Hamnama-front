@@ -429,7 +429,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       {currentSubtitleText && activeSubtitle >= 0 && (
         <div
           key={`${activeSubtitle}-${currentSubtitleText}`}
-          className="pointer-events-none absolute inset-x-4 bottom-[78px] z-15 flex justify-center px-4 sm:bottom-[88px]"
+          className="pointer-events-none absolute inset-x-4 bottom-19.5 z-15 flex justify-center px-4 sm:bottom-22"
           aria-live="polite"
         >
           <span className="max-w-[92%] whitespace-pre-line rounded-md bg-black/75 px-3 py-1.5 text-center text-base font-medium leading-relaxed text-white shadow-lg [text-shadow:0_2px_3px_rgba(0,0,0,0.9)] sm:text-lg md:text-xl">
