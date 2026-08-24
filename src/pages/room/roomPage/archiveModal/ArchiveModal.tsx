@@ -217,7 +217,11 @@ const FileCard: React.FC<{
         {file.season != null && <span className="archive-badge archive-badge--season">فصل {file.season}</span>}
         {file.episode != null && <span className="archive-badge archive-badge--season">قسمت {file.episode}</span>}
         {file.quality_tags && <span className="archive-badge archive-badge--qual">{file.quality_tags}</span>}
-        {file.version && <span className="archive-badge">{file.version}</span>}
+        {
+          file.version && <span className="archive-badge">
+            {file.version === "SoftSub" ? "زیرنویس(SoftSub)" : file.version === "HardSub" ? "زیرنویس(HardSub)" : file.version === "Dubbed" ? "دوبله" : file.version}
+          </span>
+        }
         {file.release && <span className="archive-badge">{file.release}</span>}
       </div>
 
