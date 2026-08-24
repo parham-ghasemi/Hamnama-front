@@ -303,8 +303,8 @@ const SupportChatWidget = () => {
     event.preventDefault();
     setError("");
 
-    if (!name.trim() || !initialMessage.trim()) {
-      setError("نام و پیام اول را وارد کنید.");
+    if (!initialMessage.trim()) {
+      setError("پیام اول را وارد کنید.");
       return;
     }
 
@@ -314,9 +314,11 @@ const SupportChatWidget = () => {
       const savedVisitorId =
         getStored(VISITOR_KEY) || crypto.randomUUID();
 
+      const visitorName = name.trim() || "ناشناس";
+
       const response = await supportApi.createConversation({
         visitor_id: savedVisitorId,
-        name: name.trim(),
+        name: visitorName,
         message: initialMessage.trim(),
       });
 
@@ -334,6 +336,7 @@ const SupportChatWidget = () => {
       );
 
       setConversation(response.data);
+      setName(visitorName);
       setInitialMessage("");
     } catch (err: any) {
       if (err?.response?.status === 429) {
@@ -453,11 +456,9 @@ const SupportChatWidget = () => {
                   نام
                   <input
                     value={name}
-                    onChange={(event) =>
-                      setName(event.target.value)
-                    }
+                    onChange={(event) => setName(event.target.value)}
                     maxLength={80}
-                    placeholder="مثلاً سارا"
+                    placeholder="پیش‌فرض: ناشناس"
                     autoComplete="name"
                   />
                 </label>
@@ -529,8 +530,8 @@ const SupportChatWidget = () => {
                       <div
                         key={item.id}
                         className={`support-chat__message ${item.sender_type === "admin"
-                            ? "is-admin"
-                            : "is-visitor"
+                          ? "is-admin"
+                          : "is-visitor"
                           }`}
                       >
                         <span className="support-chat__message__label">

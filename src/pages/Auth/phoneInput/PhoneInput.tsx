@@ -55,6 +55,7 @@ const PhoneInput = ({ setPhoneNumber, isLoading = false }: PhoneInputProps) => {
 
       <input
         placeholder='۰۹XXXXXXXXX'
+        autoComplete='tel'
         type='text'
         inputMode='numeric'
         dir='ltr'
