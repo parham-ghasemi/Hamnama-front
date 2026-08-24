@@ -65,6 +65,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [showControls, setShowControls] = useState(true);
   const [isHoveringVolume, setIsHoveringVolume] = useState(false);
   const [showShortcutHints, setShowShortcutHints] = useState(false);
+  const [subtitlesRequested, setSubtitlesRequested] = useState(false);
   const [activeSubtitle, setActiveSubtitle] = useState(-1);
   const lastTouchRef = useRef<{ time: number; x: number } | null>(null);
 
@@ -80,7 +81,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     bytesRead: mkvBytesRead,
     totalBytes: mkvTotalBytes,
     loadingElapsedMs: mkvLoadingElapsedMs,
-  } = useMkvSubtitles(videoRef, src);
+  } = useMkvSubtitles(videoRef, subtitlesRequested ? src : "");
 
   const playing = isPlaying ?? internalPlaying;
   const time = currentTime ?? internalCurrentTime;
@@ -205,6 +206,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   }, [activeSubtitle, mkvSubtitleCues, mkvSubtitleTracks, time, mkvCueRevision]);
 
   const toggleSubtitles = useCallback(() => {
+    // Do not touch the MKV subtitle parser until the user explicitly asks
+    // for subtitles. This keeps subtitle extraction off the critical path
+    // for normal video playback.
+    if (!subtitlesRequested) {
+      setSubtitlesRequested(true);
+      return;
+    }
+
     if (mkvSubtitleStatus === "loading") return;
 
     if (!mkvSubtitleTracks.length) {
@@ -217,7 +226,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
 
     setActiveSubtitle((current) => (current >= 0 ? -1 : 0));
-  }, [mkvSubtitleError, mkvSubtitleStatus, mkvSubtitleTracks.length, src]);
+  }, [mkvSubtitleError, mkvSubtitleStatus, mkvSubtitleTracks.length, src, subtitlesRequested]);
+
+  useEffect(() => {
+    // The first subtitle-button press starts extraction. Once extraction
+    // finishes successfully, enable the first available track automatically
+    // so the same click acts as the "enable subtitles" action.
+    if (subtitlesRequested && mkvSubtitleStatus !== "loading" && mkvSubtitleTracks.length > 0) {
+      setActiveSubtitle((current) => (current >= 0 ? current : 0));
+    }
+  }, [mkvSubtitleStatus, mkvSubtitleTracks.length, subtitlesRequested]);
 
   const toggleFullscreen = async () => {
     if (!containerRef.current) return;
@@ -301,8 +319,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   }, [currentTime]);
 
   useEffect(() => {
-    // A new source always starts with subtitles hidden. The extraction hook
-    // independently resets its cue list for the new MKV.
+    // A new source starts with subtitle extraction disabled. The next click
+    // on the captions button explicitly opts into MKV subtitle loading.
+    setSubtitlesRequested(false);
     setActiveSubtitle(-1);
   }, [src]);
 
@@ -668,29 +687,36 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 <button
                   type="button"
                   onClick={toggleSubtitles}
-                  disabled={mkvSubtitleStatus === "loading" || mkvSubtitleStatus === "no-subtitles" || mkvSubtitleStatus === "error"}
+                  disabled={
+                    subtitlesRequested &&
+                    (mkvSubtitleStatus === "loading" || mkvSubtitleStatus === "no-subtitles" || mkvSubtitleStatus === "error")
+                  }
                   title={
-                    mkvSubtitleStatus === "loading"
-                      ? mkvLoadingElapsedMs > 8000
-                        ? "Subtitles are still being extracted from the video…"
-                        : "Extracting subtitles…"
-                      : mkvSubtitleStatus === "no-subtitles"
-                        ? "No supported subtitles found in this MKV"
-                        : mkvSubtitleStatus === "error"
-                          ? mkvSubtitleError || "Couldn't load subtitles"
-                          : activeSubtitle >= 0
-                            ? "Hide subtitles"
-                            : "Show subtitles"
+                    !subtitlesRequested
+                      ? "Load subtitles"
+                      : mkvSubtitleStatus === "loading"
+                        ? mkvLoadingElapsedMs > 8000
+                          ? "Subtitles are still being extracted from the video…"
+                          : "Extracting subtitles…"
+                        : mkvSubtitleStatus === "no-subtitles"
+                          ? "No supported subtitles found in this MKV"
+                          : mkvSubtitleStatus === "error"
+                            ? mkvSubtitleError || "Couldn't load subtitles"
+                            : activeSubtitle >= 0
+                              ? "Hide subtitles"
+                              : "Show subtitles"
                   }
                   aria-label={
-                    mkvSubtitleStatus === "loading"
-                      ? "Loading subtitles"
-                      : activeSubtitle >= 0
-                        ? "Hide subtitles"
-                        : "Show subtitles"
+                    !subtitlesRequested
+                      ? "Load subtitles"
+                      : mkvSubtitleStatus === "loading"
+                        ? "Loading subtitles"
+                        : activeSubtitle >= 0
+                          ? "Hide subtitles"
+                          : "Show subtitles"
                   }
                   aria-pressed={activeSubtitle >= 0}
-                  aria-busy={mkvSubtitleStatus === "loading"}
+                  aria-busy={subtitlesRequested && mkvSubtitleStatus === "loading"}
                   className={`relative p-1.5 rounded-full transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${activeSubtitle >= 0
                     ? "bg-white/15 text-white"
                     : "text-gray-200 hover:bg-white/20 hover:text-white"
