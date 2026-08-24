@@ -1,4 +1,13 @@
-import { PiArchiveFill, PiChatsCircleFill, PiClockFill, PiDevicesFill, PiFilmReelFill, PiFilmStripBold, PiFolderOpenFill, PiHexagonFill } from 'react-icons/pi';
+import {
+  PiArchiveFill,
+  PiChatsCircleFill,
+  PiClockFill,
+  PiDevicesFill,
+  PiFilmReelFill,
+  PiFilmStripBold,
+  PiFolderOpenFill,
+  PiUserPlusFill,
+} from 'react-icons/pi';
 import './FeatureGrid.scss';
 import { BsMusicPlayerFill } from 'react-icons/bs';
 import Reveal from '../reveal/Reveal';
@@ -18,7 +27,8 @@ const FeatureGrid = () => {
     {
       icon: <BsMusicPlayerFill />,
       title: "رادیو موزیک",
-      desc: "پخش موزیک همزمان با دوستان"
+      desc: "پخش موزیک همزمان با دوستان",
+      comingSoon: true,
     },
     {
       icon: <PiChatsCircleFill />,
@@ -38,27 +48,29 @@ const FeatureGrid = () => {
     {
       icon: <PiArchiveFill />,
       title: "آرشیو فیلم",
-      desc: "ذخیره و دسترسی به فیلم های تماشا شده"
+      desc: "ذخیره و دسترسی به فیلم‌های تماشا شده"
     },
     {
-      icon: <PiHexagonFill />,
-      title: "اتاق های خصوصی",
-      desc: "لابی امن با رمز عبور"
+      icon: <PiUserPlusFill />,
+      title: "دعوت دوستان",
+      desc: "دعوت دوستان به تماشای گروهی"
     },
     {
       icon: <PiDevicesFill />,
       title: "موبایل و دسکتاپ",
       desc: "دسترسی از هر دستگاهی"
     },
-  ]
+  ];
 
   return (
     <div className="home-feature-grid">
-      {/* <div className="home-feature-grid__blob"></div> */}
       {
         gridItems.map((item, indx) => (
           <Reveal
-            className="home-feature-grid__item"
+            className={`home-feature-grid__item${item.comingSoon
+              ? ' home-feature-grid__item--coming-soon'
+              : ''
+              }`}
             key={`homefeature-grid-${indx}`}
             delay={(indx % 3) * 70}
           >
@@ -68,9 +80,17 @@ const FeatureGrid = () => {
             </div>
 
             <div className="home-feature-grid__item__left">
-              <p className="home-feature-grid__item__left__title">
-                {item.title}
-              </p>
+              <div className="home-feature-grid__item__left__title-row">
+                <p className="home-feature-grid__item__left__title">
+                  {item.title}
+                </p>
+
+                {item.comingSoon && (
+                  <span className="home-feature-grid__item__coming-soon">
+                    به‌زودی
+                  </span>
+                )}
+              </div>
 
               <p className="home-feature-grid__item__left__desc">
                 {item.desc}
@@ -80,7 +100,7 @@ const FeatureGrid = () => {
         ))
       }
     </div>
-  )
-}
+  );
+};
 
-export default FeatureGrid
+export default FeatureGrid;

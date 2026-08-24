@@ -1,4 +1,4 @@
-import { FaAndroid, FaLinux, FaWindows } from 'react-icons/fa';
+import { FaAndroid, FaApple, FaWindows } from 'react-icons/fa';
 import { PiHourglassMediumFill } from 'react-icons/pi';
 import './DownloadApp.scss';
 import Reveal from '../reveal/Reveal';
@@ -17,10 +17,10 @@ const platforms = [
     desc: 'تجربه‌ی کامل سینمای خانگی روی دسکتاپ',
   },
   {
-    key: 'linux',
-    icon: <FaLinux />,
-    title: 'لینوکس',
-    desc: 'سبک، سریع و مخصوص حرفه‌ای‌ها',
+    key: 'ios',
+    icon: <FaApple />,
+    title: 'آیفون',
+    desc: 'ساده، روان و همیشه همراهت',
   },
 ];
 
