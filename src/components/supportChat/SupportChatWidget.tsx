@@ -388,6 +388,20 @@ const SupportChatWidget = () => {
     setError("");
   };
 
+  const handleMessageKeyDown = (
+    event: React.KeyboardEvent<HTMLTextAreaElement>,
+  ) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+
+      if (!message.trim() || !conversation || conversation.status !== "open") {
+        return;
+      }
+
+      event.currentTarget.form?.requestSubmit();
+    }
+  };
+
   return (
     <>
       <button
@@ -565,9 +579,8 @@ const SupportChatWidget = () => {
                   >
                     <textarea
                       value={message}
-                      onChange={(event) =>
-                        setMessage(event.target.value)
-                      }
+                      onChange={(event) => setMessage(event.target.value)}
+                      onKeyDown={handleMessageKeyDown}
                       maxLength={2000}
                       rows={2}
                       placeholder="پیامتان را بنویسید…"
