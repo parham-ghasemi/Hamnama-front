@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import {
   Play,
   Pause,
@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useMkvSubtitles } from "../../../../hooks/useMKVSubtitles";
 
 export interface VideoPlayerProps {
   src: string;
@@ -66,6 +67,20 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [showShortcutHints, setShowShortcutHints] = useState(false);
   const [activeSubtitle, setActiveSubtitle] = useState(-1);
   const lastTouchRef = useRef<{ time: number; x: number } | null>(null);
+
+  // MKV subtitles are demuxed in the browser and rendered by React as an
+  // overlay. This avoids relying on the browser's opaque native TextTrack
+  // renderer, which is not reliable for embedded MKV subtitle streams.
+  const {
+    status: mkvSubtitleStatus,
+    error: mkvSubtitleError,
+    tracks: mkvSubtitleTracks,
+    cues: mkvSubtitleCues,
+    cueRevision: mkvCueRevision,
+    bytesRead: mkvBytesRead,
+    totalBytes: mkvTotalBytes,
+    loadingElapsedMs: mkvLoadingElapsedMs,
+  } = useMkvSubtitles(videoRef, src);
 
   const playing = isPlaying ?? internalPlaying;
   const time = currentTime ?? internalCurrentTime;
@@ -142,50 +157,67 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
   };
 
-  const getSubtitleTracks = useCallback(() => {
-    const video = videoRef.current;
-    if (!video) return [] as TextTrack[];
+  const currentSubtitleText = useMemo(() => {
+    if (activeSubtitle < 0) return null;
 
-    return Array.from(video.textTracks)
-  }, []);
+    const track = mkvSubtitleTracks[activeSubtitle];
+    if (!track || !mkvSubtitleCues.length) return null;
 
-  const syncSubtitleTracks = useCallback(() => {
-    const tracks = getSubtitleTracks();
-    const visibleIndex = tracks.findIndex((track) => track.mode === "showing");
-    setActiveSubtitle(visibleIndex);
-  }, [getSubtitleTracks]);
+    const videoTime = videoRef.current?.currentTime ?? time;
+
+    // Cues are emitted in MKV timeline order. Binary-search for the region
+    // around the current time, then check nearby overlapping cues for the
+    // selected track.
+    let lo = 0;
+    let hi = mkvSubtitleCues.length - 1;
+    let candidate = -1;
+
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      const cue = mkvSubtitleCues[mid];
+
+      if (cue.start <= videoTime) {
+        candidate = mid;
+        lo = mid + 1;
+      } else {
+        hi = mid - 1;
+      }
+    }
+
+    for (let i = candidate; i >= 0; i -= 1) {
+      const cue = mkvSubtitleCues[i];
+      if (cue.start > videoTime) continue;
+      if (videoTime - cue.start > 15) break;
+      if (cue.trackNumber === track.number && cue.end > videoTime) {
+        return cue.text;
+      }
+    }
+
+    for (let i = candidate + 1; i < mkvSubtitleCues.length; i += 1) {
+      const cue = mkvSubtitleCues[i];
+      if (cue.start > videoTime) break;
+      if (cue.trackNumber === track.number && cue.end > videoTime) {
+        return cue.text;
+      }
+    }
+
+    return null;
+  }, [activeSubtitle, mkvSubtitleCues, mkvSubtitleTracks, time, mkvCueRevision]);
 
   const toggleSubtitles = useCallback(() => {
-    const tracks = getSubtitleTracks();
+    if (mkvSubtitleStatus === "loading") return;
 
-    if (!tracks.length) {
-      // Some MKV demuxers expose embedded captions slightly after the media
-      // metadata is ready, so give the element one more chance to populate
-      // textTracks before treating the click as unavailable.
-      window.setTimeout(() => {
-        const delayedTracks = getSubtitleTracks();
-        if (!delayedTracks.length) {
-          console.warn("No browser text tracks are exposed by this media:", videoRef.current?.currentSrc || src);
-          return;
-        }
-
-        delayedTracks.forEach((track, index) => {
-          track.mode = index === 0 ? "showing" : "disabled";
-        });
-        setActiveSubtitle(0);
-      }, 120);
+    if (!mkvSubtitleTracks.length) {
+      console.warn("[mkv-subtitles] no parsed subtitle tracks", {
+        status: mkvSubtitleStatus,
+        error: mkvSubtitleError,
+        src,
+      });
       return;
     }
 
-    const visibleIndex = tracks.findIndex((track) => track.mode === "showing");
-    const nextIndex = visibleIndex >= 0 ? -1 : 0;
-
-    tracks.forEach((track, index) => {
-      track.mode = index === nextIndex ? "showing" : "disabled";
-    });
-
-    setActiveSubtitle(nextIndex);
-  }, [getSubtitleTracks, src]);
+    setActiveSubtitle((current) => (current >= 0 ? -1 : 0));
+  }, [mkvSubtitleError, mkvSubtitleStatus, mkvSubtitleTracks.length, src]);
 
   const toggleFullscreen = async () => {
     if (!containerRef.current) return;
@@ -269,28 +301,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   }, [currentTime]);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
+    // A new source always starts with subtitles hidden. The extraction hook
+    // independently resets its cue list for the new MKV.
     setActiveSubtitle(-1);
-    syncSubtitleTracks();
-
-    const textTracks = video.textTracks;
-    textTracks.addEventListener("addtrack", syncSubtitleTracks);
-    textTracks.addEventListener("removetrack", syncSubtitleTracks);
-    textTracks.addEventListener("change", syncSubtitleTracks);
-
-    const rescans = [120, 500, 1200].map((delay) =>
-      window.setTimeout(syncSubtitleTracks, delay),
-    );
-
-    return () => {
-      textTracks.removeEventListener("addtrack", syncSubtitleTracks);
-      textTracks.removeEventListener("removetrack", syncSubtitleTracks);
-      textTracks.removeEventListener("change", syncSubtitleTracks);
-      rescans.forEach((id) => window.clearTimeout(id));
-    };
-  }, [src, syncSubtitleTracks]);
+  }, [src]);
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -401,7 +415,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           onLocalTimeUpdate?.(t);
         }}
         onLoadedMetadata={() => {
-          syncSubtitleTracks();
           if (videoRef.current) {
             setDuration(videoRef.current.duration);
             if (typeof currentTime === "number") {
@@ -412,6 +425,72 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         onEnded={() => setInternalPlaying(false)}
         className="w-full h-full object-contain cursor-pointer focus:outline-none"
       />
+
+      {currentSubtitleText && activeSubtitle >= 0 && (
+        <div
+          key={`${activeSubtitle}-${currentSubtitleText}`}
+          className="pointer-events-none absolute inset-x-4 bottom-[78px] z-15 flex justify-center px-4 sm:bottom-[88px]"
+          aria-live="polite"
+        >
+          <span className="max-w-[92%] whitespace-pre-line rounded-md bg-black/75 px-3 py-1.5 text-center text-base font-medium leading-relaxed text-white shadow-lg [text-shadow:0_2px_3px_rgba(0,0,0,0.9)] sm:text-lg md:text-xl">
+            {currentSubtitleText}
+          </span>
+        </div>
+      )}
+
+      <AnimatePresence>
+        {mkvSubtitleStatus === "loading" && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            className="absolute bottom-20 left-1/2 z-30 w-[min(420px,calc(100%-2rem))] -translate-x-1/2 rounded-xl border border-white/10 bg-black/75 px-4 py-3 text-center text-sm text-white shadow-2xl backdrop-blur-md"
+          >
+            <div className="flex items-center justify-center gap-2 font-medium">
+              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-yellow-400" />
+              {mkvLoadingElapsedMs > 8000 ? "Still extracting subtitles…" : "Loading subtitles…"}
+            </div>
+            <div className="mt-1 text-xs text-white/65">
+              {mkvTotalBytes && mkvTotalBytes > 0
+                ? `${Math.min(100, Math.round((mkvBytesRead / mkvTotalBytes) * 100))}% of the video read`
+                : mkvLoadingElapsedMs > 8000
+                  ? "Large MKV files can take a while because the subtitles are embedded in the video."
+                  : "The player is reading the MKV to find its embedded subtitle track."}
+            </div>
+            {mkvTotalBytes && mkvTotalBytes > 0 && (
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/15">
+                <div
+                  className="h-full rounded-full bg-white transition-[width] duration-300"
+                  style={{ width: `${Math.min(100, Math.round((mkvBytesRead / mkvTotalBytes) * 100))}%` }}
+                />
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {mkvSubtitleStatus === "error" && mkvSubtitleError && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            className="absolute bottom-20 left-1/2 z-30 w-[min(460px,calc(100%-2rem))] -translate-x-1/2 rounded-xl border border-red-400/20 bg-black/80 px-4 py-3 text-center text-sm text-white shadow-2xl backdrop-blur-md"
+          >
+            <div className="font-medium text-red-300">Couldn’t load subtitles</div>
+            <div className="mt-1 text-xs text-white/65">{mkvSubtitleError}</div>
+          </motion.div>
+        )}
+
+        {mkvSubtitleStatus === "no-subtitles" && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            className="absolute bottom-20 left-1/2 z-30 -translate-x-1/2 rounded-xl border border-white/10 bg-black/75 px-4 py-2.5 text-center text-xs text-white/80 shadow-2xl backdrop-blur-md"
+          >
+            No supported embedded subtitles were found in this video.
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {!playing && (
@@ -589,15 +668,38 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 <button
                   type="button"
                   onClick={toggleSubtitles}
-                  title={activeSubtitle >= 0 ? "Hide subtitles" : "Show subtitles"}
-                  aria-label={activeSubtitle >= 0 ? "Hide subtitles" : "Show subtitles"}
+                  disabled={mkvSubtitleStatus === "loading" || mkvSubtitleStatus === "no-subtitles" || mkvSubtitleStatus === "error"}
+                  title={
+                    mkvSubtitleStatus === "loading"
+                      ? mkvLoadingElapsedMs > 8000
+                        ? "Subtitles are still being extracted from the video…"
+                        : "Extracting subtitles…"
+                      : mkvSubtitleStatus === "no-subtitles"
+                        ? "No supported subtitles found in this MKV"
+                        : mkvSubtitleStatus === "error"
+                          ? mkvSubtitleError || "Couldn't load subtitles"
+                          : activeSubtitle >= 0
+                            ? "Hide subtitles"
+                            : "Show subtitles"
+                  }
+                  aria-label={
+                    mkvSubtitleStatus === "loading"
+                      ? "Loading subtitles"
+                      : activeSubtitle >= 0
+                        ? "Hide subtitles"
+                        : "Show subtitles"
+                  }
                   aria-pressed={activeSubtitle >= 0}
-                  className={`p-1.5 rounded-full hover:bg-white/20 transition-colors ${activeSubtitle >= 0
+                  aria-busy={mkvSubtitleStatus === "loading"}
+                  className={`relative p-1.5 rounded-full transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${activeSubtitle >= 0
                     ? "bg-white/15 text-white"
-                    : "text-gray-200 hover:text-white"
-                    }`}
+                    : "text-gray-200 hover:bg-white/20 hover:text-white"
+                    } ${mkvSubtitleStatus === "loading" ? "animate-pulse" : ""}`}
                 >
                   <Captions className="w-4 h-4" />
+                  {mkvSubtitleStatus === "loading" && (
+                    <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-yellow-400 animate-ping" />
+                  )}
                 </button>
 
                 <button
