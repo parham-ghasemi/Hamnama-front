@@ -24,6 +24,14 @@ img {
   user-select: none; /* Standard syntax */
 }
 
+input,
+textarea,
+select {
+  @media (max-width: 500px) {
+    font-size: 16px !important;
+  }
+}
+
 html.theme-transitioning {
   &,
   * {
