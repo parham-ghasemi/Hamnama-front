@@ -323,8 +323,10 @@ const RoomPage = () => {
     const newParticles: ParticleData[] = Array.from({ length: 10 }).map(() => ({
       id: reactionParticleIdRef.current++,
       emoji,
-      x: startX,
-      y: startY,
+      // small random offset around the origin so the burst reads as an
+      // organic cluster instead of ten particles stacked on one pixel
+      x: startX + (Math.random() - 0.5) * 18,
+      y: startY + (Math.random() - 0.5) * 18,
     }));
 
     setParticles((prev) => [...prev, ...newParticles]);
@@ -2189,18 +2191,44 @@ const RoomPage = () => {
             />
           ) : (
             <div className="room-page__main__player__empty">
-              <span className="room-page__main__player__empty__icon">
-                <TbMovieOff />
-              </span>
-              <strong>هنوز چیزی برای پخش انتخاب نشده</strong>
-              <p>با زدن «انتخاب فیلم» یک عنوان از آرشیو انتخاب کنید یا لینک مستقیم ویدیو را وارد کنید.</p>
-              <div className="mt-4 max-w-xl rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs leading-6 text-gray-300">
-                <strong className="mr-1 text-white">راهنمای کنترل:</strong>
-                <span>J / L = عقب یا جلو ۱۰ ثانیه · K / Space = پخش یا توقف · ← / → = عقب یا جلو ۵ ثانیه · F = تمام‌صفحه · موبایل: دو ضربه روی نیمه چپ یا راست = عقب/جلو ۱۰ ثانیه</span>
+              <div className="room-page__main__player__empty__ambience" aria-hidden="true">
+                <span className="room-page__main__player__empty__ambience__glow room-page__main__player__empty__ambience__glow--a" />
+                <span className="room-page__main__player__empty__ambience__glow room-page__main__player__empty__ambience__glow--b" />
+                <span className="room-page__main__player__empty__ambience__grid" />
+                <span className="room-page__main__player__empty__ambience__spark room-page__main__player__empty__ambience__spark--1" />
+                <span className="room-page__main__player__empty__ambience__spark room-page__main__player__empty__ambience__spark--2" />
+                <span className="room-page__main__player__empty__ambience__spark room-page__main__player__empty__ambience__spark--3" />
               </div>
-              <button type="button" onClick={() => setMediaTypeModalOpen(true)}>
-                انتخاب منبع پخش
-              </button>
+
+              <div className="room-page__main__player__empty__content">
+                <span className="room-page__main__player__empty__icon">
+                  <span className="room-page__main__player__empty__icon__ring" />
+                  <TbMovieOff />
+                </span>
+                <strong>هنوز چیزی برای پخش انتخاب نشده</strong>
+                <p>با زدن «انتخاب فیلم» یک عنوان از آرشیو انتخاب کنید یا لینک مستقیم ویدیو را وارد کنید.</p>
+                <div className="room-page__main__player__empty__hint">
+                  <strong>راهنمای کنترل:</strong>
+                  <p>
+                    J / L = عقب یا جلو ۱۰ ثانیه
+                  </p>
+                  <p>
+                    K / Space = پخش یا توقف
+                  </p>
+                  <p>
+                    ← / → = عقب یا جلو ۵ ثانیه
+                  </p>
+                  <p>
+                    F = تمام‌صفحه
+                  </p>
+                  <p>
+                    موبایل: دو ضربه روی نیمه چپ یا راست = عقب/جلو ۱۰ ثانیه
+                  </p>
+                </div>
+                <button type="button" onClick={() => setMediaTypeModalOpen(true)}>
+                  انتخاب منبع پخش
+                </button>
+              </div>
             </div>
           )}
         </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import { TbCheck, TbCopy, TbLink, TbShare3, TbUsers, TbX } from "react-icons/tb";
+import { TbCheck, TbCopy, TbLink, TbShare3, TbX } from "react-icons/tb";
 import "./InviteModal.scss";
 
 interface InviteModalProps {
@@ -30,13 +30,6 @@ const InviteModal: React.FC<InviteModalProps> = ({ isOpen, roomCode, copied, onC
       </header>
 
       <div className="invite-modal__body">
-        <div className="invite-modal__intro">
-          <span className="invite-modal__intro-icon"><TbUsers /></span>
-          <div>
-            <strong>کد اتاق آماده است</strong>
-            <p>این کد را برای افراد موردنظرتان بفرستید تا مستقیم به همین اتاق ملحق شوند.</p>
-          </div>
-        </div>
 
         <section className="invite-modal__code-card" aria-label="کد اتاق">
           <div className="invite-modal__code-label"><TbLink /> کد دعوت</div>
