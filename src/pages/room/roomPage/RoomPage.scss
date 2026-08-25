@@ -776,10 +776,11 @@
               opacity: 1;
               color: var(--text-primary);
               background: var(--msg-reply-bg);
+              transform: translate(-8px, -1px);
             }
 
             &:active {
-              transform: scale(0.94);
+              transform: scale(0.94) translateX(-8px);
             }
           }
           &__edited {
@@ -813,6 +814,9 @@
         }
         .room-page__chat-container__message-block__messages__message__more {
           transform: translateX(8px);
+          &:hover {
+            transform: translate(8px, -1px);
+          }
         }
 
         .room-page__chat-container__message-block__messages {
