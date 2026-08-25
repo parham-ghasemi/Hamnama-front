@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMkvSubtitles } from "../../../../hooks/useMKVSubtitles";
+import type { SubtitleSettings } from "../settingsModal/SettingsModal";
 
 export interface VideoPlayerProps {
   src: string;
@@ -34,6 +35,7 @@ export interface VideoPlayerProps {
     quality?: string;
   } | null;
   onNextEpisodeRequest?: () => void;
+  subtitleSettings?: SubtitleSettings;
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -50,6 +52,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   onLocalTimeUpdate,
   nextEpisode,
   onNextEpisodeRequest,
+  subtitleSettings = { fontSize: 20, opacity: 100, backgroundOpacity: 72, fontWeight: 500, position: "low" },
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -446,44 +449,40 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       />
 
       {currentSubtitleText && activeSubtitle >= 0 && (
-        <div
+        <motion.div
           key={`${activeSubtitle}-${currentSubtitleText}`}
-          className="pointer-events-none absolute inset-x-4 bottom-19.5 z-15 flex justify-center px-4 sm:bottom-22"
+          initial={{ opacity: 0, y: subtitleSettings.position === "middle" ? 4 : 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.18 }}
+          className={`pointer-events-none absolute inset-x-4 z-15 flex justify-center px-4 ${subtitleSettings.position === "middle" ? "top-1/2 -translate-y-1/2" : "bottom-19.5 sm:bottom-22"}`}
           aria-live="polite"
         >
-          <span className="max-w-[92%] whitespace-pre-line rounded-md bg-black/75 px-3 py-1.5 text-center text-base font-medium leading-relaxed text-white shadow-lg [text-shadow:0_2px_3px_rgba(0,0,0,0.9)] sm:text-lg md:text-xl">
+          <span
+            className="max-w-[92%] whitespace-pre-line rounded-md px-3 py-1.5 text-center leading-relaxed text-white shadow-lg [text-shadow:0_2px_3px_rgba(0,0,0,0.9)]"
+            style={{
+              fontSize: `${subtitleSettings.fontSize}px`,
+              fontWeight: subtitleSettings.fontWeight,
+              opacity: subtitleSettings.opacity / 100,
+              background: `rgba(0, 0, 0, ${subtitleSettings.backgroundOpacity / 100})`,
+            }}
+          >
             {currentSubtitleText}
           </span>
-        </div>
+        </motion.div>
       )}
 
       <AnimatePresence>
         {mkvSubtitleStatus === "loading" && (
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            className="absolute bottom-20 left-1/2 z-30 w-[min(420px,calc(100%-2rem))] -translate-x-1/2 rounded-xl border border-white/10 bg-black/75 px-4 py-3 text-center text-sm text-white shadow-2xl backdrop-blur-md"
+            exit={{ opacity: 0, y: 6 }}
+            className="absolute bottom-20 left-1/2 z-30 -translate-x-1/2 rounded-full border border-white/10 bg-black/45 px-3 py-1.5 text-xs text-white/80 shadow-xl backdrop-blur-md"
           >
-            <div className="flex items-center justify-center gap-2 font-medium">
-              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-yellow-400" />
-              {mkvLoadingElapsedMs > 8000 ? "Still extracting subtitles…" : "Loading subtitles…"}
-            </div>
-            <div className="mt-1 text-xs text-white/65">
-              {mkvTotalBytes && mkvTotalBytes > 0
-                ? `${Math.min(100, Math.round((mkvBytesRead / mkvTotalBytes) * 100))}% of the video read`
-                : mkvLoadingElapsedMs > 8000
-                  ? "Large MKV files can take a while because the subtitles are embedded in the video."
-                  : "The player is reading the MKV to find its embedded subtitle track."}
-            </div>
-            {mkvTotalBytes && mkvTotalBytes > 0 && (
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/15">
-                <div
-                  className="h-full rounded-full bg-white transition-[width] duration-300"
-                  style={{ width: `${Math.min(100, Math.round((mkvBytesRead / mkvTotalBytes) * 100))}%` }}
-                />
-              </div>
-            )}
+            <span className="mr-2 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#d04e2f] align-middle" />
+            {mkvTotalBytes && mkvTotalBytes > 0
+              ? `در حال آماده‌سازی زیرنویس · ${Math.min(100, Math.round((mkvBytesRead / mkvTotalBytes) * 100))}%`
+              : mkvLoadingElapsedMs > 8000 ? "در حال آماده‌سازی زیرنویس…" : "در حال خواندن زیرنویس…"}
           </motion.div>
         )}
 

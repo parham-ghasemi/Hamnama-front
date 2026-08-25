@@ -1401,59 +1401,71 @@
         justify-content: center;
         text-align: center;
         gap: 12px;
-        padding: 24px;
+        padding: 28px;
         background:
-          radial-gradient(
-            circle at 50% 20%,
-            color-mix(in srgb, var(--component-bg) 80%, transparent),
-            transparent 65%
-          ),
+          linear-gradient(180deg, color-mix(in srgb, var(--component-bg) 40%, transparent), transparent 58%),
           var(--bg-main);
 
+        &::before {
+          content: "";
+          width: min(300px, 60%);
+          height: 1px;
+          margin-bottom: 4px;
+          background: linear-gradient(90deg, transparent, var(--border-subtle), transparent);
+        }
+
         &__icon {
-          width: 78px;
-          height: 78px;
-          border-radius: 26px;
+          width: 64px;
+          height: 64px;
+          border-radius: 20px;
           @include mx.flex-center;
-          font-size: 38px;
+          font-size: 30px;
           color: var(--text-muted);
-          background: var(--component-bg);
+          background: color-mix(in srgb, var(--component-bg) 85%, transparent);
           border: 1px solid var(--border-subtle);
+          box-shadow: 0 12px 28px rgba(0,0,0,.12);
         }
 
         > strong {
-          font-size: 20px;
-          font-weight: 800;
+          font-size: 18px;
+          font-weight: 850;
           color: var(--text-primary);
         }
 
         > p {
-          max-width: 380px;
-          font-size: 13.5px;
-          line-height: 1.8;
+          max-width: 420px;
+          margin: 0;
+          font-size: 12.5px;
+          line-height: 1.9;
           color: var(--text-muted);
         }
 
+        > div {
+          max-width: 620px;
+          margin-top: 2px;
+          padding: 10px 14px;
+          border: 1px solid var(--border-subtle);
+          border-radius: 12px;
+          background: rgba(255,255,255,.018);
+          color: var(--text-muted);
+          font-size: 12px !important;
+          line-height: 1.8;
+        }
+
         > button {
-          margin-top: 4px;
-          padding: 11px 22px;
-          border-radius: 14px;
-          font-size: 14px;
-          font-weight: 800;
+          margin-top: 2px;
+          padding: 10px 18px;
+          border-radius: 12px;
+          font-size: 13px;
+          font-weight: 850;
           cursor: pointer;
           color: var(--text-primary);
           background: var(--btn-submit-bg);
           border: 1px solid var(--border-subtle);
-          transition:
-            opacity 160ms ease,
-            transform 160ms ease;
+          transition: opacity 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 
-          &:hover {
-            opacity: 0.9;
-          }
-          &:active {
-            transform: scale(0.97);
-          }
+          &:hover { opacity: .94; box-shadow: 0 8px 20px rgba(0,0,0,.14); }
+          &:active { transform: scale(.98); }
         }
       }
     }
@@ -2057,179 +2069,6 @@
   }
 }
 
-// INVITE MODAL
-
-.room-page__invite-modal {
-  width: 550px; /* Smaller width since it only contains text and a code block */
-  max-width: 95%;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  border-radius: 18px;
-  background-color: var(--modal-bg);
-  opacity: 0;
-  transition: opacity ease 200ms;
-  overflow: hidden;
-  margin: 0 auto;
-
-  @include mx.max-w(768px) {
-    border-radius: 18px;
-  }
-
-  &.open {
-    opacity: 1;
-  }
-
-  &__head {
-    width: 100%;
-    height: 120px;
-    flex-shrink: 0;
-    background-color: var(--modal-head-bg);
-    color: var(--text-primary);
-    @include mx.flex-center;
-    gap: 12px;
-    margin: 0 auto;
-
-    @include mx.max-w(768px) {
-      height: 100px;
-      gap: 10px;
-    }
-
-    @include mx.max-w(480px) {
-      height: 80px;
-      gap: 8px;
-    }
-
-    > span {
-      font-size: 28px;
-      font-weight: 800;
-
-      @include mx.max-w(768px) {
-        font-size: 24px;
-      }
-
-      @include mx.max-w(480px) {
-        font-size: 20px;
-      }
-    }
-
-    > svg {
-      font-size: 42px;
-
-      @include mx.max-w(768px) {
-        font-size: 34px;
-      }
-
-      @include mx.max-w(480px) {
-        font-size: 28px;
-      }
-    }
-  }
-
-  &__body {
-    padding: 50px 60px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
-    background-color: var(--modal-body-bg);
-    color: var(--text-primary);
-
-    @include mx.max-w(768px) {
-      padding: 40px 30px;
-      gap: 25px;
-    }
-
-    @include mx.max-w(480px) {
-      padding: 30px 20px;
-      gap: 20px;
-    }
-
-    > p {
-      font-size: 18px;
-      font-weight: 500;
-      color: var(--text-muted);
-      text-align: center;
-
-      @include mx.max-w(480px) {
-        font-size: 15px;
-      }
-    }
-
-    &__code {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background-color: var(
-        --user-card-bg
-      ); /* Mirrors the style of user cards */
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: 10px 10px 10px 25px; /* Creates space around the inner button */
-      gap: 15px;
-
-      @include mx.max-w(480px) {
-        flex-direction: column;
-        padding: 20px;
-        border-radius: 14px;
-      }
-
-      > span {
-        font-size: 26px;
-        font-weight: 700;
-        letter-spacing: 3px;
-        color: var(--modal-text);
-        user-select: all; /* Allows users to double-click and easily select the whole code */
-
-        @include mx.max-w(480px) {
-          font-size: 22px;
-          letter-spacing: 2px;
-        }
-      }
-
-      > button {
-        background: var(--btn-submit-bg);
-        color: var(--text-primary);
-        border: none;
-        border-radius: 10px;
-        padding: 14px 35px;
-        font-size: 16px;
-        font-weight: 800;
-        cursor: pointer;
-        transition:
-          opacity 200ms ease,
-          transform 100ms ease;
-
-        &:hover {
-          opacity: 0.9;
-        }
-
-        &:active {
-          transform: scale(0.96); /* Subtle click effect */
-        }
-
-        @include mx.max-w(480px) {
-          width: 100%;
-          padding: 12px;
-          font-size: 15px;
-        }
-      }
-    }
-  }
-}
-
-.room-exit-primary {
-  background-color: dark.$color-red !important;
-  transition: opacity 200ms ease !important;
-  &:hover {
-    opacity: 0.8;
-  }
-  @include mx.light {
-    background-color: light.$color-red !important;
-  }
-}
-
 /* Voice chat join action */
 .room-page__side-bar__voice-join {
   display: flex;
@@ -2296,3 +2135,43 @@
     transform: translateY(0) scale(1);
   }
 }
+
+/* ------------------------------------------------------------------
+ * Room polish layer: subtle motion and atmosphere shared by the page.
+ * Keeps interactions calm while giving the room a more intentional,
+ * premium feel without moving layout-critical elements.
+ * ------------------------------------------------------------------ */
+.room-page {
+  .room-page__main__top,
+  .room-page__main__player,
+  .room-page__chat-container,
+  .room-page__side-bar {
+    transition: border-color 180ms ease, box-shadow 220ms ease, background 220ms ease;
+  }
+
+  .room-page__main__player {
+    box-shadow: 0 20px 55px rgba(0,0,0,.13), inset 0 1px 0 rgba(255,255,255,.025);
+  }
+
+  .room-page__chat-container__head,
+  .room-page__chat-container__foot {
+    transition: background 280ms ease, border-color 280ms ease;
+  }
+
+  .room-page__main__top__choose,
+  .room-page__main__top__submit,
+  .room-page__side-bar button,
+  .room-page__chat-container button {
+    transition: transform 180ms mx.$ease-out-soft, box-shadow 220ms ease, background 220ms ease, border-color 220ms ease;
+  }
+
+  .room-page__main__top__choose:hover,
+  .room-page__main__top__submit:hover:not(:disabled),
+  .room-page__side-bar button:hover,
+  .room-page__chat-container button:hover {
+    transform: translateY(-1px);
+  }
+
+}
+
+

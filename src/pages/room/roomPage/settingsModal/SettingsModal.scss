@@ -1,186 +1,48 @@
 @use "../../../../styles/abstracts/mixins" as mx;
 
-.room-settings-modal {
-  width: 420px;
-  max-width: 95%;
-  border-radius: 20px;
-  background: var(--modal-bg);
-  color: var(--modal-text);
-  opacity: 0;
-  transform: translateY(10px) scale(0.98);
-  transition:
-    opacity 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-  overflow: hidden;
-  box-shadow:
-    0 1px 0 0 rgba(255, 255, 255, 0.05) inset,
-    0 24px 48px -16px rgba(0, 0, 0, 0.6);
+.room-settings-modal { width: min(520px, 95vw); max-height: min(900px, 92vh); overflow: hidden; border: 1px solid color-mix(in srgb, var(--border-subtle) 80%, white 5%); border-radius: 24px; color: var(--modal-text); background: var(--modal-bg); box-shadow: 0 30px 90px rgba(0,0,0,.42); opacity: 0; transform: translateY(10px) scale(.985); transition: opacity 240ms mx.$ease-out-soft, transform 320ms mx.$ease-out-soft; }
+.room-settings-modal.open { opacity: 1; transform: translateY(0) scale(1); }
+.room-settings-modal__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--border-subtle); background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.012)); }
+.room-settings-modal__head > div { display: flex; flex-direction: column; gap: 3px; }
+.room-settings-modal__head span { font-size: 18px; font-weight: 900; }
+.room-settings-modal__head small { color: var(--text-muted); font-size: 10px; }
+.room-settings-modal__head > svg { color: var(--accent); font-size: 24px; }
+.room-settings-modal__body { overflow: auto; max-height: calc(min(900px, 92vh) - 82px); padding: 18px; display: flex; flex-direction: column; gap: 18px; background: var(--modal-body-bg); }
+.room-settings-modal__body__row > h5 { margin: 0 0 8px; color: var(--text-muted); font-size: 11px; font-weight: 800; }
+.room-settings-modal__body__row__items { display: grid; gap: 8px; }
+.room-settings-modal__body__row__items--2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.room-settings-modal__body__row__items--3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+.room-settings-modal__body__row__items__item { min-height: 72px; border: 1px solid var(--border-subtle); border-radius: 13px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; color: inherit; background: var(--set-item-bg); font: inherit; cursor: pointer; transition: .18s ease; }
+.room-settings-modal__body__row__items__item svg { font-size: 19px; color: var(--text-muted); }
+.room-settings-modal__body__row__items__item span { font-size: 11px; font-weight: 750; }
+.room-settings-modal__body__row__items__item:hover { transform: translateY(-1px); background: rgba(255,255,255,.055); }
+.room-settings-modal__body__row__items__item.active { border-color: color-mix(in srgb, var(--accent) 35%, var(--border-subtle)); background: color-mix(in srgb, var(--accent) 9%, var(--set-item-bg)); box-shadow: 0 9px 22px color-mix(in srgb, var(--accent-glow) 16%, transparent); }
+.room-settings-modal__body__row__items__item.active svg { color: var(--accent); }
 
-  @include mx.max-w(480px) {
-    border-radius: 16px;
-  }
+.room-settings-modal__subtitle-card { padding: 14px; border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border-subtle)); border-radius: 18px; background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 6%, transparent), rgba(255,255,255,.018)); }
+.room-settings-modal__subtitle-card__head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.room-settings-modal__subtitle-card__head > div { display: flex; flex-direction: column; gap: 3px; }
+.room-settings-modal__subtitle-card__head strong { font-size: 13px; font-weight: 900; }
+.room-settings-modal__subtitle-card__head span { color: var(--text-muted); font-size: 9px; }
+.room-settings-modal__subtitle-card__badge { padding: 5px 7px; border-radius: 999px; color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); font-size: 8px !important; font-weight: 900; }
+.room-settings-modal__subtitle-card__preview { min-height: 112px; margin: 12px 0; display: grid; place-items: center; overflow: hidden; border-radius: 13px; background: radial-gradient(circle at 50% 70%, rgba(255,255,255,.10), transparent 45%), linear-gradient(180deg, #14161b, #07080a); border: 1px solid rgba(255,255,255,.06); }
+.room-settings-modal__subtitle-card__preview > span { max-width: 92%; padding: 4px 8px; border-radius: 5px; color: #fff; text-align: center; line-height: 1.45; transition: .2s ease; }
+.room-settings-modal__subtitle-controls { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+.room-settings-modal__subtitle-controls label { display: flex; flex-direction: column; gap: 7px; }
+.room-settings-modal__subtitle-controls label > span { color: var(--text-muted); font-size: 9px; }
+.room-settings-modal__subtitle-controls label > strong { font-size: 10px; }
+.room-settings-modal__subtitle-controls input[type="range"] { width: 100%; accent-color: var(--accent); }
+.room-settings-modal__subtitle-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 10px; }
+.room-settings-modal__subtitle-segment { display: flex; flex-wrap: wrap; gap: 6px; padding: 9px; border-radius: 12px; background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.05); }
+.room-settings-modal__subtitle-segment > span { width: 100%; color: var(--text-muted); font-size: 9px; }
+.room-settings-modal__subtitle-segment button { flex: 1; min-width: 0; padding: 7px 8px; border: 1px solid transparent; border-radius: 8px; color: var(--text-muted); background: transparent; font: inherit; font-size: 9px; cursor: pointer; }
+.room-settings-modal__subtitle-segment button.active { color: var(--modal-text); border-color: color-mix(in srgb, var(--accent) 28%, var(--border-subtle)); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.room-settings-modal__subtitle-reset { width: 100%; margin-top: 9px; padding: 8px; border: 0; border-radius: 9px; color: var(--text-muted); background: transparent; font: inherit; font-size: 9px; cursor: pointer; transition: .18s ease; }
+.room-settings-modal__subtitle-reset:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); }
 
-  &.open {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-
-  &__head {
-    width: 100%;
-    padding: 22px 24px;
-    background: var(--modal-head-bg);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 1px solid var(--border-subtle);
-
-    @include mx.max-w(480px) {
-      padding: 16px 18px;
-    }
-
-    > span {
-      font-size: 20px;
-      font-weight: 800;
-    }
-
-    > svg {
-      font-size: 24px;
-      color: var(--accent);
-    }
-  }
-
-  &__body {
-    padding: 22px 22px 26px;
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-    background: var(--modal-body-bg);
-
-    @include mx.max-w(480px) {
-      padding: 18px 14px 22px;
-      gap: 22px;
-    }
-
-    &__row {
-      > h5 {
-        font-size: 14px;
-        font-weight: 700;
-        display: flex;
-        gap: 10px;
-        margin-bottom: 12px;
-        color: var(--modal-text);
-        align-items: center;
-        opacity: 0.85;
-        letter-spacing: 0.01em;
-
-        @include mx.max-w(480px) {
-          font-size: 13px;
-          margin-bottom: 10px;
-        }
-
-        &::before {
-          content: "";
-          height: 14px;
-          width: 3px;
-          border-radius: 2px;
-          background: var(--set-row-border);
-          display: block;
-          flex-shrink: 0;
-        }
-      }
-
-      &__items {
-        display: flex;
-        gap: 10px;
-
-        @include mx.max-w(480px) {
-          gap: 8px;
-        }
-
-        &--2,
-        &--3 {
-          .room-settings-modal__body__row__items__item {
-            background: var(--set-item-bg);
-            border: 1.5px solid transparent;
-
-            &.active {
-              background: var(--set-item-active-bg);
-              border-color: var(--set-item-active-border);
-              box-shadow:
-                0 0 0 1px var(--set-item-active-border),
-                0 4px 16px -4px var(--accent-glow);
-            }
-          }
-        }
-
-        &__item {
-          width: 100%;
-          flex: 1;
-          min-height: 88px;
-          border-radius: 14px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 10px;
-          cursor: pointer;
-          transition:
-            background 180ms ease,
-            border-color 180ms ease,
-            box-shadow 180ms ease,
-            transform 160ms ease;
-          border: 1.5px solid transparent;
-          color: inherit;
-          font-family: inherit;
-          background: var(--set-item-bg);
-          padding: 12px 8px;
-
-          @include mx.max-w(480px) {
-            min-height: 72px;
-            gap: 8px;
-            border-radius: 12px;
-            padding: 10px 4px;
-
-            svg {
-              font-size: 20px;
-            }
-          }
-
-          svg {
-            font-size: 22px;
-            opacity: 0.75;
-            transition:
-              opacity 160ms ease,
-              color 160ms ease;
-          }
-
-          span {
-            font-size: 13px;
-            font-weight: 600;
-            opacity: 0.8;
-          }
-
-          &.active {
-            svg {
-              opacity: 1;
-              color: var(--accent);
-            }
-            span {
-              opacity: 1;
-              font-weight: 700;
-            }
-          }
-
-          &:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-1px);
-          }
-
-          &:active {
-            transform: translateY(0);
-          }
-        }
-      }
-    }
-  }
+@include mx.max-w(520px) {
+  .room-settings-modal { width: 100%; max-width: 100%; border-radius: 18px; }
+  .room-settings-modal__subtitle-controls, .room-settings-modal__subtitle-actions { grid-template-columns: 1fr; }
+  .room-settings-modal__body { padding: 14px; }
 }
+@include mx.reduced-motion { .room-settings-modal, .room-settings-modal__subtitle-card__preview > span { transition: none !important; } }

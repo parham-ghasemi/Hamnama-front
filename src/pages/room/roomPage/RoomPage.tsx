@@ -10,12 +10,13 @@ import { IoChatbubblesSharp, IoChevronBack, IoClose, IoExitOutline } from "react
 import { FaArrowRight, FaCheck } from "react-icons/fa6";
 import { TbSticker, TbMovieOff, TbPlayerPlayFilled, TbX } from "react-icons/tb";
 
-import SettingsModal from "./settingsModal/SettingsModal";
+import SettingsModal, { DEFAULT_SUBTITLE_SETTINGS, type SubtitleSettings } from "./settingsModal/SettingsModal";
 import ChatMessage from "./ChatMessage";
 import EmojiPicker from "./EmojiePicker";
 import UsersModal from "./usersModal/UsersModal";
 import MediaTypeModal from "./mediaTypeModal/MediaTypeModal";
 import ArchiveModal, { type SelectedArchiveMedia } from "./archiveModal/ArchiveModal";
+import InviteModal from "./inviteModal/InviteModal";
 import VideoPlayer from "./videoPlayer.tsx/VideoPlayer";
 
 import {
@@ -181,6 +182,7 @@ const RoomPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const [particles, setParticles] = useState<ParticleData[]>([]);
+  const [subtitleSettings, setSubtitleSettings] = useState<SubtitleSettings>(DEFAULT_SUBTITLE_SETTINGS);
 
   const [currentQuality, setCurrentQuality] = useState("quality");
   const [currentId, setCurrentId] = useState('')
@@ -2183,6 +2185,7 @@ const RoomPage = () => {
                   : null
               }
               onNextEpisodeRequest={handleNextEpisode}
+              subtitleSettings={subtitleSettings}
             />
           ) : (
             <div className="room-page__main__player__empty">
@@ -2400,6 +2403,8 @@ const RoomPage = () => {
               playbackTime={roomState.playback_time}
               currentlyPlaying={roomState.currently_playing}
               createdAt={roomState.created_at}
+              subtitleSettings={subtitleSettings}
+              onSubtitleSettingsChange={setSubtitleSettings}
             />
           </div>
         )}
@@ -2452,19 +2457,13 @@ const RoomPage = () => {
 
         {inviteModalOpen && (
           <div className="room-page__modal-overlay__modal room-page__modal-overlay__modal--invite" onClick={(e) => e.stopPropagation()}>
-            <div className={clsx("room-page__invite-modal", inviteModalOpen && "open")}>
-              <div className="room-page__invite-modal__head">
-                <span>دعوت به اتاق</span>
-                <BsFillShareFill />
-              </div>
-              <div className="room-page__invite-modal__body">
-                <p>کد اتاق را با دیگران به اشتراک بگذارید.</p>
-                <div className="room-page__invite-modal__body__code">
-                  <span>{roomState.code}</span>
-                  <button onClick={handleCopyInviteCode}>{inviteCopied ? "کپی شد" : "کپی"}</button>
-                </div>
-              </div>
-            </div>
+            <InviteModal
+              isOpen={inviteModalOpen}
+              roomCode={String(roomState.code)}
+              copied={inviteCopied}
+              onClose={() => setInviteModalOpen(false)}
+              onCopy={handleCopyInviteCode}
+            />
           </div>
         )}
       </div>
