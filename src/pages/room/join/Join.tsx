@@ -2,16 +2,17 @@ import { BsPlusLg } from 'react-icons/bs';
 import Header from '../../../components/header/Header';
 import './Join.scss';
 import { IoCopyOutline } from 'react-icons/io5';
-import { PiFilmSlateFill, PiUsersThreeFill, PiClockCounterClockwiseFill, PiPlayFill } from 'react-icons/pi';
+import { PiFilmSlateFill, PiUsersThreeFill, PiClockCounterClockwiseFill, PiPlayFill, PiTrashSimpleFill, PiSpinner } from 'react-icons/pi';
 import CreateRoomModal from './createRoomModal/CreateRoomModal';
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { getCurrentRoom, getLastActiveRoom, getRoomApiErrorStatus, joinRoom } from '../../../apiCalls/roomApi';
+import { clearRoomData, getCurrentRoom, getLastActiveRoom, getRoomApiErrorStatus, joinRoom } from '../../../apiCalls/roomApi';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../context/AuthContext';
+// import { useAuth } from '../../../context/AuthContext';
 import { FaCheck } from 'react-icons/fa6';
 import clsx from 'clsx';
 import { toast } from '../../../components/toast';
+import { useConfirmationModal } from '../../../context/ConfirmModalContext/ConfirmaModalContext';
 
 
 const Join = () => {
@@ -19,13 +20,14 @@ const Join = () => {
   const [copied, setCopied] = useState(false);
   const [code, setCode] = useState<number | string>("");
   const nav = useNavigate();
+  const { openConfirmation } = useConfirmationModal();
 
-  const { isAuthenticated } = useAuth();
-  useEffect(() => {
-    if (!isAuthenticated) {
-      nav('/');
-    }
-  }, [isAuthenticated])
+  // const { isAuthenticated } = useAuth();
+  // useEffect(() => {
+  //   if (!isAuthenticated) {
+  //     nav('/');
+  //   }
+  // }, [])
 
 
   const currentRoomQuery = useQuery({
@@ -91,11 +93,48 @@ const Join = () => {
     },
   });
 
+  const clearRoomDataMutation = useMutation({
+    mutationFn: (roomId: string) => clearRoomData(roomId),
+    onSuccess: async () => {
+      await Promise.all([currentRoomQuery.refetch(), lastRoomQuery.refetch()]);
+      toast.success("اطلاعات اتاق پاک شد", {
+        description: "پیام‌ها، وضعیت پخش و سایر داده‌های اتاق حذف شدند.",
+      });
+      location.reload()
+    },
+    onError: (error) => {
+      if (getRoomApiErrorStatus(error) === 403) {
+        toast.error("دسترسی مجاز نیست", {
+          description: "فقط سازنده اتاق می‌تواند اطلاعات آن را پاک کند.",
+        });
+        return;
+      }
+
+      toast.error("پاک کردن اطلاعات اتاق با خطا مواجه شد", {
+        description: "لطفاً دوباره تلاش کنید.",
+      });
+      console.error("Failed to clear room data:", error);
+    },
+  });
+
   const handleJoin = () => {
     const roomCode = Number(code);
     if (!Number.isInteger(roomCode) || roomCode <= 0 || joinRoomMutation.isPending) return;
 
     joinRoomMutation.mutate(roomCode);
+  };
+
+  const handleClearRoomData = () => {
+    if (!activeRoom || clearRoomDataMutation.isPending) return;
+
+    openConfirmation({
+      title: "آیا از پاک کردن این اتاق مطمئن هستید؟",
+      body: "تمام پیام‌های چت، وضعیت و رسانه در حال پخش و سایر اطلاعات ذخیره‌شده این اتاق برای همیشه حذف می‌شوند.",
+      primaryButtonText: "پاک کردن",
+      secondaryButtonText: "انصراف",
+      primaryButtonClasses: "confirm-modal__primary--danger",
+      onConfirm: () => clearRoomDataMutation.mutateAsync(activeRoom.id),
+    });
   };
 
   const handleCopy = () => {
@@ -124,13 +163,9 @@ const Join = () => {
     <div className='join-page'>
       <Header />
       <div className="join-page__content">
-
         <div className="join-page__content__main">
-
           <div className="join-page__content__main__blob" />
-
           <div className="join-page__content__main__inner">
-
             <div className="join-page__content__main__intro">
               <h1 className="join-page__content__main__intro__title">
                 یک <span>اتاق سینمایی</span> انتخاب کنید
@@ -146,36 +181,29 @@ const Join = () => {
                   <PiFilmSlateFill />
                 </span>
 
-                <h4>اتاق شخصی</h4>
+                <button className={clsx("join-page__content__main__cards__card__del", clearRoomDataMutation.isPending && "pending")}
+                  disabled={!activeRoom || activeRoomLoading || clearRoomDataMutation.isPending}
+                  onClick={handleClearRoomData}>
+                  {clearRoomDataMutation.isPending ? <PiSpinner /> : <PiTrashSimpleFill />}
+                </button>
 
+                <h4>اتاق شخصی</h4>
                 <div className="join-page__content__main__cards__card__i">
                   <span className="join-page__content__main__cards__card__i__screen" aria-hidden="true">
                     <PiPlayFill />
                   </span>
                 </div>
-
                 <div className={clsx("join-page__content__main__cards__card__code", copied && 'copied')}>
-                  کد شما: {activeRoom ? activeRoom.code.toLocaleString("fa-IR").replace('٬', "") : "---"}
-                  <span
-                    onClick={handleCopy}
-                    aria-hidden={!activeRoom}
-                  >
-                    {
-                      copied ? (
-                        <FaCheck />
-                      )
-                        : (
-                          <IoCopyOutline />
-                        )
-                    }
+                  کد شما:
+                  <code>
+                    {activeRoom ? activeRoom.code.toLocaleString("fa-IR").replace('٬', "") : "---"}
+                  </code>
+                  <span onClick={handleCopy} aria-hidden={!activeRoom} >
+                    {copied ? (<FaCheck />) : (<IoCopyOutline />)}
                   </span>
                 </div>
 
-                <button
-                  className="join-page__content__main__cards__card__enter"
-                  disabled={!activeRoom || activeRoomLoading}
-                  onClick={() => activeRoom && nav(`/room/${activeRoom.id}`)}
-                >
+                <button className="join-page__content__main__cards__card__enter" disabled={!activeRoom || activeRoomLoading} onClick={() => activeRoom && nav(`/room/${activeRoom.id}`)} >
                   ورود
                 </button>
               </div>

@@ -129,6 +129,10 @@ export async function leaveRoom(roomId: string) {
   await api.post(`/rooms/${roomId}/leave`);
 }
 
+export async function clearRoomData(roomId: string) {
+  await api.delete(`/rooms/${roomId}`);
+}
+
 export async function updateRoomMemberRole(
   roomId: string,
   userId: string,

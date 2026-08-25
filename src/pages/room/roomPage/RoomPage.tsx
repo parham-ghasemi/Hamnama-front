@@ -1309,7 +1309,7 @@ const RoomPage = () => {
           if (parsed.payload.user_id === user?.id) {
             intentionalSocketCloseRef.current = true;
             socket.close();
-            navigate("/");
+            navigate("/join-room");
             return;
           }
 
@@ -1434,7 +1434,7 @@ const RoomPage = () => {
       }
       if (e.code === 4003) {
         intentionalSocketCloseRef.current = true;
-        navigate("/");
+        navigate("/join-room");
         return;
       }
       if (!intentionalSocketCloseRef.current) {
@@ -1518,7 +1518,7 @@ const RoomPage = () => {
     onSuccess: () => {
       intentionalSocketCloseRef.current = true;
       socketRef.current?.close();
-      navigate("/");
+      navigate("/join-room");
     },
   });
 

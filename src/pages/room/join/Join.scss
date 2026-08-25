@@ -25,7 +25,8 @@
     justify-content: space-between;
     padding: 13px 15px;
     border-radius: 14px;
-    border: 1px solid color-mix(in srgb, var(--send-btn-bg) 28%, var(--border-subtle));
+    border: 1px solid
+      color-mix(in srgb, var(--send-btn-bg) 28%, var(--border-subtle));
     background: color-mix(in srgb, var(--send-btn-bg) 10%, var(--component-bg));
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
     backdrop-filter: blur(14px);
@@ -401,6 +402,44 @@
               grid-area: auto;
             }
           }
+          &__del {
+            position: absolute;
+            top: 60px;
+            right: 16px;
+            height: 34px;
+            width: 34px;
+            border-radius: 10px;
+            @include mx.flex-center;
+            font-size: 20px;
+            color: dark.$color-red;
+            background: rgba(179, 46, 46, 0.12);
+            box-shadow: 0 0 0 1px rgba(208, 78, 47, 0.22) inset;
+            z-index: 4;
+            cursor: pointer;
+            transition:
+              background ease 200ms,
+              font-size ease 200ms;
+
+            &:hover {
+              background: rgba(179, 46, 46, 0.288);
+            }
+
+            &:disabled {
+              display: none;
+            }
+
+            @include mx.light {
+              color: light.$color-primary;
+              background: rgba(139, 91, 130, 0.12);
+              box-shadow: 0 0 0 1px rgba(139, 91, 130, 0.2) inset;
+            }
+
+            @include mx.max-w(768px) {
+              height: 30px;
+              width: 30px;
+              font-size: 16px;
+            }
+          }
 
           // Small ember-lit icon chip in the card corner.
           &__badge {
@@ -619,6 +658,11 @@
             @include mx.max-w(768px) {
               height: 54px;
               font-size: 16px;
+            }
+
+            > code {
+              user-select: all;
+              margin-right: 6px;
             }
 
             > span {
