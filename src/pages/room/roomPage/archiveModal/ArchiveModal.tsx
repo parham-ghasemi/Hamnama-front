@@ -74,6 +74,31 @@ const qualityScore = (value?: string | null) => {
   return sourceRank.find((item) => normalized.includes(item.token))?.value ?? 0;
 };
 
+const sizeInBytes = (value?: string | null) => {
+  if (!value) return 0;
+
+  const match = String(value).trim().match(/^(\d+(?:\.\d+)?)\s*([KMGT]?B|[KMGT])$/i);
+  if (!match) return 0;
+
+  const amount = Number(match[1]);
+  if (!Number.isFinite(amount)) return 0;
+
+  const unit = match[2].toUpperCase();
+  const multipliers: Record<string, number> = {
+    B: 1,
+    K: 1024,
+    KB: 1024,
+    M: 1024 ** 2,
+    MB: 1024 ** 2,
+    G: 1024 ** 3,
+    GB: 1024 ** 3,
+    T: 1024 ** 4,
+    TB: 1024 ** 4,
+  };
+
+  return amount * (multipliers[unit] ?? 0);
+};
+
 const isSoftsubFile = (file: MediaFileItem) => {
   const searchable = [
     file.quality_tags,
@@ -215,20 +240,22 @@ const ArchiveDropdown: React.FC<ArchiveDropdownProps> = ({ label, value, options
         <TbChevronDown />
       </button>
       <div className="archive-dropdown__menu" role="listbox">
-        {options.map((option) => (
-          <button
-            type="button"
-            key={option.value}
-            className={clsx("archive-dropdown__option", option.value === value && "selected")}
-            onClick={() => {
-              onChange(option.value);
-              setOpen(false);
-            }}
-          >
-            <span>{option.label}</span>
-            {option.value === value && <span className="archive-dropdown__check">✓</span>}
-          </button>
-        ))}
+        <div className="archive-dropdown__menu__inner" role="listbox">
+          {options.map((option) => (
+            <button
+              type="button"
+              key={option.value}
+              className={clsx("archive-dropdown__option", option.value === value && "selected")}
+              onClick={() => {
+                onChange(option.value);
+                setOpen(false);
+              }}
+            >
+              <span>{option.label}</span>
+              {option.value === value && <span className="archive-dropdown__check">✓</span>}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -262,7 +289,10 @@ const groupSeriesFiles = (files: MediaFileItem[]): GroupedSeason[] => {
       season,
       episodes: Array.from(episodes.entries())
         .sort((a, b) => a[0] - b[0])
-        .map(([episode, episodeFiles]) => ({ episode, files: episodeFiles })),
+        .map(([episode, episodeFiles]) => ({
+          episode,
+          files: [...episodeFiles].sort((a, b) => sizeInBytes(b.size) - sizeInBytes(a.size)),
+        })),
     }));
 };
 
@@ -369,7 +399,6 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
           </div>
         </div>
         <div className="archive-modal__head-actions">
-          <span className="archive-modal__head-live"><i /> زنده</span>
           <button type="button" className="archive-modal__close-btn" onClick={closeModal} aria-label="بستن"><TbX /></button>
         </div>
       </header>
