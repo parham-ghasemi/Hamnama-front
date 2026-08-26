@@ -171,61 +171,103 @@
     }
   }
 
-  /* ---- Team ---------------------------------------------------------- */
-  &__team-title {
-    text-align: center;
-    font-size: 45px;
-    font-weight: 700;
+  /* ---- Generic section ------------------------------------------------ */
+  &__section {
     margin-top: 110px;
-    padding: 0 16px;
-    color: dark.$color-white;
-
-    > span {
-      color: dark.$color-primary;
-      font-weight: 800;
-
-      @include mx.light {
-        color: light.$color-primary;
-      }
-    }
-
-    @include mx.light {
-      color: light.$color-black;
-    }
 
     @include mx.max-w(768px) {
-      font-size: 28px;
       margin-top: 64px;
+    }
+
+    &__title {
+      text-align: center;
+      font-size: 45px;
+      font-weight: 700;
+      padding: 0 16px;
+      color: dark.$color-white;
+
+      > span {
+        color: dark.$color-primary;
+        font-weight: 800;
+
+        @include mx.light {
+          color: light.$color-primary;
+        }
+      }
+
+      @include mx.light {
+        color: light.$color-black;
+      }
+
+      @include mx.max-w(768px) {
+        font-size: 28px;
+      }
     }
   }
 
-  &__team {
+  /* ---- Story ---------------------------------------------------------- */
+  &__story {
     position: relative;
-    display: flex;
-    align-items: stretch;
-    justify-content: center;
-    gap: 23.8px;
-    margin-top: 48px;
-    padding: 0 16px;
+    max-width: 900px;
+    margin: 40px auto 0;
+    padding: 0 20px;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
 
-    @include mx.max-w(768px) {
-      flex-direction: column;
-      align-items: center;
-      gap: 22px;
-      margin-top: 32px;
+    > p {
+      font-size: 17.5px;
+      line-height: 2.15;
+      text-align: center;
+      color: color.adjust(dark.$color-gray, $lightness: -8%);
+
+      @include mx.light {
+        color: light.$color-dark-gray;
+      }
+
+      @include mx.max-w(768px) {
+        font-size: 15px;
+        line-height: 1.95;
+        text-align: start;
+      }
     }
 
     &__blob {
-      @include mx.background-blob(1100px, 520px, -20%, auto, auto, -10%);
+      @include mx.background-blob(900px, 420px, -30%, auto, auto, -8%);
 
       @include mx.max-w(768px) {
         display: none;
       }
     }
+
+    @include mx.max-w(768px) {
+      margin-top: 28px;
+    }
   }
 
-  &__person {
+  /* ---- Values ----------------------------------------------------------
+   * Individually staggered (variant="up", delay = ind * 90) to match the
+   * per-card entrance rhythm used by the home page's feature cards, rather
+   * than fading the whole grid in as one block.
+   * --------------------------------------------------------------------- */
+  &__values {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    max-width: 900px;
+    margin: 48px auto 0;
+    padding: 0 20px;
+    box-sizing: border-box;
+
+    @include mx.max-w(720px) {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+      margin-top: 28px;
+    }
+  }
+
+  &__value {
     position: relative;
     isolation: isolate;
     overflow: hidden;
@@ -233,17 +275,12 @@
 
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 12px;
-
-    width: 375.7px;
-    max-width: 100%;
-    padding: 30px 24px 28px;
-    border-radius: 26px;
+    gap: 10px;
+    padding: 26px 24px;
+    border-radius: 22px;
 
     @include mx.cinema-surface;
-    @include mx.ambient-shadow(0.8);
+    @include mx.ambient-shadow(0.6);
 
     transition:
       transform mx.$dur-slow mx.$ease-out-soft,
@@ -255,7 +292,7 @@
 
     &::before {
       @include mx.gradient-border(
-        26px,
+        22px,
         rgba(255, 255, 255, 0.2),
         rgba(255, 255, 255, 0.03)
       );
@@ -264,12 +301,10 @@
 
     @include mx.light {
       background: light.$color-card-bg;
-      box-shadow: 0 14px 30px -22px
-        color.adjust(light.$color-black, $alpha: -0.6);
 
       &::before {
         @include mx.gradient-border(
-          26px,
+          22px,
           rgba(139, 91, 130, 0.28),
           rgba(0, 0, 0, 0.04)
         );
@@ -277,56 +312,90 @@
     }
 
     &:hover {
-      transform: translateY(-8px);
-      @include mx.ambient-shadow(1.2);
+      transform: translateY(-6px);
+      @include mx.ambient-shadow(1);
 
-      .about-page__person__sheen {
+      .about-page__value__sheen {
         transform: translateX(130%);
       }
+
+      .about-page__value__icon {
+        background: rgba(208, 78, 47, 0.26);
+
+        @include mx.light {
+          background: rgba(139, 91, 130, 0.2);
+        }
+
+        > svg {
+          transform: translateY(-2px) scale(1.08);
+        }
+      }
+
+      .about-page__value__icon__glow {
+        opacity: 1;
+      }
     }
 
-    &__role {
+    &__icon {
+      position: relative;
+      isolation: isolate;
       display: inline-flex;
       align-items: center;
-      padding: 6px 14px;
-      border-radius: 999px;
-      font-size: 13.5px;
-      font-weight: 700;
-      color: dark.$color-primary;
-      background: rgba(208, 78, 47, 0.14);
+      justify-content: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 15px;
+      background: rgba(208, 78, 47, 0.16);
+      transition: background-color mx.$dur-base ease;
 
-      @include mx.light {
-        color: light.$color-primary;
-        background: rgba(139, 91, 130, 0.13);
-      }
-    }
+      > svg {
+        position: relative;
+        z-index: 1;
+        font-size: 22px;
+        color: dark.$color-primary;
+        filter: drop-shadow(0 4px 14px rgba(208, 78, 47, 0.4));
+        transition: transform mx.$dur-base mx.$ease-out-soft;
 
-    &__avatar {
-      width: 132px;
-      height: 132px;
-      border-radius: 50%;
-      overflow: hidden;
-      margin-top: 4px;
-      box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.12),
-        0 0 0 6px rgba(208, 78, 47, 0.14);
-
-      > img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
+        @include mx.reduced-motion {
+          transition: none;
+        }
       }
 
       @include mx.light {
-        box-shadow:
-          0 0 0 1px rgba(0, 0, 0, 0.06),
-          0 0 0 6px rgba(139, 91, 130, 0.14);
+        background: rgba(139, 91, 130, 0.14);
+
+        > svg {
+          color: light.$color-primary;
+          filter: none;
+        }
+      }
+
+      // Same soft radial bloom used behind the icons on the home page.
+      &__glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 230%;
+        height: 230%;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(
+          circle,
+          rgba(208, 78, 47, 0.38) 0%,
+          transparent 62%
+        );
+        opacity: 0;
+        transition: opacity mx.$dur-slow ease;
+        pointer-events: none;
+        z-index: 0;
+
+        @include mx.light {
+          display: none;
+        }
       }
     }
 
-    &__name {
-      font-size: 24px;
+    &__title {
+      font-size: 19px;
       font-weight: 800;
       color: dark.$color-white;
 
@@ -335,88 +404,13 @@
       }
     }
 
-    &__desc {
-      font-size: 15.5px;
-      line-height: 1.9;
+    &__text {
+      font-size: 15px;
+      line-height: 1.95;
       color: dark.$color-gray;
 
       @include mx.light {
         color: light.$color-dark-gray;
-      }
-    }
-
-    &__contact {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-      margin-top: 8px;
-
-      &__row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 14px;
-        border-radius: 16px;
-        text-decoration: none;
-        direction: ltr;
-
-        background: rgba(255, 255, 255, 0.05);
-        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
-        color: color.adjust(dark.$color-white, $alpha: -0.1);
-
-        transition:
-          background mx.$dur-base mx.$ease-out-soft,
-          transform mx.$dur-base mx.$ease-out-soft;
-
-        &:hover {
-          background: rgba(208, 78, 47, 0.16);
-          transform: translateY(-2px);
-        }
-
-        &__icon {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 34px;
-          width: 34px;
-          flex: 0 0 34px;
-          border-radius: 12px;
-          background: rgba(208, 78, 47, 0.18);
-
-          > svg {
-            font-size: 17px;
-            color: dark.$color-primary;
-          }
-
-          @include mx.light {
-            background: rgba(139, 91, 130, 0.16);
-
-            > svg {
-              color: light.$color-primary;
-            }
-          }
-        }
-
-        &__value {
-          font-size: 15px;
-          font-weight: 600;
-          overflow-wrap: anywhere;
-        }
-
-        @include mx.light {
-          background: rgba(0, 0, 0, 0.035);
-          box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05) inset;
-          color: light.$color-dark-gray;
-
-          &:hover {
-            background: rgba(139, 91, 130, 0.12);
-          }
-        }
-
-        @include mx.reduced-motion {
-          transition: none;
-        }
       }
     }
 
@@ -440,22 +434,463 @@
     }
   }
 
-  &__note {
+  /* ---- Journey ------------------------------------------------------------
+   * A vertical timeline instead of the numbered-circle grid used on the
+   * home page's "3 steps" section, so the two don't read as the same
+   * component. The connecting line only occupies the gap between nodes,
+   * never running behind them, so no background-colour matching is needed.
+   * --------------------------------------------------------------------- */
+  &__journey {
+    position: relative;
     max-width: 640px;
-    margin: 48px auto 0;
-    padding: 0 16px;
-    text-align: center;
-    font-size: 16px;
-    line-height: 2;
-    color: dark.$color-gray;
-
-    @include mx.light {
-      color: light.$color-dark-gray;
-    }
+    margin: 56px auto 0;
+    padding: 0 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 34px;
 
     @include mx.max-w(768px) {
-      font-size: 14px;
-      margin-top: 32px;
+      margin-top: 34px;
+      gap: 26px;
+    }
+
+    &__item {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+
+      &:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        top: 56px;
+        right: 27px;
+        width: 2px;
+        height: calc(100% - 56px + 34px);
+        background: linear-gradient(
+          180deg,
+          rgba(208, 78, 47, 0.45),
+          rgba(208, 78, 47, 0)
+        );
+
+        @include mx.light {
+          background: linear-gradient(
+            180deg,
+            rgba(139, 91, 130, 0.4),
+            rgba(139, 91, 130, 0)
+          );
+        }
+
+        @include mx.max-w(480px) {
+          right: 21px;
+          top: 44px;
+        }
+      }
+
+      &__icon {
+        position: relative;
+        z-index: 1;
+        flex: 0 0 56px;
+        width: 56px;
+        height: 56px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(208, 78, 47, 0.16);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+
+        > svg {
+          font-size: 24px;
+          color: dark.$color-primary;
+        }
+
+        @include mx.light {
+          background: rgba(139, 91, 130, 0.14);
+          box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05) inset;
+
+          > svg {
+            color: light.$color-primary;
+          }
+        }
+
+        @include mx.max-w(480px) {
+          flex-basis: 44px;
+          width: 44px;
+          height: 44px;
+
+          > svg {
+            font-size: 19px;
+          }
+        }
+      }
+
+      &__content {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding-top: 14px;
+        min-width: 0;
+
+        @include mx.max-w(480px) {
+          padding-top: 8px;
+        }
+      }
+
+      &__title {
+        font-size: 18px;
+        font-weight: 800;
+        color: dark.$color-white;
+
+        @include mx.light {
+          color: light.$color-black;
+        }
+      }
+
+      &__text {
+        font-size: 14.5px;
+        line-height: 1.95;
+        color: dark.$color-gray;
+
+        @include mx.light {
+          color: light.$color-dark-gray;
+        }
+      }
+    }
+  }
+
+  /* ---- Contact ----------------------------------------------------------- */
+  &__contact {
+    max-width: 820px;
+    margin: 44px auto 0;
+    padding: 0 20px;
+    box-sizing: border-box;
+
+    @include mx.max-w(768px) {
+      margin-top: 28px;
+    }
+
+    &__lead {
+      text-align: center;
+      font-size: 16.5px;
+      line-height: 2.1;
+      color: dark.$color-gray;
+
+      @include mx.light {
+        color: light.$color-dark-gray;
+      }
+
+      @include mx.max-w(768px) {
+        font-size: 14.5px;
+      }
+    }
+
+    &__rows {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 26px;
+
+      @include mx.max-w(640px) {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    &__row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 18px;
+      border-radius: 20px;
+      text-decoration: none;
+      direction: ltr;
+      box-sizing: border-box;
+
+      @include mx.cinema-surface;
+      color: color.adjust(dark.$color-white, $alpha: -0.05);
+
+      transition:
+        transform mx.$dur-base mx.$ease-out-soft,
+        box-shadow mx.$dur-base mx.$ease-out-soft;
+
+      &::before {
+        @include mx.gradient-border(
+          20px,
+          rgba(255, 255, 255, 0.18),
+          rgba(255, 255, 255, 0.03)
+        );
+      }
+
+      &:hover {
+        transform: translateY(-4px);
+        @include mx.ambient-shadow(1);
+      }
+
+      @include mx.reduced-motion {
+        transition: none;
+      }
+
+      &__icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 42px;
+        width: 42px;
+        flex: 0 0 42px;
+        border-radius: 14px;
+        background: rgba(208, 78, 47, 0.18);
+
+        > svg {
+          font-size: 19px;
+          color: dark.$color-primary;
+        }
+
+        @include mx.light {
+          background: rgba(139, 91, 130, 0.16);
+
+          > svg {
+            color: light.$color-primary;
+          }
+        }
+      }
+
+      &__body {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+      }
+
+      &__label {
+        font-size: 12.5px;
+        color: dark.$color-gray;
+
+        @include mx.light {
+          color: light.$color-gray;
+        }
+      }
+
+      &__value {
+        font-size: 15.5px;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+      }
+
+      @include mx.light {
+        background: light.$color-card-bg;
+        color: light.$color-dark-gray;
+
+        &::before {
+          @include mx.gradient-border(
+            20px,
+            rgba(139, 91, 130, 0.26),
+            rgba(0, 0, 0, 0.04)
+          );
+        }
+      }
+    }
+  }
+
+  /* ---- Developer credit ---------------------------------------------------
+   * Intentionally low-key: a slim pill rather than a big elevated card, so
+   * it reads as a footnote you can still find, not a headline section — but
+   * dressed with the same surface, hairline border and icon glow as the
+   * rest of the page so it doesn't feel like an afterthought.
+   * --------------------------------------------------------------------- */
+  &__credit {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    width: fit-content;
+    max-width: calc(100% - 40px);
+    margin: 84px auto 0;
+    padding: 10px 22px 10px 12px;
+    border-radius: 999px;
+    box-sizing: border-box;
+
+    @include mx.cinema-surface;
+    @include mx.ambient-shadow(0.4);
+
+    transition:
+      transform mx.$dur-base mx.$ease-out-soft,
+      box-shadow mx.$dur-base mx.$ease-out-soft;
+
+    &::before {
+      @include mx.gradient-border(
+        999px,
+        rgba(255, 255, 255, 0.18),
+        rgba(255, 255, 255, 0.03)
+      );
+    }
+
+    @include mx.light {
+      background: light.$color-card-bg;
+
+      &::before {
+        @include mx.gradient-border(
+          999px,
+          rgba(139, 91, 130, 0.26),
+          rgba(0, 0, 0, 0.04)
+        );
+      }
+    }
+
+    &:hover {
+      transform: translateY(-3px);
+      @include mx.ambient-shadow(0.7);
+
+      .about-page__credit__badge__glow {
+        opacity: 1;
+      }
+    }
+
+    @include mx.reduced-motion {
+      transition: none;
+    }
+
+    @include mx.max-w(480px) {
+      margin-top: 56px;
+      flex-wrap: wrap;
+      justify-content: center;
+      text-align: center;
+      border-radius: 22px;
+      padding: 16px 20px;
+    }
+
+    &__badge {
+      position: relative;
+      isolation: isolate;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 36px;
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: rgba(208, 78, 47, 0.16);
+
+      > svg {
+        position: relative;
+        z-index: 1;
+        font-size: 16px;
+        color: dark.$color-primary;
+      }
+
+      @include mx.light {
+        background: rgba(139, 91, 130, 0.14);
+
+        > svg {
+          color: light.$color-primary;
+        }
+      }
+
+      &__glow {
+        position: absolute;
+        inset: -70%;
+        background: radial-gradient(
+          circle,
+          rgba(208, 78, 47, 0.42) 0%,
+          transparent 45%
+        );
+        opacity: 0;
+        transition: opacity mx.$dur-slow ease;
+        pointer-events: none;
+        z-index: 0;
+
+        @include mx.light {
+          display: none;
+        }
+      }
+    }
+
+    &__info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    &__label {
+      font-size: 10px;
+      font-weight: 400;
+      color: dark.$color-gray;
+
+      @include mx.light {
+        color: light.$color-gray;
+      }
+    }
+
+    &__name {
+      font-size: 16px;
+      font-weight: 600;
+      white-space: nowrap;
+      color: rgba(dark.$color-white, $alpha: 0.8);
+
+      @include mx.light {
+        color: light.$color-black;
+      }
+    }
+
+    &__divider {
+      align-self: stretch;
+      width: 1px;
+      margin: 2px 0;
+      background: rgba(255, 255, 255, 0.12);
+
+      @include mx.light {
+        background: rgba(0, 0, 0, 0.08);
+      }
+
+      @include mx.max-w(480px) {
+        display: none;
+      }
+    }
+
+    &__links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      > a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 9px;
+        color: dark.$color-gray;
+        transition:
+          color mx.$dur-base mx.$ease-out-soft,
+          background-color mx.$dur-base mx.$ease-out-soft;
+
+        > svg {
+          font-size: 16px;
+        }
+
+        &:hover {
+          color: dark.$color-primary;
+          background: rgba(208, 78, 47, 0.14);
+        }
+
+        @include mx.light {
+          color: light.$color-dark-gray;
+
+          &:hover {
+            color: light.$color-primary;
+            background: rgba(139, 91, 130, 0.12);
+          }
+        }
+
+        @include mx.reduced-motion {
+          transition: none;
+        }
+      }
     }
   }
 }
