@@ -21,21 +21,30 @@ export function SEO({
 }: SEOProps) {
   return (
     <>
-      <title>{title}</title>
+      {title && <title>{title}</title>}
 
-      <meta name="description" content={description} />
+      {description && <meta name="description" content={description} />}
 
       <meta
         name="robots"
         content={noindex ? "noindex, nofollow" : "index, follow"}
       />
 
-      <link rel="canonical" href={canonical} />
+      {canonical && <link rel="canonical" href={canonical} />}
 
-      <meta property="og:title" content={ogTitle || title} />
-      <meta property="og:description" content={ogDescription || description} />
-      <meta property="og:image" content={ogImage || ""} />
-      <meta property="og:url" content={ogURL || canonical} />
+      {ogTitle || title && (
+        <meta property="og:title" content={ogTitle || title} />
+      )}
+      {ogDescription || description && (
+        <meta property="og:description" content={ogDescription || description} />
+      )}
+      {ogImage && (
+        <meta property="og:image" content={ogImage || ""} />
+      )}
+      {ogURL || canonical && (
+        <meta property="og:url" content={ogURL || canonical} />
+      )}
+
       <meta property="og:type" content="website" />
     </>
   );
