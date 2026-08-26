@@ -90,6 +90,18 @@ export async function joinRoom(code: number) {
   return data;
 }
 
+export interface TurnCredentialsResponse {
+  urls: string[];
+  username: string;
+  credential: string;
+  expires_at: number;
+}
+
+export async function getTurnCredentials() {
+  const { data } = await api.get<TurnCredentialsResponse>(`/turn/credentials`);
+  return data;
+}
+
 export async function getRoomAnnouncements() {
   const { data } = await api.get<RoomAnnouncementsResponse>('/announcements/room');
   return data;

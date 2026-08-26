@@ -21,6 +21,7 @@ import VideoPlayer from "./videoPlayer.tsx/VideoPlayer";
 
 import {
   getRoom,
+  getTurnCredentials,
   getRoomAnnouncements,
   leaveRoom,
   sendRoomMessage,
@@ -354,6 +355,13 @@ const RoomPage = () => {
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const voiceEnabledRef = useRef<boolean>(false);
   const localStreamRef = useRef<MediaStream | null>(null);
+  const turnCredentialsRef = useRef<{
+    urls: string[];
+    username: string;
+    credential: string;
+    expires_at: number;
+  } | null>(null);
+  const turnRefreshTimerRef = useRef<number | null>(null);
   const peersRef = useRef<Map<string, {
     pc: RTCPeerConnection;
     pendingIce: RTCIceCandidateInit[];
@@ -463,26 +471,53 @@ const RoomPage = () => {
     });
   };
 
-  const ICE_SERVERS: RTCIceServer[] = [
-    { urls: "stun:stun.l.google.com:19302" },
-    ...(() => {
-      const urls = String(import.meta.env["VITE_TURN_URLS"] ?? "")
-        .split(",")
-        .map((value) => value.trim())
-        .filter(Boolean);
-      if (!urls.length) return [] as RTCIceServer[];
+  const buildIceServers = (): RTCIceServer[] => {
+    const servers: RTCIceServer[] = [
+      { urls: "stun:stun.l.google.com:19302" },
+    ];
 
-      const username = String(import.meta.env["VITE_TURN_USERNAME"] ?? "");
-      const credential = String(import.meta.env["VITE_TURN_CREDENTIAL"] ?? "");
-      if (!username || !credential) return [] as RTCIceServer[];
+    const turn = turnCredentialsRef.current;
+    if (turn) {
+      servers.push({
+        urls: turn.urls,
+        username: turn.username,
+        credential: turn.credential,
+      });
+    }
 
-      return [{
-        urls,
-        username,
-        credential,
-      }] as RTCIceServer[];
-    })(),
-  ];
+    return servers;
+  };
+
+  const refreshTurnCredentials = async (): Promise<boolean> => {
+    try {
+      const credentials = await getTurnCredentials();
+      turnCredentialsRef.current = credentials;
+      voiceLog("TURN credentials refreshed", { expiresAt: credentials.expires_at });
+      return true;
+    } catch (e) {
+      voiceWarn("TURN credential refresh failed", e);
+      return false;
+    }
+  };
+
+  const scheduleTurnCredentialsRefresh = () => {
+    if (turnRefreshTimerRef.current !== null) {
+      window.clearTimeout(turnRefreshTimerRef.current);
+      turnRefreshTimerRef.current = null;
+    }
+
+    const expiresAt = turnCredentialsRef.current?.expires_at;
+    if (!expiresAt || !voiceEnabledRef.current) return;
+
+    const refreshInMs = Math.max(30_000, (expiresAt - Math.floor(Date.now() / 1000) - 120) * 1000);
+    turnRefreshTimerRef.current = window.setTimeout(async () => {
+      turnRefreshTimerRef.current = null;
+      if (!voiceEnabledRef.current) return;
+      await refreshTurnCredentials();
+      scheduleTurnCredentialsRefresh();
+    }, refreshInMs);
+  };
+
 
   const localUserIdRef = useRef<string>(user?.id ?? "");
   useEffect(() => { localUserIdRef.current = user?.id ?? ""; }, [user?.id]);
@@ -684,7 +719,7 @@ const RoomPage = () => {
 
     console.log("voice: creating peer", { remoteId, isInitiator });
 
-    const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+    const pc = new RTCPeerConnection({ iceServers: buildIceServers() });
     const meta = {
       pc,
       pendingIce: [] as RTCIceCandidateInit[],
@@ -964,11 +999,17 @@ const RoomPage = () => {
       localStreamRef.current = null;
     }
     Object.keys(audioElsRef.current).forEach((id) => removeAudioElementFor(id));
+    if (turnRefreshTimerRef.current !== null) {
+      window.clearTimeout(turnRefreshTimerRef.current);
+      turnRefreshTimerRef.current = null;
+    }
   };
 
   const enableVoice = async () => {
     if (!user?.id) return;
     try {
+      await refreshTurnCredentials();
+
       console.log("voice: acquiring microphone...");
       const s = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
       console.log("voice: microphone acquired");
@@ -997,6 +1038,7 @@ const RoomPage = () => {
       // update refs before starting connections
       voiceEnabledRef.current = true;
       setVoiceEnabled(true);
+      scheduleTurnCredentialsRefresh();
 
       // add local tracks to any existing peers
       peersRef.current.forEach((meta, remoteId) => {
