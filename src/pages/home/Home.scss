@@ -46,7 +46,7 @@
       width: 100%;
 
       @include mx.max-w(1300px) {
-        height: 86vh;
+        height: 100vh;
       }
 
       @include mx.max-w(768px) {
@@ -67,6 +67,8 @@
     }
 
     > h1 {
+      position: absolute;
+      bottom: 16px;
       font-size: 45px;
       font-weight: 700;
       max-width: 660px;
@@ -107,17 +109,24 @@
       @include mx.max-w(1024px) {
         font-size: 34px;
         max-width: 520px;
+        bottom: 42px;
       }
 
       @include mx.max-w(768px) {
         font-size: 24px;
-        max-width: 90%;
+        max-width: 346px;
         letter-spacing: 0.05em;
+        bottom: 10px;
+      }
+      @include mx.max-w(593px) {
+        bottom: 40px;
       }
 
       @include mx.max-w(480px) {
         font-size: 18px;
         border-left-width: 0.1em;
+        bottom: 70px;
+        max-width: 262px;
       }
     }
   }
