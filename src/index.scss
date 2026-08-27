@@ -22,6 +22,30 @@ img {
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
+
+  scrollbar-width: thin;
+  scrollbar-color: rgb(58, 50, 48) transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(208, 78, 47, 0.45);
+    border-radius: 10px;
+  }
+}
+
+body * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(208, 78, 47, 0.45) transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(208, 78, 47, 0.45);
+    border-radius: 10px;
+  }
 }
 
 input,

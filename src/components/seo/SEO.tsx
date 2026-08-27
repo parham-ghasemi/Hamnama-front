@@ -32,18 +32,21 @@ export function SEO({
 
       {canonical && <link rel="canonical" href={canonical} />}
 
-      {ogTitle || title && (
+      {ogTitle || title ? (
         <meta property="og:title" content={ogTitle || title} />
-      )}
-      {ogDescription || description && (
+      ) : null}
+
+      {ogDescription || description ? (
         <meta property="og:description" content={ogDescription || description} />
-      )}
+      ) : null}
+
       {ogImage && (
         <meta property="og:image" content={ogImage || ""} />
       )}
-      {ogURL || canonical && (
+
+      {ogURL || canonical ? (
         <meta property="og:url" content={ogURL || canonical} />
-      )}
+      ) : null}
 
       <meta property="og:type" content="website" />
     </>

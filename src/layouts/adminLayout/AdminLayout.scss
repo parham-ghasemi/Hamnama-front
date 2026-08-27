@@ -23,6 +23,12 @@
   background: var(--layout-page-bg);
   color: var(--layout-text);
 
+  * {
+    -webkit-user-select: text; /* Safari */
+    -ms-user-select: text; /* IE 10 and IE 11 */
+    user-select: text; /* Standard syntax */
+  }
+
   @include mx.light {
     --layout-surface: #{light.$color-white};
     --layout-border: rgba(0, 0, 0, 0.08);
