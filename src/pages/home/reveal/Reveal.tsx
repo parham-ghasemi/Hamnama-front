@@ -8,6 +8,7 @@ type RevealProps = {
   /** Rendered element — kept configurable so semantics stay intact. */
   as?: ElementType;
   className?: string;
+  id?: string;
   /** Staggered delay in ms. Keep small; this is a supporting effect. */
   delay?: number;
   /** Entrance flavour. */
@@ -27,6 +28,7 @@ const Reveal = ({
   className,
   delay = 0,
   variant = "up",
+  id
 }: RevealProps) => {
   const { ref, isVisible } = useReveal<HTMLElement>();
 
@@ -35,6 +37,7 @@ const Reveal = ({
       ref={ref}
       className={clsx("reveal", `reveal--${variant}`, isVisible && "reveal--in", className)}
       style={delay ? ({ "--reveal-delay": `${delay}ms` } as CSSProperties) : undefined}
+      id={id}
     >
       {children}
     </Tag>

@@ -207,7 +207,7 @@ const About = () => {
         </section>
 
         {/* ---- Contact --------------------------------------------------- */}
-        <section className="about-page__section">
+        <section className="about-page__section" id='contact'>
           <Reveal as="h2" className="about-page__section__title">
             راه‌های <span>ارتباط با ما</span>
           </Reveal>

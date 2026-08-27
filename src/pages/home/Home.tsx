@@ -86,8 +86,8 @@ const Home = () => {
         </Reveal>
         <DownloadApp />
 
-        <Reveal as='h2' className='home-page__faq-title'>سوالات متداول</Reveal>
-        <h3 className='home-page__faq-subtitle'>آموزش قدم به قدم استفاده از سایت هم‌نما</h3>
+        <Reveal as='h2' className='home-page__faq-title' id='faq'>سوالات متداول</Reveal>
+        {/* <h3 className='home-page__faq-subtitle'>آموزش قدم به قدم استفاده از سایت هم‌نما</h3> */}
         <Faq />
       </div>
     </>

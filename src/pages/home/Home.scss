@@ -680,6 +680,8 @@
     margin-top: 103.7px;
     padding: 0 16px;
 
+    scroll-margin-top: 90px;
+
     @include mx.max-w(1024px) {
       font-size: 36px;
       margin-top: 70px;

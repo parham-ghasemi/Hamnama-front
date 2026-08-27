@@ -1,56 +1,56 @@
-import { Link } from 'react-router-dom';
 import './Footer.scss';
-import { PiInstagramLogoFill, PiTelegramLogoFill } from "react-icons/pi"
-import { SiGmail } from "react-icons/si";
+import { PiInstagramLogoFill, PiTelegramLogoFill } from 'react-icons/pi';
+import { SiGmail } from 'react-icons/si';
 
+// Only links that actually point somewhere are kept.
+// In the host app (react-router-dom) you can swap <a> for <Link to={...}>.
+const LINKS = [
+  { href: '/#faq', label: 'سوالات متداول' },
+  { href: '/about-us', label: 'درباره ما' },
+  { href: '/about-us#contact', label: 'تماس با ما' },
+];
+
+// TODO: replace '#' with the real profile URLs.
+const SOCIALS = [
+  { href: '#', label: 'اینستاگرام', icon: <PiInstagramLogoFill /> },
+  { href: '#', label: 'تلگرام', icon: <PiTelegramLogoFill /> },
+  { href: '#', label: 'جیمیل', icon: <SiGmail /> },
+];
 
 const Footer = () => {
   return (
-    <div className="footer-container">
-      <div className="footer">
-        <ul className="footer__quick">
-          <p className="footer__section-title">دسترسی سریع</p>
+    <footer className="site-footer" dir="rtl">
+      <div className="site-footer__inner">
+        <div className="site-footer__brand">
+          <span className="site-footer__logo">
+            <img src="/logo/transparentBg/hamnama1-8-08-cropped.png" alt="" />
+          </span>
+          <span className="site-footer__tagline">تماشای فیلم و سریال، کنار هم</span>
+        </div>
 
-          <li>امکانات</li>
-          <li>پلن ها</li>
-          <li>آموزش</li>
-        </ul>
-        <ul className="footer__useful">
-          <p className="footer__section-title">لینک های مفید</p>
+        <nav className="site-footer__nav" aria-label="لینک‌های فوتر">
+          {LINKS.map((link) => (
+            <a key={link.href} href={link.href} className="site-footer__link">
+              {link.label}
+            </a>
+          ))}
+        </nav>
 
-          <li>سوالات متداول</li>
-          <li>دانلود برنامه</li>
-          <li>قوانین هم‌نما</li>
-        </ul>
-        <ul className="footer__contact">
-          <p className="footer__section-title">لینک های مفید</p>
-
-          <li>پشتیبانی</li>
-          <li>
-            <Link to={"/about-us"}>
-              درباره ما
-            </Link>
-          </li>
-          <li>گزارش مشکل</li>
-        </ul>
-
-        <div className="footer__social">
-          <p className="footer__section-title">مارا در شبکات اجتماعی دنبال کنید :</p>
-          <div className="footer__social-links">
-
-            <PiInstagramLogoFill style={{ fill: "#bf3058" }} />
-            <PiTelegramLogoFill style={{ fill: "#2e84c7" }} />
-            <SiGmail style={{ fill: "#d04e2f" }} />
-            <img src='/bale.png' />
-          </div>
+        <div className="site-footer__socials">
+          {SOCIALS.map((s) => (
+            <a key={s.label} href={s.href} aria-label={s.label} className="site-footer__social">
+              {s.icon}
+            </a>
+          ))}
+          <a href="#" aria-label="بله" className="site-footer__social">
+            <img src="/bale.png" alt="بله" />
+          </a>
         </div>
       </div>
 
-      <div className="footer-rights">
-        © 2026 هم‌نما . تمامی حقوق محفوظ است.
-      </div>
-    </div>
-  )
-}
+      <div className="site-footer__rights">© 2026 هم‌نما — تمامی حقوق محفوظ است.</div>
+    </footer>
+  );
+};
 
-export default Footer
+export default Footer;
