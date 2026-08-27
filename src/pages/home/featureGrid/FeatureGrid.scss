@@ -27,10 +27,23 @@
   }
 
   @include mx.max-w(640px) {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    // Keep two columns on mobile so the section doesn't become
+    // unnecessarily tall.
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
     margin-top: 40px;
-    max-width: 440px;
+    // max-width: 440px;
+  }
+
+  @include mx.max-w(472px) {
+    gap: 10px;
+    padding: 0 14px;
+    margin-top: 60px;
+    margin-bottom: 60px;
+  }
+  @include mx.max-w(350px) {
+    grid-template-columns: repeat(1, 1fr);
+    max-width: 250px;
   }
 
   &__blob {
@@ -38,7 +51,7 @@
     transform: translate(50%, -50%);
 
     @include mx.max-w(768px) {
-      display: none; // Prevent horizontal scrollbar on mobile
+      display: none;
     }
   }
 
@@ -62,7 +75,6 @@
       z-index: 2;
     }
 
-    // Warm light pooled behind the icon corner, revealed on hover.
     &::after {
       content: "";
       position: absolute;
@@ -156,13 +168,25 @@
       padding: 18px 20px;
     }
 
-    @include mx.max-w(480px) {
-      padding: 14px 16px;
-      gap: 12px;
-      border-radius: 14px;
+    @include mx.max-w(640px) {
+      min-height: 82px;
+      padding: 12px 13px;
+      gap: 9px;
+      border-radius: 13px;
 
       &::before {
-        border-radius: 14px;
+        border-radius: 13px;
+      }
+    }
+
+    @include mx.max-w(472px) {
+      min-height: 50px;
+      padding: 10px 11px;
+      gap: 8px;
+      border-radius: 12px;
+
+      &::before {
+        border-radius: 12px;
       }
     }
 
@@ -170,7 +194,7 @@
       @include mx.flex-center;
       width: 47.6px;
       height: 47.6px;
-      flex-shrink: 0; // Ensures icon container doesn't shrink on smaller screens
+      flex-shrink: 0;
       background-color: #48261f;
       border-radius: 7px;
       z-index: 1;
@@ -206,6 +230,13 @@
         font-size: 22px;
       }
 
+      @include mx.max-w(420px) {
+        width: 36px;
+        height: 36px;
+        font-size: 19px;
+        border-radius: 6px;
+      }
+
       &__glow {
         position: absolute;
         top: 50%;
@@ -231,6 +262,7 @@
 
     &__left {
       flex: 1;
+      min-width: 0;
       display: flex;
       flex-direction: column;
       gap: 6.8px;
@@ -240,19 +272,38 @@
         display: flex;
         gap: 8px;
         align-items: center;
+        min-width: 0;
       }
 
       &__title {
         font-weight: 900;
         font-size: 17px;
         color: dark.$color-primary;
+        text-wrap: nowrap;
+
+        // // Prevent long Persian titles from forcing the grid wider.
+        // overflow: hidden;
+        // text-overflow: ellipsis;
+        // display: -webkit-box;
+        // -webkit-box-orient: vertical;
+        // -webkit-line-clamp: 2;
+        // line-clamp: 2;
 
         @include mx.light {
           color: light.$color-primary;
         }
 
-        @include mx.max-w(480px) {
-          font-size: 15px;
+        @include mx.max-w(640px) {
+          font-size: 13px;
+          line-height: 1.45;
+        }
+
+        @include mx.max-w(486px) {
+          font-size: 11.5px;
+        }
+
+        @include mx.max-w(486px) {
+          font-size: 13px;
         }
       }
 
@@ -265,8 +316,19 @@
           color: light.$color-dark-gray;
         }
 
-        @include mx.max-w(480px) {
-          font-size: 11.5px;
+        @include mx.max-w(640px) {
+          font-size: 10.5px;
+          line-height: 1.5;
+
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+        }
+
+        @include mx.max-w(472px) {
+          display: none;
         }
       }
     }
@@ -283,6 +345,7 @@
         line-height: 1;
         white-space: nowrap;
         transform: translateY(-2px);
+        flex-shrink: 0;
 
         color: dark.$color-primary;
         background: rgba(208, 78, 47, 0.12);
@@ -292,6 +355,12 @@
           color: light.$color-primary;
           background: rgba(139, 91, 130, 0.08);
           border-color: rgba(139, 91, 130, 0.16);
+        }
+
+        @include mx.max-w(420px) {
+          padding: 2px 5px;
+          font-size: 7px;
+          border-radius: 4px;
         }
       }
     }
