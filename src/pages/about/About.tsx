@@ -6,7 +6,6 @@ import {
   PiCompassFill,
   PiEnvelopeSimpleFill,
   PiLightbulbFilamentFill,
-  PiPhoneFill,
   PiRocketLaunchFill,
   PiShieldCheckFill,
   PiSparkleFill,
@@ -18,11 +17,12 @@ import Reveal from '../home/reveal/Reveal';
 import { useTheme } from '../../context/ThemeContext';
 import { toPersianNumerals } from '../../helpers/NumberConversion';
 import { SEO } from '../../components/seo/SEO';
+import { FaTelegramPlane } from 'react-icons/fa';
 
 /** Contact details of the website owner. Swap with the real values. */
 const contact = {
   email: 'info@hamnama.net',
-  phone: '09120000000',
+  telegram: 'https://t.me/hamnama',
 };
 
 /** The developer behind هم‌نما. */
@@ -115,7 +115,7 @@ const About = () => {
 
           <div className="about-page__hero__stats">
             <div className="about-page__hero__stats__item">
-              <strong>{toPersianNumerals(3)}</strong>
+              <strong>{toPersianNumerals(12)}</strong>
               <span>نفر تیم اصلی</span>
             </div>
             <div className="about-page__hero__stats__item">
@@ -219,27 +219,27 @@ const About = () => {
             </p>
 
             <div className="about-page__contact__rows">
-              <a className="about-page__contact__row" href={`mailto:${contact.email}`} dir="ltr">
+              <div className="about-page__contact__row" dir='ltr'>
                 <span className="about-page__contact__row__icon" aria-hidden="true">
                   <PiEnvelopeSimpleFill />
                 </span>
-                <span className="about-page__contact__row__body">
+                <a className="about-page__contact__row__body " href={`mailto:${contact.email}`} dir="ltr">
                   <span className="about-page__contact__row__label">ایمیل</span>
                   <span className="about-page__contact__row__value">{contact.email}</span>
-                </span>
-              </a>
+                </a>
+              </div>
 
-              <a className="about-page__contact__row" href={`tel:${contact.phone}`} dir="ltr">
+              <div className="about-page__contact__row" dir="ltr">
                 <span className="about-page__contact__row__icon" aria-hidden="true">
-                  <PiPhoneFill />
+                  <FaTelegramPlane />
                 </span>
-                <span className="about-page__contact__row__body">
-                  <span className="about-page__contact__row__label">تلفن</span>
+                <a className="about-page__contact__row__body" href={``} dir='ltr'>
+                  <span className="about-page__contact__row__label">تلگرام</span>
                   <span className="about-page__contact__row__value">
-                    {toPersianNumerals(contact.phone)}
+                    {`@${contact.telegram.slice(contact.telegram.lastIndexOf('/') + 1)}`}
                   </span>
-                </span>
-              </a>
+                </a>
+              </div>
             </div>
           </Reveal>
         </section>
@@ -262,8 +262,8 @@ const About = () => {
             <a href={`mailto:${developer.email}`} aria-label={developer.email} dir="ltr">
               <PiEnvelopeSimpleFill aria-hidden="true" />
             </a>
-            <a href={`tel:${developer.phone}`} aria-label={toPersianNumerals(developer.phone)} dir="ltr">
-              <PiPhoneFill aria-hidden="true" />
+            <a href={`https://t.me/Prhm09`} aria-label={toPersianNumerals(developer.phone)} dir="ltr">
+              <FaTelegramPlane aria-hidden />
             </a>
           </span>
         </Reveal>

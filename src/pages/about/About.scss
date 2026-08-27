@@ -676,6 +676,7 @@
         font-size: 15.5px;
         font-weight: 700;
         overflow-wrap: anywhere;
+        user-select: all;
       }
 
       @include mx.light {
