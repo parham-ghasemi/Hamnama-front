@@ -1,16 +1,20 @@
 import { BsFillGearFill, BsGiftFill, BsXLg } from 'react-icons/bs';
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import clsx from 'clsx';
 import './UsernameDropdown.scss';
 import { PiUserFill } from 'react-icons/pi';
 import { useConfirmationModal } from '../../../context/ConfirmModalContext/ConfirmaModalContext';
 import { toast } from '../../toast';
+import { FaUserLock } from 'react-icons/fa6';
+import AdminRoute from '../../adminRoute/AdminRoute';
 
 // Accept isOpen as a prop
 const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isAdminDashboard = location.pathname.startsWith('/admin');
 
   const bodyItems = [
     {
@@ -21,7 +25,12 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
     {
       icon: <BsGiftFill />,
       title: "دعوت از دوستان",
-      onClick: () => { }
+      onClick: () => { shareInvite() }
+    },
+    {
+      icon: <FaUserLock />,
+      title: "پنل ادمین",
+      onClick: () => navigate('/admin/dashboard')
     },
   ];
 
@@ -44,6 +53,20 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
     })
   }
 
+  async function shareInvite() {
+    const inviteUrl = `https://hamnama.net/invite/${user?.id}`;
+
+    try {
+      await navigator.share({
+        title: "همنما",
+        text: "بیا با هم فیلم ببینیم!",
+        url: inviteUrl,
+      });
+    } catch (error) {
+      console.log("Share cancelled or failed", error);
+    }
+  }
+
   return (
     <>
       {/* Conditionally add the open class */}
@@ -56,7 +79,7 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
         </div>
 
         <div className='username-dropdown__body'>
-          <div className='username-dropdown__body__username'>
+          <Link to={'/user/info'} className='username-dropdown__body__username'>
             <div className='username-dropdown__body__username__photo'>
               {
                 user?.profile_picture ? (
@@ -69,17 +92,29 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
             <span>
               {user?.username}
             </span>
-          </div>
+          </Link>
           <ul>
             {
               bodyItems.map((item, ind) => (
-                <li
-                  key={`headerdropdownbodyind${ind}`}
-                  onClick={item.onClick}
-                >
-                  {item.icon}
-                  {item.title}
-                </li>
+                item.title === "پنل ادمین" && !isAdminDashboard ? (
+                  <AdminRoute>
+                    <li
+                      key={`headerdropdownbodyind${ind}`}
+                      onClick={item.onClick}
+                    >
+                      {item.icon}
+                      {item.title}
+                    </li>
+                  </AdminRoute>
+                ) : (
+                  <li
+                    key={`headerdropdownbodyind${ind}`}
+                    onClick={item.onClick}
+                  >
+                    {item.icon}
+                    {item.title}
+                  </li>
+                )
               ))
             }
           </ul>

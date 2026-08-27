@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useAuth } from '../../context/AuthContext';
@@ -11,6 +11,8 @@ interface AdminRouteProps {
 
 const AdminRoute = ({ children }: AdminRouteProps) => {
   const { isLoading, isAuthenticated, logout } = useAuth();
+  const location = useLocation();
+  const isDashboard = location.pathname.startsWith('/admin');
 
   const { isFetching, isError, error } = useQuery({
     queryKey: ['admin-access'],
@@ -19,7 +21,7 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
     retry: false,
   });
 
-  if (isLoading || (isAuthenticated && isFetching)) {
+  if (isLoading || (isAuthenticated && isFetching) && isDashboard) {
     return (
       <div className="admin-route__loading">
         <div className="admin-route__loading__spinner" />

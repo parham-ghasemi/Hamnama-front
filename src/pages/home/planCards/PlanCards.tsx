@@ -95,7 +95,7 @@ const PlanCards = () => {
                   <p className='home-planCards__card__price-container__current-price__main'>
                     {toPersianNumerals(plan.discount ? plan.discount.newPrice.toLocaleString().replace(',', "،") : plan.price)}
                     <span>
-                      هــــزار تومان
+                      هــــزار تومــان
                     </span>
                   </p>
 
