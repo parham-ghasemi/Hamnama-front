@@ -13,8 +13,37 @@
 
   // Hides the StepAnimation component on tablet & mobile screens
   > *:first-child {
+    @include mx.max-w(1274px) {
+      transform: scale(1.5);
+    }
     @include mx.max-w(1024px) {
+      transform: scale(1.5) translate(0, -20px);
+    }
+    @include mx.max-w(964px) {
+      transform: scale(1.5) translate(0vw, -20px);
+    }
+    @include mx.max-w(720px) {
+      transform: scale(1.6) translate(8vw, -20px);
+    }
+    @include mx.max-w(534px) {
+      transform: scale(1.7) translate(5.5vw, -20px);
+    }
+    @include mx.max-w(395px) {
+      transform: scale(2.3) translate(9vw, -10px);
+    }
+    @include mx.max-w(323px) {
       display: none;
+    }
+  }
+
+  @include mx.max-w(720px) {
+    > * {
+      transform: translateX(10vw);
+    }
+  }
+  @include mx.max-w(323px) {
+    > * {
+      transform: translateX(0);
     }
   }
 
@@ -41,12 +70,18 @@
     width: 100%;
     max-width: 654.5px;
 
+    @include mx.max-w(1024px) {
+      max-width: 500px;
+    }
+
     @include mx.max-w(768px) {
       gap: 24px;
+      max-width: 350px;
     }
 
     @include mx.max-w(480px) {
       gap: 16px;
+      max-width: 250px;
     }
 
     > .img {
