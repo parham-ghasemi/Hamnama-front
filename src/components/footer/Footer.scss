@@ -124,12 +124,19 @@
       width: 17px;
       height: 17px;
       object-fit: contain;
+      filter: grayscale(100%);
+      transition: filter 300ms ease;
     }
 
     &:hover {
       background: var(--footer-chip-hover);
       color: var(--footer-accent);
       transform: translateY(-2px);
+
+      > img {
+        filter: invert(39%) sepia(85%) saturate(1050%) hue-rotate(335deg)
+          brightness(88%) contrast(88%);
+      }
     }
   }
 
