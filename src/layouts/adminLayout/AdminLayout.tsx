@@ -6,6 +6,7 @@ import {
   FiMonitor,
   FiSettings,
   FiMessageCircle,
+  FiArchive,
 } from 'react-icons/fi';
 import Header from '../../components/header/Header';
 import './AdminLayout.scss';
@@ -17,6 +18,7 @@ const navItems = [
   { to: '/admin/users', label: 'کاربران', icon: FiUsers },
   { to: '/admin/rooms', label: 'اتاق‌ها', icon: FiMonitor },
   { to: '/admin/settings', label: 'تنظیمات', icon: FiSettings },
+  { to: '/admin/archive', label: 'مدیریت آرشیو', icon: FiArchive },
 ];
 
 const AdminLayout = () => {

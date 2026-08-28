@@ -147,6 +147,61 @@ export interface SubtitleSyncStatusResponse {
   error?: string;
 }
 
+
+export interface AdminArchiveFileInput {
+  url: string;
+  filename: string;
+  season?: number | null;
+  episode?: number | null;
+  quality_tags?: string;
+  version?: string;
+  release?: string;
+  size?: string;
+  status: number;
+  content_type?: string;
+  valid: boolean;
+  final_url?: string;
+  error?: string;
+}
+
+export interface AdminArchiveItem {
+  id: string;
+  type: 'movie' | 'series';
+  title_en: string;
+  title_fa: string;
+  year: string;
+  rating: string;
+  votes: string;
+  links: unknown;
+  related: string[];
+  omdb?: unknown;
+  rated?: string;
+  released?: string;
+  runtime?: string;
+  genre?: string;
+  director?: string;
+  writer?: string;
+  actors?: string;
+  plot?: string;
+  language?: string;
+  country?: string;
+  awards?: string;
+  poster?: string;
+  metascore?: string;
+  box_office?: string;
+  imdb_rating?: string;
+  imdb_votes?: string;
+  files: AdminArchiveFileInput[];
+}
+
+export interface AdminArchiveResponse {
+  data: AdminArchiveItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export const adminApi = {
   getDashboard: () => api.get<AdminDashboardResponse>("/admin/dashboard"),
 
@@ -158,7 +213,7 @@ export const adminApi = {
 
   listUsers: (params: Record<string, string | number | boolean | undefined>) => api.get<AdminUsersResponse>('/admin/users', { params }),
   updateUser: (id: string, payload: Record<string, unknown>) => api.patch(`/admin/users/${id}`, payload),
-  banUser: (id: string, payload: { reason: string; expires_at?: string; permanent?: boolean }) => api.post(`/admin/users/${id}/ban`, payload),
+  banUser: (id: string, payload: { reason: string; duration: | '1week' | '1month' | '3months' | '6months' | '1year' | 'forever'; }) => api.post(`/admin/users/${id}/ban`, payload),
   unbanUser: (id: string) => api.post(`/admin/users/${id}/unban`),
 
   listRooms: (params: Record<string, string | number | boolean | undefined>) => api.get<AdminRoomsResponse>('/admin/rooms', { params }),
@@ -177,6 +232,15 @@ export const adminApi = {
   triggerArchiveScrape: (url: string) => api.post<ArchiveJobResponse>('/admin/scrape', { url }),
   getArchiveJobStatus: (id: string) => api.get<ArchiveJobStatusResponse>(`/admin/scrape/${id}`),
   getScrapeJobs: () => api.get<ScrapeJobsResponse>('/admin/scrape'),
+
+  listArchive: (params?: { search?: string; type?: string; page?: number; limit?: number }) =>
+    api.get<AdminArchiveResponse>('/admin/archive', { params }),
+  getArchiveItem: (id: string) => api.get<AdminArchiveItem>(`/admin/archive/${id}`),
+  createArchiveItem: (payload: Record<string, unknown>) =>
+    api.post<AdminArchiveItem>('/admin/archive', payload),
+  updateArchiveItem: (id: string, payload: Record<string, unknown>) =>
+    api.patch<AdminArchiveItem>(`/admin/archive/${id}`, payload),
+  deleteArchiveItem: (id: string) => api.delete(`/admin/archive/${id}`),
 
   triggerSubtitleSync: () => api.post<SubtitleSyncResponse>('/admin/subtitles/sync'),
   getSubtitleSyncStatus: (id: string) => api.get<SubtitleSyncStatusResponse>(`/admin/subtitles/sync/${id}`),

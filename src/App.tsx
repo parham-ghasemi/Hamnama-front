@@ -18,7 +18,7 @@ import { AuthProvider } from "./context/AuthContext";
 import RoomPage from "./pages/room/roomPage/RoomPage";
 import AdminLayout from "./layouts/adminLayout/AdminLayout";
 import AdminRoute from "./components/adminRoute/AdminRoute";
-import { AdminDashboard, AdminTickets, AdminUsers, AdminRooms, AdminSettings } from "./pages/admin";
+import { AdminDashboard, AdminTickets, AdminUsers, AdminRooms, AdminSettings, AdminArchive } from "./pages/admin";
 import { ConfirmationModalProvider } from "./context/ConfirmModalContext/ConfirmaModalContext";
 import Home from "./pages/home/Home";
 import NotFound from "./components/notFound/NotFound";
@@ -66,6 +66,7 @@ function App() {
                   <Route path="rooms" element={<AdminRooms />} />
                   <Route path="settings" element={<AdminSettings />} />
                   <Route path="support" element={<AdminSupport />} />
+                  <Route path="archive" element={<AdminArchive />} />
                 </Route>
 
                 <Route path="join-room" element={<Join />} />

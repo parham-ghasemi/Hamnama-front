@@ -9,7 +9,7 @@ import {
   FiSlash,
 } from 'react-icons/fi';
 import { toast } from '../../../components/toast';
-import { adminApi } from '../../../apiCalls/adminApi';
+import { adminApi, type AdminUser } from '../../../apiCalls/adminApi';
 import './Users.scss';
 
 type Filter = 'all' | 'banned' | 'active';
@@ -122,9 +122,7 @@ const Users = () => {
   const [filter, setFilter] = useState<Filter>('all');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [banReason, setBanReason] = useState('');
-  const [banExpiresAt, setBanExpiresAt] = useState('');
-  const [permanentBan, setPermanentBan] = useState(false);
-
+  const [banDuration, setBanDuration] = useState<'1week' | '1month' | '3months' | '6months' | '1year' | 'forever'>('1week');
   const params = useMemo(
     () => ({
       search,
@@ -165,24 +163,16 @@ const Users = () => {
     mutationFn: ({
       id,
       reason,
-      expiresAt,
-      permanent,
+      duration,
     }: {
       id: string;
       reason: string;
-      expiresAt?: string;
-      permanent: boolean;
-    }) =>
-      adminApi.banUser(id, {
-        reason,
-        expires_at: expiresAt,
-        permanent,
-      }),
+      duration: | '1week' | '1month' | '3months' | '6months' | '1year' | 'forever';
+    }) => adminApi.banUser(id, { reason, duration }),
     onSuccess: async () => {
       toast.success('کاربر مسدود شد');
       setBanReason('');
-      setBanExpiresAt('');
-      setPermanentBan(false);
+      setBanDuration('1week');
       setSelectedUserId(null);
       await queryClient.invalidateQueries({ queryKey: ['admin-users'] });
     },
@@ -208,12 +198,7 @@ const Users = () => {
   const handleBanSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (!selectedUserId || !banReason.trim()) return;
-    banMutation.mutate({
-      id: selectedUserId,
-      reason: banReason.trim(),
-      expiresAt: banExpiresAt || undefined,
-      permanent: permanentBan,
-    });
+    banMutation.mutate({ id: selectedUserId, reason: banReason.trim(), duration: banDuration });
   };
 
   const pagination = data?.pagination;
@@ -286,95 +271,85 @@ const Users = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {data?.users?.map(
-                    (user: {
-                      id: string;
-                      username: string;
-                      profile_picture?: string;
-                      created_at: string;
-                      phone_number: string;
-                      is_banned: boolean;
-                      is_admin: boolean;
-                      level: number | string;
-                    }) => (
-                      <tr key={user.id}>
-                        <td>
-                          <div className="admin-users__user">
-                            <div className="admin-users__avatar">
-                              {user.profile_picture ? (
-                                <img
-                                  src={`${import.meta.env.VITE_BASE_URL}${user.profile_picture}`}
-                                  alt={user.username}
-                                />
-                              ) : (
-                                <FiUserPlus />
-                              )}
-                            </div>
-                            <div>
-                              <p className="admin-users__username">
-                                {user.username}
-                              </p>
-                              <span className="admin-users__meta">
-                                {user.created_at}
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-                        <td>{user.phone_number}</td>
-                        <td>
-                          <div className="admin-users__badges">
-                            {user.is_banned ? (
-                              <span className="admin-users__badge admin-users__badge--banned">
-                                مسدود
-                              </span>
+                  {data?.users?.map((user: AdminUser) => (
+                    <tr key={user.id}>
+                      <td>
+                        <div className="admin-users__user">
+                          <div className="admin-users__avatar">
+                            {user.profile_picture ? (
+                              <img
+                                src={`${import.meta.env.VITE_BASE_URL}${user.profile_picture}`}
+                                alt={user.username}
+                              />
                             ) : (
-                              <span className="admin-users__badge admin-users__badge--active">
-                                فعال
-                              </span>
+                              <FiUserPlus />
                             )}
-                            {user.is_admin ? (
-                              <span className="admin-users__badge admin-users__badge--admin">
-                                ادمین
-                              </span>
-                            ) : null}
                           </div>
-                        </td>
-                        <td>{user.level}</td>
-                        <td>
-                          <div className="admin-users__row-actions">
+                          <div>
+                            <p className="admin-users__username">
+                              {user.username}
+                            </p>
+                            <span className="admin-users__meta">
+                              {user.created_at}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                      <td>{user.phone_number}</td>
+                      <td>
+                        <div className="admin-users__badges">
+                          {user.is_banned ? (
+                            <span className="admin-users__badge admin-users__badge--banned">
+                              مسدود
+                            </span>
+                          ) : (
+                            <span className="admin-users__badge admin-users__badge--active">
+                              فعال
+                            </span>
+                          )}
+                          {user.is_admin ? (
+                            <span className="admin-users__badge admin-users__badge--admin">
+                              ادمین
+                            </span>
+                          ) : null}
+                        </div>
+                      </td>
+                      <td>{user.level}</td>
+                      <td>
+                        <div className="admin-users__row-actions">
+                          <button
+                            type="button"
+                            className="admin-users__action"
+                            onClick={() => handleToggleAdmin(user)}
+                            disabled={updateUserMutation.isPending}
+                          >
+                            <FiShield />
+                            {user.is_admin ? 'حذف ادمینی' : 'تعیین ادمین'}
+                          </button>
+                          {user.is_banned ? (
                             <button
                               type="button"
-                              className="admin-users__action"
-                              onClick={() => handleToggleAdmin(user)}
-                              disabled={updateUserMutation.isPending}
+                              className="admin-users__action admin-users__action--secondary"
+                              onClick={() => unbanMutation.mutate(user.id)}
+                              disabled={unbanMutation.isPending}
                             >
-                              <FiShield />
-                              {user.is_admin ? 'حذف ادمینی' : 'تعیین ادمین'}
+                              <FiChevronRight />
+                              رفع مسدودی
                             </button>
-                            {user.is_banned ? (
-                              <button
-                                type="button"
-                                className="admin-users__action admin-users__action--secondary"
-                                onClick={() => unbanMutation.mutate(user.id)}
-                                disabled={unbanMutation.isPending}
-                              >
-                                <FiChevronRight />
-                                رفع مسدودی
-                              </button>
-                            ) : (
-                              <button
-                                type="button"
-                                className="admin-users__action admin-users__action--danger"
-                                onClick={() => setSelectedUserId(user.id)}
-                              >
-                                <FiSlash />
-                                مسدودسازی
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    )
+                          ) : (
+                            <button
+                              type="button"
+                              className="admin-users__action admin-users__action--danger"
+                              onClick={() => setSelectedUserId(user.id)}
+                            >
+                              <FiSlash />
+                              مسدودسازی
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )
                   )}
                 </tbody>
               </table>
@@ -429,24 +404,22 @@ const Users = () => {
                   rows={3}
                 />
               </label>
-              <label className="admin-users__modal__toggle">
-                <input
-                  type="checkbox"
-                  checked={permanentBan}
-                  onChange={(event) => setPermanentBan(event.target.checked)}
+              <label>
+                <span>مدت مسدودی</span>
+                <SmoothDropdown
+                  value={banDuration}
+                  options={[
+                    { value: '1week', label: '۱ هفته' },
+                    { value: '1month', label: '۱ ماه' },
+                    { value: '3months', label: '۳ ماه' },
+                    { value: '6months', label: '۶ ماه' },
+                    { value: '1year', label: '۱ سال' },
+                    { value: 'forever', label: 'همیشه' },
+                  ]}
+                  onChange={setBanDuration}
+                  ariaLabel="مدت مسدودی"
                 />
-                <span>مسدودسازی دائم</span>
               </label>
-              {!permanentBan ? (
-                <label>
-                  <span>تاریخ انقضا</span>
-                  <input
-                    type="datetime-local"
-                    value={banExpiresAt}
-                    onChange={(event) => setBanExpiresAt(event.target.value)}
-                  />
-                </label>
-              ) : null}
               <div className="admin-users__modal__actions">
                 <button
                   type="button"
