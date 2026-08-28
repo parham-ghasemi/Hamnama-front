@@ -25,6 +25,7 @@ import {
   getRoomAnnouncements,
   leaveRoom,
   sendRoomMessage,
+  uploadRoomMedia,
   editRoomMessage,
   kickRoomMember,
   updateRoomMemberRole,
@@ -77,6 +78,8 @@ type ClientSocketEvent =
       currently_playing?: string | null;
       is_playing: boolean;
       user_id: string;
+      upload_id?: string;
+      subtitles?: { id: string; filename: string; cues: { start: number; end: number; text: string }[] }[];
     };
   }
   | {
@@ -131,6 +134,8 @@ type ServerSocketEvent =
       currently_playing?: string | null;
       is_playing: boolean;
       user_id: string;
+      upload_id?: string;
+      subtitles?: { id: string; filename: string; cues: { start: number; end: number; text: string }[] }[];
     };
   }
   | { type: "voice_offer"; payload: any }
@@ -241,11 +246,10 @@ const RoomPage = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [isMicMuted, setIsMicMuted] = useState(true);
   const [inviteCopied, setInviteCopied] = useState(false);
-  const [screenShareStream, setScreenShareStream] = useState<MediaStream | null>(null);
-  const [screenShareError, setScreenShareError] = useState<string | null>(null);
+  const [customSubtitleTracks, setCustomSubtitleTracks] = useState<{ id: string; filename: string; cues: { start: number; end: number; text: string }[] }[]>([]);
+  const [currentUploadId, setCurrentUploadId] = useState<string | null>(null);
   const [connectionStatuses, setConnectionStatuses] = useState<Record<string, ConnectionStatus>>({});
   const currentTimeRef = useRef(0);
-  const screenVideoRef = useRef<HTMLVideoElement | null>(null);
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
   const messageInputRef = useRef<HTMLTextAreaElement | null>(null);
   const viewportBaseHeightRef = useRef<number | null>(null);
@@ -1232,6 +1236,7 @@ const RoomPage = () => {
     setRoomState(roomQuery.data);
     setConnectionLost(false);
     setPlaybackSrc(roomQuery.data.currently_playing ?? "");
+    setCustomSubtitleTracks(roomQuery.data.subtitles ?? []);
     setCurrentTime(roomQuery.data.playback_time ?? 0);
     setIsPlaying(roomQuery.data.is_playing ?? false);
     const statuses: Record<string, ConnectionStatus> = {};
@@ -1242,18 +1247,6 @@ const RoomPage = () => {
 
     setConnectionStatuses(statuses);
   }, [roomQuery.data]);
-
-  useEffect(() => {
-    if (screenVideoRef.current && screenShareStream) {
-      screenVideoRef.current.srcObject = screenShareStream;
-    }
-  }, [screenShareStream]);
-
-  useEffect(() => {
-    return () => {
-      screenShareStream?.getTracks().forEach((track) => track.stop());
-    };
-  }, [screenShareStream]);
 
   const groupedMessages = useMemo(() => {
     const messages = (roomState?.messages ?? []).map((message) => ({
@@ -1365,7 +1358,7 @@ const RoomPage = () => {
           setRoomState((prev) => {
             if (!prev) return prev;
             if (prev.messages.some((m) => m.id === parsed.payload.id)) return prev;
-            return { ...prev, messages: [...prev.messages, parsed.payload] };
+            return { ...prev, messages: [...prev.messages, parsed.payload].slice(-100) };
           });
           break;
 
@@ -1472,18 +1465,30 @@ const RoomPage = () => {
         case "sync_playback": {
           if (parsed.payload.user_id === user.id) break;
 
+          const nextSubtitles = parsed.payload.subtitles ?? [];
+          const playbackUpdate: Partial<RoomResponse> = {
+            currently_playing: parsed.payload.currently_playing ?? null,
+            playback_time: Math.round(parsed.payload.playback_time),
+            is_playing: parsed.payload.is_playing,
+          };
+          if (parsed.payload.action === "load" || parsed.payload.upload_id) {
+            playbackUpdate.subtitles = nextSubtitles;
+          }
           setRoomState((prev) =>
             prev
-              ? {
-                ...prev,
-                currently_playing: parsed.payload.currently_playing ?? prev.currently_playing,
-                playback_time: Math.round(parsed.payload.playback_time),
-              }
+              ? { ...prev, ...playbackUpdate }
               : prev,
           );
 
           if (typeof parsed.payload.currently_playing === "string") {
             setPlaybackSrc(parsed.payload.currently_playing);
+          } else if (parsed.payload.currently_playing === null) {
+            setPlaybackSrc("");
+          }
+
+          if (parsed.payload.action === "load" || parsed.payload.upload_id) {
+            setCustomSubtitleTracks(nextSubtitles);
+            setCurrentUploadId(parsed.payload.upload_id ?? null);
           }
 
           setCurrentTime(parsed.payload.playback_time);
@@ -1611,6 +1616,8 @@ const RoomPage = () => {
           currently_playing: playbackSrc || null,
           is_playing: true,
           user_id: user?.id ? user.id : "",
+          upload_id: currentUploadId ?? undefined,
+          subtitles: currentUploadId ? customSubtitleTracks : undefined,
         },
       });
     }, 30000);
@@ -1621,7 +1628,7 @@ const RoomPage = () => {
         syncIntervalRef.current = null;
       }
     };
-  }, [isCreator, isPlaying, currentTime, playbackSrc, user?.id]);
+  }, [isCreator, isPlaying, currentTime, playbackSrc, currentUploadId, customSubtitleTracks, user?.id]);
 
   const sendMessageMutation = useMutation({
     mutationFn: (content: string) => sendRoomMessage(roomId!, content, replyingTo.id),
@@ -1705,6 +1712,8 @@ const RoomPage = () => {
       currently_playing: source || null,
       is_playing: action === "play" || action === "sync" || action === "load" ? true : action === "pause" ? false : isPlaying,
       user_id: user?.id ?? "",
+      upload_id: action === "load" ? (currentUploadId && source === playbackSrc ? currentUploadId : undefined) : currentUploadId ?? undefined,
+      subtitles: currentUploadId && (action !== "load" || source === playbackSrc) ? customSubtitleTracks : undefined,
     };
 
     sendSocketEvent({ type: "sync_playback", payload });
@@ -1719,6 +1728,23 @@ const RoomPage = () => {
         : prev,
     );
   };
+
+  const resizeMessageInput = useCallback(() => {
+    const input = messageInputRef.current;
+    if (!input) return;
+    const styles = window.getComputedStyle(input);
+    const lineHeight = Number.parseFloat(styles.lineHeight) || 21;
+    const paddingY = (Number.parseFloat(styles.paddingTop) || 0) + (Number.parseFloat(styles.paddingBottom) || 0);
+    const maxHeight = Math.ceil(lineHeight * 4 + paddingY);
+    input.style.height = "auto";
+    const nextHeight = Math.min(input.scrollHeight, maxHeight);
+    input.style.height = `${Math.max(nextHeight, 44)}px`;
+    input.style.overflowY = input.scrollHeight > maxHeight ? "auto" : "hidden";
+  }, []);
+
+  useEffect(() => {
+    resizeMessageInput();
+  }, [messageText, resizeMessageInput]);
 
   const handleSendMessage = () => {
     const content = messageText.trim();
@@ -1805,6 +1831,8 @@ const RoomPage = () => {
     if (!nextSrc) return;
 
     setSelectedMedia(null);
+    setCustomSubtitleTracks([]);
+    setCurrentUploadId(null);
     setPlaybackSrc(nextSrc);
     setCurrentTime(0);
     setIsPlaying(false);
@@ -1820,6 +1848,8 @@ const RoomPage = () => {
   const handleArchiveSelect = (media: SelectedArchiveMedia) => {
     setCurrentId(media.id)
     setSelectedMedia(media);
+    setCustomSubtitleTracks([]);
+    setCurrentUploadId(null);
     setLinkModeEnabled(false);
     setLink("");
     setCurrentQuality(media.quality ?? "quality");
@@ -1835,6 +1865,8 @@ const RoomPage = () => {
 
     setCurrentId(nextEpisode.id);
     setSelectedMedia(nextEpisode);
+    setCustomSubtitleTracks([]);
+    setCurrentUploadId(null);
     setCurrentQuality(nextEpisode.quality ?? "quality");
     setPlaybackSrc(nextEpisode.url);
     setCurrentTime(0);
@@ -1842,27 +1874,27 @@ const RoomPage = () => {
     emitPlayback("load", 0, nextEpisode.url);
   };
 
-  const handleShareScreen = async () => {
-    try {
-      setScreenShareError(null);
-      setMediaTypeModalOpen(false);
-
-      if (!navigator.mediaDevices?.getDisplayMedia) {
-        throw new Error("این مرورگر از اشتراک‌گذاری صفحه پشتیبانی نمی‌کند.");
-      }
-
-      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-      setScreenShareStream(stream);
-    } catch (error) {
-      setScreenShareError(error instanceof Error ? error.message : "امکان شروع اشتراک‌گذاری صفحه وجود ندارد.");
-      console.error("Screen share error:", error);
-    }
-  };
-
-  const stopScreenShare = () => {
-    screenShareStream?.getTracks().forEach((track) => track.stop());
-    setScreenShareStream(null);
-    setScreenShareError(null);
+  const handleUploadOwnMedia = async (videoFile: File, subtitleFile: File | null) => {
+    if (!roomId) return;
+    const result = await uploadRoomMedia(roomId, videoFile, subtitleFile);
+    setSelectedMedia(null);
+    setLinkModeEnabled(false);
+    setLink("");
+    setCurrentQuality("uploaded");
+    setCurrentId("");
+    setCurrentUploadId(result.upload_id);
+    setCustomSubtitleTracks(result.subtitles ?? []);
+    setPlaybackSrc(result.video_url);
+    setCurrentTime(0);
+    setIsPlaying(false);
+    setMediaTypeModalOpen(false);
+    setRoomState((prev) => prev ? {
+      ...prev,
+      currently_playing: result.video_url,
+      playback_time: 0,
+      is_playing: false,
+      subtitles: result.subtitles ?? [],
+    } : prev);
   };
 
   const handleCopyInviteCode = async () => {
@@ -2294,15 +2326,7 @@ const RoomPage = () => {
         </div>
 
         <div className="room-page__main__player">
-          {screenShareStream ? (
-            <div className="room-page__main__player__screen-share">
-              <video ref={screenVideoRef} autoPlay playsInline muted className="room-page__main__player__screen-share__video" />
-              <div className="room-page__main__player__screen-share__actions">
-                <button onClick={stopScreenShare}>توقف اشتراک‌گذاری</button>
-                {screenShareError && <p>{screenShareError}</p>}
-              </div>
-            </div>
-          ) : playbackSrc ? (
+          {playbackSrc ? (
             <>
               <img src="/logo//transparentBg//hamnama1-8-08-cropped.png" alt="" className="room-page__main__player__logo" />
               <VideoPlayer
@@ -2311,6 +2335,7 @@ const RoomPage = () => {
                 mediaId={selectedMedia?.id || currentId || undefined}
                 subtitleSeason={selectedMedia?.season}
                 subtitleEpisode={selectedMedia?.episode}
+                customSubtitleTracks={customSubtitleTracks}
                 isPlaying={isPlaying}
                 currentTime={currentTime}
                 className='flex-1! h-full! mb-0 mt-auto ml-auto mr-auto'
@@ -2586,7 +2611,7 @@ const RoomPage = () => {
                   onBlur={() => setIsKeyboardOpen(false)}
                   disabled={false}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
+                    if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
                       e.preventDefault();
                       handleSendMessage();
                     }
@@ -2643,7 +2668,7 @@ const RoomPage = () => {
               closeModal={() => setMediaTypeModalOpen(false)}
               openArchive={() => setArchiveModalOpen(true)}
               onChooseLink={handleChooseLinkMode}
-              onShareScreen={handleShareScreen}
+              onSubmitUpload={handleUploadOwnMedia}
             />
           </div>
         )}

@@ -39,6 +39,7 @@ export interface VideoPlayerProps {
   mediaId?: string;
   subtitleSeason?: number | null;
   subtitleEpisode?: number | null;
+  customSubtitleTracks?: SubtitleTrack[];
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -59,6 +60,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   mediaId,
   subtitleSeason,
   subtitleEpisode,
+  customSubtitleTracks = [],
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -183,10 +185,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const toggleSubtitles = useCallback(async () => {
     if (subtitleStatus === "loading") return;
 
+    if (customSubtitleTracks.length) {
+      if (!subtitlesRequested) {
+        setSubtitlesRequested(true);
+        setSubtitleTracks(customSubtitleTracks);
+        setSubtitleStatus("ready");
+        setActiveSubtitle(0);
+        return;
+      }
+      if (subtitleStatus !== "ready") return;
+      setActiveSubtitle((current) => (current >= 0 ? -1 : 0));
+      return;
+    }
+
     if (!subtitlesRequested) {
       if (!mediaId) {
         setSubtitleStatus("error");
-        setSubtitleError("زیرنویس فقط برای ویدیوهای انتخاب‌شده از آرشیو در دسترس است.");
+        setSubtitleError("برای این ویدیو زیرنویس آماده نشده است.");
         setSubtitlesRequested(true);
         return;
       }
@@ -217,7 +232,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
     if (subtitleStatus !== "ready" || !subtitleTracks.length) return;
     setActiveSubtitle((current) => (current >= 0 ? -1 : 0));
-  }, [mediaId, subtitleEpisode, subtitleSeason, subtitleStatus, subtitleTracks.length, subtitlesRequested]);
+  }, [customSubtitleTracks, mediaId, subtitleEpisode, subtitleSeason, subtitleStatus, subtitleTracks.length, subtitlesRequested]);
 
   const toggleFullscreen = async () => {
     if (!containerRef.current) return;

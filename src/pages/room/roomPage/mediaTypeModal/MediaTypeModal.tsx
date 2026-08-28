@@ -1,30 +1,58 @@
 import './MediaTypeModal.scss';
 import clsx from "clsx";
+import { useState } from "react";
 import { BsLink45Deg } from "react-icons/bs";
-import { IoClose, IoTvOutline } from "react-icons/io5";
+import { IoClose, IoCloudUploadOutline } from "react-icons/io5";
 import { TbArchiveFilled, TbPlayerPlay } from 'react-icons/tb';
 
 const MediaTypeModal = ({
   openArchive,
   isOpen,
   closeModal,
-  onShareScreen,
   onChooseLink,
+  onSubmitUpload,
 }: {
   isOpen: boolean;
   openArchive: () => void;
   closeModal: () => void;
-  onShareScreen: () => void;
   onChooseLink: () => void;
+  onSubmitUpload: (videoFile: File, subtitleFile: File | null) => Promise<void>;
 }) => {
-  const handleOpenArchive = () => {
-    closeModal();
-    openArchive();
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [subtitleFile, setSubtitleFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const resetUpload = () => {
+    setUploadOpen(false);
+    setVideoFile(null);
+    setSubtitleFile(null);
+    setUploadError(null);
+    setUploading(false);
   };
 
-  const handleShareScreen = () => {
+  const handleClose = () => {
+    resetUpload();
     closeModal();
-    onShareScreen();
+  };
+
+  const handleChooseUpload = () => {
+    setUploadOpen(true);
+    setUploadError(null);
+  };
+
+  const handleSubmit = async () => {
+    if (!videoFile || uploading) return;
+    setUploading(true);
+    setUploadError(null);
+    try {
+      await onSubmitUpload(videoFile, subtitleFile);
+      resetUpload();
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : "آپلود فایل‌ها انجام نشد.");
+      setUploading(false);
+    }
   };
 
   return (
@@ -40,7 +68,7 @@ const MediaTypeModal = ({
         <button
           type="button"
           className="media-type-modal__close"
-          onClick={closeModal}
+          onClick={handleClose}
           aria-label="بستن"
         >
           <IoClose />
@@ -52,6 +80,7 @@ const MediaTypeModal = ({
           type="button"
           className="media-type-modal__option media-type-modal__option--link"
           onClick={onChooseLink}
+          disabled={uploading}
         >
           <div className="media-type-modal__option-icon">
             <BsLink45Deg />
@@ -66,7 +95,12 @@ const MediaTypeModal = ({
         <button
           type="button"
           className="media-type-modal__option media-type-modal__option--archive"
-          onClick={handleOpenArchive}
+          onClick={() => {
+            resetUpload();
+            closeModal();
+            openArchive();
+          }}
+          disabled={uploading}
         >
           <div className="media-type-modal__option-icon">
             <TbArchiveFilled />
@@ -80,18 +114,60 @@ const MediaTypeModal = ({
 
         <button
           type="button"
-          className="media-type-modal__option media-type-modal__option--screen"
-          onClick={handleShareScreen}
+          className={clsx(
+            "media-type-modal__option",
+            "media-type-modal__option--upload",
+            uploadOpen && "is-open",
+          )}
+          onClick={handleChooseUpload}
+          disabled={uploading}
         >
           <div className="media-type-modal__option-icon">
-            <IoTvOutline />
+            <IoCloudUploadOutline />
           </div>
           <div className="media-type-modal__option-text">
-            <strong>اشتراک‌گذاری صفحه</strong>
-            <span>صفحه نمایش خود را با دیگران به اشتراک بگذارید</span>
+            <strong>آپلود فایل خودتان</strong>
+            <span>ویدیوی خودتان را به‌همراه زیرنویس SRT به اتاق اضافه کنید</span>
           </div>
           <span className="media-type-modal__option-arrow">←</span>
         </button>
+
+        {uploadOpen && (
+          <div className="media-type-modal__upload-panel">
+            <label className="media-type-modal__file-field">
+              <span>فایل ویدیو <b>*</b></span>
+              <input
+                type="file"
+                accept="video/*,.mp4,.webm,.mov,.m4v,.mkv,.avi,.mpeg,.mpg,.ogv"
+                onChange={(event) => setVideoFile(event.target.files?.[0] ?? null)}
+                disabled={uploading}
+              />
+              <em>{videoFile?.name ?? "انتخاب فایل ویدیویی"}</em>
+            </label>
+
+            <label className="media-type-modal__file-field">
+              <span>زیرنویس <small>(اختیاری، فقط SRT)</small></span>
+              <input
+                type="file"
+                accept=".srt,application/x-subrip"
+                onChange={(event) => setSubtitleFile(event.target.files?.[0] ?? null)}
+                disabled={uploading}
+              />
+              <em>{subtitleFile?.name ?? "انتخاب فایل .srt"}</em>
+            </label>
+
+            {uploadError && <p className="media-type-modal__upload-error">{uploadError}</p>}
+
+            <button
+              type="button"
+              className="media-type-modal__upload-submit"
+              onClick={handleSubmit}
+              disabled={!videoFile || uploading}
+            >
+              {uploading ? "در حال آپلود…" : "آپلود و پخش در اتاق"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1226,7 +1226,7 @@
 
         &__row {
           display: flex;
-          align-items: center;
+          align-items: end;
           width: 100%;
         }
 
@@ -2814,8 +2814,7 @@
 
   .room-page__main__top__choose:hover,
   .room-page__main__top__submit:hover:not(:disabled),
-  .room-page__side-bar button:hover,
-  .room-page__chat-container button:hover {
+  .room-page__side-bar button:hover {
     transform: translateY(-1px);
   }
 }
@@ -3483,7 +3482,7 @@
 
     &__row {
       min-height: 52px;
-      align-items: center;
+      align-items: end;
     }
 
     &__row > textarea {
@@ -3497,6 +3496,7 @@
 
     &__row > button {
       flex: 0 0 38px;
+      transform: translateY(-3px);
     }
   }
 }
@@ -3546,4 +3546,13 @@
       }
     }
   }
+}
+
+/* Chat composer: fully rounded controls at every responsive breakpoint. */
+.room-page__chat-container__foot__input,
+.room-page__chat-container__foot__input:has(
+  .room-page__chat-container__foot__replying-to
+),
+.room-page__chat-container__foot__send {
+  border-radius: 27px;
 }

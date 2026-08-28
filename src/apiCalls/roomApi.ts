@@ -1,6 +1,18 @@
 import api from "../lib/axiosConfig";
 import axios from "axios";
 
+export interface SubtitleCue {
+  start: number;
+  end: number;
+  text: string;
+}
+
+export interface SubtitleTrack {
+  id: string;
+  filename: string;
+  cues: SubtitleCue[];
+}
+
 export type ConnectionStatus = "good" | "medium" | "bad" | "offline";
 
 export interface RoomMemberResponse {
@@ -78,6 +90,7 @@ export interface RoomResponse {
   created_at: string;
   members: RoomMemberResponse[];
   messages: RoomMessageResponse[];
+  subtitles?: SubtitleTrack[];
 }
 
 export async function createRoom(request: CreateRoomRequest) {
@@ -160,4 +173,19 @@ export async function kickRoomMember(roomId: string, userId: string) {
 
 export function getRoomApiErrorStatus(error: unknown): number | undefined {
   return axios.isAxiosError(error) ? error.response?.status : undefined;
+}
+
+export interface UploadRoomMediaResponse {
+  upload_id: string;
+  video_url: string;
+  subtitles?: SubtitleTrack[];
+}
+
+export async function uploadRoomMedia(roomId: string, videoFile: File, subtitleFile?: File | null) {
+  const form = new FormData();
+  form.append("video", videoFile);
+  if (subtitleFile) form.append("subtitle", subtitleFile);
+
+  const { data } = await api.post<UploadRoomMediaResponse>(`/rooms/${roomId}/media`, form);
+  return data;
 }

@@ -154,7 +154,7 @@
   &__option--archive .media-type-modal__option-icon {
     background: var(--media-grad-2);
   }
-  &__option--screen .media-type-modal__option-icon {
+  &__option--upload .media-type-modal__option-icon {
     background: var(--media-grad-3);
   }
 
@@ -192,3 +192,81 @@
     transform: translateX(-3px);
   }
 }
+
+
+.media-type-modal__option[disabled] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.media-type-modal__upload-panel {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border-subtle));
+  background: color-mix(in srgb, var(--accent) 5%, var(--media-card-bg));
+}
+
+.media-type-modal__file-field {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px dashed color-mix(in srgb, var(--accent) 24%, var(--border-subtle));
+  background: color-mix(in srgb, var(--component-bg) 70%, transparent);
+  cursor: pointer;
+}
+
+.media-type-modal__file-field > span {
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.media-type-modal__file-field > span b { color: var(--accent); }
+.media-type-modal__file-field > span small { opacity: 0.55; font-weight: 600; }
+
+.media-type-modal__file-field > input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.media-type-modal__file-field > em {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-style: normal;
+}
+
+.media-type-modal__upload-error {
+  margin: 0;
+  color: #ff9f96;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.media-type-modal__upload-submit {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.media-type-modal__upload-submit:hover:not(:disabled) { opacity: 0.9; }
+.media-type-modal__upload-submit:active:not(:disabled) { transform: scale(0.985); }
+.media-type-modal__upload-submit:disabled { opacity: 0.45; cursor: not-allowed; }
