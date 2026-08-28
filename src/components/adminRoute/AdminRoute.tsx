@@ -38,12 +38,14 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
     const axiosError = error as AxiosError<{ message?: string }>;
     const status = axiosError.response?.status;
 
-    if (status === 401) {
-      logout();
-      return <Navigate to="/auth" replace />;
-    }
+    if (isDashboard) {
+      if (status === 401) {
+        logout();
+        return <Navigate to="/auth" replace />;
+      }
 
-    return <Navigate to="/" replace />;
+      return <Navigate to="/" replace />;
+    }
   }
 
   return <>{children}</>;

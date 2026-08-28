@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { AiTwotoneSetting } from "react-icons/ai";
-import { BsEmojiLaughing, BsFillPeopleFill, BsFillShareFill, BsMicFill, BsMicMuteFill, BsReplyFill } from "react-icons/bs";
+import { BsEmojiLaughing, BsFillPeopleFill, BsFillShareFill, BsMicFill, BsMicMuteFill, BsReplyFill, BsPeopleFill } from "react-icons/bs";
 import { IoChatbubblesSharp, IoChevronBack, IoClose, IoExitOutline } from "react-icons/io5";
 import { FaArrowRight, FaCheck } from "react-icons/fa6";
 import { TbSticker, TbMovieOff, TbPlayerPlayFilled, TbX } from "react-icons/tb";
@@ -157,6 +157,10 @@ type ServerSocketEvent =
     };
   };
 
+const CHAT_WIDTH_STORAGE_KEY = "cinema-room-chat-width";
+const DEFAULT_CHAT_WIDTH = 345;
+const MIN_CHAT_WIDTH = 275;
+
 function buildWsUrl(baseUrl: string, roomId: string, token?: string) {
   const url = new URL(baseUrl);
   url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
@@ -164,6 +168,17 @@ function buildWsUrl(baseUrl: string, roomId: string, token?: string) {
   if (token) url.searchParams.set("token", token);
   return url.toString();
 }
+
+const getStoredChatWidth = () => {
+  if (typeof window === "undefined") return DEFAULT_CHAT_WIDTH;
+
+  try {
+    const stored = Number(window.localStorage.getItem(CHAT_WIDTH_STORAGE_KEY));
+    return Number.isFinite(stored) && stored > 0 ? stored : DEFAULT_CHAT_WIDTH;
+  } catch {
+    return DEFAULT_CHAT_WIDTH;
+  }
+};
 
 const RoomPage = () => {
   const { id: roomId } = useParams<{ id: string }>();
@@ -211,7 +226,7 @@ const RoomPage = () => {
   const [hiddenAnnouncementIds, setHiddenAnnouncementIds] = useState<Set<string>>(
     () => new Set(),
   );
-  const [chatWidth, setChatWidth] = useState(345);
+  const [chatWidth, setChatWidth] = useState(getStoredChatWidth);
   const chatResizeRef = useRef<{ active: boolean; startX: number; startWidth: number }>({
     active: false,
     startX: 0,
@@ -238,10 +253,29 @@ const RoomPage = () => {
   const intentionalSocketCloseRef = useRef(false);
 
   const clampChatWidth = useCallback((width: number) => {
-    const minWidth = 275;
-    const maxWidth = Math.max(minWidth, Math.floor(window.innerWidth * 0.5));
-    return Math.min(maxWidth, Math.max(minWidth, width));
+    const maxWidth = Math.max(
+      MIN_CHAT_WIDTH,
+      Math.floor(window.innerWidth * 0.5),
+    );
+    return Math.min(maxWidth, Math.max(MIN_CHAT_WIDTH, width));
   }, []);
+
+  useEffect(() => {
+    const clampedWidth = clampChatWidth(chatWidth);
+    if (clampedWidth !== chatWidth) {
+      setChatWidth(clampedWidth);
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(
+        CHAT_WIDTH_STORAGE_KEY,
+        String(Math.round(chatWidth)),
+      );
+    } catch {
+      // Storage can be unavailable in privacy-restricted browser contexts.
+    }
+  }, [chatWidth, clampChatWidth]);
 
   const handleChatResizeStart = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (window.innerWidth <= 980) return;
@@ -2072,7 +2106,14 @@ const RoomPage = () => {
 
 
   return (
-    <div className={clsx("room-page", sidebarOpen && "sidebar-open", isKeyboardOpen && "keyboard-open")}>
+    <div
+      className={clsx(
+        "room-page",
+        sidebarOpen && "sidebar-open",
+        isKeyboardOpen && "keyboard-open",
+        isPlaying && "is-playing",
+      )}
+    >
       {connectionLost && (
         <div className="room-page__connection-lost" role="alert">
           <span>اتصال شما به اتاق قطع شد.</span>
@@ -2262,36 +2303,39 @@ const RoomPage = () => {
               </div>
             </div>
           ) : playbackSrc ? (
-            <VideoPlayer
-              src={playbackSrc}
-              quality={currentQuality}
-              isPlaying={isPlaying}
-              currentTime={currentTime}
-              className='flex-1! h-full! mb-0 mt-auto ml-auto mr-auto'
-              onPlayRequest={() => {
-                setIsPlaying(true);
-                emitPlayback("play", currentTime);
-              }}
-              onPauseRequest={() => {
-                setIsPlaying(false);
-                emitPlayback("pause", currentTime);
-              }}
-              onSeekRequest={(t) => {
-                setCurrentTime(t);
-                emitPlayback("seek", t);
-              }}
-              onLocalTimeUpdate={(t) => {
-                setCurrentTime(t);
-                currentTimeRef.current = t;
-              }}
-              nextEpisode={
-                selectedMedia?.type === "series" && selectedMedia.season != null && selectedMedia.episode != null
-                  ? selectedMedia.nextEpisode ?? null
-                  : null
-              }
-              onNextEpisodeRequest={handleNextEpisode}
-              subtitleSettings={subtitleSettings}
-            />
+            <>
+              <img src="/logo//transparentBg//hamnama1-8-08-cropped.png" alt="" className="room-page__main__player__logo" />
+              <VideoPlayer
+                src={playbackSrc}
+                quality={currentQuality}
+                isPlaying={isPlaying}
+                currentTime={currentTime}
+                className='flex-1! h-full! mb-0 mt-auto ml-auto mr-auto'
+                onPlayRequest={() => {
+                  setIsPlaying(true);
+                  emitPlayback("play", currentTime);
+                }}
+                onPauseRequest={() => {
+                  setIsPlaying(false);
+                  emitPlayback("pause", currentTime);
+                }}
+                onSeekRequest={(t) => {
+                  setCurrentTime(t);
+                  emitPlayback("seek", t);
+                }}
+                onLocalTimeUpdate={(t) => {
+                  setCurrentTime(t);
+                  currentTimeRef.current = t;
+                }}
+                nextEpisode={
+                  selectedMedia?.type === "series" && selectedMedia.season != null && selectedMedia.episode != null
+                    ? selectedMedia.nextEpisode ?? null
+                    : null
+                }
+                onNextEpisodeRequest={handleNextEpisode}
+                subtitleSettings={subtitleSettings}
+              />
+            </>
           ) : (
             <div className="room-page__main__player__empty">
               <div className="room-page__main__player__empty__ambience" aria-hidden="true">
@@ -2351,13 +2395,22 @@ const RoomPage = () => {
           onPointerMove={handleChatResizeMove}
           onPointerUp={handleChatResizeEnd}
           onPointerCancel={handleChatResizeEnd}
-          onDoubleClick={() => setChatWidth(clampChatWidth(345))}
+          onDoubleClick={() => setChatWidth(clampChatWidth(DEFAULT_CHAT_WIDTH))}
         />
         <div className="room-page__chat-container__head">
-          <p>چت آنلاین</p>
-          <span>
-            <IoChatbubblesSharp />
-          </span>
+          <div className="room-page__chat-container__head__identity">
+            <span className="room-page__chat-container__head__icon" aria-hidden="true">
+              <IoChatbubblesSharp />
+            </span>
+            <div className="room-page__chat-container__head__copy">
+              <strong>گفت‌وگوی اتاق</strong>
+              <span>مکالمه‌ی شما با افراد حاضر</span>
+            </div>
+          </div>
+          <div className="room-page__chat-container__head__presence" aria-label={`${members.length} نفر حاضر در اتاق`}>
+            <BsPeopleFill aria-hidden="true" />
+            <span>{members.length}</span>
+          </div>
         </div>
 
         <div className="room-page__chat-container__chat-main">
@@ -2385,9 +2438,13 @@ const RoomPage = () => {
           ))}
           {groupedMessages.length === 0 && (
             <div className="room-page__chat-container__empty">
-              <IoChatbubblesSharp />
-              <p>هنوز پیامی ارسال نشده است</p>
-              <span>اولین نفری باشید که چت را شروع می‌کند</span>
+              <div className="room-page__chat-container__empty__icon" aria-hidden="true">
+                <IoChatbubblesSharp />
+              </div>
+              <div className="room-page__chat-container__empty__copy">
+                <strong>گفت‌وگو از اینجا شروع می‌شود</strong>
+                <p>اولین پیام را بفرستید و فضا را زنده کنید.</p>
+              </div>
             </div>
           )}
 
