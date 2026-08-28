@@ -445,6 +445,9 @@
   transform: scale(1.045);
   filter: saturate(1.05);
 }
+.archive-card:hover .archive-card__favorite {
+  bottom: 94px;
+}
 .archive-card__poster-fallback {
   width: 100%;
   height: 100%;
@@ -1184,7 +1187,11 @@
 
 .archive-modal__view-tab.is-active {
   color: var(--modal-text);
-  border-color: color-mix(in srgb, var(--archive-accent) 25%, var(--border-subtle));
+  border-color: color-mix(
+    in srgb,
+    var(--archive-accent) 25%,
+    var(--border-subtle)
+  );
   background: color-mix(in srgb, var(--archive-accent) 11%, transparent);
 }
 
@@ -1215,7 +1222,7 @@
 .archive-card__favorite {
   position: absolute;
   z-index: 5;
-  top: 8px;
+  bottom: 88px;
   left: 8px;
   width: 32px;
   height: 32px;
@@ -1238,7 +1245,11 @@
 
 .archive-card__favorite.is-favorite {
   color: #ffb3a2;
-  border-color: color-mix(in srgb, var(--archive-accent) 35%, rgba(255, 255, 255, 0.1));
+  border-color: color-mix(
+    in srgb,
+    var(--archive-accent) 35%,
+    rgba(255, 255, 255, 0.1)
+  );
 }
 
 .archive-card__favorite:disabled {
@@ -1279,7 +1290,11 @@
 .archive-favorite-btn:hover:not(:disabled),
 .archive-favorite-btn.is-favorite {
   color: var(--modal-text);
-  border-color: color-mix(in srgb, var(--archive-accent) 30%, var(--border-subtle));
+  border-color: color-mix(
+    in srgb,
+    var(--archive-accent) 30%,
+    var(--border-subtle)
+  );
   background: color-mix(in srgb, var(--archive-accent) 10%, transparent);
 }
 
@@ -1294,6 +1309,7 @@
 
 .archive-section--favorites-head {
   margin-top: 0;
+  margin-bottom: 16px;
 }
 
 @media (max-width: 720px) {
