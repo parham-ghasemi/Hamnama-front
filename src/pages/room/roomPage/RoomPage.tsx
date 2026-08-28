@@ -1,7 +1,7 @@
 import { getAccessToken } from "../../../lib/authToken";
 import './RoomPage.scss'
 import './themse/Themes.scss'
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { AiTwotoneSetting } from "react-icons/ai";
@@ -211,6 +211,12 @@ const RoomPage = () => {
   const [hiddenAnnouncementIds, setHiddenAnnouncementIds] = useState<Set<string>>(
     () => new Set(),
   );
+  const [chatWidth, setChatWidth] = useState(345);
+  const chatResizeRef = useRef<{ active: boolean; startX: number; startWidth: number }>({
+    active: false,
+    startX: 0,
+    startWidth: 345,
+  });
 
   useEffect(() => {
     setHiddenAnnouncementIds(new Set());
@@ -230,6 +236,60 @@ const RoomPage = () => {
   const viewportBaseHeightRef = useRef<number | null>(null);
   const previousKeyboardOpenRef = useRef(false);
   const intentionalSocketCloseRef = useRef(false);
+
+  const clampChatWidth = useCallback((width: number) => {
+    const minWidth = 275;
+    const maxWidth = Math.max(minWidth, Math.floor(window.innerWidth * 0.5));
+    return Math.min(maxWidth, Math.max(minWidth, width));
+  }, []);
+
+  const handleChatResizeStart = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (window.innerWidth <= 980) return;
+
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    chatResizeRef.current = {
+      active: true,
+      startX: event.clientX,
+      startWidth: chatWidth,
+    };
+    document.body.style.userSelect = "none";
+    document.body.style.cursor = "col-resize";
+  };
+
+  const handleChatResizeMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!chatResizeRef.current.active || window.innerWidth <= 980) return;
+
+    // The page is RTL, so dragging the resize handle to the left should
+    // make the chat wider and dragging it to the right should make it narrower.
+    const delta = event.clientX - chatResizeRef.current.startX;
+    setChatWidth(clampChatWidth(chatResizeRef.current.startWidth + delta));
+  };
+
+  const handleChatResizeEnd = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!chatResizeRef.current.active) return;
+
+    chatResizeRef.current.active = false;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    document.body.style.userSelect = "";
+    document.body.style.cursor = "";
+  };
+
+  useEffect(() => {
+    const handleViewportResize = () => {
+      if (window.innerWidth <= 980) return;
+      setChatWidth((current) => clampChatWidth(current));
+    };
+
+    window.addEventListener("resize", handleViewportResize);
+    return () => {
+      window.removeEventListener("resize", handleViewportResize);
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
+    };
+  }, [clampChatWidth]);
 
   useEffect(() => {
     const viewport = window.visualViewport;
@@ -2278,7 +2338,21 @@ const RoomPage = () => {
       </div>
 
 
-      <div className={clsx("room-page__chat-container", sidebarOpen && "sidebar-open")}>
+      <div
+        className={clsx("room-page__chat-container", sidebarOpen && "sidebar-open")}
+        style={{ "--chat-width": `${chatWidth}px` } as CSSProperties}
+      >
+        <div
+          className="room-page__chat-container__resize-handle"
+          role="separator"
+          aria-label="تغییر عرض چت"
+          aria-orientation="vertical"
+          onPointerDown={handleChatResizeStart}
+          onPointerMove={handleChatResizeMove}
+          onPointerUp={handleChatResizeEnd}
+          onPointerCancel={handleChatResizeEnd}
+          onDoubleClick={() => setChatWidth(clampChatWidth(345))}
+        />
         <div className="room-page__chat-container__head">
           <p>چت آنلاین</p>
           <span>

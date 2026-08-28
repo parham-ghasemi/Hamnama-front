@@ -66,7 +66,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isPip, setIsPip] = useState(false);
   const [showControls, setShowControls] = useState(true);
-  const [isHoveringVolume, setIsHoveringVolume] = useState(false);
   const [showShortcutHints, setShowShortcutHints] = useState(false);
   const [subtitlesRequested, setSubtitlesRequested] = useState(false);
   const [activeSubtitle, setActiveSubtitle] = useState(-1);
@@ -633,44 +632,38 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 </button>
 
                 <div
-                  className="relative flex items-center gap-2"
-                  onMouseEnter={() => setIsHoveringVolume(true)}
-                  onMouseLeave={() => setIsHoveringVolume(false)}
+                  className="group/volume flex items-center rounded-xl border border-white/10 bg-black/25 px-1 py-1 backdrop-blur-md transition-all duration-200"
+                  title={`Volume ${Math.round((isMuted ? 0 : volume) * 100)}%`}
                 >
                   <button
+                    type="button"
                     onClick={toggleMute}
-                    className="p-1.5 rounded-full hover:bg-white/20 transition-colors text-gray-200 hover:text-white"
+                    aria-label={isMuted || volume === 0 ? "Unmute" : "Mute"}
+                    className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-200 transition-colors hover:bg-white/10 hover:text-white"
                   >
                     {isMuted || volume === 0 ? (
-                      <VolumeX className="w-5 h-5 text-red-400" />
+                      <VolumeX className="h-4 w-4 text-[#d04e2f]" />
                     ) : volume < 0.5 ? (
-                      <Volume1 className="w-5 h-5" />
+                      <Volume1 className="h-4 w-4" />
                     ) : (
-                      <Volume2 className="w-5 h-5" />
+                      <Volume2 className="h-4 w-4" />
                     )}
                   </button>
 
-                  <AnimatePresence>
-                    {isHoveringVolume && (
-                      <motion.div
-                        initial={{ opacity: 0, width: 0 }}
-                        animate={{ opacity: 1, width: 70 }}
-                        exit={{ opacity: 0, width: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden flex items-center"
-                      >
-                        <input
-                          type="range"
-                          min={0}
-                          max={1}
-                          step={0.05}
-                          value={isMuted ? 0 : volume}
-                          onChange={handleVolumeChange}
-                          className="w-16 h-1 bg-white/30 rounded-lg appearance-none cursor-pointer accent-white focus:outline-none"
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    value={isMuted ? 0 : volume}
+                    onChange={handleVolumeChange}
+                    aria-label="Volume"
+                    className="h-1.5 w-0 max-w-20 cursor-pointer appearance-none overflow-hidden rounded-full opacity-0 transition-[width,opacity] duration-200 focus:outline-none group-hover/volume:w-20 group-hover/volume:opacity-100 max-[520px]:group-hover/volume:w-14"
+                    style={{
+                      background: `linear-gradient(to right, #d04e2f 0%, #d04e2f ${Math.round((isMuted ? 0 : volume) * 100)}%, rgba(255,255,255,.22) ${Math.round((isMuted ? 0 : volume) * 100)}%, rgba(255,255,255,.22) 100%)`,
+                      accentColor: "#d04e2f",
+                    }}
+                  />
                 </div>
               </div>
 
