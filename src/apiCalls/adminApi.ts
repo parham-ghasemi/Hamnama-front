@@ -134,6 +134,19 @@ export interface ScrapeJobsResponse {
   jobs: ScrapeJob[];
 }
 
+export interface SubtitleSyncResponse {
+  job_id: string;
+  status: string;
+}
+
+export interface SubtitleSyncStatusResponse {
+  job_id: string;
+  status: string;
+  processed: number;
+  total: number;
+  error?: string;
+}
+
 export const adminApi = {
   getDashboard: () => api.get<AdminDashboardResponse>("/admin/dashboard"),
 
@@ -164,4 +177,7 @@ export const adminApi = {
   triggerArchiveScrape: (url: string) => api.post<ArchiveJobResponse>('/admin/scrape', { url }),
   getArchiveJobStatus: (id: string) => api.get<ArchiveJobStatusResponse>(`/admin/scrape/${id}`),
   getScrapeJobs: () => api.get<ScrapeJobsResponse>('/admin/scrape'),
+
+  triggerSubtitleSync: () => api.post<SubtitleSyncResponse>('/admin/subtitles/sync'),
+  getSubtitleSyncStatus: (id: string) => api.get<SubtitleSyncStatusResponse>(`/admin/subtitles/sync/${id}`),
 };

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   TbArchiveFilled,
   TbArrowRight,
@@ -8,6 +8,8 @@ import {
   TbChevronLeft,
   TbChevronRight,
   TbDeviceTv,
+  TbHeart,
+  TbHeartFilled,
   TbInfoCircle,
   TbLink,
   TbLoader2,
@@ -189,24 +191,46 @@ const translatedVersion = (value?: string | null) => {
   return value;
 };
 
-const MediaCard: React.FC<{ item: MediaListItem; onClick: () => void; compact?: boolean }> = ({ item, onClick, compact = false }) => (
-  <button type="button" className={clsx("archive-card", compact && "archive-card--compact")} onClick={onClick}>
-    <div className="archive-card__poster-wrapper">
-      {item.poster ? (
-        <img src={item.poster} alt={item.title_en || item.title_fa || item.id} className="archive-card__poster" loading="lazy" />
-      ) : (
-        <div className="archive-card__poster-fallback">{item.type === "series" ? <TbDeviceTv /> : <TbMovie />}</div>
-      )}
-      <span className="archive-card__type">{typeLabel(item.type)}</span>
-      {item.rating && item.rating !== "N/A" && <span className="archive-card__rating"><TbStarFilled /> {item.rating}</span>}
-      <span className="archive-card__hover-icon"><TbArrowRight /></span>
-    </div>
-    <div className="archive-card__info">
-      <strong className="archive-card__title">{item.title_en || item.title_fa}</strong>
-      {item.title_fa && item.title_en && <span className="archive-card__fa-title">{item.title_fa}</span>}
-      <span className="archive-card__meta">{clean(item.year)}{item.votes ? ` · ${item.votes} رأی` : ""}</span>
-    </div>
-  </button>
+const MediaCard: React.FC<{
+  item: MediaListItem;
+  onClick: () => void;
+  compact?: boolean;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
+  favoritePending?: boolean;
+}> = ({ item, onClick, compact = false, isFavorite = false, onToggleFavorite, favoritePending = false }) => (
+  <article className={clsx("archive-card", compact && "archive-card--compact")}>
+    <button type="button" className="archive-card__main" onClick={onClick}>
+      <div className="archive-card__poster-wrapper">
+        {item.poster ? (
+          <img src={item.poster} alt={item.title_en || item.title_fa || item.id} className="archive-card__poster" loading="lazy" />
+        ) : (
+          <div className="archive-card__poster-fallback">{item.type === "series" ? <TbDeviceTv /> : <TbMovie />}</div>
+        )}
+        <span className="archive-card__type">{typeLabel(item.type)}</span>
+        {item.rating && item.rating !== "N/A" && <span className="archive-card__rating"><TbStarFilled /> {item.rating}</span>}
+        <span className="archive-card__hover-icon"><TbArrowRight /></span>
+      </div>
+      <div className="archive-card__info">
+        <strong className="archive-card__title">{item.title_en || item.title_fa}</strong>
+        {item.title_fa && item.title_en && <span className="archive-card__fa-title">{item.title_fa}</span>}
+        <span className="archive-card__meta">{clean(item.year)}{item.votes ? ` · ${item.votes} رأی` : ""}</span>
+      </div>
+    </button>
+    {onToggleFavorite && (
+      <button
+        type="button"
+        className={clsx("archive-card__favorite", isFavorite && "is-favorite")}
+        onClick={(event) => { event.stopPropagation(); onToggleFavorite(); }}
+        disabled={favoritePending}
+        aria-label={isFavorite ? "حذف از علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"}
+        aria-pressed={isFavorite}
+        title={isFavorite ? "حذف از علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"}
+      >
+        {isFavorite ? <TbHeartFilled /> : <TbHeart />}
+      </button>
+    )}
+  </article>
 );
 
 type ArchiveDropdownProps = {
@@ -319,6 +343,8 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
   const [selectedSeason, setSelectedSeason] = useState<number | null>(null);
   const [selectedEpisode, setSelectedEpisode] = useState<number | null>(null);
   const [openSeasons, setOpenSeasons] = useState<number[]>([]);
+  const [activeView, setActiveView] = useState<"archive" | "favorites">("archive");
+  const queryClient = useQueryClient();
 
   const listQuery = useQuery({
     queryKey: ["archiveMediaList", { search, typeFilter, sortBy, page }],
@@ -340,6 +366,28 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
     enabled: isOpen && !!currentPlaying,
     staleTime: 60_000,
   });
+
+  const favoritesQuery = useQuery<MediaListItem[]>({
+    queryKey: ["archiveFavorites"],
+    queryFn: async () => (await archiveApi.getFavorites()).data.data,
+    enabled: isOpen,
+    staleTime: 30_000,
+  });
+
+  const favoriteMutation = useMutation({
+    mutationFn: async ({ mediaId, isFavorite }: { mediaId: string; isFavorite: boolean }) =>
+      isFavorite ? archiveApi.removeFavorite(mediaId) : archiveApi.addFavorite(mediaId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["archiveFavorites"] });
+    },
+  });
+
+  const favorites = favoritesQuery.data ?? [];
+  const favoriteIds = useMemo(() => new Set(favorites.map((item) => item.id)), [favorites]);
+  const toggleFavorite = (mediaId: string) => {
+    if (favoriteMutation.isPending) return;
+    favoriteMutation.mutate({ mediaId, isFavorite: favoriteIds.has(mediaId) });
+  };
 
   const detail = detailQuery.data;
   const relatedFromDetail = detail?.related_media ?? [];
@@ -366,6 +414,12 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
     setSelectedEpisode(null);
     setOpenSeasons([]);
   }, [detail, groupedSeasons]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setSelectedId(currentPlayingId || null);
+    setActiveView("archive");
+  }, [isOpen, currentPlayingId]);
 
   const selectFile = (file: MediaFileItem) => {
     if (!detail) return;
@@ -399,6 +453,10 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
           </div>
         </div>
         <div className="archive-modal__head-actions">
+          <div className="archive-modal__view-tabs" role="tablist" aria-label="نمای آرشیو">
+            <button type="button" className={clsx("archive-modal__view-tab", activeView === "archive" && !selectedId && "is-active")} onClick={() => { setSelectedId(null); setActiveView("archive"); }}><TbArchiveFilled /> آرشیو</button>
+            <button type="button" className={clsx("archive-modal__view-tab", activeView === "favorites" && !selectedId && "is-active")} onClick={() => { setSelectedId(null); setActiveView("favorites"); }}><TbHeartFilled /> علاقه‌مندی‌ها<span>{favorites.length}</span></button>
+          </div>
           <button type="button" className="archive-modal__close-btn" onClick={closeModal} aria-label="بستن"><TbX /></button>
         </div>
       </header>
@@ -406,7 +464,7 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
       <div className="archive-modal__body">
         {selectedId ? (
           <section className="archive-detail">
-            <button type="button" className="archive-modal__back-btn" onClick={() => setSelectedId(null)}><TbArrowRight /><span>بازگشت به آرشیو</span></button>
+            <button type="button" className="archive-modal__back-btn" onClick={() => setSelectedId(null)}><TbArrowRight /><span>{activeView === "favorites" ? "بازگشت به علاقه‌مندی‌ها" : "بازگشت به آرشیو"}</span></button>
 
             {detailQuery.isLoading ? (
               <div className="archive-modal__loading"><TbLoader2 className="spinner" /><span>در حال دریافت اطلاعات...</span></div>
@@ -422,7 +480,20 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
                       {detail.year && <span className="archive-pill">{detail.year}</span>}
                       {detail.rating && <span className="archive-pill archive-pill--rating"><TbStarFilled /> {detail.rating}</span>}
                     </div>
-                    <h1>{detail.title_en || detail.title_fa}</h1>
+                    <div className="archive-hero__title-row">
+                      <h1>{detail.title_en || detail.title_fa}</h1>
+                      <button
+                        type="button"
+                        className={clsx("archive-favorite-btn", favoriteIds.has(detail.id) && "is-favorite")}
+                        onClick={() => toggleFavorite(detail.id)}
+                        disabled={favoriteMutation.isPending}
+                        aria-label={favoriteIds.has(detail.id) ? "حذف از علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"}
+                        aria-pressed={favoriteIds.has(detail.id)}
+                      >
+                        {favoriteIds.has(detail.id) ? <TbHeartFilled /> : <TbHeart />}
+                        <span>{favoriteIds.has(detail.id) ? "در علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"}</span>
+                      </button>
+                    </div>
                     {detail.title_fa && detail.title_en && <h2>{detail.title_fa}</h2>}
                     <p className="archive-hero__plot">{clean(detail.plot || detail.omdb?.Plot)}</p>
                     <div className="archive-hero__meta">
@@ -513,11 +584,31 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
                 {suggested.length > 0 && (
                   <section className="archive-section">
                     <div className="archive-section__heading"><div><span className="archive-section__eyebrow">پیشنهاد برای تماشا</span><h3>مرتبط با این عنوان</h3></div></div>
-                    <div className="archive-related-grid">{suggested.map((item) => <MediaCard key={item.id} item={item} onClick={() => setSelectedId(item.id)} compact />)}</div>
+                    <div className="archive-related-grid">{suggested.map((item) => <MediaCard key={item.id} item={item} onClick={() => setSelectedId(item.id)} compact isFavorite={favoriteIds.has(item.id)} onToggleFavorite={() => toggleFavorite(item.id)} favoritePending={favoriteMutation.isPending && favoriteMutation.variables?.mediaId === item.id} />)}</div>
                   </section>
                 )}
               </>
             ) : <p className="archive-modal__empty">اطلاعات یافت نشد.</p>}
+          </section>
+        ) : activeView === "favorites" ? (
+          <section className="archive-list archive-list--favorites">
+            <div className="archive-section archive-section--favorites-head">
+              <div className="archive-section__heading">
+                <div><span className="archive-section__eyebrow"><TbHeartFilled /> لیست شخصی</span><h3>فیلم‌ها و سریال‌های مورد علاقه‌ات</h3></div>
+                <span className="archive-section__count">{favorites.length.toLocaleString("fa-IR")} عنوان</span>
+              </div>
+            </div>
+            {favoritesQuery.isLoading ? (
+              <div className="archive-modal__loading"><TbLoader2 className="spinner" /><span>در حال دریافت علاقه‌مندی‌ها...</span></div>
+            ) : favorites.length > 0 ? (
+              <div className="archive-modal__grid">
+                {favorites.map((item) => (
+                  <MediaCard key={item.id} item={item} onClick={() => setSelectedId(item.id)} isFavorite onToggleFavorite={() => toggleFavorite(item.id)} favoritePending={favoriteMutation.isPending && favoriteMutation.variables?.mediaId === item.id} />
+                ))}
+              </div>
+            ) : (
+              <div className="archive-modal__empty"><TbHeart /><span>هنوز چیزی به علاقه‌مندی‌ها اضافه نکرده‌ای.</span></div>
+            )}
           </section>
         ) : (
           <section className="archive-list">
@@ -529,11 +620,20 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
               </div>
             </div>
 
-            {contextRelated.length > 0 && <section className="archive-section archive-section--context"><div className="archive-section__heading"><div><span className="archive-section__eyebrow"><TbSparkles /> پیشنهاد هوشمند</span><h3>بر اساس محتوای در حال پخش</h3></div></div><div className="archive-related-grid archive-related-grid--list">{contextRelated.map((item) => <MediaCard key={item.id} item={item} onClick={() => setSelectedId(item.id)} compact />)}</div></section>}
+            {contextRelated.length > 0 && <section className="archive-section archive-section--context"><div className="archive-section__heading"><div><span className="archive-section__eyebrow"><TbSparkles /> پیشنهاد هوشمند</span><h3>بر اساس محتوای در حال پخش</h3></div></div><div className="archive-related-grid archive-related-grid--list">{contextRelated.map((item) => <MediaCard key={item.id} item={item} onClick={() => setSelectedId(item.id)} compact isFavorite={favoriteIds.has(item.id)} onToggleFavorite={() => toggleFavorite(item.id)} favoritePending={favoriteMutation.isPending && favoriteMutation.variables?.mediaId === item.id} />)}</div></section>}
 
             {listQuery.isLoading ? <div className="archive-modal__loading"><TbLoader2 className="spinner" /><span>در حال دریافت آرشیو...</span></div> : mediaList.length > 0 ? <>
               <div className="archive-list__summary"><span>{listQuery.data?.total.toLocaleString("fa-IR")} عنوان</span><span>صفحه {page.toLocaleString("fa-IR")} از {totalPages.toLocaleString("fa-IR")}</span></div>
-              <div className="archive-modal__grid">{mediaList.map((item) => <MediaCard key={item.id} item={item} onClick={() => setSelectedId(item.id)} />)}</div>
+              <div className="archive-modal__grid">{mediaList.map((item) => (
+                <MediaCard
+                  key={item.id}
+                  item={item}
+                  onClick={() => setSelectedId(item.id)}
+                  isFavorite={favoriteIds.has(item.id)}
+                  onToggleFavorite={() => toggleFavorite(item.id)}
+                  favoritePending={favoriteMutation.isPending && favoriteMutation.variables?.mediaId === item.id}
+                />
+              ))}</div>
               {totalPages > 1 && <div className="archive-modal__pagination"><button type="button" disabled={page <= 1} onClick={() => setPage((value) => value - 1)}><TbChevronRight /></button><span>صفحه {page.toLocaleString("fa-IR")} از {totalPages.toLocaleString("fa-IR")}</span><button type="button" disabled={page >= totalPages} onClick={() => setPage((value) => value + 1)}><TbChevronLeft /></button></div>}
             </> : <div className="archive-modal__empty"><TbInfoCircle /><span>هیچ عنوانی با این مشخصات پیدا نشد.</span></div>}
           </section>

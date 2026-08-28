@@ -2308,6 +2308,9 @@ const RoomPage = () => {
               <VideoPlayer
                 src={playbackSrc}
                 quality={currentQuality}
+                mediaId={selectedMedia?.id || currentId || undefined}
+                subtitleSeason={selectedMedia?.season}
+                subtitleEpisode={selectedMedia?.episode}
                 isPlaying={isPlaying}
                 currentTime={currentTime}
                 className='flex-1! h-full! mb-0 mt-auto ml-auto mr-auto'

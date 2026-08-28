@@ -83,6 +83,30 @@ export interface PaginatedMediaResponse {
   totalPages: number;
 }
 
+export interface FavoriteListResponse {
+  data: MediaListItem[];
+}
+
+export interface SubtitleCue {
+  start: number;
+  end: number;
+  text: string;
+}
+
+export interface SubtitleTrack {
+  id: string;
+  filename: string;
+  cues: SubtitleCue[];
+}
+
+export interface SubtitleResponse {
+  media_id: string;
+  type: "movie" | "series";
+  season?: number;
+  episode?: number;
+  tracks: SubtitleTrack[];
+}
+
 export interface GetMediaListParams {
   search?: string;
   type?: string;
@@ -101,5 +125,22 @@ export const archiveApi = {
   getRelatedMedia: (currentFileUrl: string) =>
     api.get<MediaListItem[]>("/media/related", {
       params: { url: currentFileUrl },
+    }),
+
+  getFavorites: () =>
+    api.get<FavoriteListResponse>("/users/me/favorites"),
+
+  addFavorite: (mediaId: string) =>
+    api.post<MediaListItem>("/users/me/favorites", { media_id: mediaId }),
+
+  removeFavorite: (mediaId: string) =>
+    api.delete(`/users/me/favorites/${mediaId}`),
+
+  getSubtitles: (mediaId: string, params?: { season?: number | null; episode?: number | null }) =>
+    api.get<SubtitleResponse>(`/media/${mediaId}/subtitles`, {
+      params: {
+        season: params?.season ?? undefined,
+        episode: params?.episode ?? undefined,
+      },
     }),
 };

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FiArchive, FiBell, FiCheckCircle, FiAlertCircle, FiPower, FiTrash2, FiPlus } from 'react-icons/fi';
 import { toast } from '../../../components/toast';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -9,6 +9,8 @@ const Settings = () => {
   const [archiveUrl, setArchiveUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [jobId, setJobId] = useState<string | null>(null);
+  const [subtitleSyncJobId, setSubtitleSyncJobId] = useState<string | null>(null);
+  const [isStartingSubtitleSync, setIsStartingSubtitleSync] = useState(false);
   const queryClient = useQueryClient();
   const [announcementMessages, setAnnouncementMessages] = useState<Record<AnnouncementType, string>>({
     room: '',
@@ -155,6 +157,33 @@ const Settings = () => {
     return new Date(dateString).toLocaleString('fa-IR');
   };
 
+  const subtitleStatusQuery = useQuery({
+    queryKey: ['subtitleSyncJob', subtitleSyncJobId],
+    queryFn: () => adminApi.getSubtitleSyncStatus(subtitleSyncJobId!),
+    enabled: !!subtitleSyncJobId,
+    refetchInterval: (query) => query.state.data?.data.status === 'running' ? 2000 : false,
+  });
+
+  useEffect(() => {
+    if (subtitleStatusQuery.data?.data.status === 'completed') {
+      toast.success('پردازش زیرنویس‌ها با موفقیت تمام شد');
+    }
+  }, [subtitleStatusQuery.data?.data.status]);
+
+  const handleSubtitleSync = async () => {
+    if (isStartingSubtitleSync) return;
+    setIsStartingSubtitleSync(true);
+    try {
+      const response = await adminApi.triggerSubtitleSync();
+      setSubtitleSyncJobId(response.data.job_id);
+      toast.success('پردازش زیرنویس کل آرشیو آغاز شد');
+    } catch {
+      toast.error('آغاز پردازش زیرنویس‌ها با مشکل مواجه شد');
+    } finally {
+      setIsStartingSubtitleSync(false);
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!archiveUrl.trim()) return;
@@ -293,6 +322,33 @@ const Settings = () => {
             </p>
           </div>
         ) : null}
+      </div>
+
+      <div className="admin-settings__card">
+        <div className="admin-settings__card__head">
+          <div>
+            <p className="admin-settings__card__title"><FiArchive aria-hidden className="admin-settings__card__title-icon" /> زیرنویس آرشیو</p>
+            <span className="admin-settings__card__subtitle">فایل‌های SRT کل آرشیو را از SubTitleStar دریافت و به JSON آماده‌ی پخش تبدیل می‌کند.</span>
+          </div>
+        </div>
+
+        <div className="admin-settings__subtitle-sync">
+          <button type="button" className="admin-settings__submit" onClick={() => void handleSubtitleSync()} disabled={isStartingSubtitleSync || subtitleStatusQuery.data?.data.status === 'running'}>
+            {isStartingSubtitleSync || subtitleStatusQuery.data?.data.status === 'running' ? 'در حال پردازش…' : 'دریافت زیرنویس کل آرشیو'}
+          </button>
+          {subtitleStatusQuery.data?.data ? (
+            <div className="admin-settings__status">
+              <FiCheckCircle aria-hidden />
+              <p>
+                {subtitleStatusQuery.data.data.status === 'completed'
+                  ? 'پردازش کامل شد'
+                  : subtitleStatusQuery.data.data.status === 'running'
+                    ? `پردازش ${subtitleStatusQuery.data.data.processed.toLocaleString('fa-IR')} از ${subtitleStatusQuery.data.data.total.toLocaleString('fa-IR')}`
+                    : `پردازش با خطا متوقف شد${subtitleStatusQuery.data.data.error ? `: ${subtitleStatusQuery.data.data.error}` : ''}`}
+              </p>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {/* --- Scrape Jobs List Card --- */}

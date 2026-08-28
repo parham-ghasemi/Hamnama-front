@@ -554,3 +554,14 @@
     align-items: flex-end;
   }
 }
+
+.admin-settings__subtitle-sync {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-settings__subtitle-sync .admin-settings__status {
+  flex: 1 1 300px;
+}

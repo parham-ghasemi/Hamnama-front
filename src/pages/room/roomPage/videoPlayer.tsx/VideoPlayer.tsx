@@ -15,7 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useMkvSubtitles } from "../../../../hooks/useMKVSubtitles";
+import { archiveApi, type SubtitleTrack } from "../../../../apiCalls/archiveApi";
 import type { SubtitleSettings } from "../settingsModal/SettingsModal";
 
 export interface VideoPlayerProps {
@@ -36,6 +36,9 @@ export interface VideoPlayerProps {
   } | null;
   onNextEpisodeRequest?: () => void;
   subtitleSettings?: SubtitleSettings;
+  mediaId?: string;
+  subtitleSeason?: number | null;
+  subtitleEpisode?: number | null;
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -53,6 +56,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   nextEpisode,
   onNextEpisodeRequest,
   subtitleSettings = { fontSize: 20, opacity: 100, backgroundOpacity: 72, fontWeight: 500, position: "low" },
+  mediaId,
+  subtitleSeason,
+  subtitleEpisode,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -68,22 +74,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [showControls, setShowControls] = useState(true);
   const [showShortcutHints, setShowShortcutHints] = useState(false);
   const [subtitlesRequested, setSubtitlesRequested] = useState(false);
+  const [subtitleTracks, setSubtitleTracks] = useState<SubtitleTrack[]>([]);
+  const [subtitleStatus, setSubtitleStatus] = useState<"idle" | "loading" | "ready" | "no-subtitles" | "error">("idle");
+  const [subtitleError, setSubtitleError] = useState<string | null>(null);
   const [activeSubtitle, setActiveSubtitle] = useState(-1);
   const lastTouchRef = useRef<{ time: number; x: number } | null>(null);
-
-  // MKV subtitles are demuxed in the browser and rendered by React as an
-  // overlay. This avoids relying on the browser's opaque native TextTrack
-  // renderer, which is not reliable for embedded MKV subtitle streams.
-  const {
-    status: mkvSubtitleStatus,
-    error: mkvSubtitleError,
-    tracks: mkvSubtitleTracks,
-    cues: mkvSubtitleCues,
-    cueRevision: mkvCueRevision,
-    bytesRead: mkvBytesRead,
-    totalBytes: mkvTotalBytes,
-    loadingElapsedMs: mkvLoadingElapsedMs,
-  } = useMkvSubtitles(videoRef, subtitlesRequested ? src : "");
 
   const playing = isPlaying ?? internalPlaying;
   const time = currentTime ?? internalCurrentTime;
@@ -162,82 +157,67 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   const currentSubtitleText = useMemo(() => {
     if (activeSubtitle < 0) return null;
-
-    const track = mkvSubtitleTracks[activeSubtitle];
-    if (!track || !mkvSubtitleCues.length) return null;
+    const track = subtitleTracks[activeSubtitle];
+    if (!track || !track.cues.length) return null;
 
     const videoTime = videoRef.current?.currentTime ?? time;
-
-    // Cues are emitted in MKV timeline order. Binary-search for the region
-    // around the current time, then check nearby overlapping cues for the
-    // selected track.
     let lo = 0;
-    let hi = mkvSubtitleCues.length - 1;
+    let hi = track.cues.length - 1;
     let candidate = -1;
-
     while (lo <= hi) {
       const mid = (lo + hi) >> 1;
-      const cue = mkvSubtitleCues[mid];
-
-      if (cue.start <= videoTime) {
+      if (track.cues[mid].start <= videoTime) {
         candidate = mid;
         lo = mid + 1;
       } else {
         hi = mid - 1;
       }
     }
-
-    for (let i = candidate; i >= 0; i -= 1) {
-      const cue = mkvSubtitleCues[i];
-      if (cue.start > videoTime) continue;
-      if (videoTime - cue.start > 15) break;
-      if (cue.trackNumber === track.number && cue.end > videoTime) {
-        return cue.text;
-      }
+    if (candidate >= 0) {
+      const cue = track.cues[candidate];
+      if (cue.start <= videoTime && cue.end > videoTime) return cue.text;
     }
-
-    for (let i = candidate + 1; i < mkvSubtitleCues.length; i += 1) {
-      const cue = mkvSubtitleCues[i];
-      if (cue.start > videoTime) break;
-      if (cue.trackNumber === track.number && cue.end > videoTime) {
-        return cue.text;
-      }
-    }
-
     return null;
-  }, [activeSubtitle, mkvSubtitleCues, mkvSubtitleTracks, time, mkvCueRevision]);
+  }, [activeSubtitle, subtitleTracks, time]);
 
-  const toggleSubtitles = useCallback(() => {
-    // Do not touch the MKV subtitle parser until the user explicitly asks
-    // for subtitles. This keeps subtitle extraction off the critical path
-    // for normal video playback.
+  const toggleSubtitles = useCallback(async () => {
+    if (subtitleStatus === "loading") return;
+
     if (!subtitlesRequested) {
+      if (!mediaId) {
+        setSubtitleStatus("error");
+        setSubtitleError("زیرنویس فقط برای ویدیوهای انتخاب‌شده از آرشیو در دسترس است.");
+        setSubtitlesRequested(true);
+        return;
+      }
       setSubtitlesRequested(true);
+      setSubtitleStatus("loading");
+      setSubtitleError(null);
+      try {
+        const response = await archiveApi.getSubtitles(mediaId, { season: subtitleSeason, episode: subtitleEpisode });
+        const tracks = response.data.tracks ?? [];
+        if (!tracks.length) {
+          setSubtitleStatus("no-subtitles");
+          setSubtitleTracks([]);
+          setActiveSubtitle(-1);
+          return;
+        }
+        setSubtitleTracks(tracks);
+        setSubtitleStatus("ready");
+        setActiveSubtitle(0);
+      } catch (error: any) {
+        const status = error?.response?.status;
+        setSubtitleStatus(status === 404 ? "no-subtitles" : "error");
+        setSubtitleError(status === 404 ? "برای این عنوان هنوز زیرنویسی آماده نشده است." : "دریافت زیرنویس با خطا مواجه شد.");
+        setSubtitleTracks([]);
+        setActiveSubtitle(-1);
+      }
       return;
     }
 
-    if (mkvSubtitleStatus === "loading") return;
-
-    if (!mkvSubtitleTracks.length) {
-      console.warn("[mkv-subtitles] no parsed subtitle tracks", {
-        status: mkvSubtitleStatus,
-        error: mkvSubtitleError,
-        src,
-      });
-      return;
-    }
-
+    if (subtitleStatus !== "ready" || !subtitleTracks.length) return;
     setActiveSubtitle((current) => (current >= 0 ? -1 : 0));
-  }, [mkvSubtitleError, mkvSubtitleStatus, mkvSubtitleTracks.length, src, subtitlesRequested]);
-
-  useEffect(() => {
-    // The first subtitle-button press starts extraction. Once extraction
-    // finishes successfully, enable the first available track automatically
-    // so the same click acts as the "enable subtitles" action.
-    if (subtitlesRequested && mkvSubtitleStatus !== "loading" && mkvSubtitleTracks.length > 0) {
-      setActiveSubtitle((current) => (current >= 0 ? current : 0));
-    }
-  }, [mkvSubtitleStatus, mkvSubtitleTracks.length, subtitlesRequested]);
+  }, [mediaId, subtitleEpisode, subtitleSeason, subtitleStatus, subtitleTracks.length, subtitlesRequested]);
 
   const toggleFullscreen = async () => {
     if (!containerRef.current) return;
@@ -321,11 +301,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   }, [currentTime]);
 
   useEffect(() => {
-    // A new source starts with subtitle extraction disabled. The next click
-    // on the captions button explicitly opts into MKV subtitle loading.
     setSubtitlesRequested(false);
+    setSubtitleTracks([]);
+    setSubtitleStatus("idle");
+    setSubtitleError(null);
     setActiveSubtitle(-1);
-  }, [src]);
+  }, [src, mediaId, subtitleSeason, subtitleEpisode]);
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -471,7 +452,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       )}
 
       <AnimatePresence>
-        {mkvSubtitleStatus === "loading" && (
+        {subtitleStatus === "loading" && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
@@ -479,32 +460,30 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             className="absolute bottom-20 left-1/2 z-30 -translate-x-1/2 rounded-full border border-white/10 bg-black/45 px-3 py-1.5 text-xs text-white/80 shadow-xl backdrop-blur-md"
           >
             <span className="mr-2 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#d04e2f] align-middle" />
-            {mkvTotalBytes && mkvTotalBytes > 0
-              ? `در حال آماده‌سازی زیرنویس · ${Math.min(100, Math.round((mkvBytesRead / mkvTotalBytes) * 100))}%`
-              : mkvLoadingElapsedMs > 8000 ? "در حال آماده‌سازی زیرنویس…" : "در حال خواندن زیرنویس…"}
+            در حال دریافت زیرنویس…
           </motion.div>
         )}
 
-        {mkvSubtitleStatus === "error" && mkvSubtitleError && (
+        {subtitleStatus === "error" && subtitleError && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             className="absolute bottom-20 left-1/2 z-30 w-[min(460px,calc(100%-2rem))] -translate-x-1/2 rounded-xl border border-red-400/20 bg-black/80 px-4 py-3 text-center text-sm text-white shadow-2xl backdrop-blur-md"
           >
-            <div className="font-medium text-red-300">Couldn’t load subtitles</div>
-            <div className="mt-1 text-xs text-white/65">{mkvSubtitleError}</div>
+            <div className="font-medium text-red-300">خطا در دریافت زیرنویس</div>
+            <div className="mt-1 text-xs text-white/65">{subtitleError}</div>
           </motion.div>
         )}
 
-        {mkvSubtitleStatus === "no-subtitles" && (
+        {subtitleStatus === "no-subtitles" && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             className="absolute bottom-20 left-1/2 z-30 -translate-x-1/2 rounded-xl border border-white/10 bg-black/75 px-4 py-2.5 text-center text-xs text-white/80 shadow-2xl backdrop-blur-md"
           >
-            No supported embedded subtitles were found in this video.
+            برای این ویدیو زیرنویس آماده نشده است.
           </motion.div>
         )}
       </AnimatePresence>
@@ -679,43 +658,38 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 <button
                   type="button"
                   onClick={toggleSubtitles}
-                  disabled={
-                    subtitlesRequested &&
-                    (mkvSubtitleStatus === "loading" || mkvSubtitleStatus === "no-subtitles" || mkvSubtitleStatus === "error")
-                  }
+                  disabled={subtitleStatus === "loading"}
                   title={
                     !subtitlesRequested
-                      ? "Load subtitles"
-                      : mkvSubtitleStatus === "loading"
-                        ? mkvLoadingElapsedMs > 8000
-                          ? "Subtitles are still being extracted from the video…"
-                          : "Extracting subtitles…"
-                        : mkvSubtitleStatus === "no-subtitles"
-                          ? "No supported subtitles found in this MKV"
-                          : mkvSubtitleStatus === "error"
-                            ? mkvSubtitleError || "Couldn't load subtitles"
+                      ? "دریافت زیرنویس"
+                      : subtitleStatus === "loading"
+                        ? "در حال دریافت زیرنویس"
+                        : subtitleStatus === "no-subtitles"
+                          ? "زیرنویسی برای این ویدیو پیدا نشد"
+                          : subtitleStatus === "error"
+                            ? subtitleError || "خطا در دریافت زیرنویس"
                             : activeSubtitle >= 0
-                              ? "Hide subtitles"
-                              : "Show subtitles"
+                              ? "مخفی کردن زیرنویس"
+                              : "نمایش زیرنویس"
                   }
                   aria-label={
                     !subtitlesRequested
-                      ? "Load subtitles"
-                      : mkvSubtitleStatus === "loading"
-                        ? "Loading subtitles"
+                      ? "دریافت زیرنویس"
+                      : subtitleStatus === "loading"
+                        ? "در حال دریافت زیرنویس"
                         : activeSubtitle >= 0
-                          ? "Hide subtitles"
-                          : "Show subtitles"
+                          ? "مخفی کردن زیرنویس"
+                          : "نمایش زیرنویس"
                   }
                   aria-pressed={activeSubtitle >= 0}
-                  aria-busy={subtitlesRequested && mkvSubtitleStatus === "loading"}
+                  aria-busy={subtitleStatus === "loading"}
                   className={`relative p-1.5 rounded-full transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${activeSubtitle >= 0
                     ? "bg-white/15 text-white"
                     : "text-gray-200 hover:bg-white/20 hover:text-white"
-                    } ${mkvSubtitleStatus === "loading" ? "animate-pulse" : ""}`}
+                    } ${subtitleStatus === "loading" ? "animate-pulse" : ""}`}
                 >
                   <Captions className="w-4 h-4" />
-                  {mkvSubtitleStatus === "loading" && (
+                  {subtitleStatus === "loading" && (
                     <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-yellow-400 animate-ping" />
                   )}
                 </button>
