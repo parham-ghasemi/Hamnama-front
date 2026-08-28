@@ -41,6 +41,7 @@ import AnimatedParticle from '../../../components/animatedParticle/AnimatedParti
 import { useConfirmationModal } from '../../../context/ConfirmModalContext/ConfirmaModalContext';
 import { useAppViewport } from '../../../hooks/useAppViewPort';
 import { useNavigate, useParams } from 'react-router-dom';
+import { PiUserSoundFill } from "react-icons/pi";
 
 type ClientSocketEvent =
   | {
@@ -2065,7 +2066,7 @@ const RoomPage = () => {
               title="پیوستن به چت صوتی"
               onClick={handleJoinVoice}
             >
-              <BsMicFill />
+              <PiUserSoundFill />
             </button>
             <span>چت صوتی</span>
           </div>
