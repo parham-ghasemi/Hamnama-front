@@ -8,6 +8,7 @@ import {
   TbChevronLeft,
   TbChevronRight,
   TbDeviceTv,
+  TbFlag,
   TbHeart,
   TbHeartFilled,
   TbInfoCircle,
@@ -25,6 +26,7 @@ import {
   type MediaFileItem,
   type MediaListItem,
 } from "../../../../apiCalls/archiveApi";
+import { toast } from "sonner";
 import "./ArchiveModal.scss";
 
 export interface SelectedArchiveMedia {
@@ -344,6 +346,13 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
   const [selectedEpisode, setSelectedEpisode] = useState<number | null>(null);
   const [openSeasons, setOpenSeasons] = useState<number[]>([]);
   const [activeView, setActiveView] = useState<"archive" | "favorites">("archive");
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportTarget, setReportTarget] = useState<"media" | "episode" | "file">("media");
+  const [reportSeason, setReportSeason] = useState<number | null>(null);
+  const [reportEpisode, setReportEpisode] = useState<number | null>(null);
+  const [reportFileUrl, setReportFileUrl] = useState("");
+  const [reportType, setReportType] = useState("broken_file");
+  const [customReport, setCustomReport] = useState("");
   const queryClient = useQueryClient();
 
   const listQuery = useQuery({
@@ -380,6 +389,27 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["archiveFavorites"] });
     },
+  });
+
+  const reportMutation = useMutation({
+    mutationFn: () => {
+      if (!detail) throw new Error("media_not_selected");
+      return archiveApi.createArchiveReport(detail.id, {
+        target_type: reportTarget,
+        season: reportTarget === "episode" ? reportSeason : undefined,
+        episode: reportTarget === "episode" ? reportEpisode : undefined,
+        file_url: reportTarget === "file" ? reportFileUrl : undefined,
+        report_type: reportType,
+        custom_text: reportType === "custom" ? customReport.trim() : undefined,
+      });
+    },
+    onSuccess: () => {
+      toast.success("از گزارش شما ممنونیم؛ گزارش ثبت شد و تیم ما مشکل را بررسی خواهد کرد.");
+      setReportOpen(false);
+      setCustomReport("");
+      setReportType("broken_file");
+    },
+    onError: () => toast.error("ثبت گزارش انجام نشد؛ لطفاً دوباره تلاش کنید."),
   });
 
   const favorites = favoritesQuery.data ?? [];
@@ -440,6 +470,16 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
   if (!isOpen) return null;
   const mediaList = listQuery.data?.data ?? [];
   const totalPages = listQuery.data?.totalPages ?? 1;
+  const episodeOptions = groupedSeasons.flatMap((season) => season.episodes.map((ep) => ({ season: season.season, episode: ep.episode, label: `فصل ${season.season} · قسمت ${ep.episode}` })));
+
+  useEffect(() => {
+    if (!reportOpen || !detail) return;
+    const firstEpisode = episodeOptions[0];
+    const firstValidFile = detail.files.find((file) => file.valid && file.url) ?? detail.files[0];
+    setReportSeason((value) => value ?? firstEpisode?.season ?? null);
+    setReportEpisode((value) => value ?? firstEpisode?.episode ?? null);
+    setReportFileUrl((value) => value || firstValidFile?.url || "");
+  }, [reportOpen, detail, episodeOptions]);
 
   return (
     <div className="archive-modal open" onClick={(event) => event.stopPropagation()} dir="rtl">
@@ -493,6 +533,7 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
                         {favoriteIds.has(detail.id) ? <TbHeartFilled /> : <TbHeart />}
                         <span>{favoriteIds.has(detail.id) ? "در علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"}</span>
                       </button>
+                      <button type="button" className="archive-report-btn" onClick={() => setReportOpen(true)}><TbFlag /><span>گزارش مشکل</span></button>
                     </div>
                     {detail.title_fa && detail.title_en && <h2>{detail.title_fa}</h2>}
                     <p className="archive-hero__plot">{clean(detail.plot || detail.omdb?.Plot)}</p>
@@ -579,6 +620,23 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
                     <div className="archive-section__heading"><div><span className="archive-section__eyebrow">نسخه‌های قابل پخش</span><h3>{detail.files?.length ?? 0} فایل</h3></div></div>
                     {detail.files?.length ? <div className="archive-files">{detail.files.map((file, index) => <FileVariantButton key={`${file.url}-${index}`} file={file} onSelect={() => selectFile(file)} />)}</div> : <p className="archive-modal__empty archive-modal__empty--inline">هیچ فایل قابل انتخابی برای این عنوان ثبت نشده است.</p>}
                   </section>
+                )}
+
+                {reportOpen && (
+                  <div className="archive-report-panel">
+                    <div className="archive-report-panel__head">
+                      <div><span className="archive-section__eyebrow"><TbFlag /> گزارش مشکل</span><h3>چه چیزی نیاز به بررسی دارد؟</h3></div>
+                      <button type="button" onClick={() => setReportOpen(false)} aria-label="بستن"><TbX /></button>
+                    </div>
+                    <div className="archive-report-panel__body">
+                      <label><span>محدوده گزارش</span><select value={reportTarget} onChange={(event) => setReportTarget(event.target.value as "media" | "episode" | "file")}><option value="media">کل عنوان</option><option value="episode" disabled={!episodeOptions.length}>یک قسمت مشخص</option><option value="file" disabled={!detail.files.length}>یک فایل مشخص</option></select></label>
+                      {reportTarget === "episode" && <div className="archive-report-panel__row"><label><span>قسمت</span><select value={reportSeason != null && reportEpisode != null ? `${reportSeason}:${reportEpisode}` : ""} onChange={(event) => { const [season, episode] = event.target.value.split(":").map(Number); setReportSeason(season); setReportEpisode(episode); }}><option value="">انتخاب قسمت</option>{episodeOptions.map((item) => <option key={`${item.season}:${item.episode}`} value={`${item.season}:${item.episode}`}>{item.label}</option>)}</select></label></div>}
+                      {reportTarget === "file" && <label><span>فایل</span><select value={reportFileUrl} onChange={(event) => setReportFileUrl(event.target.value)}><option value="">انتخاب فایل</option>{detail.files.map((file, index) => <option key={`${file.url}-${index}`} value={file.url}>{file.filename || file.quality_tags || `فایل ${index + 1}`}{file.season != null && file.episode != null ? ` · S${file.season}E${file.episode}` : ""}</option>)}</select></label>}
+                      <label><span>نوع مشکل</span><select value={reportType} onChange={(event) => setReportType(event.target.value)}><option value="broken_file">فایل پخش نمی‌شود</option><option value="invalid_subtitle">زیرنویس نامعتبر است</option><option value="wrong_episode">قسمت اشتباه است</option><option value="wrong_quality">کیفیت یا نسخه اشتباه است</option><option value="missing_file">فایل ناقص یا گمشده است</option><option value="wrong_metadata">اطلاعات عنوان اشتباه است</option><option value="custom">گزارش سفارشی</option></select></label>
+                      {reportType === "custom" && <label><span>توضیحات</span><textarea value={customReport} onChange={(event) => setCustomReport(event.target.value)} rows={4} maxLength={2000} placeholder="مشکل را با جزئیات بنویسید…" /> </label>}
+                    </div>
+                    <div className="archive-report-panel__footer"><button type="button" onClick={() => setReportOpen(false)}>انصراف</button><button type="button" className="primary" disabled={reportMutation.isPending || (reportTarget === "episode" && (reportSeason == null || reportEpisode == null)) || (reportTarget === "file" && !reportFileUrl) || (reportType === "custom" && !customReport.trim())} onClick={() => reportMutation.mutate()}>{reportMutation.isPending ? "در حال ثبت…" : "ارسال گزارش"}</button></div>
+                  </div>
                 )}
 
                 {suggested.length > 0 && (

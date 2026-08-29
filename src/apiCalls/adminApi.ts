@@ -165,6 +165,32 @@ export interface AdminArchiveFileInput {
   error?: string;
 }
 
+export interface AdminArchiveReport {
+  id: string;
+  media_id: string;
+  user_id: string;
+  username: string;
+  phone: string;
+  target_type: 'media' | 'episode' | 'file';
+  season?: number;
+  episode?: number;
+  file_url?: string;
+  report_type: string;
+  custom_text?: string;
+  created_at: string;
+}
+
+export interface AdminArchiveReportsResponse {
+  reports: AdminArchiveReport[];
+}
+
+export interface SubtitleHealthReport {
+  total_items: number;
+  valid_items: number;
+  invalid_items: number;
+  valid_percentage: number;
+}
+
 export interface AdminArchiveItem {
   id: string;
   type: 'movie' | 'series';
@@ -193,6 +219,7 @@ export interface AdminArchiveItem {
   imdb_rating?: string;
   imdb_votes?: string;
   files: AdminArchiveFileInput[];
+  enabled: boolean;
 }
 
 export interface AdminArchiveResponse {
@@ -242,7 +269,10 @@ export const adminApi = {
   updateArchiveItem: (id: string, payload: Record<string, unknown>) =>
     api.patch<AdminArchiveItem>(`/admin/archive/${id}`, payload),
   deleteArchiveItem: (id: string) => api.delete(`/admin/archive/${id}`),
+  setArchiveItemEnabled: (id: string, enabled: boolean) => api.patch<{ success: boolean; enabled: boolean }>(`/admin/archive/${id}/enabled`, { enabled }),
+  getArchiveReports: (id: string) => api.get<AdminArchiveReportsResponse>(`/admin/archive/${id}/reports`),
 
   triggerSubtitleSync: () => api.post<SubtitleSyncResponse>('/admin/subtitles/sync'),
   getSubtitleSyncStatus: (id: string) => api.get<SubtitleSyncStatusResponse>(`/admin/subtitles/sync/${id}`),
+  getSubtitleHealthReport: () => api.get<SubtitleHealthReport>('/admin/subtitles/report'),
 };

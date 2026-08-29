@@ -41,6 +41,17 @@ export interface OmdbResponse {
   Error?: string;
 }
 
+export type ArchiveReportTarget = 'media' | 'episode' | 'file';
+
+export interface ArchiveReportInput {
+  target_type: ArchiveReportTarget;
+  season?: number | null;
+  episode?: number | null;
+  file_url?: string;
+  report_type: string;
+  custom_text?: string;
+}
+
 export interface MediaListItem {
   id: string;
   type: "movie" | "series";
@@ -50,6 +61,7 @@ export interface MediaListItem {
   rating: string;
   votes: string;
   poster?: string;
+  enabled?: boolean;
 }
 
 export interface MediaDetailResponse extends MediaListItem {
@@ -143,6 +155,9 @@ export const archiveApi = {
         episode: params?.episode ?? undefined,
       },
     }),
+
+  createArchiveReport: (mediaId: string, payload: ArchiveReportInput) =>
+    api.post(`/media/${encodeURIComponent(mediaId)}/reports`, payload),
 
   getSubtitlesUrl: (mediaId: string, params?: { season?: number | null; episode?: number | null }) => {
     const rawBase = String(import.meta.env["VITE_BASE_URL"] ?? window.location.origin).replace(/\/+$/, "");
