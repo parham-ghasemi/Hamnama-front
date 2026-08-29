@@ -11,6 +11,7 @@ export interface SubtitleSettings {
   backgroundOpacity: number;
   fontWeight: 500 | 700 | 800;
   position: "low" | "middle";
+  offsetMs: number;
 }
 
 export const DEFAULT_SUBTITLE_SETTINGS: SubtitleSettings = {
@@ -19,6 +20,7 @@ export const DEFAULT_SUBTITLE_SETTINGS: SubtitleSettings = {
   backgroundOpacity: 72,
   fontWeight: 500,
   position: "low",
+  offsetMs: 0,
 };
 
 const SettingsModal = ({
@@ -106,6 +108,32 @@ const SettingsModal = ({
             <label><span>پس‌زمینه</span><strong>{subtitleSettings.backgroundOpacity}%</strong><input type="range" min="0" max="90" step="5" value={subtitleSettings.backgroundOpacity} onChange={(event) => updateSubtitle("backgroundOpacity", Number(event.target.value))} /></label>
           </div>
 
+          <div className="room-settings-modal__subtitle-offset">
+            <div>
+              <strong>هماهنگ‌سازی زمان زیرنویس</strong>
+              <span>مقدار مثبت یعنی زیرنویس دیرتر نمایش داده می‌شود.</span>
+            </div>
+            <label>
+              <span>تاخیر</span>
+              <input
+                type="number"
+                min="-10000"
+                max="10000"
+                step="100"
+                value={subtitleSettings.offsetMs}
+                onChange={(event) => updateSubtitle("offsetMs", Number(event.target.value) || 0)}
+              />
+              <small>ms</small>
+            </label>
+            <div className="room-settings-modal__subtitle-offset__presets">
+              {[-1000, -500, 0, 500, 1000].map((value) => (
+                <button key={value} type="button" className={clsx(subtitleSettings.offsetMs === value && "active")} onClick={() => updateSubtitle("offsetMs", value)}>
+                  {value === 0 ? "۰" : `${value > 0 ? "+" : ""}${value / 1000}s`}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="room-settings-modal__subtitle-actions">
             <div className="room-settings-modal__subtitle-segment">
               <span>ضخامت</span>
@@ -118,7 +146,7 @@ const SettingsModal = ({
             </div>
           </div>
 
-          <button type="button" className="room-settings-modal__subtitle-reset" onClick={() => onSubtitleSettingsChange(DEFAULT_SUBTITLE_SETTINGS)}>بازنشانی ظاهر زیرنویس</button>
+          <button type="button" className="room-settings-modal__subtitle-reset" onClick={() => onSubtitleSettingsChange(DEFAULT_SUBTITLE_SETTINGS)}>بازنشانی تنظیمات زیرنویس</button>
         </div>
       </div>
     </div>

@@ -3492,6 +3492,8 @@
       min-height: 44px;
       padding: 11px 7px 11px 4px;
       line-height: 1.55;
+      transform: translateY(-3px);
+      font-size: 16px !important;
     }
 
     &__row > button {
@@ -3555,4 +3557,25 @@
 ),
 .room-page__chat-container__foot__send {
   border-radius: 27px;
+}
+
+.room-page__chat-container__message-block.is-admin-message {
+  .room-page__chat-container__message-block__messages {
+    align-items: center;
+  }
+
+  .room-page__chat-container__message-block__messages__message {
+    border: 1px solid
+      color-mix(in srgb, var(--accent) 38%, var(--border-subtle));
+    background: color-mix(in srgb, var(--accent) 9%, var(--component-bg));
+    box-shadow: 0 8px 24px -18px var(--accent-glow);
+  }
+
+  .room-page__chat-container__message-block__messages__message__admin-label {
+    margin-bottom: 5px;
+    color: var(--accent);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+  }
 }

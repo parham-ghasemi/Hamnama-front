@@ -10,13 +10,12 @@ import {
   Maximize,
   Minimize,
   PictureInPicture2,
-  Keyboard,
-  Captions,
   X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { archiveApi, type SubtitleTrack } from "../../../../apiCalls/archiveApi";
 import type { SubtitleSettings } from "../settingsModal/SettingsModal";
+import { FaRegClosedCaptioning } from "react-icons/fa";
 
 export interface VideoPlayerProps {
   src: string;
@@ -56,7 +55,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   onLocalTimeUpdate,
   nextEpisode,
   onNextEpisodeRequest,
-  subtitleSettings = { fontSize: 20, opacity: 100, backgroundOpacity: 72, fontWeight: 500, position: "low" },
+  subtitleSettings = { fontSize: 20, opacity: 100, backgroundOpacity: 72, fontWeight: 500, position: "low", offsetMs: 0 },
   mediaId,
   subtitleSeason,
   subtitleEpisode,
@@ -75,7 +74,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [isPip, setIsPip] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [showShortcutHints, setShowShortcutHints] = useState(false);
-  const [subtitlesRequested, setSubtitlesRequested] = useState(false);
+  const [_, setSubtitlesRequested] = useState(false);
   const [subtitleTracks, setSubtitleTracks] = useState<SubtitleTrack[]>([]);
   const [subtitleStatus, setSubtitleStatus] = useState<"idle" | "loading" | "ready" | "no-subtitles" | "error">("idle");
   const [subtitleError, setSubtitleError] = useState<string | null>(null);
@@ -162,7 +161,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const track = subtitleTracks[activeSubtitle];
     if (!track || !track.cues.length) return null;
 
-    const videoTime = videoRef.current?.currentTime ?? time;
+    const videoTime = (videoRef.current?.currentTime ?? time) - (subtitleSettings.offsetMs / 1000);
     let lo = 0;
     let hi = track.cues.length - 1;
     let candidate = -1;
@@ -180,59 +179,54 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       if (cue.start <= videoTime && cue.end > videoTime) return cue.text;
     }
     return null;
-  }, [activeSubtitle, subtitleTracks, time]);
+  }, [activeSubtitle, subtitleSettings.offsetMs, subtitleTracks, time]);
 
-  const toggleSubtitles = useCallback(async () => {
-    if (subtitleStatus === "loading") return;
-
+  const loadSubtitles = useCallback(async () => {
     if (customSubtitleTracks.length) {
-      if (!subtitlesRequested) {
-        setSubtitlesRequested(true);
-        setSubtitleTracks(customSubtitleTracks);
-        setSubtitleStatus("ready");
-        setActiveSubtitle(0);
-        return;
-      }
-      if (subtitleStatus !== "ready") return;
-      setActiveSubtitle((current) => (current >= 0 ? -1 : 0));
+      setSubtitlesRequested(true);
+      setSubtitleTracks(customSubtitleTracks);
+      setSubtitleStatus("ready");
+      setSubtitleError(null);
+      setActiveSubtitle((current) => current >= 0 ? current : 0);
       return;
     }
 
-    if (!subtitlesRequested) {
-      if (!mediaId) {
-        setSubtitleStatus("error");
-        setSubtitleError("برای این ویدیو زیرنویس آماده نشده است.");
-        setSubtitlesRequested(true);
-        return;
-      }
+    if (!mediaId) {
       setSubtitlesRequested(true);
-      setSubtitleStatus("loading");
-      setSubtitleError(null);
-      try {
-        const response = await archiveApi.getSubtitles(mediaId, { season: subtitleSeason, episode: subtitleEpisode });
-        const tracks = response.data.tracks ?? [];
-        if (!tracks.length) {
-          setSubtitleStatus("no-subtitles");
-          setSubtitleTracks([]);
-          setActiveSubtitle(-1);
-          return;
-        }
-        setSubtitleTracks(tracks);
-        setSubtitleStatus("ready");
-        setActiveSubtitle(0);
-      } catch (error: any) {
-        const status = error?.response?.status;
-        setSubtitleStatus(status === 404 ? "no-subtitles" : "error");
-        setSubtitleError(status === 404 ? "برای این عنوان هنوز زیرنویسی آماده نشده است." : "دریافت زیرنویس با خطا مواجه شد.");
+      setSubtitleStatus("no-subtitles");
+      setSubtitleTracks([]);
+      setActiveSubtitle(-1);
+      return;
+    }
+
+    setSubtitlesRequested(true);
+    setSubtitleStatus("loading");
+    setSubtitleError(null);
+    try {
+      const response = await archiveApi.getSubtitles(mediaId, { season: subtitleSeason, episode: subtitleEpisode });
+      const tracks = response.data.tracks ?? [];
+      if (!tracks.length) {
+        setSubtitleStatus("no-subtitles");
         setSubtitleTracks([]);
         setActiveSubtitle(-1);
+        return;
       }
-      return;
+      setSubtitleTracks(tracks);
+      setSubtitleStatus("ready");
+      setActiveSubtitle(0);
+    } catch (error: any) {
+      const status = error?.response?.status;
+      setSubtitleStatus(status === 404 ? "no-subtitles" : "error");
+      setSubtitleError(status === 404 ? "برای این عنوان هنوز زیرنویسی آماده نشده است." : "دریافت زیرنویس با خطا مواجه شد.");
+      setSubtitleTracks([]);
+      setActiveSubtitle(-1);
     }
+  }, [customSubtitleTracks, mediaId, subtitleEpisode, subtitleSeason]);
 
+  const toggleSubtitles = useCallback(() => {
     if (subtitleStatus !== "ready" || !subtitleTracks.length) return;
     setActiveSubtitle((current) => (current >= 0 ? -1 : 0));
-  }, [customSubtitleTracks, mediaId, subtitleEpisode, subtitleSeason, subtitleStatus, subtitleTracks.length, subtitlesRequested]);
+  }, [subtitleStatus, subtitleTracks.length]);
 
   const toggleFullscreen = async () => {
     if (!containerRef.current) return;
@@ -316,12 +310,18 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   }, [currentTime]);
 
   useEffect(() => {
+    let cancelled = false;
     setSubtitlesRequested(false);
     setSubtitleTracks([]);
     setSubtitleStatus("idle");
     setSubtitleError(null);
     setActiveSubtitle(-1);
-  }, [src, mediaId, subtitleSeason, subtitleEpisode]);
+    void (async () => {
+      await loadSubtitles();
+      if (cancelled) return;
+    })();
+    return () => { cancelled = true; };
+  }, [src, mediaId, subtitleSeason, subtitleEpisode, customSubtitleTracks, loadSubtitles]);
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -675,23 +675,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   onClick={toggleSubtitles}
                   disabled={subtitleStatus === "loading"}
                   title={
-                    !subtitlesRequested
-                      ? "دریافت زیرنویس"
-                      : subtitleStatus === "loading"
-                        ? "در حال دریافت زیرنویس"
-                        : subtitleStatus === "no-subtitles"
-                          ? "زیرنویسی برای این ویدیو پیدا نشد"
-                          : subtitleStatus === "error"
-                            ? subtitleError || "خطا در دریافت زیرنویس"
-                            : activeSubtitle >= 0
-                              ? "مخفی کردن زیرنویس"
-                              : "نمایش زیرنویس"
+                    subtitleStatus === "loading"
+                      ? "در حال دریافت زیرنویس"
+                      : subtitleStatus === "no-subtitles"
+                        ? "زیرنویسی برای این ویدیو پیدا نشد"
+                        : subtitleStatus === "error"
+                          ? subtitleError || "خطا در دریافت زیرنویس"
+                          : activeSubtitle >= 0
+                            ? "مخفی کردن زیرنویس"
+                            : "نمایش زیرنویس"
                   }
                   aria-label={
-                    !subtitlesRequested
-                      ? "دریافت زیرنویس"
-                      : subtitleStatus === "loading"
-                        ? "در حال دریافت زیرنویس"
+                    subtitleStatus === "loading"
+                      ? "در حال دریافت زیرنویس"
+                      : subtitleStatus === "no-subtitles"
+                        ? "زیرنویسی برای این ویدیو پیدا نشد"
                         : activeSubtitle >= 0
                           ? "مخفی کردن زیرنویس"
                           : "نمایش زیرنویس"
@@ -703,21 +701,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                     : "text-gray-200 hover:bg-white/20 hover:text-white"
                     } ${subtitleStatus === "loading" ? "animate-pulse" : ""}`}
                 >
-                  <Captions className="w-4 h-4" />
+                  <FaRegClosedCaptioning className="w-4 h-4" />
                   {subtitleStatus === "loading" && (
                     <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-yellow-400 animate-ping" />
                   )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowShortcutHints((prev) => !prev)}
-                  title="Keyboard shortcuts"
-                  aria-label="نمایش میانبرهای صفحه‌کلید و لمس"
-                  aria-expanded={showShortcutHints}
-                  className={`p-1.5 rounded-full hover:bg-white/20 transition-colors text-gray-200 hover:text-white sm:block hidden ${showShortcutHints ? "bg-white/15 text-white" : ""}`}
-                >
-                  <Keyboard className="w-4 h-4" />
                 </button>
 
                 <button

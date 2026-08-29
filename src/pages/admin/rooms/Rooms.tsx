@@ -5,9 +5,10 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiLock,
-  FiUnlock,
+  FiLogIn,
 } from 'react-icons/fi';
 import { toast } from '../../../components/toast';
+import { useNavigate } from 'react-router-dom';
 import { adminApi } from '../../../apiCalls/adminApi';
 import './Rooms.scss';
 
@@ -115,6 +116,7 @@ const SORT_OPTIONS: DropdownOption<string>[] = [
 
 const Rooms = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<Filter>('all');
@@ -150,14 +152,6 @@ const Rooms = () => {
     onError: () => toast.error('امکان بستن اتاق وجود ندارد'),
   });
 
-  const reopenMutation = useMutation({
-    mutationFn: (id: string) => adminApi.reopenRoom(id),
-    onSuccess: async () => {
-      toast.success('اتاق دوباره باز شد');
-      await queryClient.invalidateQueries({ queryKey: ['admin-rooms'] });
-    },
-    onError: () => toast.error('امکان باز کردن اتاق وجود ندارد'),
-  });
 
   const pagination = data?.pagination;
 
@@ -255,7 +249,12 @@ const Rooms = () => {
                             </span>
                           </div>
                         </td>
-                        <td>{room.created_by}</td>
+                        <td>
+                          <div className="admin-rooms__owner">
+                            <strong>{room.created_by_name || room.created_by}</strong>
+                            <span>{room.created_by.slice(0, 8)}…</span>
+                          </div>
+                        </td>
                         <td>
                           <span className="admin-rooms__playing">
                             {room.currently_playing ?? '—'}
@@ -263,26 +262,26 @@ const Rooms = () => {
                         </td>
                         <td>
                           <div className="admin-rooms__row-actions">
-                            {room.is_closed ? (
-                              <button
-                                type="button"
-                                className="admin-rooms__action admin-rooms__action--secondary"
-                                onClick={() => reopenMutation.mutate(room.id)}
-                                disabled={reopenMutation.isPending}
-                              >
-                                <FiUnlock />
-                                بازکردن
-                              </button>
-                            ) : (
-                              <button
-                                type="button"
-                                className="admin-rooms__action admin-rooms__action--danger"
-                                onClick={() => closeMutation.mutate(room.id)}
-                                disabled={closeMutation.isPending}
-                              >
-                                <FiLock />
-                                بستن
-                              </button>
+                            {!room.is_closed && (
+                              <>
+                                <button
+                                  type="button"
+                                  className="admin-rooms__action admin-rooms__action--secondary"
+                                  onClick={() => navigate(`/room/${room.id}?admin=1`)}
+                                >
+                                  <FiLogIn />
+                                  ورود به‌عنوان مدیر
+                                </button>
+                                <button
+                                  type="button"
+                                  className="admin-rooms__action admin-rooms__action--danger"
+                                  onClick={() => closeMutation.mutate(room.id)}
+                                  disabled={closeMutation.isPending}
+                                >
+                                  <FiLock />
+                                  بستن اتاق
+                                </button>
+                              </>
                             )}
                           </div>
                         </td>

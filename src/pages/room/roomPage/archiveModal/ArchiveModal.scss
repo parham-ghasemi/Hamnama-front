@@ -118,12 +118,19 @@
   font-size: 18px;
   font-weight: 900;
   letter-spacing: -0.02em;
+
+  @include mx.max-w(498px) {
+    display: none;
+  }
 }
 .archive-modal__head-title span {
   display: block;
   margin-top: 4px;
   color: var(--text-muted);
   font-size: 12px;
+  @include mx.max-w(498px) {
+    display: none;
+  }
 }
 .archive-modal__head-actions {
   display: flex;
@@ -1048,9 +1055,6 @@
   .archive-modal__head {
     min-height: 76px;
     padding: 13px;
-  }
-  .archive-modal__head-title span {
-    display: none !important;
   }
   .archive-modal__grid,
   .archive-related-grid,

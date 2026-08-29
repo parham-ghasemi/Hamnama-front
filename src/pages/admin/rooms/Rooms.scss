@@ -466,3 +466,8 @@
     }
   }
 }
+
+
+.admin-rooms__owner { display: grid; gap: 2px; min-width: 130px; }
+.admin-rooms__owner strong { font-size: 12px; font-weight: 800; color: var(--text-primary); }
+.admin-rooms__owner span { font-size: 9px; color: var(--text-muted); direction: ltr; text-align: right; }

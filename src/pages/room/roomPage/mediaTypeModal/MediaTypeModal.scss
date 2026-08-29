@@ -270,3 +270,10 @@
 .media-type-modal__upload-submit:hover:not(:disabled) { opacity: 0.9; }
 .media-type-modal__upload-submit:active:not(:disabled) { transform: scale(0.985); }
 .media-type-modal__upload-submit:disabled { opacity: 0.45; cursor: not-allowed; }
+
+
+.media-type-modal__upload-progress { display: grid; gap: 7px; padding-top: 2px; }
+.media-type-modal__upload-progress__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--text-muted); font-size: 10px; font-weight: 800; }
+.media-type-modal__upload-progress__head strong { color: var(--accent); font-size: 11px; }
+.media-type-modal__upload-progress__track { height: 7px; overflow: hidden; border-radius: 999px; background: color-mix(in srgb, var(--text-muted) 18%, transparent); }
+.media-type-modal__upload-progress__bar { height: 100%; border-radius: inherit; background: var(--accent); transition: width 120ms linear; }

@@ -46,3 +46,24 @@
   .room-settings-modal__body { padding: 14px; }
 }
 @include mx.reduced-motion { .room-settings-modal, .room-settings-modal__subtitle-card__preview > span { transition: none !important; } }
+
+
+.room-settings-modal__subtitle-offset {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 14%, var(--border-subtle));
+  background: color-mix(in srgb, var(--component-bg) 70%, transparent);
+}
+.room-settings-modal__subtitle-offset > div:first-child { display: flex; flex-direction: column; gap: 3px; }
+.room-settings-modal__subtitle-offset strong { font-size: 11px; font-weight: 900; }
+.room-settings-modal__subtitle-offset > div:first-child span { color: var(--text-muted); font-size: 9px; line-height: 1.5; }
+.room-settings-modal__subtitle-offset > label { display: flex; align-items: center; gap: 7px; }
+.room-settings-modal__subtitle-offset > label span { font-size: 10px; font-weight: 800; }
+.room-settings-modal__subtitle-offset > label input { min-width: 0; flex: 1; height: 36px; border: 1px solid var(--border-subtle); border-radius: 10px; background: var(--component-bg); color: var(--text-primary); padding: 0 10px; font: inherit; font-size: 11px; font-weight: 800; }
+.room-settings-modal__subtitle-offset > label small { color: var(--text-muted); font-size: 9px; font-weight: 800; }
+.room-settings-modal__subtitle-offset__presets { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.room-settings-modal__subtitle-offset__presets button { min-height: 30px; border: 1px solid var(--border-subtle); border-radius: 9px; background: var(--component-bg); color: var(--text-muted); font: inherit; font-size: 9px; font-weight: 800; cursor: pointer; }
+.room-settings-modal__subtitle-offset__presets button.active { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 42%, var(--border-subtle)); background: color-mix(in srgb, var(--accent) 10%, var(--component-bg)); }

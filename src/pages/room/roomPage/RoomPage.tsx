@@ -18,11 +18,13 @@ import MediaTypeModal from "./mediaTypeModal/MediaTypeModal";
 import ArchiveModal, { type SelectedArchiveMedia } from "./archiveModal/ArchiveModal";
 import InviteModal from "./inviteModal/InviteModal";
 import VideoPlayer from "./videoPlayer.tsx/VideoPlayer";
+import { archiveApi } from "../../../apiCalls/archiveApi";
 
 import {
   getRoom,
   getTurnCredentials,
   getRoomAnnouncements,
+  getSharedRoomSubtitles,
   leaveRoom,
   sendRoomMessage,
   uploadRoomMedia,
@@ -41,10 +43,14 @@ import { useAuth } from "../../../context/AuthContext";
 import AnimatedParticle from '../../../components/animatedParticle/AnimatedParticle';
 import { useConfirmationModal } from '../../../context/ConfirmModalContext/ConfirmaModalContext';
 import { useAppViewport } from '../../../hooks/useAppViewPort';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { PiUserSoundFill } from "react-icons/pi";
 
 type ClientSocketEvent =
+  | {
+    type: "chat_message";
+    payload: { content: string; replying_to?: string | null };
+  }
   | {
     type: "reaction";
     payload: {
@@ -80,6 +86,7 @@ type ClientSocketEvent =
       user_id: string;
       upload_id?: string;
       subtitles?: { id: string; filename: string; cues: { start: number; end: number; text: string }[] }[];
+      currently_playing_subtitles?: string | null;
     };
   }
   | {
@@ -136,7 +143,12 @@ type ServerSocketEvent =
       user_id: string;
       upload_id?: string;
       subtitles?: { id: string; filename: string; cues: { start: number; end: number; text: string }[] }[];
+      currently_playing_subtitles?: string | null;
     };
+  }
+  | {
+    type: "admin_chat_message";
+    payload: { id: string; content: string; created_at: string };
   }
   | { type: "voice_offer"; payload: any }
   | { type: "voice_answer"; payload: any }
@@ -166,11 +178,12 @@ const CHAT_WIDTH_STORAGE_KEY = "cinema-room-chat-width";
 const DEFAULT_CHAT_WIDTH = 345;
 const MIN_CHAT_WIDTH = 275;
 
-function buildWsUrl(baseUrl: string, roomId: string, token?: string) {
+function buildWsUrl(baseUrl: string, roomId: string, token?: string, stealthAdmin = false) {
   const url = new URL(baseUrl);
   url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
   url.pathname = url.pathname.replace(/\/$/, "") + `/rooms/${roomId}/ws`;
   if (token) url.searchParams.set("token", token);
+  if (stealthAdmin) url.searchParams.set("admin", "1");
   return url.toString();
 }
 
@@ -187,7 +200,9 @@ const getStoredChatWidth = () => {
 
 const RoomPage = () => {
   const { id: roomId } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const isStealthAdmin = searchParams.get("admin") === "1";
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { openConfirmation } = useConfirmationModal();
@@ -248,6 +263,7 @@ const RoomPage = () => {
   const [inviteCopied, setInviteCopied] = useState(false);
   const [customSubtitleTracks, setCustomSubtitleTracks] = useState<{ id: string; filename: string; cues: { start: number; end: number; text: string }[] }[]>([]);
   const [currentUploadId, setCurrentUploadId] = useState<string | null>(null);
+  const [currentSubtitleUrl, setCurrentSubtitleUrl] = useState<string | null>(null);
   const [connectionStatuses, setConnectionStatuses] = useState<Record<string, ConnectionStatus>>({});
   const currentTimeRef = useRef(0);
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
@@ -1237,6 +1253,7 @@ const RoomPage = () => {
     setConnectionLost(false);
     setPlaybackSrc(roomQuery.data.currently_playing ?? "");
     setCustomSubtitleTracks(roomQuery.data.subtitles ?? []);
+    setCurrentSubtitleUrl(roomQuery.data.currently_playing_subtitles ?? null);
     setCurrentTime(roomQuery.data.playback_time ?? 0);
     setIsPlaying(roomQuery.data.is_playing ?? false);
     const statuses: Record<string, ConnectionStatus> = {};
@@ -1247,6 +1264,21 @@ const RoomPage = () => {
 
     setConnectionStatuses(statuses);
   }, [roomQuery.data]);
+
+  useEffect(() => {
+    if (!currentSubtitleUrl || customSubtitleTracks.length) return;
+    let cancelled = false;
+    getSharedRoomSubtitles(currentSubtitleUrl)
+      .then((tracks) => {
+        if (cancelled) return;
+        setCustomSubtitleTracks(tracks);
+        setRoomState((prev) => prev ? { ...prev, subtitles: tracks } : prev);
+      })
+      .catch(() => {
+        if (!cancelled) setCustomSubtitleTracks([]);
+      });
+    return () => { cancelled = true; };
+  }, [currentSubtitleUrl, customSubtitleTracks.length]);
 
   const groupedMessages = useMemo(() => {
     const messages = (roomState?.messages ?? []).map((message) => ({
@@ -1308,7 +1340,7 @@ const RoomPage = () => {
     if (!wsBaseUrl) return;
 
     const token = getAccessToken() ?? undefined;
-    const socket = new WebSocket(buildWsUrl(wsBaseUrl, roomId, token));
+    const socket = new WebSocket(buildWsUrl(wsBaseUrl, roomId, token, isStealthAdmin));
     socketRef.current = socket;
 
 
@@ -1361,6 +1393,23 @@ const RoomPage = () => {
             return { ...prev, messages: [...prev.messages, parsed.payload].slice(-100) };
           });
           break;
+
+        case "admin_chat_message": {
+          const adminMessage: RoomMessageResponse = {
+            id: parsed.payload.id,
+            sender_id: "__website_admin__",
+            sender_name: "مدیریت سایت",
+            sender_avatar: "",
+            replying_to: "",
+            content: parsed.payload.content,
+            created_at: parsed.payload.created_at,
+            updated_at: parsed.payload.created_at,
+            edited: false,
+            is_admin_sender: true,
+          };
+          setRoomState((prev) => prev ? { ...prev, messages: [...prev.messages, adminMessage].slice(-100) } : prev);
+          break;
+        }
 
         case "chat_message_updated":
           setRoomState((prev) =>
@@ -1470,6 +1519,7 @@ const RoomPage = () => {
             currently_playing: parsed.payload.currently_playing ?? null,
             playback_time: Math.round(parsed.payload.playback_time),
             is_playing: parsed.payload.is_playing,
+            currently_playing_subtitles: parsed.payload.currently_playing_subtitles ?? null,
           };
           if (parsed.payload.action === "load" || parsed.payload.upload_id) {
             playbackUpdate.subtitles = nextSubtitles;
@@ -1486,6 +1536,7 @@ const RoomPage = () => {
             setPlaybackSrc("");
           }
 
+          setCurrentSubtitleUrl(parsed.payload.currently_playing_subtitles ?? null);
           if (parsed.payload.action === "load" || parsed.payload.upload_id) {
             setCustomSubtitleTracks(nextSubtitles);
             setCurrentUploadId(parsed.payload.upload_id ?? null);
@@ -1574,7 +1625,7 @@ const RoomPage = () => {
       if (socketRef.current === socket) {
         socketRef.current = null;
       }
-      if (e.code === 4003) {
+      if (e.code === 4003 || e.code === 4004) {
         intentionalSocketCloseRef.current = true;
         navigate("/join-room");
         return;
@@ -1588,7 +1639,7 @@ const RoomPage = () => {
       intentionalSocketCloseRef.current = true;
       socket.close();
     };
-  }, [roomId, user?.id]);
+  }, [roomId, user?.id, isStealthAdmin]);
 
   useEffect(() => {
     if (!isCreator) {
@@ -1618,6 +1669,7 @@ const RoomPage = () => {
           user_id: user?.id ? user.id : "",
           upload_id: currentUploadId ?? undefined,
           subtitles: currentUploadId ? customSubtitleTracks : undefined,
+          currently_playing_subtitles: currentSubtitleUrl,
         },
       });
     }, 30000);
@@ -1628,7 +1680,7 @@ const RoomPage = () => {
         syncIntervalRef.current = null;
       }
     };
-  }, [isCreator, isPlaying, currentTime, playbackSrc, currentUploadId, customSubtitleTracks, user?.id]);
+  }, [isCreator, isPlaying, currentTime, playbackSrc, currentUploadId, currentSubtitleUrl, customSubtitleTracks, user?.id]);
 
   const sendMessageMutation = useMutation({
     mutationFn: (content: string) => sendRoomMessage(roomId!, content, replyingTo.id),
@@ -1704,7 +1756,7 @@ const RoomPage = () => {
     setInviteModalOpen(false);
   };
 
-  const emitPlayback = (action: "play" | "pause" | "seek" | "sync" | "load", nextTime: number, nextSrc?: string) => {
+  const emitPlayback = (action: "play" | "pause" | "seek" | "sync" | "load", nextTime: number, nextSrc?: string, nextSubtitleUrl?: string | null) => {
     const source = nextSrc ?? playbackSrc;
     const payload = {
       action,
@@ -1714,6 +1766,7 @@ const RoomPage = () => {
       user_id: user?.id ?? "",
       upload_id: action === "load" ? (currentUploadId && source === playbackSrc ? currentUploadId : undefined) : currentUploadId ?? undefined,
       subtitles: currentUploadId && (action !== "load" || source === playbackSrc) ? customSubtitleTracks : undefined,
+      currently_playing_subtitles: nextSubtitleUrl !== undefined ? nextSubtitleUrl : currentSubtitleUrl,
     };
 
     sendSocketEvent({ type: "sync_playback", payload });
@@ -1723,6 +1776,7 @@ const RoomPage = () => {
         ? {
           ...prev,
           currently_playing: source || null,
+          currently_playing_subtitles: nextSubtitleUrl !== undefined ? nextSubtitleUrl : currentSubtitleUrl,
           playback_time: Math.round(nextTime),
         }
         : prev,
@@ -1749,6 +1803,13 @@ const RoomPage = () => {
   const handleSendMessage = () => {
     const content = messageText.trim();
     if (!content || sendMessageMutation.isPending || editMessageMutation.isPending) return;
+
+    if (isStealthAdmin) {
+      sendSocketEvent({ type: "chat_message", payload: { content } });
+      setMessageText("");
+      setReplyingTo({ message: "", id: "" });
+      return;
+    }
 
     if (editingMessageId) {
       editMessageMutation.mutate({ messageId: editingMessageId, content });
@@ -1833,10 +1894,11 @@ const RoomPage = () => {
     setSelectedMedia(null);
     setCustomSubtitleTracks([]);
     setCurrentUploadId(null);
+    setCurrentSubtitleUrl(null);
     setPlaybackSrc(nextSrc);
     setCurrentTime(0);
     setIsPlaying(false);
-    emitPlayback("load", 0, nextSrc);
+    emitPlayback("load", 0, nextSrc, null);
   };
 
   const handleChooseLinkMode = () => {
@@ -1845,10 +1907,21 @@ const RoomPage = () => {
     setMediaTypeModalOpen(false);
   };
 
-  const handleArchiveSelect = (media: SelectedArchiveMedia) => {
+  const handleArchiveSelect = async (media: SelectedArchiveMedia) => {
+    const subtitleUrl = archiveApi.getSubtitlesUrl(media.id, { season: media.season, episode: media.episode });
+    let tracks: Awaited<ReturnType<typeof getSharedRoomSubtitles>> = [];
+    try {
+      const response = await archiveApi.getSubtitles(media.id, { season: media.season, episode: media.episode });
+      tracks = response.data.tracks ?? [];
+    } catch {
+      tracks = [];
+    }
+
+    const sharedSubtitleUrl = tracks.length ? subtitleUrl : null;
     setCurrentId(media.id)
     setSelectedMedia(media);
-    setCustomSubtitleTracks([]);
+    setCustomSubtitleTracks(tracks);
+    setCurrentSubtitleUrl(sharedSubtitleUrl);
     setCurrentUploadId(null);
     setLinkModeEnabled(false);
     setLink("");
@@ -1856,27 +1929,38 @@ const RoomPage = () => {
     setPlaybackSrc(media.url);
     setCurrentTime(0);
     setIsPlaying(false);
-    emitPlayback("load", 0, media.url);
+    emitPlayback("load", 0, media.url, sharedSubtitleUrl);
   };
 
-  const handleNextEpisode = () => {
+  const handleNextEpisode = async () => {
     const nextEpisode = selectedMedia?.nextEpisode;
     if (!nextEpisode) return;
 
+    const subtitleUrl = archiveApi.getSubtitlesUrl(nextEpisode.id, { season: nextEpisode.season, episode: nextEpisode.episode });
+    let tracks: Awaited<ReturnType<typeof getSharedRoomSubtitles>> = [];
+    try {
+      const response = await archiveApi.getSubtitles(nextEpisode.id, { season: nextEpisode.season, episode: nextEpisode.episode });
+      tracks = response.data.tracks ?? [];
+    } catch {
+      tracks = [];
+    }
+    const sharedSubtitleUrl = tracks.length ? subtitleUrl : null;
+
     setCurrentId(nextEpisode.id);
     setSelectedMedia(nextEpisode);
-    setCustomSubtitleTracks([]);
+    setCustomSubtitleTracks(tracks);
+    setCurrentSubtitleUrl(sharedSubtitleUrl);
     setCurrentUploadId(null);
     setCurrentQuality(nextEpisode.quality ?? "quality");
     setPlaybackSrc(nextEpisode.url);
     setCurrentTime(0);
     setIsPlaying(true);
-    emitPlayback("load", 0, nextEpisode.url);
+    emitPlayback("load", 0, nextEpisode.url, sharedSubtitleUrl);
   };
 
-  const handleUploadOwnMedia = async (videoFile: File, subtitleFile: File | null) => {
+  const handleUploadOwnMedia = async (videoFile: File, subtitleFile: File | null, onProgress?: (percent: number) => void) => {
     if (!roomId) return;
-    const result = await uploadRoomMedia(roomId, videoFile, subtitleFile);
+    const result = await uploadRoomMedia(roomId, videoFile, subtitleFile, onProgress);
     setSelectedMedia(null);
     setLinkModeEnabled(false);
     setLink("");
@@ -1884,6 +1968,7 @@ const RoomPage = () => {
     setCurrentId("");
     setCurrentUploadId(result.upload_id);
     setCustomSubtitleTracks(result.subtitles ?? []);
+    setCurrentSubtitleUrl(result.subtitle_url ?? null);
     setPlaybackSrc(result.video_url);
     setCurrentTime(0);
     setIsPlaying(false);
@@ -1891,6 +1976,7 @@ const RoomPage = () => {
     setRoomState((prev) => prev ? {
       ...prev,
       currently_playing: result.video_url,
+      currently_playing_subtitles: result.subtitle_url ?? null,
       playback_time: 0,
       is_playing: false,
       subtitles: result.subtitles ?? [],
@@ -2108,7 +2194,7 @@ const RoomPage = () => {
     connectionStatus: connectionStatuses[member.user_id] ?? "good",
   }));
 
-  const isCurrentUserAdmin = members.some(
+  const isCurrentUserAdmin = isStealthAdmin || members.some(
     (member) => member.userId === user?.id && member.role === "admin",
   );
 
@@ -2190,47 +2276,46 @@ const RoomPage = () => {
           <span>تنظیمات</span>
         </div>
 
-        {!voiceEnabled ? (
-          <div className="room-page__side-bar__item">
-            <button
-              type="button"
-              className="room-page__side-bar__voice-join"
-              aria-label="پیوستن به چت صوتی"
-              title="پیوستن به چت صوتی"
-              onClick={handleJoinVoice}
-            >
-              <PiUserSoundFill />
-            </button>
-            <span>چت صوتی</span>
-          </div>
-        ) : (
-          <div className="room-page__side-bar__item">
-            <button
-              type="button"
-              className={clsx("room-page__side-bar__microphone", "voice-active")}
-              aria-label={isMicMuted ? "روشن کردن میکروفون" : "بی‌صدا کردن میکروفون"}
-              title={isMicMuted ? "روشن کردن میکروفون" : "بی‌صدا کردن میکروفون"}
-              onClick={() => {
-                setIsMicMuted((prev) => {
-                  const next = !prev;
-                  voiceLog("local mute toggle", {
-                    muted: next,
-                    voiceEnabled: voiceEnabledRef.current,
+        {!isStealthAdmin && (
+          voiceEnabled ? (
+            <div className="room-page__side-bar__item">
+              <button
+                type="button"
+                className={clsx("room-page__side-bar__microphone", "voice-active")}
+                aria-label={isMicMuted ? "روشن کردن میکروفون" : "بی‌صدا کردن میکروفون"}
+                title={isMicMuted ? "روشن کردن میکروفون" : "بی‌صدا کردن میکروفون"}
+                onClick={() => {
+                  setIsMicMuted((prev) => {
+                    const next = !prev;
+                    voiceLog("local mute toggle", { muted: next, voiceEnabled: voiceEnabledRef.current });
+                    return next;
                   });
-                  return next;
-                });
-              }}
-            >
-              {isMicMuted ? <BsMicMuteFill /> : <BsMicFill />}
-            </button>
-            <span>میکروفون</span>
-          </div>
+                }}
+              >
+                {isMicMuted ? <BsMicMuteFill /> : <BsMicFill />}
+              </button>
+              <span>میکروفون</span>
+            </div>
+          ) : (
+            <div className="room-page__side-bar__item">
+              <button
+                type="button"
+                className="room-page__side-bar__voice-join"
+                aria-label="پیوستن به چت صوتی"
+                title="پیوستن به چت صوتی"
+                onClick={handleJoinVoice}
+              >
+                <PiUserSoundFill />
+              </button>
+              <span>چت صوتی</span>
+            </div>
+          )
         )}
 
         <div className="room-page__side-bar__item">
-          <button className="room-page__side-bar__microphone" onClick={() => setUsersModalOpen(true)}>
+          {!isStealthAdmin && <button className="room-page__side-bar__microphone" onClick={() => setUsersModalOpen(true)}>
             <BsFillPeopleFill />
-          </button>
+          </button>}
           <span>کاربران</span>
         </div>
 
@@ -2497,7 +2582,7 @@ const RoomPage = () => {
             const next = groupedMessages[index + 1];
             const prevMessage = prev?.kind === "message" ? prev.message : null;
             const nextMessage = next?.kind === "message" ? next.message : null;
-            const isOwn = message.sender_id === user?.id;
+            const isOwn = !message.is_admin_sender && message.sender_id === user?.id;
 
             const dayLabel = new Date(message.created_at).toLocaleDateString("fa-IR", {
               day: "numeric",
@@ -2522,8 +2607,8 @@ const RoomPage = () => {
                   isOwn={isOwn}
                   showAvatar={showAvatar}
                   isHighlighted={highlightedMessageId === message.id}
-                  onReply={() => handleReply({ id: message.id, message: message.content })}
-                  onReplyNavigate={message.replying_to_id ? () => handleNavigateToMessage(message.replying_to_id as string) : undefined}
+                  onReply={message.is_admin_sender ? () => undefined : () => handleReply({ id: message.id, message: message.content })}
+                  onReplyNavigate={message.is_admin_sender ? undefined : (message.replying_to_id ? () => handleNavigateToMessage(message.replying_to_id as string) : undefined)}
                   onEdit={isOwn ? () => handleEditMessage(message) : undefined}
                 />
               </div>

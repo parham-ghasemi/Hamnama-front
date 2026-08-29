@@ -53,6 +53,7 @@ const ChatMessage = ({
   };
 
   const openContextMenu = (x: number, y: number) => {
+    if (message.is_admin_sender) return;
     const left = Math.max(
       8,
       Math.min(
@@ -252,7 +253,7 @@ const ChatMessage = ({
     <div
       id={`chat-message-${message.id}`}
       data-message-id={message.id}
-      className={clsx(
+      className={clsx(message.is_admin_sender && "is-admin-message", 
         "room-page__chat-container__message-block",
         isOwn && "outgoing",
         showAvatar && "has-avatar",
@@ -289,6 +290,11 @@ const ChatMessage = ({
       >
         <div className="room-page__chat-container__message-block__messages">
           <div className="room-page__chat-container__message-block__messages__message">
+            {message.is_admin_sender && (
+              <div className="room-page__chat-container__message-block__messages__message__admin-label">
+                مدیریت سایت
+              </div>
+            )}
             {!!message.replying_to && (
               <button
                 type="button"
@@ -319,7 +325,7 @@ const ChatMessage = ({
             </span>
 
             <span className="room-page__chat-container__message-block__messages__message__meta">
-              <button
+              {!message.is_admin_sender && <button
                 type="button"
                 className="room-page__chat-container__message-block__messages__message__more"
                 onClick={handleMoreAction}
@@ -330,7 +336,7 @@ const ChatMessage = ({
                 title="گزینه‌های پیام"
               >
                 <BsThreeDotsVertical />
-              </button>
+              </button>}
 
               <div className={clsx("flex gap-1", !isOwn && "flex-row-reverse")}>
                 {message.edited && (
@@ -377,7 +383,7 @@ const ChatMessage = ({
         )}
       </div>
 
-      {contextMenu && (
+      {contextMenu && !message.is_admin_sender && (
         <div
           ref={contextMenuRef}
           className="room-page__chat-container__message-block__context-menu"

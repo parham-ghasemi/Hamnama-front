@@ -143,4 +143,13 @@ export const archiveApi = {
         episode: params?.episode ?? undefined,
       },
     }),
+
+  getSubtitlesUrl: (mediaId: string, params?: { season?: number | null; episode?: number | null }) => {
+    const rawBase = String(import.meta.env["VITE_BASE_URL"] ?? window.location.origin).replace(/\/+$/, "");
+    const originBase = rawBase.replace(/\/api$/i, "");
+    const url = new URL(`/api/media/${encodeURIComponent(mediaId)}/subtitles`, originBase);
+    if (params?.season != null) url.searchParams.set("season", String(params.season));
+    if (params?.episode != null) url.searchParams.set("episode", String(params.episode));
+    return url.toString();
+  },
 };

@@ -34,6 +34,7 @@ export interface RoomMessageResponse {
   created_at: string;
   updated_at: string;
   edited: boolean;
+  is_admin_sender?: boolean;
 }
 
 export interface CreateRoomRequest {
@@ -83,6 +84,7 @@ export interface RoomResponse {
   created_by_name: string;
   created_by_avatar: string;
   currently_playing?: string | null;
+  currently_playing_subtitles?: string | null;
   playback_time: number;
   is_playing: boolean;
   is_public: boolean;
@@ -178,14 +180,29 @@ export function getRoomApiErrorStatus(error: unknown): number | undefined {
 export interface UploadRoomMediaResponse {
   upload_id: string;
   video_url: string;
+  subtitle_url?: string | null;
   subtitles?: SubtitleTrack[];
 }
 
-export async function uploadRoomMedia(roomId: string, videoFile: File, subtitleFile?: File | null) {
+export async function uploadRoomMedia(
+  roomId: string,
+  videoFile: File,
+  subtitleFile?: File | null,
+  onUploadProgress?: (percent: number) => void,
+) {
   const form = new FormData();
   form.append("video", videoFile);
   if (subtitleFile) form.append("subtitle", subtitleFile);
 
-  const { data } = await api.post<UploadRoomMediaResponse>(`/rooms/${roomId}/media`, form);
+  const { data } = await api.post<UploadRoomMediaResponse>(`/rooms/${roomId}/media`, form, {
+    onUploadProgress: (event) => {
+      if (event.total) onUploadProgress?.(Math.min(100, Math.round((event.loaded / event.total) * 100)));
+    },
+  });
   return data;
+}
+
+export async function getSharedRoomSubtitles(url: string) {
+  const { data } = await api.get<{ tracks: SubtitleTrack[] }>(url);
+  return data.tracks ?? [];
 }

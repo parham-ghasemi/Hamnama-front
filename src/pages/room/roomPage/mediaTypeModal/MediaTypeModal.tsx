@@ -16,13 +16,14 @@ const MediaTypeModal = ({
   openArchive: () => void;
   closeModal: () => void;
   onChooseLink: () => void;
-  onSubmitUpload: (videoFile: File, subtitleFile: File | null) => Promise<void>;
+  onSubmitUpload: (videoFile: File, subtitleFile: File | null, onProgress?: (percent: number) => void) => Promise<void>;
 }) => {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [subtitleFile, setSubtitleFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const resetUpload = () => {
     setUploadOpen(false);
@@ -30,6 +31,7 @@ const MediaTypeModal = ({
     setSubtitleFile(null);
     setUploadError(null);
     setUploading(false);
+    setUploadProgress(0);
   };
 
   const handleClose = () => {
@@ -40,6 +42,7 @@ const MediaTypeModal = ({
   const handleChooseUpload = () => {
     setUploadOpen(true);
     setUploadError(null);
+    setUploadProgress(0);
   };
 
   const handleSubmit = async () => {
@@ -47,7 +50,8 @@ const MediaTypeModal = ({
     setUploading(true);
     setUploadError(null);
     try {
-      await onSubmitUpload(videoFile, subtitleFile);
+      setUploadProgress(0);
+      await onSubmitUpload(videoFile, subtitleFile, setUploadProgress);
       resetUpload();
     } catch (error) {
       setUploadError(error instanceof Error ? error.message : "آپلود فایل‌ها انجام نشد.");
@@ -157,6 +161,18 @@ const MediaTypeModal = ({
             </label>
 
             {uploadError && <p className="media-type-modal__upload-error">{uploadError}</p>}
+
+            {uploading && (
+              <div className="media-type-modal__upload-progress" aria-live="polite">
+                <div className="media-type-modal__upload-progress__head">
+                  <span>پیشرفت آپلود</span>
+                  <strong>{uploadProgress}%</strong>
+                </div>
+                <div className="media-type-modal__upload-progress__track">
+                  <div className="media-type-modal__upload-progress__bar" style={{ width: `${uploadProgress}%` }} />
+                </div>
+              </div>
+            )}
 
             <button
               type="button"

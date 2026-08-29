@@ -74,6 +74,7 @@ export interface AdminRoom {
   id: string;
   code: number;
   created_by: string;
+  created_by_name: string;
   currently_playing?: string;
   playback_time: number;
   is_public: boolean;
