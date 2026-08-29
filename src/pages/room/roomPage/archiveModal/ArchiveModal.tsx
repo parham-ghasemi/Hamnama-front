@@ -28,6 +28,8 @@ import {
 } from "../../../../apiCalls/archiveApi";
 import { toast } from "sonner";
 import "./ArchiveModal.scss";
+import { toPersianNumerals } from "../../../../helpers/NumberConversion";
+import { countries, languages, movieGenres } from "./movie-locales";
 
 export interface SelectedArchiveMedia {
   id: string;
@@ -538,10 +540,10 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
                     {detail.title_fa && detail.title_en && <h2>{detail.title_fa}</h2>}
                     <p className="archive-hero__plot">{clean(detail.plot || detail.omdb?.Plot)}</p>
                     <div className="archive-hero__meta">
-                      {detail.runtime && <span>{detail.runtime}</span>}
-                      {detail.genre && <span>{detail.genre}</span>}
-                      {detail.language && <span>{detail.language}</span>}
-                      {detail.country && <span>{detail.country}</span>}
+                      {detail.runtime && <span>{toPersianNumerals(detail.runtime.replace("min", "دقیقه"))}</span>}
+                      {detail.genre && <span>{detail.genre.split(", ").map(g => movieGenres[g]).join(", ")}</span>}
+                      {detail.language && <span>{detail.language.split(", ").map(g => languages[g]).join(", ")}</span>}
+                      {detail.country && <span>{detail.country.split(", ").map(g => countries[g]).join(", ")}</span>}
                     </div>
                     {(detail.director || detail.actors) && <div className="archive-hero__credits">
                       {detail.director && detail.director !== "N/A" && <p><strong>کارگردان:</strong> {detail.director}</p>}
