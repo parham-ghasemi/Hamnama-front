@@ -550,6 +550,23 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
                   </div>
                 </section>
 
+                {reportOpen && (
+                  <div className="archive-report-panel">
+                    <div className="archive-report-panel__head">
+                      <div><span className="archive-section__eyebrow"><TbFlag /> گزارش مشکل</span><h3>چه چیزی نیاز به بررسی دارد؟</h3></div>
+                      <button type="button" onClick={() => setReportOpen(false)} aria-label="بستن"><TbX /></button>
+                    </div>
+                    <div className="archive-report-panel__body">
+                      <ArchiveDropdown label="محدوده گزارش" value={reportTarget} options={[{ value: "media", label: "کل عنوان" }, { value: "episode", label: "یک قسمت مشخص" }, { value: "file", label: "یک فایل مشخص" }]} onChange={(value) => setReportTarget(value as "media" | "episode" | "file")} disabled={false} />
+                      {reportTarget === "episode" && <div className="archive-report-panel__row"><ArchiveDropdown label="قسمت" value={reportSeason != null && reportEpisode != null ? `${reportSeason}:${reportEpisode}` : ""} options={[{ value: "", label: "انتخاب قسمت" }, ...episodeOptions.map((item) => ({ value: `${item.season}:${item.episode}`, label: item.label }))]} onChange={(value) => { if (!value) { setReportSeason(null); setReportEpisode(null); return; } const [season, episode] = value.split(":").map(Number); setReportSeason(season); setReportEpisode(episode); }} disabled={!episodeOptions.length} /></div>}
+                      {reportTarget === "file" && <ArchiveDropdown label="فایل" value={reportFileUrl} options={[{ value: "", label: "انتخاب فایل" }, ...detail.files.map((file, index) => ({ value: file.url, label: `${file.quality_tags || `فایل ${index + 1}`}${file.season != null && file.episode != null ? ` · S${file.season}E${file.episode}` : ""}` }))]} onChange={setReportFileUrl} disabled={!detail.files.length} />}
+                      <ArchiveDropdown label="نوع مشکل" value={reportType} options={[{ value: "broken_file", label: "فایل پخش نمی‌شود" }, { value: "invalid_subtitle", label: "زیرنویس نامعتبر است" }, { value: "wrong_episode", label: "قسمت اشتباه است" }, { value: "wrong_quality", label: "کیفیت یا نسخه اشتباه است" }, { value: "missing_file", label: "فایل ناقص یا گمشده است" }, { value: "wrong_metadata", label: "اطلاعات عنوان اشتباه است" }, { value: "custom", label: "گزارش سفارشی" }]} onChange={setReportType} />
+                      {reportType === "custom" && <label><span>توضیحات</span><textarea value={customReport} onChange={(event) => setCustomReport(event.target.value)} rows={4} maxLength={2000} placeholder="مشکل را با جزئیات بنویسید…" /> </label>}
+                    </div>
+                    <div className="archive-report-panel__footer"><button type="button" onClick={() => setReportOpen(false)}>انصراف</button><button type="button" className="primary" disabled={reportMutation.isPending || (reportTarget === "episode" && (reportSeason == null || reportEpisode == null)) || (reportTarget === "file" && !reportFileUrl) || (reportType === "custom" && !customReport.trim())} onClick={() => reportMutation.mutate()}>{reportMutation.isPending ? "در حال ثبت…" : "ارسال گزارش"}</button></div>
+                  </div>
+                )}
+
                 {detail.type === "series" ? (
                   <section className="archive-section archive-section--series">
                     <div className="archive-section__heading">
@@ -622,22 +639,6 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
                   </section>
                 )}
 
-                {reportOpen && (
-                  <div className="archive-report-panel">
-                    <div className="archive-report-panel__head">
-                      <div><span className="archive-section__eyebrow"><TbFlag /> گزارش مشکل</span><h3>چه چیزی نیاز به بررسی دارد؟</h3></div>
-                      <button type="button" onClick={() => setReportOpen(false)} aria-label="بستن"><TbX /></button>
-                    </div>
-                    <div className="archive-report-panel__body">
-                      <label><span>محدوده گزارش</span><select value={reportTarget} onChange={(event) => setReportTarget(event.target.value as "media" | "episode" | "file")}><option value="media">کل عنوان</option><option value="episode" disabled={!episodeOptions.length}>یک قسمت مشخص</option><option value="file" disabled={!detail.files.length}>یک فایل مشخص</option></select></label>
-                      {reportTarget === "episode" && <div className="archive-report-panel__row"><label><span>قسمت</span><select value={reportSeason != null && reportEpisode != null ? `${reportSeason}:${reportEpisode}` : ""} onChange={(event) => { const [season, episode] = event.target.value.split(":").map(Number); setReportSeason(season); setReportEpisode(episode); }}><option value="">انتخاب قسمت</option>{episodeOptions.map((item) => <option key={`${item.season}:${item.episode}`} value={`${item.season}:${item.episode}`}>{item.label}</option>)}</select></label></div>}
-                      {reportTarget === "file" && <label><span>فایل</span><select value={reportFileUrl} onChange={(event) => setReportFileUrl(event.target.value)}><option value="">انتخاب فایل</option>{detail.files.map((file, index) => <option key={`${file.url}-${index}`} value={file.url}>{file.filename || file.quality_tags || `فایل ${index + 1}`}{file.season != null && file.episode != null ? ` · S${file.season}E${file.episode}` : ""}</option>)}</select></label>}
-                      <label><span>نوع مشکل</span><select value={reportType} onChange={(event) => setReportType(event.target.value)}><option value="broken_file">فایل پخش نمی‌شود</option><option value="invalid_subtitle">زیرنویس نامعتبر است</option><option value="wrong_episode">قسمت اشتباه است</option><option value="wrong_quality">کیفیت یا نسخه اشتباه است</option><option value="missing_file">فایل ناقص یا گمشده است</option><option value="wrong_metadata">اطلاعات عنوان اشتباه است</option><option value="custom">گزارش سفارشی</option></select></label>
-                      {reportType === "custom" && <label><span>توضیحات</span><textarea value={customReport} onChange={(event) => setCustomReport(event.target.value)} rows={4} maxLength={2000} placeholder="مشکل را با جزئیات بنویسید…" /> </label>}
-                    </div>
-                    <div className="archive-report-panel__footer"><button type="button" onClick={() => setReportOpen(false)}>انصراف</button><button type="button" className="primary" disabled={reportMutation.isPending || (reportTarget === "episode" && (reportSeason == null || reportEpisode == null)) || (reportTarget === "file" && !reportFileUrl) || (reportType === "custom" && !customReport.trim())} onClick={() => reportMutation.mutate()}>{reportMutation.isPending ? "در حال ثبت…" : "ارسال گزارش"}</button></div>
-                  </div>
-                )}
 
                 {suggested.length > 0 && (
                   <section className="archive-section">

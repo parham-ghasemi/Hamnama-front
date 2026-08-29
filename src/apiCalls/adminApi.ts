@@ -184,6 +184,19 @@ export interface AdminArchiveReportsResponse {
   reports: AdminArchiveReport[];
 }
 
+export interface AdminArchiveReportGroup {
+  media_id: string;
+  title_en: string;
+  title_fa: string;
+  type: 'movie' | 'series';
+  poster?: string;
+  report_count: number;
+}
+
+export interface AdminArchiveReportGroupsResponse {
+  items: AdminArchiveReportGroup[];
+}
+
 export interface SubtitleHealthReport {
   total_items: number;
   valid_items: number;
@@ -271,8 +284,10 @@ export const adminApi = {
   deleteArchiveItem: (id: string) => api.delete(`/admin/archive/${id}`),
   setArchiveItemEnabled: (id: string, enabled: boolean) => api.patch<{ success: boolean; enabled: boolean }>(`/admin/archive/${id}/enabled`, { enabled }),
   getArchiveReports: (id: string) => api.get<AdminArchiveReportsResponse>(`/admin/archive/${id}/reports`),
+  getArchiveReportGroups: () => api.get<AdminArchiveReportGroupsResponse>('/admin/archive/reports'),
 
   triggerSubtitleSync: () => api.post<SubtitleSyncResponse>('/admin/subtitles/sync'),
   getSubtitleSyncStatus: (id: string) => api.get<SubtitleSyncStatusResponse>(`/admin/subtitles/sync/${id}`),
   getSubtitleHealthReport: () => api.get<SubtitleHealthReport>('/admin/subtitles/report'),
+  getInvalidSubtitleItems: (params?: { page?: number; limit?: number }) => api.get<AdminArchiveResponse>('/admin/subtitles/invalid', { params }),
 };
