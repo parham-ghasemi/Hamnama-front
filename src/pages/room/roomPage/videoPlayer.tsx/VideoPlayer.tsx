@@ -395,6 +395,22 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
   }, [playing]);
 
+  useEffect(() => {
+    if (
+      subtitleStatus !== "loading" &&
+      subtitleStatus !== "error" &&
+      subtitleStatus !== "no-subtitles"
+    ) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setSubtitleStatus("idle"); // or whatever your default/hidden status is
+    }, 10_000);
+
+    return () => clearTimeout(timer);
+  }, [subtitleStatus]);
+
   return (
     <div
       ref={containerRef}
@@ -472,6 +488,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
+            onClick={() => setSubtitleStatus("idle")}
             className="absolute bottom-20 left-1/2 z-30 -translate-x-1/2 rounded-full border border-white/10 bg-black/45 px-3 py-1.5 text-xs text-white/80 shadow-xl backdrop-blur-md"
           >
             <span className="mr-2 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#d04e2f] align-middle" />
@@ -484,10 +501,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
+            onClick={() => setSubtitleStatus("idle")}
             className="absolute bottom-20 left-1/2 z-30 w-[min(460px,calc(100%-2rem))] -translate-x-1/2 rounded-xl border border-red-400/20 bg-black/80 px-4 py-3 text-center text-sm text-white shadow-2xl backdrop-blur-md"
           >
-            <div className="font-medium text-red-300">خطا در دریافت زیرنویس</div>
-            <div className="mt-1 text-xs text-white/65">{subtitleError}</div>
+            <div className="font-medium text-red-300">
+              خطا در دریافت زیرنویس
+            </div>
+            <div className="mt-1 text-xs text-white/65">
+              {subtitleError}
+            </div>
           </motion.div>
         )}
 
@@ -496,6 +518,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
+            onClick={() => setSubtitleStatus("idle")}
             className="absolute bottom-20 left-1/2 z-30 -translate-x-1/2 rounded-xl border border-white/10 bg-black/75 px-4 py-2.5 text-center text-xs text-white/80 shadow-2xl backdrop-blur-md"
           >
             برای این ویدیو زیرنویس آماده نشده است.
