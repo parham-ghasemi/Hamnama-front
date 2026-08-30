@@ -1508,7 +1508,7 @@ const RoomPage = () => {
             is_admin_sender: true,
           };
           setRoomState((prev) => prev ? { ...prev, messages: [...prev.messages, adminMessage].slice(-100) } : prev);
-          playRoomSound("newChatMessage");
+          // playRoomSound("newChatMessage");
           break;
         }
 
