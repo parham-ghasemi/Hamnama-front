@@ -2629,6 +2629,8 @@ const RoomPage = () => {
                 subtitleSeason={selectedMedia?.season}
                 subtitleEpisode={selectedMedia?.episode}
                 customSubtitleTracks={customSubtitleTracks}
+                subtitleSettings={subtitleSettings}
+                onSubtitleSettingsChange={setSubtitleSettings}
                 isPlaying={isPlaying}
                 currentTime={currentTime}
                 className='flex-1! h-full! mb-0 mt-auto ml-auto mr-auto'
@@ -2654,7 +2656,6 @@ const RoomPage = () => {
                     : null
                 }
                 onNextEpisodeRequest={handleNextEpisode}
-                subtitleSettings={subtitleSettings}
               />
             </>
           ) : (
@@ -2926,8 +2927,8 @@ const RoomPage = () => {
               playbackTime={roomState.playback_time}
               currentlyPlaying={roomState.currently_playing}
               createdAt={roomState.created_at}
-              subtitleSettings={subtitleSettings}
-              onSubtitleSettingsChange={setSubtitleSettings}
+              // subtitleSettings={subtitleSettings}
+              // onSubtitleSettingsChange={setSubtitleSettings}
               soundVolumes={roomSoundVolumes}
               onSoundVolumesChange={setRoomSoundVolumes}
             />

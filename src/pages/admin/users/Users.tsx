@@ -332,11 +332,6 @@ const Users = () => {
                               ادمین
                             </span>
                           ) : null}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="admin-users__level-cell">
-                          <span>{user.level}</span>
                           {user.is_admin && isFullAccess ? (
                             <SmoothDropdown
                               value={String(user.access_level)}
@@ -351,6 +346,11 @@ const Users = () => {
                           ) : user.is_admin ? (
                             <span className="admin-users__access-level">سطح {user.access_level}</span>
                           ) : null}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="admin-users__level-cell">
+                          <span>{user.level}</span>
                         </div>
                       </td>
                       <td>

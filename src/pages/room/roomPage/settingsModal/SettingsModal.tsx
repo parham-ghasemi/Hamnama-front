@@ -44,8 +44,6 @@ const SettingsModal = ({
   isOpen,
   isPublic,
   mediaControlPermission,
-  subtitleSettings,
-  onSubtitleSettingsChange,
   soundVolumes,
   onSoundVolumesChange,
 }: {
@@ -55,8 +53,6 @@ const SettingsModal = ({
   playbackTime?: number;
   currentlyPlaying?: string | null;
   createdAt?: string;
-  subtitleSettings: SubtitleSettings;
-  onSubtitleSettingsChange: (settings: SubtitleSettings) => void;
   soundVolumes: RoomSoundVolumes;
   onSoundVolumesChange: (volumes: RoomSoundVolumes) => void;
 }) => {
@@ -68,10 +64,6 @@ const SettingsModal = ({
     setTheme(nextTheme);
   };
 
-  const updateSubtitle = <K extends keyof SubtitleSettings>(key: K, value: SubtitleSettings[K]) => {
-    onSubtitleSettingsChange({ ...subtitleSettings, [key]: value });
-  };
-
   const updateSoundVolume = (key: RoomSoundKey, value: number) => {
     onSoundVolumesChange({ ...soundVolumes, [key]: value });
   };
@@ -81,7 +73,7 @@ const SettingsModal = ({
       <div className="room-settings-modal__head">
         <div>
           <span>تنظیمات اتاق</span>
-          <small>ظاهر اتاق و زیرنویس را مطابق سلیقه‌ات تنظیم کن</small>
+          <small>ظاهر اتاق و تنظیمات صدا را مطابق سلیقه‌ات تنظیم کن</small>
         </div>
         <AiTwotoneSetting />
       </div>
@@ -139,67 +131,6 @@ const SettingsModal = ({
           </div>
         </div>
 
-        <div className="room-settings-modal__subtitle-card">
-          <div className="room-settings-modal__subtitle-card__head">
-            <div><strong>ظاهر زیرنویس</strong><span>پیش‌نمایش لحظه‌ای روی پلیر</span></div>
-            <span className="room-settings-modal__subtitle-card__badge">زنده</span>
-          </div>
-
-          <div className="room-settings-modal__subtitle-card__preview">
-            <span style={{
-              fontSize: `${subtitleSettings.fontSize}px`,
-              fontWeight: subtitleSettings.fontWeight,
-              opacity: subtitleSettings.opacity / 100,
-              background: `rgba(0,0,0,${subtitleSettings.backgroundOpacity / 100})`,
-            }}>این یک پیش‌نمایش زیرنویس است</span>
-          </div>
-
-          <div className="room-settings-modal__subtitle-controls">
-            <label><span>اندازه متن</span><strong>{subtitleSettings.fontSize}px</strong><input type="range" min="14" max="34" step="1" value={subtitleSettings.fontSize} onChange={(event) => updateSubtitle("fontSize", Number(event.target.value))} /></label>
-            <label><span>شفافیت متن</span><strong>{subtitleSettings.opacity}%</strong><input type="range" min="60" max="100" step="5" value={subtitleSettings.opacity} onChange={(event) => updateSubtitle("opacity", Number(event.target.value))} /></label>
-            <label><span>پس‌زمینه</span><strong>{subtitleSettings.backgroundOpacity}%</strong><input type="range" min="0" max="90" step="5" value={subtitleSettings.backgroundOpacity} onChange={(event) => updateSubtitle("backgroundOpacity", Number(event.target.value))} /></label>
-          </div>
-
-          <div className="room-settings-modal__subtitle-offset">
-            <div>
-              <strong>هماهنگ‌سازی زمان زیرنویس</strong>
-              <span>مقدار مثبت یعنی زیرنویس دیرتر نمایش داده می‌شود.</span>
-            </div>
-            <label>
-              <span>تاخیر</span>
-              <input
-                type="number"
-                min="-10000"
-                max="10000"
-                step="100"
-                value={subtitleSettings.offsetMs}
-                onChange={(event) => updateSubtitle("offsetMs", Number(event.target.value) || 0)}
-              />
-              <small>ms</small>
-            </label>
-            <div className="room-settings-modal__subtitle-offset__presets">
-              {[-1000, -500, 0, 500, 1000].map((value) => (
-                <button key={value} type="button" className={clsx(subtitleSettings.offsetMs === value && "active")} onClick={() => updateSubtitle("offsetMs", value)}>
-                  {value === 0 ? "۰" : `${value > 0 ? "+" : ""}${value / 1000}s`}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="room-settings-modal__subtitle-actions">
-            <div className="room-settings-modal__subtitle-segment">
-              <span>ضخامت</span>
-              {([500, 700, 800] as const).map((weight) => <button key={weight} type="button" className={clsx(subtitleSettings.fontWeight === weight && "active")} onClick={() => updateSubtitle("fontWeight", weight)}>{weight === 500 ? "عادی" : weight === 700 ? "نیمه‌پر" : "پررنگ"}</button>)}
-            </div>
-            <div className="room-settings-modal__subtitle-segment">
-              <span>جایگاه</span>
-              <button type="button" className={clsx(subtitleSettings.position === "low" && "active")} onClick={() => updateSubtitle("position", "low")}>پایین</button>
-              <button type="button" className={clsx(subtitleSettings.position === "middle" && "active")} onClick={() => updateSubtitle("position", "middle")}>میانی</button>
-            </div>
-          </div>
-
-          <button type="button" className="room-settings-modal__subtitle-reset" onClick={() => onSubtitleSettingsChange(DEFAULT_SUBTITLE_SETTINGS)}>بازنشانی تنظیمات زیرنویس</button>
-        </div>
       </div>
     </div>
   );
