@@ -1,4 +1,5 @@
-import { FaAndroid, FaApple, FaWindows } from 'react-icons/fa';
+import { FaAndroid, FaWindows } from 'react-icons/fa';
+import { LuGlobe } from 'react-icons/lu';
 import { PiHourglassMediumFill } from 'react-icons/pi';
 import './DownloadApp.scss';
 import Reveal from '../reveal/Reveal';
@@ -17,9 +18,9 @@ const platforms = [
     desc: 'تجربه‌ی کامل سینمای خانگی روی دسکتاپ',
   },
   {
-    key: 'ios',
-    icon: <FaApple />,
-    title: 'آیفون',
+    key: 'pwa',
+    icon: <LuGlobe />,
+    title: 'وب اپلیکیشن',
     desc: 'ساده، روان و همیشه همراهت',
   },
 ];

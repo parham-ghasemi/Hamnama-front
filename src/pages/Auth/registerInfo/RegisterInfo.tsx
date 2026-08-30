@@ -32,14 +32,12 @@ const RegisterInfo = ({ onSubmit, isLoading = false }: RegisterInfoProps) => {
     e.preventDefault();
 
     if (password !== repeatPassword) {
-      // Using sonner for mismatched passwords
       toast.error('رمز عبور و تکرار آن مطابقت ندارند');
       return;
     }
 
     const passwordError = validatePassword(password);
     if (passwordError) {
-      // Using dom error for specific field validation rules
       setDomError(passwordError);
       return;
     }
