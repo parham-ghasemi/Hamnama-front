@@ -4,6 +4,7 @@ import { AxiosError } from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { adminApi } from '../../apiCalls/adminApi';
 import './AdminRoute.scss';
+import { AdminAccessContext } from './AdminAccessContext';
 
 interface AdminRouteProps {
   children: React.ReactNode;
@@ -14,14 +15,23 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
   const location = useLocation();
   const isDashboard = location.pathname.startsWith('/admin');
 
-  const { isFetching, isError, error } = useQuery({
+  const {
+    data: access,
+    isFetching,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ['admin-access'],
-    queryFn: () => adminApi.getDashboard(),
-    enabled: !isLoading && isAuthenticated,
+    queryFn: () => adminApi.getAccess().then((res) => res.data),
+    enabled: !isLoading && isAuthenticated && isDashboard,
     retry: false,
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
   });
 
-  if (isLoading || (isAuthenticated && isFetching) && isDashboard) {
+  const accessLevel = access?.access_level ?? 0;
+
+  if (isLoading || (isDashboard && isAuthenticated && isFetching)) {
     return (
       <div className="admin-route__loading">
         <div className="admin-route__loading__spinner" />
@@ -48,7 +58,11 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
     }
   }
 
-  return <>{children}</>;
+  return (
+    <AdminAccessContext.Provider value={{ accessLevel }}>
+      {children}
+    </AdminAccessContext.Provider>
+  );
 };
 
 export default AdminRoute;

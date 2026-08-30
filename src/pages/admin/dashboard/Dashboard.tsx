@@ -23,10 +23,20 @@ const PERIOD_LABELS: Record<Period, string> = {
 };
 
 const CHART_RANGE_LABELS: Record<ChartRange, string> = {
-  month: 'ماه اخیر',
-  quarter: '۳ ماه اخیر',
-  year: '۱۲ ماه اخیر',
+  month: '۳۰ روز اخیر',
+  quarter: '۹۰ روز اخیر',
+  year: '۳۶۵ روز اخیر',
   all: 'همه',
+};
+
+const formatJalaliDate = (value: string) => {
+  const date = new Date(`${value}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
 };
 
 interface DropdownOption<T extends string> {
@@ -186,7 +196,7 @@ const Dashboard = () => {
   const sliceByRange = <T,>(series: T[], range: ChartRange): T[] => {
     if (!series.length || range === 'all') return series;
     const n =
-      range === 'month' ? 1 : range === 'quarter' ? 3 : range === 'year' ? 12 : series.length;
+      range === 'month' ? 30 : range === 'quarter' ? 90 : range === 'year' ? 365 : series.length;
     return series.slice(-Math.min(n, series.length));
   };
 
@@ -197,6 +207,15 @@ const Dashboard = () => {
   const roomSeries = useMemo(
     () => sliceByRange(roomSeriesRaw, roomsChartRange),
     [roomSeriesRaw, roomsChartRange]
+  );
+
+  const userChartData = useMemo(
+    () => userSeries.map((point) => ({ ...point, jalali_label: formatJalaliDate(point.label) })),
+    [userSeries]
+  );
+  const roomChartData = useMemo(
+    () => roomSeries.map((point) => ({ ...point, jalali_label: formatJalaliDate(point.label) })),
+    [roomSeries]
   );
 
   const getStat = (
@@ -265,7 +284,7 @@ const Dashboard = () => {
             <div>
               <p className="admin-dashboard__chart__title">کاربران در طول زمان</p>
               <span className="admin-dashboard__chart__subtitle">
-                روند رشد کاربران
+                تعداد ثبت‌نام‌های جدید به تفکیک روز
               </span>
             </div>
             <SmoothDropdown
@@ -277,7 +296,7 @@ const Dashboard = () => {
           </div>
           <div className="admin-dashboard__chart__body">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={userSeries} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+              <AreaChart data={userChartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="userGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#d04e2f" stopOpacity={0.35} />
@@ -290,7 +309,7 @@ const Dashboard = () => {
                   vertical={false}
                 />
                 <XAxis
-                  dataKey="label"
+                  dataKey="jalali_label"
                   tick={{ fill: 'currentColor', fontSize: 12 }}
                   axisLine={false}
                   tickLine={false}
@@ -330,7 +349,7 @@ const Dashboard = () => {
             <div>
               <p className="admin-dashboard__chart__title">اتاق‌ها در طول زمان</p>
               <span className="admin-dashboard__chart__subtitle">
-                روند ساخت اتاق‌ها
+                تعداد اتاق‌های ساخته‌شده به تفکیک روز
               </span>
             </div>
             <SmoothDropdown
@@ -342,7 +361,7 @@ const Dashboard = () => {
           </div>
           <div className="admin-dashboard__chart__body">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={roomSeries} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+              <AreaChart data={roomChartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="roomGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#38e351" stopOpacity={0.28} />
@@ -355,7 +374,7 @@ const Dashboard = () => {
                   vertical={false}
                 />
                 <XAxis
-                  dataKey="label"
+                  dataKey="jalali_label"
                   tick={{ fill: 'currentColor', fontSize: 12 }}
                   axisLine={false}
                   tickLine={false}

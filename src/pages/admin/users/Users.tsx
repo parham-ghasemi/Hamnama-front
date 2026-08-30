@@ -11,6 +11,7 @@ import {
 import { toast } from '../../../components/toast';
 import { adminApi, type AdminUser } from '../../../apiCalls/adminApi';
 import './Users.scss';
+import { useAdminAccess } from '../../../components/adminRoute/AdminAccessContext';
 
 type Filter = 'all' | 'banned' | 'active';
 
@@ -115,6 +116,10 @@ const SORT_OPTIONS: DropdownOption<string>[] = [
 ];
 
 const Users = () => {
+  const { accessLevel } = useAdminAccess();
+
+  const isFullAccess = accessLevel === 3;
+
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -138,6 +143,8 @@ const Users = () => {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['admin-users', params],
+    retry: false,
+    refetchOnWindowFocus: false,
     queryFn: async () => {
       const response = await adminApi.listUsers(params);
       return response.data;
@@ -189,9 +196,22 @@ const Users = () => {
   });
 
   const handleToggleAdmin = (user: { id: string; is_admin: boolean }) => {
+    if (user.is_admin && !isFullAccess) {
+      toast.error('فقط ادمین با دسترسی کامل می‌تواند ادمین‌های دیگر را تغییر دهد');
+      return;
+    }
     updateUserMutation.mutate({
       id: user.id,
-      payload: { is_admin: !user.is_admin },
+      payload: user.is_admin ? { is_admin: false } : { is_admin: true, access_level: 1 },
+    });
+  };
+
+  const handleAccessLevelChange = (user: AdminUser, accessLevel: string) => {
+    const nextLevel = Number(accessLevel);
+    if (!isFullAccess || !user.is_admin || ![1, 2, 3].includes(nextLevel)) return;
+    updateUserMutation.mutate({
+      id: user.id,
+      payload: { access_level: nextLevel },
     });
   };
 
@@ -314,14 +334,32 @@ const Users = () => {
                           ) : null}
                         </div>
                       </td>
-                      <td>{user.level}</td>
+                      <td>
+                        <div className="admin-users__level-cell">
+                          <span>{user.level}</span>
+                          {user.is_admin && isFullAccess ? (
+                            <SmoothDropdown
+                              value={String(user.access_level)}
+                              options={[
+                                { value: '1', label: 'سطح ۱' },
+                                { value: '2', label: 'سطح ۲' },
+                                { value: '3', label: 'سطح ۳' },
+                              ]}
+                              onChange={(value) => handleAccessLevelChange(user, value)}
+                              ariaLabel={`سطح دسترسی ${user.username}`}
+                            />
+                          ) : user.is_admin ? (
+                            <span className="admin-users__access-level">سطح {user.access_level}</span>
+                          ) : null}
+                        </div>
+                      </td>
                       <td>
                         <div className="admin-users__row-actions">
                           <button
                             type="button"
                             className="admin-users__action"
                             onClick={() => handleToggleAdmin(user)}
-                            disabled={updateUserMutation.isPending}
+                            disabled={updateUserMutation.isPending || (user.is_admin && !isFullAccess)}
                           >
                             <FiShield />
                             {user.is_admin ? 'حذف ادمینی' : 'تعیین ادمین'}

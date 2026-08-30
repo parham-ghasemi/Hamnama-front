@@ -1,5 +1,5 @@
 import { BsFillGearFill, BsGiftFill, BsXLg } from 'react-icons/bs';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import clsx from 'clsx';
 import './UsernameDropdown.scss';
@@ -7,14 +7,11 @@ import { PiUserFill } from 'react-icons/pi';
 import { useConfirmationModal } from '../../../context/ConfirmModalContext/ConfirmaModalContext';
 import { toast } from '../../toast';
 import { FaUserLock } from 'react-icons/fa6';
-import AdminRoute from '../../adminRoute/AdminRoute';
 
 // Accept isOpen as a prop
 const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const isAdminDashboard = location.pathname.startsWith('/admin');
 
   const bodyItems = [
     {
@@ -27,11 +24,13 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
       title: "دعوت از دوستان",
       onClick: () => { shareInvite() }
     },
-    {
-      icon: <FaUserLock />,
-      title: "پنل ادمین",
-      onClick: () => navigate('/admin/dashboard')
-    },
+    ...(user?.is_admin
+      ? [{
+        icon: <FaUserLock />,
+        title: "پنل ادمین",
+        onClick: () => navigate('/admin/dashboard')
+      }]
+      : []),
   ];
 
   const confirmLogout = () => {
@@ -96,25 +95,13 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
           <ul>
             {
               bodyItems.map((item, ind) => (
-                item.title === "پنل ادمین" && !isAdminDashboard ? (
-                  <AdminRoute>
-                    <li
-                      key={`headerdropdownbodyind${ind}`}
-                      onClick={item.onClick}
-                    >
-                      {item.icon}
-                      {item.title}
-                    </li>
-                  </AdminRoute>
-                ) : (
-                  <li
-                    key={`headerdropdownbodyind${ind}`}
-                    onClick={item.onClick}
-                  >
-                    {item.icon}
-                    {item.title}
-                  </li>
-                )
+                <li
+                  key={`headerdropdownbodyind${ind}`}
+                  onClick={item.onClick}
+                >
+                  {item.icon}
+                  {item.title}
+                </li>
               ))
             }
           </ul>

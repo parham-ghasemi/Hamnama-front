@@ -35,6 +35,7 @@ import {
   type RoomMessageResponse,
   type RoomReactionResponse,
   type RoomResponse,
+  type RoomArchiveMediaState,
   type RoomSocketUserPresence,
   type RoomAnnouncement,
   type RoomAnnouncementsResponse,
@@ -82,6 +83,7 @@ type ClientSocketEvent =
       action: "play" | "pause" | "seek" | "sync" | "load";
       playback_time: number;
       currently_playing?: string | null;
+      currently_playing_media?: RoomArchiveMediaState | null;
       is_playing: boolean;
       user_id: string;
       upload_id?: string;
@@ -139,6 +141,7 @@ type ServerSocketEvent =
       action: "play" | "pause" | "seek" | "sync" | "load";
       playback_time: number;
       currently_playing?: string | null;
+      currently_playing_media?: RoomArchiveMediaState | null;
       is_playing: boolean;
       user_id: string;
       upload_id?: string;
@@ -1343,6 +1346,28 @@ const RoomPage = () => {
       playRoomSound("userJoined");
     }
     setPlaybackSrc(roomQuery.data.currently_playing ?? "");
+    setSelectedMedia(roomQuery.data.currently_playing_media ? {
+      id: roomQuery.data.currently_playing_media.id,
+      title: roomQuery.data.currently_playing_media.title,
+      type: roomQuery.data.currently_playing_media.type,
+      url: roomQuery.data.currently_playing_media.url,
+      quality: roomQuery.data.currently_playing_media.quality,
+      softsub: roomQuery.data.currently_playing_media.softsub,
+      season: roomQuery.data.currently_playing_media.season ?? null,
+      episode: roomQuery.data.currently_playing_media.episode ?? null,
+      nextEpisode: roomQuery.data.currently_playing_media.next_episode ? {
+        id: roomQuery.data.currently_playing_media.next_episode.id,
+        title: roomQuery.data.currently_playing_media.next_episode.title,
+        type: roomQuery.data.currently_playing_media.next_episode.type,
+        url: roomQuery.data.currently_playing_media.next_episode.url,
+        quality: roomQuery.data.currently_playing_media.next_episode.quality,
+        softsub: roomQuery.data.currently_playing_media.next_episode.softsub,
+        season: roomQuery.data.currently_playing_media.next_episode.season ?? null,
+        episode: roomQuery.data.currently_playing_media.next_episode.episode ?? null,
+      } : null,
+    } : null);
+    setCurrentId(roomQuery.data.currently_playing_media?.id ?? "");
+    setCurrentQuality(roomQuery.data.currently_playing_media?.quality ?? "quality");
     setCustomSubtitleTracks(roomQuery.data.subtitles ?? []);
     setCurrentSubtitleUrl(roomQuery.data.currently_playing_subtitles ?? null);
     setCurrentTime(roomQuery.data.playback_time ?? 0);
@@ -1624,6 +1649,7 @@ const RoomPage = () => {
           const nextSubtitles = parsed.payload.subtitles ?? [];
           const playbackUpdate: Partial<RoomResponse> = {
             currently_playing: parsed.payload.currently_playing ?? null,
+            currently_playing_media: parsed.payload.currently_playing_media ?? null,
             playback_time: Math.round(parsed.payload.playback_time),
             is_playing: parsed.payload.is_playing,
             currently_playing_subtitles: parsed.payload.currently_playing_subtitles ?? null,
@@ -1641,6 +1667,35 @@ const RoomPage = () => {
             setPlaybackSrc(parsed.payload.currently_playing);
           } else if (parsed.payload.currently_playing === null) {
             setPlaybackSrc("");
+          }
+
+          if (parsed.payload.currently_playing_media) {
+            const media = parsed.payload.currently_playing_media;
+            setCurrentId(media.id);
+            setCurrentQuality(media.quality ?? "quality");
+            setSelectedMedia({
+              id: media.id,
+              title: media.title,
+              type: media.type,
+              url: media.url,
+              quality: media.quality,
+              softsub: media.softsub,
+              season: media.season ?? null,
+              episode: media.episode ?? null,
+              nextEpisode: media.next_episode ? {
+                id: media.next_episode.id,
+                title: media.next_episode.title,
+                type: media.next_episode.type,
+                url: media.next_episode.url,
+                quality: media.next_episode.quality,
+                softsub: media.next_episode.softsub,
+                season: media.next_episode.season ?? null,
+                episode: media.next_episode.episode ?? null,
+              } : null,
+            });
+          } else if (parsed.payload.currently_playing_media === null) {
+            setCurrentId("");
+            setSelectedMedia(null);
           }
 
           setCurrentSubtitleUrl(parsed.payload.currently_playing_subtitles ?? null);
@@ -1865,12 +1920,33 @@ const RoomPage = () => {
     setInviteModalOpen(false);
   };
 
-  const emitPlayback = (action: "play" | "pause" | "seek" | "sync" | "load", nextTime: number, nextSrc?: string, nextSubtitleUrl?: string | null) => {
+  const emitPlayback = (action: "play" | "pause" | "seek" | "sync" | "load", nextTime: number, nextSrc?: string, nextSubtitleUrl?: string | null, mediaOverride?: SelectedArchiveMedia | null) => {
     const source = nextSrc ?? playbackSrc;
+    const mediaForPayload = mediaOverride !== undefined ? mediaOverride : selectedMedia;
     const payload = {
       action,
       playback_time: nextTime,
       currently_playing: source || null,
+      currently_playing_media: mediaForPayload ? {
+        id: mediaForPayload.id,
+        title: mediaForPayload.title,
+        type: mediaForPayload.type,
+        url: mediaForPayload.url,
+        quality: mediaForPayload.quality,
+        softsub: mediaForPayload.softsub,
+        season: mediaForPayload.season ?? undefined,
+        episode: mediaForPayload.episode ?? undefined,
+        next_episode: mediaForPayload.nextEpisode ? {
+          id: mediaForPayload.nextEpisode.id,
+          title: mediaForPayload.nextEpisode.title,
+          type: mediaForPayload.nextEpisode.type,
+          url: mediaForPayload.nextEpisode.url,
+          quality: mediaForPayload.nextEpisode.quality,
+          softsub: mediaForPayload.nextEpisode.softsub,
+          season: mediaForPayload.nextEpisode.season ?? undefined,
+          episode: mediaForPayload.nextEpisode.episode ?? undefined,
+        } : null,
+      } : null,
       is_playing: action === "play" || action === "sync" || action === "load" ? true : action === "pause" ? false : isPlaying,
       user_id: user?.id ?? "",
       upload_id: action === "load" ? (currentUploadId && source === playbackSrc ? currentUploadId : undefined) : currentUploadId ?? undefined,
@@ -1885,6 +1961,26 @@ const RoomPage = () => {
         ? {
           ...prev,
           currently_playing: source || null,
+          currently_playing_media: mediaForPayload ? {
+            id: mediaForPayload.id,
+            title: mediaForPayload.title,
+            type: mediaForPayload.type,
+            url: mediaForPayload.url,
+            quality: mediaForPayload.quality,
+            softsub: mediaForPayload.softsub,
+            season: mediaForPayload.season ?? undefined,
+            episode: mediaForPayload.episode ?? undefined,
+            next_episode: mediaForPayload.nextEpisode ? {
+              id: mediaForPayload.nextEpisode.id,
+              title: mediaForPayload.nextEpisode.title,
+              type: mediaForPayload.nextEpisode.type,
+              url: mediaForPayload.nextEpisode.url,
+              quality: mediaForPayload.nextEpisode.quality,
+              softsub: mediaForPayload.nextEpisode.softsub,
+              season: mediaForPayload.nextEpisode.season ?? undefined,
+              episode: mediaForPayload.nextEpisode.episode ?? undefined,
+            } : null,
+          } : null,
           currently_playing_subtitles: nextSubtitleUrl !== undefined ? nextSubtitleUrl : currentSubtitleUrl,
           playback_time: Math.round(nextTime),
         }
@@ -2009,7 +2105,7 @@ const RoomPage = () => {
     setPlaybackSrc(nextSrc);
     setCurrentTime(0);
     setIsPlaying(false);
-    emitPlayback("load", 0, nextSrc, null);
+    emitPlayback("load", 0, nextSrc, null, null);
   };
 
   const handleChooseLinkMode = () => {
@@ -2040,7 +2136,7 @@ const RoomPage = () => {
     setPlaybackSrc(media.url);
     setCurrentTime(0);
     setIsPlaying(false);
-    emitPlayback("load", 0, media.url, sharedSubtitleUrl);
+    emitPlayback("load", 0, media.url, sharedSubtitleUrl, media);
   };
 
   const handleNextEpisode = async () => {
@@ -2066,7 +2162,7 @@ const RoomPage = () => {
     setPlaybackSrc(nextEpisode.url);
     setCurrentTime(0);
     setIsPlaying(true);
-    emitPlayback("load", 0, nextEpisode.url, sharedSubtitleUrl);
+    emitPlayback("load", 0, nextEpisode.url, sharedSubtitleUrl, nextEpisode);
   };
 
   const handleUploadOwnMedia = async (videoFile: File, subtitleFile: File | null, onProgress?: (percent: number) => void) => {
@@ -2087,6 +2183,7 @@ const RoomPage = () => {
     setRoomState((prev) => prev ? {
       ...prev,
       currently_playing: result.video_url,
+      currently_playing_media: null,
       currently_playing_subtitles: result.subtitle_url ?? null,
       playback_time: 0,
       is_playing: false,

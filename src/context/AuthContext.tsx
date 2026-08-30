@@ -11,6 +11,7 @@ export interface User {
   username: string;
   phone_number: string;
   profile_picture: string;
+  is_admin: boolean;
 }
 
 interface AuthContextType {
@@ -36,6 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchUser = async () => {
     try {
       const { data } = await api.get<User>("/users/me");
+      console.log('data', data)
       setUser(data);
     } catch (error) {
       console.error("Failed to fetch user", error);

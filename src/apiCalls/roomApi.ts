@@ -77,6 +77,18 @@ export interface RoomSocketUserPresence {
   joined_at: string;
 }
 
+export interface RoomArchiveMediaState {
+  id: string;
+  title: string;
+  type: "movie" | "series";
+  url: string;
+  quality?: string;
+  softsub?: boolean;
+  season?: number;
+  episode?: number;
+  next_episode?: RoomArchiveMediaState | null;
+}
+
 export interface RoomResponse {
   id: string;
   code: number;
@@ -84,6 +96,7 @@ export interface RoomResponse {
   created_by_name: string;
   created_by_avatar: string;
   currently_playing?: string | null;
+  currently_playing_media?: RoomArchiveMediaState | null;
   currently_playing_subtitles?: string | null;
   playback_time: number;
   is_playing: boolean;

@@ -599,3 +599,16 @@
     }
   }
 }
+
+
+.admin-users__level-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-users__access-level {
+  font-size: 11px;
+  opacity: 0.7;
+}

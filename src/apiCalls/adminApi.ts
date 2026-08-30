@@ -55,6 +55,7 @@ export interface AdminUser {
   hours_watched: number;
   level: string;
   is_admin: boolean;
+  access_level: number;
   is_banned: boolean;
   ban_reason?: string;
   ban_expires_at?: string;
@@ -267,6 +268,7 @@ export const getScrapeProgressUrl = (id: string) => {
 };
 
 export const adminApi = {
+  getAccess: () => api.get<{ user_id: string; access_level: number }>("/admin/access"),
   getDashboard: () => api.get<AdminDashboardResponse>("/admin/dashboard"),
 
   getTickets: () => api.get<{ tickets: AdminTicketListItem[] }>('/admin/tickets'),
