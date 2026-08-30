@@ -25,6 +25,8 @@ import {
   type AdminArchiveItem,
   type AdminArchiveReport,
   type AdminArchiveReportGroup,
+  type ScrapeProgress,
+  getScrapeProgressUrl,
 } from '../../../apiCalls/adminApi';
 import './Archive.scss';
 
@@ -179,6 +181,9 @@ const Archive = () => {
   const [showSubtitleReport, setShowSubtitleReport] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [subtitleInvalidPage, setSubtitleInvalidPage] = useState(1);
+  const [activeScrapeProgress, setActiveScrapeProgress] = useState<ScrapeProgress | null>(null);
+  const scrapeStreamsRef = useRef<Map<string, EventSource>>(new Map());
+  const scrapeStreamToastRef = useRef<Set<string>>(new Set());
 
   const params = useMemo(
     () => ({ search, type: type || undefined, page, limit: 12 }),
@@ -193,8 +198,74 @@ const Archive = () => {
   const scrapeJobs = useQuery({
     queryKey: ['admin-scrape-jobs'],
     queryFn: () => adminApi.getScrapeJobs().then((r) => (Array.isArray(r.data) ? { jobs: r.data } : r.data)),
-    refetchInterval: 5000,
   });
+
+  const scrapeJobList = scrapeJobs.data?.jobs ?? [];
+
+  useEffect(() => {
+    const runningIDs = new Set(scrapeJobList.filter((job) => job.status === 'running').map((job) => job.job_id));
+
+    for (const job of scrapeJobList) {
+      if (job.status !== 'running' || scrapeStreamsRef.current.has(job.job_id)) continue;
+
+      const source = new EventSource(getScrapeProgressUrl(job.job_id));
+      scrapeStreamsRef.current.set(job.job_id, source);
+
+      const handleProgress = (event: Event) => {
+        try {
+          const progress = JSON.parse((event as MessageEvent<string>).data) as ScrapeProgress;
+          setActiveScrapeProgress(progress);
+          qc.setQueryData<{ jobs: typeof scrapeJobList }>(['admin-scrape-jobs'], (current) => {
+            if (!current) return current;
+            return {
+              jobs: current.jobs.map((item) => item.job_id === progress.job_id ? {
+                ...item,
+                status: progress.status,
+                error: progress.error,
+                finished_at: progress.finished_at,
+              } : item),
+            };
+          });
+        } catch {
+          // Keep the SSE connection alive if an unexpected payload arrives.
+        }
+      };
+
+      source.addEventListener('snapshot', handleProgress);
+      source.addEventListener('progress', handleProgress);
+      source.addEventListener('complete', (event) => {
+        handleProgress(event);
+        source.close();
+        scrapeStreamsRef.current.delete(job.job_id);
+        void qc.invalidateQueries({ queryKey: ['admin-archive'] });
+        if (!scrapeStreamToastRef.current.has(`${job.job_id}:complete`)) {
+          scrapeStreamToastRef.current.add(`${job.job_id}:complete`);
+          toast.success('اسکرپ آرشیو با موفقیت به پایان رسید');
+        }
+      });
+      source.addEventListener('failed', (event) => {
+        handleProgress(event);
+        source.close();
+        scrapeStreamsRef.current.delete(job.job_id);
+        if (!scrapeStreamToastRef.current.has(`${job.job_id}:failed`)) {
+          scrapeStreamToastRef.current.add(`${job.job_id}:failed`);
+          toast.error('اسکرپ آرشیو ناموفق بود');
+        }
+      });
+    }
+
+    for (const [jobID, source] of scrapeStreamsRef.current) {
+      if (!runningIDs.has(jobID)) {
+        source.close();
+        scrapeStreamsRef.current.delete(jobID);
+      }
+    }
+  }, [qc, scrapeJobList]);
+
+  useEffect(() => () => {
+    for (const source of scrapeStreamsRef.current.values()) source.close();
+    scrapeStreamsRef.current.clear();
+  }, []);
 
   const subtitleStatus = useQuery({
     queryKey: ['admin-subtitle-sync', subtitleJobId],
@@ -277,11 +348,29 @@ const Archive = () => {
   const startScrape = async () => {
     if (!archiveUrl.trim()) return;
     try {
-      await adminApi.triggerArchiveScrape(archiveUrl.trim());
+      const response = await adminApi.triggerArchiveScrape(archiveUrl.trim());
+      const createdAt = new Date().toISOString();
+      const newJob = {
+        job_id: response.data.job_id,
+        url: archiveUrl.trim(),
+        status: 'running' as const,
+        created_at: createdAt,
+      };
+      qc.setQueryData<{ jobs: typeof scrapeJobList }>(['admin-scrape-jobs'], (current) => ({
+        jobs: [newJob, ...(current?.jobs ?? [])],
+      }));
+      setActiveScrapeProgress({
+        job_id: response.data.job_id,
+        url: archiveUrl.trim(),
+        status: 'running',
+        total: 0,
+        scanned: 0,
+        valid: 0,
+        invalid: 0,
+      });
       toast.success('عملیات اسکرپ آغاز شد');
       setShowJobs(true);
       setArchiveUrl('');
-      void scrapeJobs.refetch();
     } catch {
       toast.error('آغاز عملیات اسکرپ با مشکل مواجه شد');
     }
@@ -364,8 +453,22 @@ const Archive = () => {
           <p>آخرین اسنپ‌شات منبع را دریافت کن و وضعیت اجرای آن را در تاریخچه ببین.</p>
           <div className="admin-archive__operation-form">
             <input value={archiveUrl} onChange={(event) => setArchiveUrl(event.target.value)} placeholder="https://example.com" dir="ltr" />
-            <button type="button" onClick={() => void startScrape()} disabled={!archiveUrl.trim()}>شروع اسکرپ</button>
+            <button type="button" onClick={() => void startScrape()} disabled={!archiveUrl.trim() || scrapeJobList.some((job) => job.status === 'running')}>شروع اسکرپ</button>
           </div>
+          {activeScrapeProgress && (
+            <div className={`admin-archive__scrape-progress is-${activeScrapeProgress.status}`}>
+              <div className="admin-archive__scrape-progress-head">
+                <div><span>وضعیت زنده</span><strong>{activeScrapeProgress.status === 'running' ? 'در حال اسکن آرشیو…' : activeScrapeProgress.status === 'completed' ? 'اسکن کامل شد' : 'اسکن ناموفق بود'}</strong></div>
+                {activeScrapeProgress.total > 0 && <b>{Math.round((activeScrapeProgress.scanned / activeScrapeProgress.total) * 100)}٪</b>}
+              </div>
+              <div className="admin-archive__scrape-progress-kpis">
+                <div><span>اسکن‌شده</span><strong>{activeScrapeProgress.scanned.toLocaleString('fa-IR')} از {activeScrapeProgress.total.toLocaleString('fa-IR')}</strong></div>
+                <div><span>معتبر</span><strong>{activeScrapeProgress.valid.toLocaleString('fa-IR')}</strong></div>
+                <div><span>نامعتبر</span><strong>{activeScrapeProgress.invalid.toLocaleString('fa-IR')}</strong></div>
+              </div>
+              <div className="admin-archive__progress-track"><span style={{ width: `${activeScrapeProgress.total > 0 ? Math.min(100, Math.round((activeScrapeProgress.scanned / activeScrapeProgress.total) * 100)) : 0}%` }} /></div>
+            </div>
+          )}
         </article>
 
         <article className="admin-archive__operation">
@@ -413,11 +516,11 @@ const Archive = () => {
         </div>
         <div className="admin-archive__stat-card">
           <span>در حال اجرا</span>
-          <strong>{scrapeJobs.data?.jobs?.filter((job) => job.status === 'running').length.toLocaleString('fa-IR') ?? '۰'}</strong>
+          <strong>{scrapeJobList.filter((job) => job.status === 'running').length.toLocaleString('fa-IR')}</strong>
           <FiClock />
         </div>
         <button type="button" className="admin-archive__utility-card" onClick={() => setShowJobs((value) => !value)}>
-          <div><span>تاریخچه عملیات</span><strong>{scrapeJobs.data?.jobs?.length?.toLocaleString('fa-IR') ?? '۰'}</strong></div>
+          <div><span>تاریخچه عملیات</span><strong>{scrapeJobList.length.toLocaleString('fa-IR')}</strong></div>
           <FiClock />
         </button>
         <button type="button" className="admin-archive__utility-card" onClick={() => { setReportGroupOpen(null); setShowReports(true); }}>
@@ -437,7 +540,7 @@ const Archive = () => {
             <button type="button" onClick={() => setShowJobs(false)} aria-label="بستن"><FiX /></button>
           </div>
           <div className="admin-archive__jobs-list">
-            {scrapeJobs.data?.jobs?.length ? scrapeJobs.data.jobs.map((job) => (
+            {scrapeJobList.length ? scrapeJobList.map((job) => (
               <div className="admin-archive__job-row" key={job.job_id}>
                 <div className="admin-archive__job-main">
                   <b className={`is-${job.status}`}>{jobLabel(job.status)}</b>

@@ -1,4 +1,5 @@
 import api from "../lib/axiosConfig";
+import { getAccessToken } from "../lib/authToken";
 
 export interface AdminDashboardResponse {
   stats: {
@@ -135,6 +136,18 @@ export interface ScrapeJobsResponse {
   jobs: ScrapeJob[];
 }
 
+export interface ScrapeProgress {
+  job_id: string;
+  url: string;
+  status: 'running' | 'completed' | 'error';
+  total: number;
+  scanned: number;
+  valid: number;
+  invalid: number;
+  finished_at?: string;
+  error?: string;
+}
+
 export interface SubtitleSyncResponse {
   job_id: string;
   status: string;
@@ -242,6 +255,16 @@ export interface AdminArchiveResponse {
   limit: number;
   totalPages: number;
 }
+
+const ADMIN_BASE = String(import.meta.env.VITE_BASE_URL || '').replace(/\/api\/?$/, '');
+
+export const getScrapeProgressUrl = (id: string) => {
+  const params = new URLSearchParams();
+  const token = getAccessToken();
+  if (token) params.set('access_token', token);
+  const query = params.toString();
+  return `${ADMIN_BASE}/api/admin/scrape/${id}/events${query ? `?${query}` : ''}`;
+};
 
 export const adminApi = {
   getDashboard: () => api.get<AdminDashboardResponse>("/admin/dashboard"),

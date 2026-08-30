@@ -1946,3 +1946,71 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+.admin-archive__scrape-progress {
+  margin-top: 13px;
+  padding: 12px;
+  border: 1px solid var(--archive-border);
+  border-radius: 12px;
+  background: var(--archive-surface-soft);
+}
+
+.admin-archive__scrape-progress-head,
+.admin-archive__scrape-progress-kpis {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-archive__scrape-progress-head {
+  justify-content: space-between;
+}
+
+.admin-archive__scrape-progress-head span {
+  display: block;
+  color: var(--archive-muted);
+  font-size: 9px;
+}
+
+.admin-archive__scrape-progress-head strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+.admin-archive__scrape-progress-head > b {
+  color: var(--archive-primary);
+  font-size: 13px;
+}
+
+.admin-archive__scrape-progress-kpis {
+  margin-top: 10px;
+}
+
+.admin-archive__scrape-progress-kpis > div {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 9px;
+  border: 1px solid var(--archive-border);
+  border-radius: 9px;
+}
+
+.admin-archive__scrape-progress-kpis span {
+  display: block;
+  color: var(--archive-muted);
+  font-size: 8px;
+}
+
+.admin-archive__scrape-progress-kpis strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 13px;
+}
+
+.admin-archive__scrape-progress.is-completed .admin-archive__scrape-progress-head strong {
+  color: var(--archive-green);
+}
+
+.admin-archive__scrape-progress.is-error .admin-archive__scrape-progress-head strong {
+  color: var(--archive-red);
+}
