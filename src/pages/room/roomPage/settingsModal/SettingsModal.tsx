@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import "./SettingsModal.scss";
 import { AiTwotoneSetting, AiTwotoneThunderbolt } from "react-icons/ai";
-import { IoLockClosed, IoLockOpen, IoSunnySharp } from "react-icons/io5";
+import { IoLockClosed, IoLockOpen, IoSunnySharp, IoVolumeHigh } from "react-icons/io5";
 import { BsMoonFill } from "react-icons/bs";
 import { useState } from "react";
 
@@ -23,12 +23,31 @@ export const DEFAULT_SUBTITLE_SETTINGS: SubtitleSettings = {
   offsetMs: 0,
 };
 
+export type RoomSoundKey =
+  | "userJoined"
+  | "otherUserJoined"
+  | "otherUserLeft"
+  | "newChatMessage"
+  | "adminAnnouncement";
+
+export type RoomSoundVolumes = Record<RoomSoundKey, number>;
+
+const SOUND_LABELS: Record<RoomSoundKey, string> = {
+  userJoined: "ورود شما به اتاق",
+  otherUserJoined: "ورود کاربر دیگر",
+  otherUserLeft: "خروج کاربر دیگر",
+  newChatMessage: "پیام جدید چت",
+  adminAnnouncement: "اعلان مدیریت",
+};
+
 const SettingsModal = ({
   isOpen,
   isPublic,
   mediaControlPermission,
   subtitleSettings,
   onSubtitleSettingsChange,
+  soundVolumes,
+  onSoundVolumesChange,
 }: {
   isOpen: boolean;
   isPublic: boolean;
@@ -38,6 +57,8 @@ const SettingsModal = ({
   createdAt?: string;
   subtitleSettings: SubtitleSettings;
   onSubtitleSettingsChange: (settings: SubtitleSettings) => void;
+  soundVolumes: RoomSoundVolumes;
+  onSoundVolumesChange: (volumes: RoomSoundVolumes) => void;
 }) => {
   const [theme, setTheme] = useState("default");
 
@@ -49,6 +70,10 @@ const SettingsModal = ({
 
   const updateSubtitle = <K extends keyof SubtitleSettings>(key: K, value: SubtitleSettings[K]) => {
     onSubtitleSettingsChange({ ...subtitleSettings, [key]: value });
+  };
+
+  const updateSoundVolume = (key: RoomSoundKey, value: number) => {
+    onSoundVolumesChange({ ...soundVolumes, [key]: value });
   };
 
   return (
@@ -84,6 +109,33 @@ const SettingsModal = ({
             <button type="button" className={clsx("room-settings-modal__body__row__items__item", theme === "dark" && "active")} onClick={() => handleThemeSelect("dark")}><BsMoonFill /><span>تیره</span></button>
             <button type="button" className={clsx("room-settings-modal__body__row__items__item", theme === "default" && "active")} onClick={() => handleThemeSelect("default")}><AiTwotoneThunderbolt /><span>پیش فرض</span></button>
             <button type="button" className={clsx("room-settings-modal__body__row__items__item", theme === "light" && "active")} onClick={() => handleThemeSelect("light")}><IoSunnySharp /><span>روشن</span></button>
+          </div>
+        </div>
+
+        <div className="room-settings-modal__sound-card">
+          <div className="room-settings-modal__sound-card__head">
+            <div>
+              <strong>صداهای رویداد</strong>
+              <span>ولوم هر صدای اتاق را جداگانه تنظیم کن</span>
+            </div>
+            <IoVolumeHigh aria-hidden="true" />
+          </div>
+
+          <div className="room-settings-modal__sound-card__controls">
+            {(Object.keys(SOUND_LABELS) as RoomSoundKey[]).map((key) => (
+              <label key={key}>
+                <span>{SOUND_LABELS[key]}</span>
+                <strong>{soundVolumes[key]}%</strong>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  value={soundVolumes[key]}
+                  onChange={(event) => updateSoundVolume(key, Number(event.target.value))}
+                />
+              </label>
+            ))}
           </div>
         </div>
 

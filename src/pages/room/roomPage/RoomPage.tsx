@@ -178,6 +178,44 @@ const CHAT_WIDTH_STORAGE_KEY = "cinema-room-chat-width";
 const DEFAULT_CHAT_WIDTH = 345;
 const MIN_CHAT_WIDTH = 275;
 
+const ROOM_SOUND_STORAGE_KEY = "cinema-room-sound-volumes";
+
+const ROOM_SOUND_SOURCES = {
+  userJoined: "/roomSound/selfJoin.wav",
+  otherUserJoined: "/roomSound/userJoin.wav",
+  otherUserLeft: "/roomSound/userExit.wav",
+  newChatMessage: "/roomSound/message.wav",
+  adminAnnouncement: "/roomSound/adminBroadcast.wav",
+} as const;
+
+type RoomSoundKey = keyof typeof ROOM_SOUND_SOURCES;
+type RoomSoundVolumes = Record<RoomSoundKey, number>;
+
+const DEFAULT_ROOM_SOUND_VOLUMES: RoomSoundVolumes = {
+  userJoined: 5,
+  otherUserJoined: 5,
+  otherUserLeft: 5,
+  newChatMessage: 5,
+  adminAnnouncement: 5,
+};
+
+const getStoredRoomSoundVolumes = (): RoomSoundVolumes => {
+  if (typeof window === "undefined") return DEFAULT_ROOM_SOUND_VOLUMES;
+
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(ROOM_SOUND_STORAGE_KEY) ?? "null");
+    if (!stored || typeof stored !== "object") return DEFAULT_ROOM_SOUND_VOLUMES;
+
+    return (Object.keys(DEFAULT_ROOM_SOUND_VOLUMES) as RoomSoundKey[]).reduce((result, key) => {
+      const value = Number(stored[key]);
+      result[key] = Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : DEFAULT_ROOM_SOUND_VOLUMES[key];
+      return result;
+    }, {} as RoomSoundVolumes);
+  } catch {
+    return DEFAULT_ROOM_SOUND_VOLUMES;
+  }
+};
+
 function buildWsUrl(baseUrl: string, roomId: string, token?: string, stealthAdmin = false) {
   const url = new URL(baseUrl);
   url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
@@ -253,10 +291,6 @@ const RoomPage = () => {
     startWidth: 345,
   });
 
-  useEffect(() => {
-    setHiddenAnnouncementIds(new Set());
-  }, [roomId]);
-
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [isMicMuted, setIsMicMuted] = useState(true);
@@ -271,6 +305,59 @@ const RoomPage = () => {
   const viewportBaseHeightRef = useRef<number | null>(null);
   const previousKeyboardOpenRef = useRef(false);
   const intentionalSocketCloseRef = useRef(false);
+  const roomSoundAudioRef = useRef<Partial<Record<RoomSoundKey, HTMLAudioElement>>>({});
+  const userJoinSoundPlayedRef = useRef(false);
+
+  useEffect(() => {
+    setHiddenAnnouncementIds(new Set());
+    userJoinSoundPlayedRef.current = false;
+  }, [roomId]);
+
+  const scrollChatToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+    window.requestAnimationFrame(() => {
+      chatBottomRef.current?.scrollIntoView({ behavior, block: "end" });
+    });
+  }, []);
+
+  const [roomSoundVolumes, setRoomSoundVolumes] = useState<RoomSoundVolumes>(getStoredRoomSoundVolumes);
+  const roomSoundVolumesRef = useRef<RoomSoundVolumes>(roomSoundVolumes);
+
+  useEffect(() => {
+    roomSoundVolumesRef.current = roomSoundVolumes;
+    try {
+      window.localStorage.setItem(ROOM_SOUND_STORAGE_KEY, JSON.stringify(roomSoundVolumes));
+    } catch {
+      // Storage can be unavailable in privacy-restricted browser contexts.
+    }
+  }, [roomSoundVolumes]);
+
+  const playRoomSound = useCallback((key: RoomSoundKey) => {
+    const volume = roomSoundVolumesRef.current[key];
+    if (volume <= 0 || typeof window === "undefined") return;
+
+    let audio = roomSoundAudioRef.current[key];
+    if (!audio) {
+      audio = new Audio(ROOM_SOUND_SOURCES[key]);
+      audio.preload = "auto";
+      roomSoundAudioRef.current[key] = audio;
+    }
+
+    audio.volume = Math.min(1, Math.max(0, volume / 100));
+    audio.currentTime = 0;
+    void audio.play().catch(() => {
+      // Browsers may block playback until the user has interacted with the page.
+    });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      (Object.values(roomSoundAudioRef.current) as HTMLAudioElement[]).forEach((audio) => {
+        audio.pause();
+        audio.currentTime = 0;
+      });
+      roomSoundAudioRef.current = {};
+    };
+  }, []);
 
   const clampChatWidth = useCallback((width: number) => {
     const maxWidth = Math.max(
@@ -391,7 +478,7 @@ const RoomPage = () => {
 
       if (keyboardOpen && !previousKeyboardOpenRef.current) {
         window.requestAnimationFrame(() => {
-          chatBottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+          scrollChatToBottom("smooth");
         });
       }
 
@@ -418,7 +505,7 @@ const RoomPage = () => {
       document.removeEventListener("focusin", handleFocusChange);
       document.removeEventListener("focusout", handleFocusChange);
     };
-  }, []);
+  }, [scrollChatToBottom]);
 
   // ========== Start Reaction Particles ===========
 
@@ -1251,6 +1338,10 @@ const RoomPage = () => {
 
     setRoomState(roomQuery.data);
     setConnectionLost(false);
+    if (!userJoinSoundPlayedRef.current) {
+      userJoinSoundPlayedRef.current = true;
+      playRoomSound("userJoined");
+    }
     setPlaybackSrc(roomQuery.data.currently_playing ?? "");
     setCustomSubtitleTracks(roomQuery.data.subtitles ?? []);
     setCurrentSubtitleUrl(roomQuery.data.currently_playing_subtitles ?? null);
@@ -1263,7 +1354,7 @@ const RoomPage = () => {
     });
 
     setConnectionStatuses(statuses);
-  }, [roomQuery.data]);
+  }, [roomQuery.data, playRoomSound, user?.id]);
 
   useEffect(() => {
     if (!currentSubtitleUrl || customSubtitleTracks.length) return;
@@ -1297,10 +1388,12 @@ const RoomPage = () => {
     );
   }, [roomState?.messages, systemMessages]);
 
-  // Auto-scroll to the newest message.
+  // Auto-scroll whenever the actual chat timeline changes, including realtime
+  // messages and join/leave system events. The explicit send path below also
+  // scrolls immediately so the UI does not wait for the socket echo.
   useEffect(() => {
-    chatBottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [groupedMessages.length]);
+    scrollChatToBottom("smooth");
+  }, [groupedMessages, scrollChatToBottom]);
 
   const isCreator = roomState?.created_by === user?.id;
 
@@ -1380,7 +1473,11 @@ const RoomPage = () => {
             const announcement = parsed.payload.announcement;
             if (!announcement) return current;
 
+            const existed = announcements.some((item) => item.id === announcement.id);
             const withoutAnnouncement = announcements.filter((item) => item.id !== announcement.id);
+            if (!existed) {
+              playRoomSound("adminAnnouncement");
+            }
             return { announcements: [announcement, ...withoutAnnouncement] };
           });
           break;
@@ -1392,6 +1489,9 @@ const RoomPage = () => {
             if (prev.messages.some((m) => m.id === parsed.payload.id)) return prev;
             return { ...prev, messages: [...prev.messages, parsed.payload].slice(-100) };
           });
+          if (parsed.payload.sender_id !== localUserIdRef.current) {
+            playRoomSound("newChatMessage");
+          }
           break;
 
         case "admin_chat_message": {
@@ -1408,6 +1508,7 @@ const RoomPage = () => {
             is_admin_sender: true,
           };
           setRoomState((prev) => prev ? { ...prev, messages: [...prev.messages, adminMessage].slice(-100) } : prev);
+          playRoomSound("newChatMessage");
           break;
         }
 
@@ -1434,6 +1535,9 @@ const RoomPage = () => {
         case "user_left": {
           const leavingId = parsed.payload.user_id;
           console.log("voice: user_left for", leavingId);
+          if (leavingId !== localUserIdRef.current) {
+            playRoomSound("otherUserLeft");
+          }
           closePeer(leavingId);
           setRemoteVoiceEnabled((prev) => {
             const copy = { ...prev };
@@ -1455,6 +1559,9 @@ const RoomPage = () => {
         }
 
         case "user_joined": {
+          if (parsed.payload.user_id !== localUserIdRef.current) {
+            playRoomSound("otherUserJoined");
+          }
           setSystemMessages((prev) => [
             ...prev,
             {
@@ -1639,7 +1746,7 @@ const RoomPage = () => {
       intentionalSocketCloseRef.current = true;
       socket.close();
     };
-  }, [roomId, user?.id, isStealthAdmin]);
+  }, [roomId, user?.id, isStealthAdmin, playRoomSound]);
 
   useEffect(() => {
     if (!isCreator) {
@@ -1687,6 +1794,8 @@ const RoomPage = () => {
     onSuccess: () => {
       setMessageText("");
       setReplyingTo({ message: "", id: "" });
+      scrollChatToBottom("smooth");
+      playRoomSound("newChatMessage");
     },
   });
 
@@ -1808,6 +1917,8 @@ const RoomPage = () => {
       sendSocketEvent({ type: "chat_message", payload: { content } });
       setMessageText("");
       setReplyingTo({ message: "", id: "" });
+      scrollChatToBottom("smooth");
+      playRoomSound("newChatMessage");
       return;
     }
 
@@ -2720,6 +2831,8 @@ const RoomPage = () => {
               createdAt={roomState.created_at}
               subtitleSettings={subtitleSettings}
               onSubtitleSettingsChange={setSubtitleSettings}
+              soundVolumes={roomSoundVolumes}
+              onSoundVolumesChange={setRoomSoundVolumes}
             />
           </div>
         )}

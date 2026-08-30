@@ -67,3 +67,19 @@
 .room-settings-modal__subtitle-offset__presets { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
 .room-settings-modal__subtitle-offset__presets button { min-height: 30px; border: 1px solid var(--border-subtle); border-radius: 9px; background: var(--component-bg); color: var(--text-muted); font: inherit; font-size: 9px; font-weight: 800; cursor: pointer; }
 .room-settings-modal__subtitle-offset__presets button.active { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 42%, var(--border-subtle)); background: color-mix(in srgb, var(--accent) 10%, var(--component-bg)); }
+
+.room-settings-modal__sound-card { padding: 14px; border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border-subtle)); border-radius: 18px; background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 6%, transparent), rgba(255,255,255,.018)); }
+.room-settings-modal__sound-card__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.room-settings-modal__sound-card__head > div { display: flex; flex-direction: column; gap: 3px; }
+.room-settings-modal__sound-card__head strong { font-size: 13px; font-weight: 900; }
+.room-settings-modal__sound-card__head span { color: var(--text-muted); font-size: 9px; }
+.room-settings-modal__sound-card__head > svg { color: var(--accent); font-size: 21px; flex: 0 0 auto; }
+.room-settings-modal__sound-card__controls { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px 14px; }
+.room-settings-modal__sound-card__controls label { display: grid; grid-template-columns: 1fr auto; gap: 7px 10px; align-items: center; }
+.room-settings-modal__sound-card__controls label > span { color: var(--text-muted); font-size: 9px; min-width: 0; }
+.room-settings-modal__sound-card__controls label > strong { font-size: 10px; }
+.room-settings-modal__sound-card__controls input[type="range"] { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); }
+
+@include mx.max-w(520px) {
+  .room-settings-modal__sound-card__controls { grid-template-columns: 1fr; }
+}
