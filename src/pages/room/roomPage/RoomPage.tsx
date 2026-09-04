@@ -4,10 +4,9 @@ import './themse/Themes.scss'
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
-import { AiTwotoneSetting } from "react-icons/ai";
 import { BsEmojiLaughing, BsFillPeopleFill, BsFillShareFill, BsMicFill, BsMicMuteFill, BsReplyFill, BsPeopleFill } from "react-icons/bs";
 import { IoChatbubblesSharp, IoChevronBack, IoClose, IoExitOutline } from "react-icons/io5";
-import { FaArrowRight, FaCheck } from "react-icons/fa6";
+import { FaArrowRight, FaCheck, FaGear } from "react-icons/fa6";
 import { TbSticker, TbMovieOff, TbPlayerPlayFilled, TbX } from "react-icons/tb";
 
 import SettingsModal, { DEFAULT_SUBTITLE_SETTINGS, type SubtitleSettings } from "./settingsModal/SettingsModal";
@@ -2479,7 +2478,7 @@ const RoomPage = () => {
       <div className={clsx("room-page__side-bar", sidebarOpen && "open")}>
         <div className="room-page__side-bar__item">
           <button className="room-page__side-bar__item__settings" onClick={() => setSettingsModalOpen(true)}>
-            <AiTwotoneSetting />
+            <FaGear />
           </button>
           <span>تنظیمات</span>
         </div>

@@ -1,9 +1,10 @@
 import clsx from "clsx";
 import "./SettingsModal.scss";
-import { AiTwotoneSetting, AiTwotoneThunderbolt } from "react-icons/ai";
+import { AiTwotoneThunderbolt } from "react-icons/ai";
 import { IoLockClosed, IoLockOpen, IoSunnySharp, IoVolumeHigh } from "react-icons/io5";
 import { BsMoonFill } from "react-icons/bs";
 import { useState } from "react";
+import { FaGear } from "react-icons/fa6";
 
 export interface SubtitleSettings {
   fontSize: number;
@@ -75,7 +76,7 @@ const SettingsModal = ({
           <span>تنظیمات اتاق</span>
           <small>ظاهر اتاق و تنظیمات صدا را مطابق سلیقه‌ات تنظیم کن</small>
         </div>
-        <AiTwotoneSetting />
+        <FaGear />
       </div>
 
       <div className="room-settings-modal__body">
