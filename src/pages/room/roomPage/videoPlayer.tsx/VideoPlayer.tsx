@@ -1093,8 +1093,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                         >
                           <span
                             className={`block h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200 ${activeSubtitle >= 0
-                              ? "-translate-x-5"
-                              : "translate-x-0"
+                              ? "translate-x-0"
+                              : "-translate-x-5"
                               }`}
                           />
                         </button>
