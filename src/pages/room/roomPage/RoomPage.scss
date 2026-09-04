@@ -1715,8 +1715,23 @@
           }
 
           @include mx.max-w(440px) {
-            > button,
+            gap: 16px;
             > p {
+              display: none;
+            }
+
+            > button {
+              padding: 8px 10px !important;
+              font-size: 11px !important;
+              border-radius: 8px;
+            }
+
+            > strong {
+              font-size: 14px !important;
+            }
+          }
+          @include mx.max-w(290px) {
+            > strong {
               display: none;
             }
           }
