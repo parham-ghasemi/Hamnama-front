@@ -2014,3 +2014,26 @@
 .admin-archive__scrape-progress.is-error .admin-archive__scrape-progress-head strong {
   color: var(--archive-red);
 }
+
+
+.admin-archive__scrape-status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 11px;
+  padding: 10px 11px;
+  border: 1px solid color-mix(in srgb, var(--archive-primary) 16%, var(--archive-border));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--archive-primary) 5%, transparent);
+  color: var(--archive-muted);
+  font-size: 9px;
+}
+
+.admin-archive__scrape-status-row svg {
+  flex: none;
+  color: var(--archive-primary);
+}
+
+.admin-archive__scrape-progress.is-running {
+  border-color: color-mix(in srgb, var(--archive-primary) 18%, var(--archive-border));
+}

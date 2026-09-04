@@ -137,15 +137,12 @@ export interface ScrapeJobsResponse {
   jobs: ScrapeJob[];
 }
 
-export interface ScrapeProgress {
-  job_id: string;
-  url: string;
-  status: 'running' | 'completed' | 'error';
-  total: number;
-  scanned: number;
-  valid: number;
-  invalid: number;
-  finished_at?: string;
+export interface ScrapeStatusEvent {
+  done: boolean;
+}
+
+export interface ScrapeFailedEvent {
+  done: boolean;
   error?: string;
 }
 
