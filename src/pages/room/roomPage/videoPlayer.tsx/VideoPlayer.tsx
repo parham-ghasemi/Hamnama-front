@@ -78,6 +78,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [showControls, setShowControls] = useState(true);
   const [showShortcutHints, setShowShortcutHints] = useState(false);
   const [showSubtitleSettings, setShowSubtitleSettings] = useState(false);
+  const [isVideoBuffering, setIsVideoBuffering] = useState(true);
+  const [bufferedRanges, setBufferedRanges] = useState<
+    Array<{ start: number; end: number }>
+  >([]);
   const [, setSubtitlesRequested] = useState(false);
   const [localSubtitleSettings, setLocalSubtitleSettings] =
     useState<SubtitleSettings>(subtitleSettings);
@@ -111,6 +115,49 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       : `${pad(m)}:${pad(s)}`;
   };
 
+  const updateBufferedRanges = useCallback(() => {
+    const video = videoRef.current;
+
+    if (!video || !Number.isFinite(video.duration) || video.duration <= 0) {
+      setBufferedRanges([]);
+      return;
+    }
+
+    const ranges: Array<{ start: number; end: number }> = [];
+
+    for (let i = 0; i < video.buffered.length; i += 1) {
+      const start = video.buffered.start(i);
+      const end = video.buffered.end(i);
+
+      if (Number.isFinite(start) && Number.isFinite(end) && end > start) {
+        ranges.push({ start, end });
+      }
+    }
+
+    setBufferedRanges(ranges);
+  }, []);
+
+  const handleVideoBufferingStart = useCallback(() => {
+    // Only show the spinner while the user is actually trying to play.
+    if (playing) {
+      setIsVideoBuffering(true);
+    }
+  }, [playing]);
+
+  const handleVideoBufferingEnd = useCallback(() => {
+    setIsVideoBuffering(false);
+  }, []);
+
+  useEffect(() => {
+    if (!playing) {
+      setIsVideoBuffering(false);
+    }
+  }, [playing]);
+
+  useEffect(() => {
+    updateBufferedRanges();
+  }, [updateBufferedRanges, duration]);
+
   const togglePlay = useCallback(() => {
     if (!videoRef.current) return;
 
@@ -122,6 +169,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       }
 
       videoRef.current.pause();
+      setIsVideoBuffering(false);
     } else {
       if (onPlayRequest) {
         onPlayRequest();
@@ -129,7 +177,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         setInternalPlaying(true);
       }
 
-      videoRef.current.play().catch(() => { });
+      setIsVideoBuffering(true);
+
+      videoRef.current.play().catch(() => {
+        setIsVideoBuffering(false);
+      });
     }
   }, [playing, onPauseRequest, onPlayRequest]);
 
@@ -456,9 +508,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
     if (typeof isPlaying === "boolean") {
       if (isPlaying) {
-        videoRef.current.play().catch(() => { });
+        setIsVideoBuffering(true);
+
+        videoRef.current.play().catch(() => {
+          setIsVideoBuffering(false);
+        });
       } else {
         videoRef.current.pause();
+        setIsVideoBuffering(false);
       }
     }
   }, [isPlaying]);
@@ -623,6 +680,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   useEffect(() => {
     if (!playing) {
       setShowControls(true);
+      setIsVideoBuffering(false);
     }
   }, [playing]);
 
@@ -664,6 +722,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     };
   }, [showSubtitleSettings]);
 
+  const playedPercent =
+    duration > 0
+      ? Math.min(
+        100,
+        Math.max(0, (time / duration) * 100)
+      )
+      : 0;
+
   return (
     <div
       ref={containerRef}
@@ -682,15 +748,35 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         poster={poster}
         autoPlay={autoPlay}
         onClick={togglePlay}
+        onLoadStart={() => {
+          updateBufferedRanges();
+
+          if (playing) {
+            setIsVideoBuffering(true);
+          }
+        }}
+        onWaiting={handleVideoBufferingStart}
+        onStalled={handleVideoBufferingStart}
+        onCanPlay={handleVideoBufferingEnd}
+        onPlaying={handleVideoBufferingEnd}
+        onProgress={updateBufferedRanges}
         onPlay={() => {
           setInternalPlaying(true);
 
           if (!isPlaying) {
             onPlayRequest?.();
           }
+
+          if (!videoRef.current?.paused) {
+            setIsVideoBuffering(
+              !videoRef.current?.readyState ||
+              videoRef.current.readyState < 3
+            );
+          }
         }}
         onPause={() => {
           setInternalPlaying(false);
+          setIsVideoBuffering(false);
 
           if (isPlaying) {
             onPauseRequest?.();
@@ -702,12 +788,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
           setInternalCurrentTime(t);
           onLocalTimeUpdate?.(t);
+          updateBufferedRanges();
         }}
         onLoadedMetadata={() => {
           if (videoRef.current) {
             setDuration(
               videoRef.current.duration
             );
+
+            updateBufferedRanges();
 
             if (
               typeof currentTime === "number"
@@ -717,9 +806,42 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             }
           }
         }}
-        onEnded={() => setInternalPlaying(false)}
+        onEnded={() => {
+          setInternalPlaying(false);
+          setIsVideoBuffering(false);
+          updateBufferedRanges();
+        }}
         className="w-full h-full object-contain cursor-pointer focus:outline-none"
       />
+
+      {/* Video loading spinner */}
+      <AnimatePresence>
+        {isVideoBuffering && playing && (
+          <motion.div
+            initial={{
+              opacity: 0,
+              scale: 0.8,
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+            }}
+            exit={{
+              opacity: 0,
+              scale: 0.8,
+            }}
+            transition={{
+              duration: 0.2,
+            }}
+            className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center"
+            aria-label="در حال بارگذاری ویدیو"
+          >
+            <div className="flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-black/50 backdrop-blur-md max-[410px]:h-10 max-[410px]:w-10">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/25 border-t-white max-[410px]:h-5 max-[410px]:w-5" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {currentSubtitleText &&
         activeSubtitle >= 0 && (
@@ -1006,9 +1128,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             }}
             className="pointer-events-none absolute inset-0 z-40 flex items-end justify-end p-3 pb-19.5 sm:p-4 sm:pb-21.5 md:p-5 md:pb-23"
           >
-            {/* Outer wrapper — provides space between the panel and player edge */}
             <div className="pointer-events-auto flex max-h-full w-[min(430px,100%)] min-w-0 overflow-hidden rounded-2xl bg-black/45 p-1 backdrop-blur-xl max-[520px]:w-full">
-              {/* Actual panel */}
               <motion.div
                 id="video-subtitle-settings"
                 role="dialog"
@@ -1016,7 +1136,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 dir="rtl"
                 className="flex min-h-0 w-full max-h-[min(560px,calc(100vh-2rem))] flex-col overflow-hidden rounded-xl text-white max-[520px]:max-h-[min(560px,calc(100vh-1.5rem))]"
               >
-                {/* Header */}
                 <div className="shrink-0 px-3 pt-3 sm:px-4 sm:pt-4">
                   <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-3">
                     <div className="min-w-0">
@@ -1035,7 +1154,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
                     <button
                       type="button"
-                      onClick={() => setShowSubtitleSettings(false)}
+                      onClick={() =>
+                        setShowSubtitleSettings(false)
+                      }
                       aria-label="بستن تنظیمات زیرنویس"
                       className="shrink-0 rounded-lg p-1.5 text-white/60 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50"
                     >
@@ -1044,7 +1165,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   </div>
                 </div>
 
-                {/* Scroll container */}
                 <div
                   className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-3 pt-3 sm:px-4 sm:pb-4 sm:pt-4 [scrollbar-gutter:stable]"
                   style={{
@@ -1052,7 +1172,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   }}
                 >
                   <div className="space-y-3 pr-1 sm:pr-1.5">
-                    {/* Subtitle toggle */}
                     <div className="rounded-xl border border-white/10 bg-white/5 p-3">
                       <div className="flex items-center justify-between gap-3">
                         <div className="min-w-0">
@@ -1104,7 +1223,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                     {subtitleStatus === "ready" &&
                       subtitleTracks.length > 0 && (
                         <div className="space-y-3">
-                          {/* Sliders */}
                           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <label className="min-w-0 rounded-xl border border-white/10 bg-white/5 p-3">
                               <span className="flex items-center justify-between gap-2 text-xs text-white/65">
@@ -1190,7 +1308,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                             </label>
                           </div>
 
-                          {/* Weight + position */}
                           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <div className="rounded-xl border border-white/10 bg-white/5 p-2.5">
                               <span className="mb-2 block px-1 text-xs text-white/60">
@@ -1319,26 +1436,35 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                     onClick={() =>
                                       updateSubtitle(
                                         "offsetMs",
-                                        value
+                                        Math.max(
+                                          -10000,
+                                          Math.min(
+                                            10000,
+                                            value === 0
+                                              ? 0
+                                              : effectiveSubtitleSettings.offsetMs +
+                                              value
+                                          )
+                                        )
                                       )
                                     }
-                                    className={`rounded-lg border px-1.5 py-2 text-[10px] transition sm:text-xs ${effectiveSubtitleSettings.offsetMs ===
-                                      value
-                                      ? "border-white/15 bg-white/15 text-white"
+                                    className={`rounded-lg border px-1.5 py-2 text-[10px] transition sm:text-xs ${value === 0
+                                      ? effectiveSubtitleSettings.offsetMs === 0
+                                        ? "border-white/15 bg-white/15 text-white"
+                                        : "border-white/5 bg-black/15 text-white/50 hover:bg-white/10 hover:text-white"
                                       : "border-white/5 bg-black/15 text-white/50 hover:bg-white/10 hover:text-white"
                                       }`}
                                   >
                                     {value === 0
                                       ? "۰"
-                                      : `${value > 0 ? "+" : ""
-                                      }${value / 1000}s`}
+                                      : `${value > 0 ? "+" : ""}${value / 1000
+                                      }s`}
                                   </button>
                                 )
                               )}
                             </div>
                           </div>
 
-                          {/* Reset */}
                           <button
                             type="button"
                             onClick={resetSubtitleSettings}
@@ -1378,6 +1504,50 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             className="absolute inset-x-0 bottom-0 z-20 flex flex-col gap-3 bg-linear-to-t from-black/90 via-black/40 to-transparent p-4"
           >
             <div className="group/scrubber relative flex h-3 w-full cursor-pointer items-center">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 overflow-hidden rounded-lg"
+                style={{
+                  background: "rgba(255,255,255,.28)",
+                }}
+              />
+
+              {duration > 0 &&
+                bufferedRanges.map((range, index) => {
+                  const left = Math.min(
+                    100,
+                    Math.max(0, (range.start / duration) * 100)
+                  );
+
+                  const width = Math.min(
+                    100 - left,
+                    Math.max(
+                      0,
+                      ((range.end - range.start) / duration) * 100
+                    )
+                  );
+
+                  return (
+                    <div
+                      key={`${range.start}-${range.end}-${index}`}
+                      aria-hidden="true"
+                      className="pointer-events-none absolute top-1/2 h-1 -translate-y-1/2 rounded-lg bg-white/45"
+                      style={{
+                        left: `${left}%`,
+                        width: `${width}%`,
+                      }}
+                    />
+                  );
+                })}
+
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute left-0 top-1/2 h-1 -translate-y-1/2 rounded-lg bg-[#d04e2f]"
+                style={{
+                  width: `${playedPercent}%`,
+                }}
+              />
+
               <input
                 type="range"
                 min={0}
@@ -1385,26 +1555,48 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 step="0.1"
                 value={time}
                 onChange={handleScrub}
-                className="absolute inset-0 h-1 w-full cursor-pointer appearance-none rounded-lg transition-all duration-150 hover:h-2 focus:outline-none"
-                style={{
-                  background:
-                    duration > 0
-                      ? `linear-gradient(to right, #d04e2f 0%, #d04e2f ${Math.min(
-                        100,
-                        Math.max(
-                          0,
-                          (time / duration) * 100
-                        )
-                      )}%, rgba(255,255,255,.28) ${Math.min(
-                        100,
-                        Math.max(
-                          0,
-                          (time / duration) * 100
-                        )
-                      )}%, rgba(255,255,255,.28) 100%)`
-                      : "rgba(255,255,255,.28)",
-                  accentColor: "#d04e2f",
-                }}
+                className="
+      absolute
+      inset-x-0
+      top-1/2
+      z-10
+      h-3
+      w-full
+      -translate-y-1/2
+      cursor-pointer
+      appearance-none
+      bg-transparent
+      focus:outline-none
+
+      [&::-webkit-slider-runnable-track]:h-1
+      [&::-webkit-slider-runnable-track]:rounded-full
+      [&::-webkit-slider-runnable-track]:bg-transparent
+
+      [&::-webkit-slider-thumb]:-mt-1.25
+      [&::-webkit-slider-thumb]:h-3
+      [&::-webkit-slider-thumb]:w-3
+      [&::-webkit-slider-thumb]:appearance-none
+      [&::-webkit-slider-thumb]:rounded-full
+      [&::-webkit-slider-thumb]:border-0
+      [&::-webkit-slider-thumb]:bg-[#d04e2f]
+      [&::-webkit-slider-thumb]:shadow-[0_0_0_2px_rgba(0,0,0,0.15)]
+      [&::-webkit-slider-thumb]:transition-transform
+      [&::-webkit-slider-thumb]:duration-150
+      group-hover/scrubber:[&::-webkit-slider-thumb]:scale-[1.01]
+
+      [&::-moz-range-track]:h-1
+      [&::-moz-range-track]:rounded-full
+      [&::-moz-range-track]:bg-transparent
+
+      [&::-moz-range-thumb]:h-3
+      [&::-moz-range-thumb]:w-3
+      [&::-moz-range-thumb]:rounded-full
+      [&::-moz-range-thumb]:border-0
+      [&::-moz-range-thumb]:bg-[#d04e2f]
+      [&::-moz-range-thumb]:transition-transform
+      [&::-moz-range-thumb]:duration-150
+      group-hover/scrubber:[&::-moz-range-thumb]:scale-[1.01]
+    "
               />
             </div>
 

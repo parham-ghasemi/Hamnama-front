@@ -2113,6 +2113,10 @@
       max-width: calc(100vw - 24px);
       max-height: calc(100dvh - 24px);
       overflow: auto;
+
+      @include mx.max-w(532px) {
+        width: calc(100vw - 16px);
+      }
     }
   }
 }
@@ -2446,10 +2450,6 @@
     &.sidebar-open &__side-bar-backdrop {
       opacity: 1;
       pointer-events: auto;
-    }
-
-    &__modal-overlay__modal {
-      width: calc(100vw - 16px);
     }
 
     // ---- 5. Drawer handle ----
