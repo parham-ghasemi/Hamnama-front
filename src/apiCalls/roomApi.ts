@@ -190,6 +190,13 @@ export function getRoomApiErrorStatus(error: unknown): number | undefined {
   return axios.isAxiosError(error) ? error.response?.status : undefined;
 }
 
+export interface RoomSubtitleResponse {
+  id: string;
+  filename: string;
+  subtitle_url: string;
+  subtitles: SubtitleTrack[];
+}
+
 export interface UploadRoomMediaResponse {
   upload_id: string;
   video_url: string;
@@ -218,4 +225,28 @@ export async function uploadRoomMedia(
 export async function getSharedRoomSubtitles(url: string) {
   const { data } = await api.get<{ tracks: SubtitleTrack[] }>(url);
   return data.tracks ?? [];
+}
+
+export async function submitRoomSubtitle(
+  roomId: string,
+  input: { file?: File; url?: string },
+) {
+  const form = new FormData();
+  if (input.file) form.append("subtitle", input.file);
+  if (input.url?.trim()) form.append("url", input.url.trim());
+
+  const { data } = await api.post<RoomSubtitleResponse>(`/rooms/${roomId}/subtitle`, form);
+  return data;
+}
+
+export function getRoomApiErrorMessage(error: unknown, fallback = "عملیات انجام نشد."): string {
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data;
+    if (typeof data === "string" && data.trim()) return data.trim();
+    if (data && typeof data === "object" && "message" in data) {
+      const message = (data as { message?: unknown }).message;
+      if (typeof message === "string" && message.trim()) return message.trim();
+    }
+  }
+  return error instanceof Error && error.message ? error.message : fallback;
 }

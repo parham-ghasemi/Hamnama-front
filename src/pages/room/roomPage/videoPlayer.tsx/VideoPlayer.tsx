@@ -41,6 +41,7 @@ export interface VideoPlayerProps {
   subtitleSeason?: number | null;
   subtitleEpisode?: number | null;
   customSubtitleTracks?: SubtitleTrack[];
+  onSubmitSubtitle?: (input: { file?: File; url?: string }) => Promise<void>;
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -63,6 +64,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   subtitleSeason,
   subtitleEpisode,
   customSubtitleTracks = [],
+  onSubmitSubtitle,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -91,6 +93,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   >("idle");
   const [subtitleError, setSubtitleError] = useState<string | null>(null);
   const [activeSubtitle, setActiveSubtitle] = useState(-1);
+  const [subtitleSourceUrl, setSubtitleSourceUrl] = useState("");
+  const [subtitleFile, setSubtitleFile] = useState<File | null>(null);
+  const [subtitleSubmitError, setSubtitleSubmitError] = useState<string | null>(null);
+  const [subtitleSubmitting, setSubtitleSubmitting] = useState(false);
 
   const lastTouchRef = useRef<{ time: number; x: number } | null>(null);
 
@@ -406,6 +412,61 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const resetSubtitleSettings = () => {
     setLocalSubtitleSettings(DEFAULT_SUBTITLE_SETTINGS);
     onSubtitleSettingsChange?.(DEFAULT_SUBTITLE_SETTINGS);
+  };
+
+  const validateLocalSubtitleFile = async (file: File) => {
+    if (!/\.srt$/i.test(file.name)) return "فایل زیرنویس باید با فرمت SRT باشد.";
+    if (file.size > 5 * 1024 * 1024) return "حجم زیرنویس نمی‌تواند بیشتر از ۵ مگابایت باشد.";
+    const text = await file.text();
+    if (!/^\s*(?:\d+\s*\n)?\s*\d{1,2}:\d{2}:\d{2}[,.]\d{3}\s*-->\s*\d{1,2}:\d{2}:\d{2}[,.]\d{3}/m.test(text)) {
+      return "محتوای فایل یک SRT معتبر نیست.";
+    }
+    return null;
+  };
+
+  const handleSubmitRoomSubtitle = async () => {
+    if (!onSubmitSubtitle || subtitleSubmitting) return;
+    setSubtitleSubmitError(null);
+    const url = subtitleSourceUrl.trim();
+    if (!subtitleFile && !url) {
+      setSubtitleSubmitError("یک فایل SRT یا لینک زیرنویس وارد کن.");
+      return;
+    }
+    if (subtitleFile && url) {
+      setSubtitleSubmitError("فقط یکی از فایل یا لینک زیرنویس را انتخاب کن.");
+      return;
+    }
+    if (subtitleFile) {
+      const validationError = await validateLocalSubtitleFile(subtitleFile);
+      if (validationError) {
+        setSubtitleSubmitError(validationError);
+        return;
+      }
+    }
+    if (url) {
+      try {
+        const parsed = new URL(url);
+        if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+          setSubtitleSubmitError("لینک زیرنویس باید با HTTP یا HTTPS شروع شود.");
+          return;
+        }
+      } catch {
+        setSubtitleSubmitError("لینک زیرنویس معتبر نیست.");
+        return;
+      }
+    }
+
+    setSubtitleSubmitting(true);
+    try {
+      await onSubmitSubtitle(subtitleFile ? { file: subtitleFile } : { url });
+      setSubtitleFile(null);
+      setSubtitleSourceUrl("");
+      setSubtitleSubmitError(null);
+    } catch (error) {
+      setSubtitleSubmitError(error instanceof Error ? error.message : "ثبت زیرنویس انجام نشد.");
+    } finally {
+      setSubtitleSubmitting(false);
+    }
   };
 
   const toggleFullscreen = async () => {
@@ -1219,6 +1280,72 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                         </button>
                       </div>
                     </div>
+
+                    {onSubmitSubtitle && (
+                      <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                        <div className="mb-3">
+                          <div className="text-sm font-semibold">زیرنویس اختصاصی اتاق</div>
+                          <div className="mt-0.5 text-[11px] leading-relaxed text-white/50 sm:text-xs">
+                            فایل SRT را آپلود کن یا لینک مستقیم فایل SRT را وارد کن. زیرنویس جدید جایگزین زیرنویس قبلی اتاق می‌شود.
+                          </div>
+                        </div>
+
+                        <label className="mb-2 block text-xs text-white/65">لینک مستقیم SRT</label>
+                        <input
+                          type="url"
+                          dir="ltr"
+                          placeholder="https://example.com/subtitle.srt"
+                          value={subtitleSourceUrl}
+                          onChange={(event) => {
+                            setSubtitleSourceUrl(event.target.value);
+                            if (subtitleFile) setSubtitleFile(null);
+                            setSubtitleSubmitError(null);
+                          }}
+                          disabled={subtitleSubmitting}
+                          className="w-full rounded-lg border border-white/10 bg-black/25 px-3 py-2.5 text-xs text-white outline-none transition placeholder:text-white/25 focus:border-white/30"
+                          data-video-keyboard-ignore
+                        />
+
+                        <div className="my-3 flex items-center gap-2 text-[10px] text-white/30">
+                          <span className="h-px flex-1 bg-white/10" />
+                          <span>یا</span>
+                          <span className="h-px flex-1 bg-white/10" />
+                        </div>
+
+                        <label className="block text-xs text-white/65">آپلود فایل SRT</label>
+                        <input
+                          type="file"
+                          accept=".srt,text/plain,application/x-subrip"
+                          onChange={(event) => {
+                            const nextFile = event.target.files?.[0] ?? null;
+                            setSubtitleSourceUrl("");
+                            setSubtitleFile(nextFile);
+                            if (!nextFile) {
+                              setSubtitleSubmitError(null);
+                              return;
+                            }
+                            void validateLocalSubtitleFile(nextFile).then(setSubtitleSubmitError);
+                          }}
+                          disabled={subtitleSubmitting}
+                          className="mt-1 block w-full cursor-pointer rounded-lg border border-white/10 bg-black/25 px-2 py-2 text-xs text-white/70 file:mr-2 file:rounded-md file:border-0 file:bg-white/10 file:px-2.5 file:py-1.5 file:text-xs file:text-white hover:file:bg-white/15"
+                        />
+
+                        {subtitleSubmitError && (
+                          <p className="mt-2 text-[11px] leading-relaxed text-red-300" role="alert">
+                            {subtitleSubmitError}
+                          </p>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => void handleSubmitRoomSubtitle()}
+                          disabled={subtitleSubmitting || (!subtitleFile && !subtitleSourceUrl.trim())}
+                          className="mt-3 w-full rounded-lg bg-[#d04e2f] px-3 py-2.5 text-xs font-semibold text-white transition hover:bg-[#bb4328] disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          {subtitleSubmitting ? "در حال دریافت و پردازش…" : "ثبت و جایگزینی زیرنویس"}
+                        </button>
+                      </div>
+                    )}
 
                     {subtitleStatus === "ready" &&
                       subtitleTracks.length > 0 && (

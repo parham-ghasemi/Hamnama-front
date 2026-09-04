@@ -27,6 +27,8 @@ import {
   leaveRoom,
   sendRoomMessage,
   uploadRoomMedia,
+  submitRoomSubtitle,
+  getRoomApiErrorMessage,
   editRoomMessage,
   kickRoomMember,
   updateRoomMemberRole,
@@ -146,6 +148,14 @@ type ServerSocketEvent =
       upload_id?: string;
       subtitles?: { id: string; filename: string; cues: { start: number; end: number; text: string }[] }[];
       currently_playing_subtitles?: string | null;
+    };
+  }
+  | {
+    type: "room_subtitle_updated";
+    payload: {
+      user_id: string;
+      subtitle_url: string;
+      subtitles: { id: string; filename: string; cues: { start: number; end: number; text: string }[] }[];
     };
   }
   | {
@@ -1770,6 +1780,19 @@ const RoomPage = () => {
           break;
         }
 
+        case "room_subtitle_updated":
+          setCustomSubtitleTracks(parsed.payload.subtitles ?? []);
+          setCurrentSubtitleUrl(parsed.payload.subtitle_url ?? null);
+          setRoomState((prev) => prev
+            ? {
+              ...prev,
+              subtitles: parsed.payload.subtitles ?? [],
+              currently_playing_subtitles: parsed.payload.subtitle_url ?? null,
+            }
+            : prev,
+          );
+          break;
+
         case "error":
           console.log(parsed.payload.message);
           break;
@@ -2188,6 +2211,25 @@ const RoomPage = () => {
       is_playing: false,
       subtitles: result.subtitles ?? [],
     } : prev);
+  };
+
+  const handleSubmitRoomSubtitle = async (input: { file?: File; url?: string }) => {
+    if (!roomId) return;
+    try {
+      const result = await submitRoomSubtitle(roomId, input);
+      setCustomSubtitleTracks(result.subtitles ?? []);
+      setCurrentSubtitleUrl(result.subtitle_url ?? null);
+      setRoomState((prev) => prev
+        ? {
+          ...prev,
+          subtitles: result.subtitles ?? [],
+          currently_playing_subtitles: result.subtitle_url ?? null,
+        }
+        : prev,
+      );
+    } catch (error) {
+      throw new Error(getRoomApiErrorMessage(error, "ثبت زیرنویس انجام نشد."));
+    }
   };
 
   const handleCopyInviteCode = async () => {
@@ -2630,6 +2672,7 @@ const RoomPage = () => {
                 customSubtitleTracks={customSubtitleTracks}
                 subtitleSettings={subtitleSettings}
                 onSubtitleSettingsChange={setSubtitleSettings}
+                onSubmitSubtitle={handleSubmitRoomSubtitle}
                 isPlaying={isPlaying}
                 currentTime={currentTime}
                 className='flex-1! h-full! mb-0 mt-auto ml-auto mr-auto'

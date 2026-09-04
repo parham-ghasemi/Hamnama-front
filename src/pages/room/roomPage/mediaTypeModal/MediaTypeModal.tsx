@@ -45,11 +45,54 @@ const MediaTypeModal = ({
     setUploadProgress(0);
   };
 
+  const validateVideoFile = async (file: File): Promise<string | null> => {
+    const ext = file.name.toLowerCase().match(/\.[^.]+$/)?.[0] ?? "";
+    const allowed = new Set([".mp4", ".webm", ".mov", ".m4v", ".mkv", ".avi", ".mpeg", ".mpg", ".ogv"]);
+    if (!allowed.has(ext)) return "فایل ویدیو باید یکی از فرمت‌های MP4، MKV، WebM، MOV، M4V، AVI، MPEG، MPG یا OGV باشد.";
+    if (file.size > 2 * 1024 * 1024 * 1024) return "حجم ویدیو نمی‌تواند بیشتر از ۲ گیگابایت باشد.";
+
+    const bytes = new Uint8Array(await file.slice(0, 4096).arrayBuffer());
+    const ascii = (from: number, length: number) => String.fromCharCode(...bytes.slice(from, from + length));
+    const hasFtyp = bytes.length >= 8 && ascii(4, 4) === "ftyp";
+    const isEbml = bytes.length >= 4 && bytes[0] === 0x1a && bytes[1] === 0x45 && bytes[2] === 0xdf && bytes[3] === 0xa3;
+    const isAvi = bytes.length >= 12 && ascii(0, 4) === "RIFF" && ascii(8, 4) === "AVI ";
+    const isOgg = bytes.length >= 4 && ascii(0, 4) === "OggS";
+    let isMpeg = false;
+    for (let i = 0; i + 4 <= Math.min(bytes.length, 512); i += 1) {
+      if (bytes[i] === 0 && bytes[i + 1] === 0 && bytes[i + 2] === 1 && [0xba, 0xbb, 0xb3].includes(bytes[i + 3])) {
+        isMpeg = true;
+        break;
+      }
+    }
+    const valid = (ext === ".mkv" || ext === ".webm") ? isEbml
+      : ext === ".avi" ? isAvi
+        : ext === ".ogv" ? isOgg
+          : (ext === ".mpeg" || ext === ".mpg") ? isMpeg
+            : hasFtyp;
+    return valid ? null : "محتوای فایل با فرمت ویدیو مطابقت ندارد.";
+  };
+
+  const validateSubtitleFile = async (file: File): Promise<string | null> => {
+    if (!/\.srt$/i.test(file.name)) return "زیرنویس فقط باید با فرمت SRT باشد.";
+    if (file.size > 5 * 1024 * 1024) return "حجم زیرنویس نمی‌تواند بیشتر از ۵ مگابایت باشد.";
+    const text = await file.text();
+    if (!/^\s*(?:\d+\s*\n)?\s*\d{1,2}:\d{2}:\d{2}[,.]\d{3}\s*-->\s*\d{1,2}:\d{2}:\d{2}[,.]\d{3}/m.test(text)) {
+      return "محتوای فایل یک SRT معتبر نیست.";
+    }
+    return null;
+  };
+
   const handleSubmit = async () => {
     if (!videoFile || uploading) return;
     setUploading(true);
     setUploadError(null);
     try {
+      const videoError = await validateVideoFile(videoFile);
+      if (videoError) throw new Error(videoError);
+      if (subtitleFile) {
+        const subtitleError = await validateSubtitleFile(subtitleFile);
+        if (subtitleError) throw new Error(subtitleError);
+      }
       setUploadProgress(0);
       await onSubmitUpload(videoFile, subtitleFile, setUploadProgress);
       resetUpload();
@@ -142,7 +185,7 @@ const MediaTypeModal = ({
               <span>فایل ویدیو <b>*</b></span>
               <input
                 type="file"
-                accept="video/*,.mp4,.webm,.mov,.m4v,.mkv,.avi,.mpeg,.mpg,.ogv"
+                accept=".mp4,.webm,.mov,.m4v,.mkv,.avi,.mpeg,.mpg,.ogv,video/mp4,video/webm,video/quicktime"
                 onChange={(event) => setVideoFile(event.target.files?.[0] ?? null)}
                 disabled={uploading}
               />
