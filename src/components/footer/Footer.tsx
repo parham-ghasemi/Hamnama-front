@@ -13,7 +13,7 @@ const LINKS = [
 // TODO: replace '#' with the real profile URLs.
 const SOCIALS = [
   { href: '#', label: 'اینستاگرام', icon: <PiInstagramLogoFill /> },
-  { href: '#', label: 'تلگرام', icon: <PiTelegramLogoFill /> },
+  { href: 'https://t.me/poshtiban_hamnama', label: 'تلگرام', icon: <PiTelegramLogoFill /> },
   { href: '#', label: 'جیمیل', icon: <SiGmail /> },
 ];
 
