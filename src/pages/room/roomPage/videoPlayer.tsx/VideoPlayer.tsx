@@ -548,18 +548,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       Math.abs(touch.clientX - lastTouch.x) < 80;
 
     if (isDoubleTap) {
-      const rect =
-        containerRef.current?.getBoundingClientRect();
-
-      if (rect) {
-        handleSeekBy(
-          touch.clientX - rect.left <
-            rect.width / 2
-            ? -10
-            : 10
-        );
-      }
-
+      void toggleFullscreen();
       lastTouchRef.current = null;
       return;
     }
@@ -820,6 +809,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       dir="ltr"
       aria-label="پخش‌کننده ویدیو"
       onTouchEnd={handleTouchEnd}
+      onDoubleClick={() => void toggleFullscreen()}
       onMouseMove={handleMouseMove}
       onMouseLeave={() =>
         playing && setShowControls(false)
@@ -1186,7 +1176,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 </b>
               </span>
               <span>
-                ۱۰ ثانیه عقب / جلو در موبایل
+                تمام‌صفحه با دو ضربه
               </span>
             </div>
           </motion.div>
