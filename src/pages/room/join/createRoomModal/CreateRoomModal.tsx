@@ -76,7 +76,7 @@ const CreateRoomModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => 
               value={name}
               maxLength={120}
               onChange={(event) => setName(event.target.value)}
-              placeholder={isPublic ? 'مثلاً فیلم شب جمعه' : 'نام اختیاری برای اتاق'}
+              placeholder={isPublic ? 'مثلاً فیلم کمدی' : 'نام اختیاری برای اتاق'}
             />
           </div>
 
