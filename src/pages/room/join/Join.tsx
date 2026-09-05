@@ -305,13 +305,14 @@ const Join = () => {
                     <article key={room.id} className="join-page__public-room-card">
                       <div className="join-page__public-room-card__title-row">
                         <h3>{room.name}</h3>
-                        <span><PiUsersThreeFill /></span>
                       </div>
                       <div className="join-page__public-room-card__image">
                         {room.image ? (
                           <img src={`${import.meta.env.VITE_BASE_URL ?? ""}${room.image}`} alt="" />
                         ) : (
-                          <PiImageSquareFill aria-hidden="true" />
+                          <span className="join-page__public-room-card__image__placeholder" aria-hidden="true">
+                            <PiImageSquareFill />
+                          </span>
                         )}
                       </div>
                       <div className="join-page__public-room-card__code">

@@ -875,7 +875,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           setIsVideoBuffering(false);
           updateBufferedRanges();
         }}
-        className="w-full h-full object-contain cursor-pointer focus:outline-none"
+        className={`w-full h-full object-contain ${canControlMedia ? "cursor-pointer" : "cursor-default"} focus:outline-none`}
       />
 
       {/* Video loading spinner */}
@@ -1740,7 +1740,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                     handleSeekBy(-10)
                   }
                   title="Rewind 10s"
-                  className="rounded-full p-1.5 text-gray-200 transition-colors hover:bg-white/20 hover:text-white"
+                  className="rounded-full p-1.5 text-gray-200 transition-colors hover:bg-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
                 >
                   <RotateCcw className="h-4 w-4" />
                 </button>
@@ -1751,7 +1751,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   title={
                     playing ? "Pause" : "Play"
                   }
-                  className="rounded-full bg-[#d04e2f]/15 p-2 text-[#d04e2f] backdrop-blur-sm transition-all hover:bg-[#d04e2f]/25"
+                  className="rounded-full bg-[#d04e2f]/15 p-2 text-[#d04e2f] backdrop-blur-sm transition-all hover:bg-[#d04e2f]/25 disabled:cursor-not-allowed disabled:opacity-35"
                 >
                   {playing ? (
                     <Pause className="h-5 w-5 fill-white text-white max-[420px]:h-3 max-[420px]:w-3" />
@@ -1766,7 +1766,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                     handleSeekBy(10)
                   }
                   title="Fast Forward 10s"
-                  className="hidden rounded-full p-1.5 text-gray-200 transition-colors hover:bg-white/20 hover:text-white sm:block"
+                  className="hidden rounded-full p-1.5 text-gray-200 transition-colors hover:bg-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 sm:block"
                 >
                   <RotateCw className="h-4 w-4" />
                 </button>
@@ -1903,7 +1903,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                       ? "Exit Fullscreen"
                       : "Fullscreen"
                   }
-                  className="rounded-full p-1.5 text-gray-200 transition-colors hover:bg-white/20 hover:text-white"
+                  className="rounded-full p-1.5 text-gray-200 transition-colors hover:bg-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
                 >
                   {isFullscreen ? (
                     <Minimize className="h-4 w-4" />

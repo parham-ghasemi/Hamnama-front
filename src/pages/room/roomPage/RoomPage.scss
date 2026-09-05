@@ -3,6 +3,11 @@
 @use "../../../styles/abstracts/variables.light" as light;
 @use "sass:color";
 
+// .room-page button:disabled {
+//   cursor: not-allowed !important;
+//   opacity: 0.35 !important;
+// }
+
 .room-page {
   &--loading {
     position: relative;
@@ -1514,12 +1519,21 @@
         font-size: 17px;
 
         &:disabled {
-          cursor: not-allowed;
-          opacity: 0.45;
+          cursor: not-allowed !important;
+          opacity: 0.45 !important;
 
           &:hover {
-            transform: none;
+            transform: none !important;
           }
+        }
+      }
+
+      > button:disabled {
+        cursor: not-allowed !important;
+        opacity: 0.45 !important;
+
+        &:hover {
+          transform: none !important;
         }
       }
 
