@@ -948,8 +948,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           >
             <span
               className={`max-w-[92%] whitespace-pre-line rounded-md text-center text-white shadow-lg [text-shadow:0_2px_3px_rgba(0,0,0,0.9)] ${isCompactPlayerHeight
-                  ? "px-2 py-0.5 text-xs leading-snug"
-                  : "px-3 py-1.5 leading-relaxed"
+                ? "px-2 py-0.5 text-xs leading-snug"
+                : "px-3 py-1.5 leading-relaxed"
                 }`}
               style={{
                 fontSize: isCompactPlayerHeight
@@ -1577,7 +1577,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                             </div>
 
                             <div className="mt-3 grid grid-cols-5 gap-1">
-                              {[-1000, -500, 0, 500, 1000].map(
+                              {[1000, 500, 0, -500, -1000].map(
                                 (value) => (
                                   <button
                                     key={value}
