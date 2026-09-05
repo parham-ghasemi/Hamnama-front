@@ -22,7 +22,7 @@ import { FaTelegramPlane } from 'react-icons/fa';
 /** Contact details of the website owner. Swap with the real values. */
 const contact = {
   email: 'info@hamnama.net',
-  telegram: 'https://t.me/hamnama',
+  telegram: 'https://t.me/poshtiban_hamnama',
 };
 
 /** The developer behind هم‌نما. */

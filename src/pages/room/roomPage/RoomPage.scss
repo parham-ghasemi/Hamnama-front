@@ -9,6 +9,19 @@
 // }
 
 .room-page {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent !important;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--scrollbar-thumb) !important;
+      border-radius: 10px;
+    }
+  }
+
   &--loading {
     position: relative;
     align-items: center;

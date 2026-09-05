@@ -187,7 +187,7 @@ const SettingsModal = ({
         <div className="room-settings-modal__body__row">
           <h5>حالت پس زمینه</h5>
           <div className="room-settings-modal__body__row__items room-settings-modal__body__row__items--3">
-            <button type="button" className={clsx("room-settings-modal__body__row__items__item", theme === "dark" && "active")} onClick={() => handleThemeSelect("dark")}><BsMoonFill /><span>تیره</span></button>
+            <button type="button" className={clsx("room-settings-modal__body__row__items__item", theme === "monochrome" && "active")} onClick={() => handleThemeSelect("monochrome")}><BsMoonFill /><span>تک‌رنگ</span></button>
             <button type="button" className={clsx("room-settings-modal__body__row__items__item", theme === "default" && "active")} onClick={() => handleThemeSelect("default")}><AiTwotoneThunderbolt /><span>پیش فرض</span></button>
             <button type="button" className={clsx("room-settings-modal__body__row__items__item", theme === "light" && "active")} onClick={() => handleThemeSelect("light")}><IoSunnySharp /><span>روشن</span></button>
           </div>

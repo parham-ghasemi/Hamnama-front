@@ -40,7 +40,7 @@
   --border-main-input: rgba(232, 228, 223, 0.22);
   --icon-color: #9a9590;
   --icon-sidebar: #c4bfb8;
-  --scrollbar-thumb: rgba(255, 255, 255, 0.22);
+  --scrollbar-thumb: rgba(208, 78, 47, 0.45);
   --modal-overlay-bg: rgba(0, 0, 0, 0.72);
 
   /* Accent (orange) */
@@ -237,109 +237,172 @@
   --arc-btn-select-hover: #a83a22;
 }
 
-/* ================== Dark THEME ================== */
-.room-page[data-theme="dark"] {
-  --bg-main: linear-gradient(160deg, #080807 0%, #11100e 50%, #0a0908 100%);
-  --text-primary: #f0ebe4;
-  --text-muted: rgba(240, 235, 228, 0.42);
+/* ================== Monochrome THEME ================== */
+.room-page[data-theme="monochrome"] {
+  --bg-main: linear-gradient(160deg, #090909 0%, #151515 50%, #0b0b0b 100%);
+  --text-primary: #f2f2f2;
+  --text-muted: rgba(242, 242, 242, 0.42);
   --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-input: #2e2b28;
-  --border-main-input: rgba(240, 235, 228, 0.18);
-  --icon-color: #8a8580;
-  --icon-sidebar: #b8b2aa;
+  --border-input: #2f2f2f;
+  --border-main-input: rgba(242, 242, 242, 0.18);
+  --icon-color: #8d8d8d;
+  --icon-sidebar: #b9b9b9;
   --scrollbar-thumb: rgba(255, 255, 255, 0.2);
-  --modal-overlay-bg: rgba(0, 0, 0, 0.78);
+  --modal-overlay-bg: rgba(0, 0, 0, 0.8);
 
-  --accent: #d04e2f;
-  --accent-hover: #e06a45;
-  --accent-soft: rgba(208, 78, 47, 0.16);
-  --accent-glow: rgba(208, 78, 47, 0.3);
+  --accent: #bdbdbd;
+  --accent-hover: #d2d2d2;
+  --accent-soft: rgba(189, 189, 189, 0.16);
+  --accent-glow: rgba(189, 189, 189, 0.3);
 
-  --chat-container-bg: #12110f;
+  --chat-container-bg: #121212;
   --component-bg:
     linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.05) 0%,
-      rgba(12, 11, 10, 0.5) 100%
+      rgba(10, 10, 10, 0.5) 100%
     ),
-    rgba(18, 16, 14, 0.7);
+    rgba(18, 18, 18, 0.7);
   --msg-in-bg:
     linear-gradient(
       -104deg,
       rgba(255, 255, 255, 0.12) 0%,
-      rgba(80, 70, 60, 0.2) 100%
+      rgba(90, 90, 90, 0.2) 100%
     ),
     rgba(255, 255, 255, 0.06);
   --msg-out-bg: rgba(255, 255, 255, 0.09);
-  --msg-reply-bg: rgba(160, 140, 120, 0.15);
-  --chat-foot-bg: rgba(200, 180, 160, 0.04);
-  --send-btn-bg: #d04e2f;
-  --send-input-bg: rgba(28, 24, 20, 0.7);
-  --btn-submit-bg: linear-gradient(230deg, #d04e2f 0%, #a33a22 100%);
-  --sidebar-btn-bg: rgba(120, 110, 100, 0.22);
-  --sidebar-btn-hover: rgba(120, 110, 100, 0.38);
+  --msg-reply-bg: rgba(160, 160, 160, 0.15);
+  --chat-foot-bg: rgba(200, 200, 200, 0.04);
+  --send-btn-bg: #bdbdbd;
+  --send-input-bg: rgba(28, 28, 28, 0.7);
+  --btn-submit-bg: linear-gradient(230deg, #c8c8c8 0%, #868686 100%);
+  --sidebar-btn-bg: rgba(120, 120, 120, 0.22);
+  --sidebar-btn-hover: rgba(120, 120, 120, 0.38);
 
-  --modal-bg: rgba(16, 14, 12, 0.95);
-  --modal-text: #f0ebe4;
-  --modal-head-bg: linear-gradient(135deg, #1e1814 0%, #12100e 100%);
-  --modal-body-bg: rgba(14, 12, 10, 0.9);
+  --modal-bg: rgba(16, 16, 16, 0.95);
+  --modal-text: #f2f2f2;
+  --modal-head-bg: linear-gradient(135deg, #252525 0%, #121212 100%);
+  --modal-body-bg: rgba(14, 14, 14, 0.9);
   --user-card-bg: rgba(255, 255, 255, 0.035);
-  --role-trigger-bg: #22201c;
-  --role-trigger-current-bg: rgba(208, 78, 47, 0.2);
-  --role-icon-bg: #2e2218;
+  --role-trigger-bg: #232323;
+  --role-trigger-current-bg: rgba(189, 189, 189, 0.2);
+  --role-icon-bg: #3a3a3a;
 
-  --set-row-border: #d04e2f;
+  --set-row-border: #bdbdbd;
   --set-item-bg: rgba(255, 255, 255, 0.04);
-  --set-item-active-bg: rgba(208, 78, 47, 0.2);
-  --set-item-active-border: #d04e2f;
-  --set-item-1: rgba(208, 78, 47, 0.14);
+  --set-item-active-bg: rgba(189, 189, 189, 0.2);
+  --set-item-active-border: #bdbdbd;
+  --set-item-1: rgba(189, 189, 189, 0.14);
   --set-item-2: rgba(255, 255, 255, 0.05);
   --set-item-3: rgba(255, 255, 255, 0.04);
   --set-item-4: rgba(255, 255, 255, 0.04);
   --set-item-5: rgba(255, 255, 255, 0.04);
 
-  --media-head-bg: linear-gradient(135deg, #1e1814 0%, #12100e 100%);
+  --media-head-bg: linear-gradient(135deg, #252525 0%, #121212 100%);
   --media-card-bg: rgba(255, 255, 255, 0.04);
   --media-shadow: rgba(0, 0, 0, 0.5);
-  --media-grad-1: linear-gradient(135deg, #d04e2f 0%, #e08a3c 100%);
-  --media-grad-2: linear-gradient(135deg, #c45a2a 0%, #8a3a1a 100%);
-  --media-grad-3: linear-gradient(135deg, #e0a340 0%, #d04e2f 100%);
+  --media-grad-1: linear-gradient(135deg, #c8c8c8 0%, #8f8f8f 100%);
+  --media-grad-2: linear-gradient(135deg, #999999 0%, #5e5e5e 100%);
+  --media-grad-3: linear-gradient(135deg, #d2d2d2 0%, #a0a0a0 100%);
 
-  --arc-bg: #0e0d0b;
+  --arc-bg: #0e0e0e;
   --arc-border: rgba(255, 255, 255, 0.06);
   --arc-shadow: rgba(0, 0, 0, 0.6);
-  --arc-head-bg: linear-gradient(135deg, #1e1814 0%, #12100e 100%);
-  --arc-accent: #d04e2f;
+  --arc-head-bg: linear-gradient(135deg, #252525 0%, #121212 100%);
+  --arc-accent: #bdbdbd;
   --arc-btn-close: rgba(255, 255, 255, 0.07);
   --arc-btn-close-hover: rgba(255, 255, 255, 0.14);
   --arc-scrollbar: rgba(255, 255, 255, 0.12);
-  --arc-text-icon: #9a9288;
+  --arc-text-icon: #9a9a9a;
   --arc-input-bg: rgba(255, 255, 255, 0.035);
   --arc-input-border: rgba(255, 255, 255, 0.09);
-  --arc-input-border-focus: #d04e2f;
-  --arc-text-placeholder: #6e665c;
+  --arc-input-border-focus: #bdbdbd;
+  --arc-text-placeholder: #6e6e6e;
   --arc-card-bg: rgba(255, 255, 255, 0.03);
   --arc-card-border: rgba(255, 255, 255, 0.05);
-  --arc-card-hover-border: rgba(208, 78, 47, 0.4);
-  --arc-poster-fallback: #1a1612;
+  --arc-card-hover-border: rgba(189, 189, 189, 0.4);
+  --arc-poster-fallback: #1a1a1a;
   --arc-rating-bg: rgba(0, 0, 0, 0.75);
-  --arc-rating-text: #e0a340;
-  --arc-type-text: #9a9288;
-  --arc-badge-type-bg: rgba(208, 78, 47, 0.14);
-  --arc-badge-rating-bg: rgba(224, 163, 64, 0.14);
-  --arc-votes-text: #7a7268;
+  --arc-rating-text: #c9c9c9;
+  --arc-type-text: #9a9a9a;
+  --arc-badge-type-bg: rgba(189, 189, 189, 0.14);
+  --arc-badge-rating-bg: rgba(201, 201, 201, 0.14);
+  --arc-votes-text: #7a7a7a;
   --arc-tag-bg: rgba(255, 255, 255, 0.05);
-  --arc-tag-text: #c8bfb4;
-  --arc-desc-text: #aea49a;
+  --arc-tag-text: #c8c8c8;
+  --arc-desc-text: #aeaeae;
   --arc-version-bg: rgba(255, 255, 255, 0.03);
   --arc-version-border: rgba(255, 255, 255, 0.06);
-  --arc-badge-season-bg: #2e2218;
-  --arc-badge-season-text: #e0b080;
-  --arc-badge-qual-bg: #18222e;
-  --arc-badge-qual-text: #80b0d0;
-  --arc-badge-sub-bg: #182e22;
-  --arc-badge-sub-text: #80d0a8;
-  --arc-btn-select-bg: #d04e2f;
-  --arc-btn-select-text: #0e0d0b;
-  --arc-btn-select-hover: #e06a45;
+  --arc-badge-season-bg: #333333;
+  --arc-badge-season-text: #d0d0d0;
+  --arc-badge-qual-bg: #292929;
+  --arc-badge-qual-text: #b9b9b9;
+  --arc-badge-sub-bg: #353535;
+  --arc-badge-sub-text: #c6c6c6;
+  --arc-btn-select-bg: #bdbdbd;
+  --arc-btn-select-text: #0e0e0e;
+  --arc-btn-select-hover: #d2d2d2;
+}
+
+/* Monochrome overrides for legacy component-local status/error colors. */
+.room-page[data-theme="monochrome"] {
+  .room-users-modal__head__stats i,
+  .room-users-modal__body__card__identity__avatar__dot,
+  .room-users-modal__body__card__identity__avatar__dot.online,
+  .room-users-modal__status.good,
+  .room-users-modal__status.medium,
+  .room-users-modal__status.bad,
+  .room-users-modal__body__card__kick,
+  .room-users-modal__body__card__kick:hover:not(:disabled),
+  .room-users-modal__admin-badge {
+    color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+  }
+
+  .room-users-modal__head__stats i,
+  .room-users-modal__body__card__identity__avatar__dot,
+  .room-users-modal__body__card__identity__avatar__dot.online {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+
+  .room-users-modal__body__card__identity__avatar__dot,
+  .room-users-modal__body__card__identity__avatar__dot.online {
+    background: var(--accent);
+  }
+
+  .invite-modal__code-row button.is-copied,
+  .archive-card__rating,
+  .archive-pill--rating,
+  .archive-card__favorite.is-favorite {
+    color: var(--accent);
+  }
+
+  .invite-modal__code-row button.is-copied {
+    background: color-mix(in srgb, var(--accent) 72%, transparent);
+  }
+
+  .media-type-modal__upload-error,
+  .room-settings-modal__validation {
+    color: var(--accent);
+  }
+
+  .room-page__connection-lost {
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--border-subtle));
+  }
+
+  .text-red-300,
+  .text-red-400,
+  .border-red-400\/20,
+  .bg-yellow-400,
+  .bg-red-400 {
+    color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 20%, transparent);
+    background-color: var(--accent);
+  }
+
+  .text-red-300,
+  .text-red-400 {
+    background-color: transparent;
+  }
 }

@@ -77,6 +77,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [internalCurrentTime, setInternalCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
+  const lastVolumeRef = useRef(1);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isPip, setIsPip] = useState(false);
@@ -261,6 +262,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
     setVolume(val);
 
+    if (val > 0) {
+      lastVolumeRef.current = val;
+    }
+
     if (videoRef.current) {
       videoRef.current.volume = val;
       videoRef.current.muted = val === 0;
@@ -280,7 +285,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (nextMuted) {
       videoRef.current.volume = 0;
     } else {
-      videoRef.current.volume = volume || 1;
+      const restoredVolume = lastVolumeRef.current > 0 ? lastVolumeRef.current : 1;
+      setVolume(restoredVolume);
+      videoRef.current.volume = restoredVolume;
     }
   };
 
@@ -990,7 +997,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             }
             className="absolute bottom-20 left-1/2 z-30 -translate-x-1/2 rounded-full border border-white/10 bg-black/45 px-3 py-1.5 text-xs text-white/80 shadow-xl backdrop-blur-md"
           >
-            <span className="mr-2 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#d04e2f] align-middle" />
+            <span className="mr-2 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-(--accent) align-middle" />
             در حال دریافت زیرنویس…
           </motion.div>
         )}
@@ -1070,7 +1077,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             onClick={togglePlay}
             className={`absolute inset-0 m-auto w-16 h-16 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center z-10 max-[410px]:w-10 max-[410px]:h-10 ${canControlMedia ? "cursor-pointer hover:scale-110 transition-transform pointer-events-auto" : "cursor-not-allowed opacity-70"}`}
           >
-            <Play className="w-8 h-8 fill-[#d04e2f] text-[#d04e2f] max-[410px]:w-4 max-[410px]:h-4" />
+            <Play className="w-8 h-8 fill-(--accent) text-(--accent) max-[410px]:w-4 max-[410px]:h-4" />
           </motion.div>
         )}
       </AnimatePresence>
@@ -1223,7 +1230,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-3">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <FaRegClosedCaptioning className="h-4 w-4 shrink-0 text-[#d04e2f]" />
+                        <FaRegClosedCaptioning className="h-4 w-4 shrink-0 text-(--accent)" />
 
                         <strong className="truncate text-sm sm:text-base">
                           تنظیمات زیرنویس
@@ -1289,7 +1296,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                           }
                           onClick={toggleSubtitles}
                           className={`relative h-7 w-12 shrink-0 rounded-full p-1 transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${activeSubtitle >= 0
-                            ? "bg-[#d04e2f]"
+                            ? "bg-(--accent)"
                             : "bg-white/15 hover:bg-white/20"
                             }`}
                         >
@@ -1362,7 +1369,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                           type="button"
                           onClick={() => void handleSubmitRoomSubtitle()}
                           disabled={subtitleSubmitting || (!subtitleFile && !subtitleSourceUrl.trim())}
-                          className="mt-3 w-full rounded-lg bg-[#d04e2f] px-3 py-2.5 text-xs font-semibold text-white transition hover:bg-[#bb4328] disabled:cursor-not-allowed disabled:opacity-40"
+                          className="mt-3 w-full rounded-lg bg-(--accent) px-3 py-2.5 text-xs font-semibold text-black transition hover:bg-(--accent-hover) disabled:cursor-not-allowed disabled:opacity-40"
                         >
                           {subtitleSubmitting ? "در حال دریافت و پردازش…" : "ثبت و جایگزینی زیرنویس"}
                         </button>
@@ -1396,7 +1403,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                     Number(event.target.value)
                                   )
                                 }
-                                className="mt-2 w-full accent-[#d04e2f]"
+                                className="mt-2 w-full accent-(--accent)"
                               />
                             </label>
 
@@ -1423,7 +1430,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                     Number(event.target.value)
                                   )
                                 }
-                                className="mt-2 w-full accent-[#d04e2f]"
+                                className="mt-2 w-full accent-(--accent)"
                               />
                             </label>
 
@@ -1452,7 +1459,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                     Number(event.target.value)
                                   )
                                 }
-                                className="mt-2 w-full accent-[#d04e2f]"
+                                className="mt-2 w-full accent-(--accent)"
                               />
                             </label>
                           </div>
@@ -1691,7 +1698,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute left-0 top-1/2 h-1 -translate-y-1/2 rounded-lg bg-[#d04e2f]"
+                className="pointer-events-none absolute left-0 top-1/2 h-1 -translate-y-1/2 rounded-lg bg-(--accent)"
                 style={{
                   width: `${playedPercent}%`,
                 }}
@@ -1728,7 +1735,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       [&::-webkit-slider-thumb]:appearance-none
       [&::-webkit-slider-thumb]:rounded-full
       [&::-webkit-slider-thumb]:border-0
-      [&::-webkit-slider-thumb]:bg-[#d04e2f]
+      [&::-webkit-slider-thumb]:bg-(--accent)
       [&::-webkit-slider-thumb]:shadow-[0_0_0_2px_rgba(0,0,0,0.15)]
       [&::-webkit-slider-thumb]:transition-transform
       [&::-webkit-slider-thumb]:duration-150
@@ -1742,7 +1749,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       [&::-moz-range-thumb]:w-3
       [&::-moz-range-thumb]:rounded-full
       [&::-moz-range-thumb]:border-0
-      [&::-moz-range-thumb]:bg-[#d04e2f]
+      [&::-moz-range-thumb]:bg-(--accent)
       [&::-moz-range-thumb]:transition-transform
       [&::-moz-range-thumb]:duration-150
       group-hover/scrubber:[&::-moz-range-thumb]:scale-[1.01]
@@ -1769,12 +1776,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   title={
                     playing ? "Pause" : "Play"
                   }
-                  className="rounded-full bg-[#d04e2f]/15 p-2 text-[#d04e2f] backdrop-blur-sm transition-all hover:bg-[#d04e2f]/25 disabled:cursor-not-allowed disabled:opacity-35"
+                  className="rounded-full bg-(--accent)/15 p-2 text-(--accent) backdrop-blur-sm transition-all hover:bg-(--accent)/25 disabled:cursor-not-allowed disabled:opacity-35"
                 >
                   {playing ? (
                     <Pause className="h-5 w-5 fill-white text-white max-[420px]:h-3 max-[420px]:w-3" />
                   ) : (
-                    <Play className="h-5 w-5 fill-[#d04e2f] text-[#d04e2f] max-[420px]:h-3 max-[420px]:w-3" />
+                    <Play className="h-5 w-5 fill-(--accent) text-(--accent) max-[420px]:h-3 max-[420px]:w-3" />
                   )}
                 </button>
 
@@ -1808,7 +1815,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   >
                     {isMuted ||
                       volume === 0 ? (
-                      <VolumeX className="h-4 w-4 text-[#d04e2f]" />
+                      <VolumeX className="h-4 w-4 text-(--accent)" />
                     ) : volume < 0.5 ? (
                       <Volume1 className="h-4 w-4" />
                     ) : (
@@ -1828,14 +1835,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                     aria-label="Volume"
                     className="h-1.5 w-0 max-w-20 cursor-pointer appearance-none overflow-hidden rounded-full opacity-0 transition-[width,opacity] duration-200 focus:outline-none group-hover/volume:w-20 group-hover/volume:opacity-100 max-[520px]:group-hover/volume:w-14"
                     style={{
-                      background: `linear-gradient(to right, #d04e2f 0%, #d04e2f ${Math.round(
+                      background: `linear-gradient(to right, var(--accent) 0%, var(--accent) ${Math.round(
                         (isMuted ? 0 : volume) *
                         100
                       )}%, rgba(255,255,255,.22) ${Math.round(
                         (isMuted ? 0 : volume) *
                         100
                       )}%, rgba(255,255,255,.22) 100%)`,
-                      accentColor: "#d04e2f",
+                      accentColor: "var(--accent)",
                     }}
                   />
                 </div>
@@ -1894,7 +1901,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   {activeSubtitle >= 0 &&
                     subtitleStatus ===
                     "ready" && (
-                      <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-[#d04e2f]" />
+                      <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-(--accent)" />
                     )}
 
                   {subtitleStatus ===
