@@ -164,7 +164,6 @@
   min-width: 0;
   padding: 17px;
   border-radius: 16px;
-  overflow: hidden;
 }
 
 .admin-archive__operation--featured {
@@ -175,13 +174,6 @@
       transparent 34%
     ),
     var(--archive-surface);
-}
-
-.admin-archive__operation-accent {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 3px;
-  background: var(--archive-primary);
 }
 
 .admin-archive__operation-head,
@@ -281,6 +273,16 @@
   padding: 9px 10px;
   border-radius: 9px;
   font-size: 11px;
+}
+
+.admin-archive__scraper-dropdown {
+  width: 155px;
+  flex: 0 0 155px;
+}
+
+.admin-archive__scraper-dropdown .admin-archive-dropdown__trigger {
+  min-height: 37px;
+  border-radius: 9px;
 }
 
 .admin-archive__operation-form button,
@@ -1831,6 +1833,10 @@
     flex-direction: column;
     align-items: stretch;
   }
+  .admin-archive__scraper-dropdown {
+    width: 100%;
+    flex-basis: auto;
+  }
   .admin-archive__operation-form button {
     width: 100%;
   }
@@ -2007,14 +2013,17 @@
   font-size: 13px;
 }
 
-.admin-archive__scrape-progress.is-completed .admin-archive__scrape-progress-head strong {
+.admin-archive__scrape-progress.is-completed
+  .admin-archive__scrape-progress-head
+  strong {
   color: var(--archive-green);
 }
 
-.admin-archive__scrape-progress.is-error .admin-archive__scrape-progress-head strong {
+.admin-archive__scrape-progress.is-error
+  .admin-archive__scrape-progress-head
+  strong {
   color: var(--archive-red);
 }
-
 
 .admin-archive__scrape-status-row {
   display: flex;
@@ -2022,7 +2031,8 @@
   gap: 8px;
   margin-top: 11px;
   padding: 10px 11px;
-  border: 1px solid color-mix(in srgb, var(--archive-primary) 16%, var(--archive-border));
+  border: 1px solid
+    color-mix(in srgb, var(--archive-primary) 16%, var(--archive-border));
   border-radius: 10px;
   background: color-mix(in srgb, var(--archive-primary) 5%, transparent);
   color: var(--archive-muted);
@@ -2035,5 +2045,9 @@
 }
 
 .admin-archive__scrape-progress.is-running {
-  border-color: color-mix(in srgb, var(--archive-primary) 18%, var(--archive-border));
+  border-color: color-mix(
+    in srgb,
+    var(--archive-primary) 18%,
+    var(--archive-border)
+  );
 }

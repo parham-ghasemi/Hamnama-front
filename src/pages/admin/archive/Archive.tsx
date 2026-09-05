@@ -25,6 +25,7 @@ import {
   type AdminArchiveItem,
   type AdminArchiveReport,
   type AdminArchiveReportGroup,
+  type ArchiveScraper,
   getScrapeProgressUrl,
 } from '../../../apiCalls/adminApi';
 import './Archive.scss';
@@ -154,6 +155,16 @@ const formTypeOptions: ArchiveDropdownOption<'movie' | 'series'>[] = [
 const jobLabel = (status: string) =>
   status === 'running' ? 'در حال اجرا' : status === 'completed' ? 'پایان یافته' : 'ناموفق';
 
+const scraperDefaultUrls: Record<ArchiveScraper, string> = {
+  old: 'https://dls6.aparatchi-dlcenter.top/DonyayeSerial/10_thous.html',
+  new: 'https://dls9.aparatchi-dlcenter.top/DonyayeSerial/movie4/2026/',
+};
+
+const scraperOptions: ArchiveDropdownOption<ArchiveScraper>[] = [
+  { value: 'old', label: 'اسکرپر قدیمی' },
+  { value: 'new', label: 'اسکرپر جدید' },
+];
+
 const reportTypeLabel: Record<string, string> = {
   broken_file: 'فایل پخش نمی‌شود',
   invalid_subtitle: 'زیرنویس نامعتبر است',
@@ -172,7 +183,8 @@ const Archive = () => {
   const [form, setForm] = useState<Form | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState('');
-  const [archiveUrl, setArchiveUrl] = useState('https://dls6.aparatchi-dlcenter.top/DonyayeSerial/10_thous.html');
+  const [scraper, setScraper] = useState<ArchiveScraper>('old');
+  const [archiveUrl, setArchiveUrl] = useState(scraperDefaultUrls.old);
   const [subtitleJobId, setSubtitleJobId] = useState<string | null>(null);
   const [reportGroupOpen, setReportGroupOpen] = useState<string | null>(null);
   const [showReports, setShowReports] = useState(false);
@@ -229,11 +241,11 @@ const Archive = () => {
             jobs: current.jobs.map((item) =>
               item.job_id === job.job_id
                 ? {
-                    ...item,
-                    status,
-                    error,
-                    finished_at: new Date().toISOString(),
-                  }
+                  ...item,
+                  status,
+                  error,
+                  finished_at: new Date().toISOString(),
+                }
                 : item,
             ),
           };
@@ -391,7 +403,7 @@ const Archive = () => {
   const startScrape = async () => {
     if (!archiveUrl.trim()) return;
     try {
-      const response = await adminApi.triggerArchiveScrape(archiveUrl.trim());
+      const response = await adminApi.triggerArchiveScrape(archiveUrl.trim(), scraper);
       const createdAt = new Date().toISOString();
       const newJob = {
         job_id: response.data.job_id,
@@ -406,7 +418,7 @@ const Archive = () => {
       toast.success('عملیات اسکرپ آغاز شد');
       setShowJobs(true);
       setArchiveUrl('');
-    } catch {
+    } catch (error) {
       const status = (error as { response?: { status?: number } })?.response?.status;
       toast.error(
         status === 409
@@ -482,7 +494,6 @@ const Archive = () => {
 
       <div className="admin-archive__overview-grid">
         <article className="admin-archive__operation admin-archive__operation--featured">
-          <div className="admin-archive__operation-accent" />
           <div className="admin-archive__operation-head">
             <div className="admin-archive__operation-icon"><FiZap /></div>
             <div>
@@ -492,6 +503,16 @@ const Archive = () => {
           </div>
           <p>آخرین اسنپ‌شات منبع را دریافت کن و وضعیت اجرای آن را در تاریخچه ببین.</p>
           <div className="admin-archive__operation-form">
+            <ArchiveDropdown
+              value={scraper}
+              options={scraperOptions}
+              onChange={(nextScraper) => {
+                setScraper(nextScraper);
+                setArchiveUrl(scraperDefaultUrls[nextScraper]);
+              }}
+              ariaLabel="نوع اسکرپر"
+              className="admin-archive__scraper-dropdown"
+            />
             <input value={archiveUrl} onChange={(event) => setArchiveUrl(event.target.value)} placeholder="https://example.com" dir="ltr" />
             <button type="button" onClick={() => void startScrape()} disabled={!archiveUrl.trim() || scrapeJobList.some((job) => job.status === 'running')}>شروع اسکرپ</button>
           </div>

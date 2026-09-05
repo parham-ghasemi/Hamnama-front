@@ -112,6 +112,8 @@ export interface AdminAnnouncementsResponse {
   announcements: AdminAnnouncement[];
 }
 
+export type ArchiveScraper = 'old' | 'new';
+
 export interface ArchiveJobResponse {
   job_id: string;
   status: string;
@@ -292,7 +294,8 @@ export const adminApi = {
   deleteAnnouncement: (id: string) =>
     api.delete<{ success: boolean }>(`/admin/announcements/${id}`),
 
-  triggerArchiveScrape: (url: string) => api.post<ArchiveJobResponse>('/admin/scrape', { url }),
+  triggerArchiveScrape: (url: string, scraper: ArchiveScraper = 'old') =>
+    api.post<ArchiveJobResponse>('/admin/scrape', { url, scraper }),
   getArchiveJobStatus: (id: string) => api.get<ArchiveJobStatusResponse>(`/admin/scrape/${id}`),
   getScrapeJobs: () => api.get<ScrapeJobsResponse>('/admin/scrape'),
 
