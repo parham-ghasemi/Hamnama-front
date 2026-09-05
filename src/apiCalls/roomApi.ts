@@ -38,6 +38,7 @@ export interface RoomMessageResponse {
 }
 
 export interface CreateRoomRequest {
+  name: string;
   is_public: boolean;
   media_control_permission: "admin" | "everyone";
 }
@@ -45,6 +46,14 @@ export interface CreateRoomRequest {
 export interface CreateRoomResponse {
   id: string;
   code: number;
+}
+
+export interface PublicRoomResponse {
+  id: string;
+  code: number;
+  name: string;
+  image?: string;
+  created_at: string;
 }
 
 export interface JoinRoomResponse {
@@ -95,6 +104,8 @@ export interface RoomResponse {
   created_by: string;
   created_by_name: string;
   created_by_avatar: string;
+  name: string;
+  image?: string;
   currently_playing?: string | null;
   currently_playing_media?: RoomArchiveMediaState | null;
   currently_playing_subtitles?: string | null;
@@ -111,6 +122,30 @@ export interface RoomResponse {
 export async function createRoom(request: CreateRoomRequest) {
   const { data } = await api.post<CreateRoomResponse>(`/rooms`, request);
   return data;
+}
+
+export async function listPublicRooms() {
+  const { data } = await api.get<{ rooms: PublicRoomResponse[] }>(`/rooms/public`);
+  return data.rooms ?? [];
+}
+
+export async function updateRoomSettings(
+  roomId: string,
+  request: { name: string; is_public: boolean; media_control_permission: "admin" | "everyone" },
+) {
+  const { data } = await api.patch<RoomResponse>(`/rooms/${roomId}/settings`, request);
+  return data;
+}
+
+export async function uploadRoomImage(roomId: string, image: File) {
+  const form = new FormData();
+  form.append("image", image);
+  const { data } = await api.post<{ image: string }>(`/rooms/${roomId}/image`, form);
+  return data;
+}
+
+export async function deleteRoomImage(roomId: string) {
+  await api.delete(`/rooms/${roomId}/image`);
 }
 
 export async function joinRoom(code: number) {

@@ -32,6 +32,9 @@ import {
   editRoomMessage,
   kickRoomMember,
   updateRoomMemberRole,
+  updateRoomSettings,
+  uploadRoomImage,
+  deleteRoomImage,
   type ConnectionStatus,
   type RoomMessageResponse,
   type RoomReactionResponse,
@@ -95,6 +98,8 @@ type ClientSocketEvent =
   | {
     type: "update_settings";
     payload: {
+      name?: string;
+      image?: string;
       is_public?: boolean;
       media_control_permission?: "admin" | "everyone";
     };
@@ -169,6 +174,8 @@ type ServerSocketEvent =
   | {
     type: "update_settings";
     payload: {
+      name?: string;
+      image?: string;
       is_public?: boolean;
       media_control_permission?: "admin" | "everyone";
     };
@@ -1723,6 +1730,8 @@ const RoomPage = () => {
             prev
               ? {
                 ...prev,
+                name: parsed.payload.name ?? prev.name,
+                image: parsed.payload.image ?? prev.image,
                 is_public: parsed.payload.is_public ?? prev.is_public,
                 media_control_permission:
                   parsed.payload.media_control_permission ?? prev.media_control_permission,
@@ -2117,6 +2126,7 @@ const RoomPage = () => {
 
   // The link is only handed to the player once the user submits it.
   const handleSubmitPlayback = () => {
+    if (!canControlMedia) return;
     const nextSrc = link.trim();
     if (!nextSrc) return;
 
@@ -2131,12 +2141,14 @@ const RoomPage = () => {
   };
 
   const handleChooseLinkMode = () => {
+    if (!canControlMedia) return;
     setSelectedMedia(null);
     setLinkModeEnabled(true);
     setMediaTypeModalOpen(false);
   };
 
   const handleArchiveSelect = async (media: SelectedArchiveMedia) => {
+    if (!canControlMedia) return;
     const subtitleUrl = archiveApi.getSubtitlesUrl(media.id, { season: media.season, episode: media.episode });
     let tracks: Awaited<ReturnType<typeof getSharedRoomSubtitles>> = [];
     try {
@@ -2162,6 +2174,7 @@ const RoomPage = () => {
   };
 
   const handleNextEpisode = async () => {
+    if (!canControlMedia) return;
     const nextEpisode = selectedMedia?.nextEpisode;
     if (!nextEpisode) return;
 
@@ -2188,7 +2201,7 @@ const RoomPage = () => {
   };
 
   const handleUploadOwnMedia = async (videoFile: File, subtitleFile: File | null, onProgress?: (percent: number) => void) => {
-    if (!roomId) return;
+    if (!roomId || !canControlMedia) return;
     const result = await uploadRoomMedia(roomId, videoFile, subtitleFile, onProgress);
     setSelectedMedia(null);
     setLinkModeEnabled(false);
@@ -2214,7 +2227,7 @@ const RoomPage = () => {
   };
 
   const handleSubmitRoomSubtitle = async (input: { file?: File; url?: string }) => {
-    if (!roomId) return;
+    if (!roomId || !canControlMedia) return;
     try {
       const result = await submitRoomSubtitle(roomId, input);
       setCustomSubtitleTracks(result.subtitles ?? []);
@@ -2446,6 +2459,42 @@ const RoomPage = () => {
   const isCurrentUserAdmin = isStealthAdmin || members.some(
     (member) => member.userId === user?.id && member.role === "admin",
   );
+  const isRoomCreator = !!user?.id && roomState.created_by === user.id;
+  const canControlMedia = isCurrentUserAdmin || roomState.media_control_permission === "everyone";
+
+  const handleSaveRoomSettings = async (settings: { name: string; isPublic: boolean; mediaControlPermission: "admin" | "everyone" }) => {
+    if (!roomId || !isRoomCreator) return;
+    try {
+      const updated = await updateRoomSettings(roomId, {
+        name: settings.name,
+        is_public: settings.isPublic,
+        media_control_permission: settings.mediaControlPermission,
+      });
+      setRoomState(updated);
+    } catch (error) {
+      throw new Error(getRoomApiErrorMessage(error, "ذخیره تنظیمات اتاق انجام نشد."));
+    }
+  };
+
+  const handleUploadRoomImage = async (file: File) => {
+    if (!roomId || !isRoomCreator) return;
+    try {
+      const result = await uploadRoomImage(roomId, file);
+      setRoomState((prev) => prev ? { ...prev, image: result.image } : prev);
+    } catch (error) {
+      throw new Error(getRoomApiErrorMessage(error, "تغییر تصویر اتاق انجام نشد."));
+    }
+  };
+
+  const handleDeleteRoomImage = async () => {
+    if (!roomId || !isRoomCreator) return;
+    try {
+      await deleteRoomImage(roomId);
+      setRoomState((prev) => prev ? { ...prev, image: "" } : prev);
+    } catch (error) {
+      throw new Error(getRoomApiErrorMessage(error, "حذف تصویر اتاق انجام نشد."));
+    }
+  };
 
   const handleChangeMemberRole = (targetUserId: string, role: "admin" | "member") => {
     if (!roomId) return;
@@ -2616,7 +2665,7 @@ const RoomPage = () => {
 
       <div className="room-page__main">
         <div className="room-page__main__top">
-          <button className="room-page__main__top__submit" onClick={handleSubmitPlayback} disabled={!linkModeEnabled || !link.trim()}>
+          <button className="room-page__main__top__submit" onClick={handleSubmitPlayback} disabled={!canControlMedia || !linkModeEnabled || !link.trim()}>
             ثبت
           </button>
 
@@ -2654,7 +2703,7 @@ const RoomPage = () => {
             />
           )}
 
-          <button className="room-page__main__top__choose" onClick={() => setMediaTypeModalOpen(true)}>
+          <button className="room-page__main__top__choose" disabled={!canControlMedia} onClick={() => canControlMedia && setMediaTypeModalOpen(true)}>
             انتخاب فیلم
           </button>
         </div>
@@ -2676,15 +2725,19 @@ const RoomPage = () => {
                 isPlaying={isPlaying}
                 currentTime={currentTime}
                 className='flex-1! h-full! mb-0 mt-auto ml-auto mr-auto'
+                canControlMedia={canControlMedia}
                 onPlayRequest={() => {
+                  if (!canControlMedia) return;
                   setIsPlaying(true);
                   emitPlayback("play", currentTime);
                 }}
                 onPauseRequest={() => {
+                  if (!canControlMedia) return;
                   setIsPlaying(false);
                   emitPlayback("pause", currentTime);
                 }}
                 onSeekRequest={(t) => {
+                  if (!canControlMedia) return;
                   setCurrentTime(t);
                   emitPlayback("seek", t);
                 }}
@@ -2736,7 +2789,7 @@ const RoomPage = () => {
                     موبایل: دو ضربه روی نیمه چپ یا راست = عقب/جلو ۱۰ ثانیه
                   </p>
                 </div>
-                <button type="button" onClick={() => setMediaTypeModalOpen(true)}>
+                <button type="button" disabled={!canControlMedia} onClick={() => canControlMedia && setMediaTypeModalOpen(true)}>
                   انتخاب منبع پخش
                 </button>
               </div>
@@ -2964,15 +3017,16 @@ const RoomPage = () => {
           <div className="room-page__modal-overlay__modal" onClick={(e) => e.stopPropagation()}>
             <SettingsModal
               isOpen={settingsModalOpen}
+              isCreator={isRoomCreator}
+              roomName={roomState.name}
+              roomImage={roomState.image}
               isPublic={roomState.is_public}
               mediaControlPermission={roomState.media_control_permission}
-              playbackTime={roomState.playback_time}
-              currentlyPlaying={roomState.currently_playing}
-              createdAt={roomState.created_at}
-              // subtitleSettings={subtitleSettings}
-              // onSubtitleSettingsChange={setSubtitleSettings}
               soundVolumes={roomSoundVolumes}
               onSoundVolumesChange={setRoomSoundVolumes}
+              onSaveRoomSettings={handleSaveRoomSettings}
+              onUploadRoomImage={handleUploadRoomImage}
+              onDeleteRoomImage={handleDeleteRoomImage}
             />
           </div>
         )}

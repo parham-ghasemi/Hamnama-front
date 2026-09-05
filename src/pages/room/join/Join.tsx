@@ -2,11 +2,11 @@ import { BsPlusLg } from 'react-icons/bs';
 import Header from '../../../components/header/Header';
 import './Join.scss';
 import { IoCopyOutline } from 'react-icons/io5';
-import { PiFilmSlateFill, PiUsersThreeFill, PiClockCounterClockwiseFill, PiPlayFill, PiTrashSimpleFill, PiSpinner } from 'react-icons/pi';
+import { PiFilmSlateFill, PiUsersThreeFill, PiClockCounterClockwiseFill, PiPlayFill, PiTrashSimpleFill, PiSpinner, PiImageSquareFill } from 'react-icons/pi';
 import CreateRoomModal from './createRoomModal/CreateRoomModal';
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { clearRoomData, getCurrentRoom, getLastActiveRoom, getRoomApiErrorStatus, joinRoom } from '../../../apiCalls/roomApi';
+import { clearRoomData, getCurrentRoom, getLastActiveRoom, getRoomApiErrorStatus, joinRoom, listPublicRooms, type PublicRoomResponse } from '../../../apiCalls/roomApi';
 import { useNavigate } from 'react-router-dom';
 // import { useAuth } from '../../../context/AuthContext';
 import { FaCheck } from 'react-icons/fa6';
@@ -37,6 +37,12 @@ const Join = () => {
       const status = getRoomApiErrorStatus(error);
       return status !== 404 && status !== 410 && failureCount < 2;
     },
+  });
+
+  const publicRoomsQuery = useQuery<PublicRoomResponse[]>({
+    queryKey: ["public-rooms"],
+    queryFn: listPublicRooms,
+    staleTime: 15_000,
   });
 
   const lastRoomQuery = useQuery({
@@ -280,6 +286,53 @@ const Join = () => {
                 <span><BsPlusLg strokeWidth={1} /></span>
               </div>
             </div>
+
+            <section className="join-page__public-rooms" aria-labelledby="public-rooms-title">
+              <div className="join-page__public-rooms__head">
+                <div>
+                  <p className="join-page__public-rooms__eyebrow">اتاق‌های عمومی</p>
+                  <h2 id="public-rooms-title">به جمع دیگران بپیوندید</h2>
+                  <span>اتاق‌های عمومی فعال را مستقیم انتخاب و وارد شوید.</span>
+                </div>
+                <PiUsersThreeFill aria-hidden="true" />
+              </div>
+
+              {publicRoomsQuery.isLoading ? (
+                <div className="join-page__public-rooms__empty">در حال دریافت اتاق‌های عمومی...</div>
+              ) : publicRoomsQuery.data?.length ? (
+                <div className="join-page__public-rooms__grid">
+                  {publicRoomsQuery.data.map((room) => (
+                    <article key={room.id} className="join-page__public-room-card">
+                      <div className="join-page__public-room-card__title-row">
+                        <h3>{room.name}</h3>
+                        <span><PiUsersThreeFill /></span>
+                      </div>
+                      <div className="join-page__public-room-card__image">
+                        {room.image ? (
+                          <img src={`${import.meta.env.VITE_BASE_URL ?? ""}${room.image}`} alt="" />
+                        ) : (
+                          <PiImageSquareFill aria-hidden="true" />
+                        )}
+                      </div>
+                      <div className="join-page__public-room-card__code">
+                        <span>کد اتاق</span>
+                        <code>{room.code.toLocaleString("fa-IR").replace('٬', "")}</code>
+                      </div>
+                      <button
+                        type="button"
+                        className="join-page__public-room-card__join"
+                        disabled={joinRoomMutation.isPending}
+                        onClick={() => joinRoomMutation.mutate(room.code)}
+                      >
+                        {joinRoomMutation.isPending ? "در حال ورود..." : "پیوستن"}
+                      </button>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <div className="join-page__public-rooms__empty">در حال حاضر اتاق عمومی فعالی وجود ندارد.</div>
+              )}
+            </section>
           </div>
         </div>
       </div>

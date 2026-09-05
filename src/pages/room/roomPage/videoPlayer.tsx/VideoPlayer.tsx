@@ -23,6 +23,7 @@ export interface VideoPlayerProps {
   poster?: string;
   quality?: string;
   autoPlay?: boolean;
+  canControlMedia?: boolean;
   className?: string;
   isPlaying?: boolean;
   currentTime?: number;
@@ -49,6 +50,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   poster,
   quality = "1080p",
   autoPlay = false,
+  canControlMedia = true,
   className = "",
   isPlaying,
   currentTime,
@@ -165,7 +167,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   }, [updateBufferedRanges, duration]);
 
   const togglePlay = useCallback(() => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || !canControlMedia) return;
 
     if (playing) {
       if (onPauseRequest) {
@@ -189,10 +191,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         setIsVideoBuffering(false);
       });
     }
-  }, [playing, onPauseRequest, onPlayRequest]);
+  }, [playing, onPauseRequest, onPlayRequest, canControlMedia]);
 
   const handleSeekBy = (seconds: number) => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || !canControlMedia) return;
 
     const next = Math.min(
       Math.max(videoRef.current.currentTime + seconds, 0),
@@ -217,6 +219,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   );
 
   const handleScrub = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!canControlMedia) return;
     const targetTime = parseFloat(e.target.value);
 
     if (videoRef.current) {
@@ -425,7 +428,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   };
 
   const handleSubmitRoomSubtitle = async () => {
-    if (!onSubmitSubtitle || subtitleSubmitting) return;
+    if (!onSubmitSubtitle || !canControlMedia || subtitleSubmitting) return;
     setSubtitleSubmitError(null);
     const url = subtitleSourceUrl.trim();
     if (!subtitleFile && !url) {
@@ -1047,7 +1050,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
               duration: 0.2,
             }}
             onClick={togglePlay}
-            className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform pointer-events-auto z-10 max-[410px]:w-10 max-[410px]:h-10"
+            className={`absolute inset-0 m-auto w-16 h-16 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center z-10 max-[410px]:w-10 max-[410px]:h-10 ${canControlMedia ? "cursor-pointer hover:scale-110 transition-transform pointer-events-auto" : "cursor-not-allowed opacity-70"}`}
           >
             <Play className="w-8 h-8 fill-[#d04e2f] text-[#d04e2f] max-[410px]:w-4 max-[410px]:h-4" />
           </motion.div>
@@ -1073,7 +1076,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 opacity: 0,
                 y: 10,
               }}
-              onClick={onNextEpisodeRequest}
+              onClick={canControlMedia ? onNextEpisodeRequest : undefined}
+              disabled={!canControlMedia}
               aria-label={`پخش قسمت بعدی${nextEpisode.title
                 ? `: ${nextEpisode.title}`
                 : ""
@@ -1281,7 +1285,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                       </div>
                     </div>
 
-                    {onSubmitSubtitle && (
+                    {onSubmitSubtitle && canControlMedia && (
                       <div className="rounded-xl border border-white/10 bg-white/5 p-3">
                         <div className="mb-3">
                           <div className="text-sm font-semibold">زیرنویس اختصاصی اتاق</div>
@@ -1682,6 +1686,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 step="0.1"
                 value={time}
                 onChange={handleScrub}
+                disabled={!canControlMedia}
                 className="
       absolute
       inset-x-0
@@ -1730,6 +1735,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-3">
                 <button
+                  disabled={!canControlMedia}
                   onClick={() =>
                     handleSeekBy(-10)
                   }
@@ -1740,6 +1746,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 </button>
 
                 <button
+                  disabled={!canControlMedia}
                   onClick={togglePlay}
                   title={
                     playing ? "Pause" : "Play"
@@ -1754,6 +1761,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 </button>
 
                 <button
+                  disabled={!canControlMedia}
                   onClick={() =>
                     handleSeekBy(10)
                   }
