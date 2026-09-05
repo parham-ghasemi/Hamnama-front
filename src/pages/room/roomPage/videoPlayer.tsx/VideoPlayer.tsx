@@ -72,6 +72,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const hideControlsTimeoutRef = useRef<number | null>(null);
 
+  const [isCompactPlayerHeight, setIsCompactPlayerHeight] = useState(false);
   const [internalPlaying, setInternalPlaying] = useState(autoPlay);
   const [internalCurrentTime, setInternalCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -104,6 +105,25 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   const playing = isPlaying ?? internalPlaying;
   const time = currentTime ?? internalCurrentTime;
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const updateCompactHeight = (height: number) => {
+      setIsCompactPlayerHeight(height < 430);
+    };
+
+    updateCompactHeight(container.getBoundingClientRect().height);
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) updateCompactHeight(entry.contentRect.height);
+    });
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     setLocalSubtitleSettings(subtitleSettings);
@@ -926,17 +946,25 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             transition={{
               duration: 0.18,
             }}
-            className={`pointer-events-none absolute inset-x-4 z-15 flex justify-center px-4 ${effectiveSubtitleSettings.position ===
-              "middle"
-              ? "top-1/2 -translate-y-1/2"
-              : "bottom-19.5 sm:bottom-22"
+            className={`pointer-events-none absolute z-15 flex justify-center ${isCompactPlayerHeight ? "inset-x-2 px-2" : "inset-x-4 px-4"
+              } ${effectiveSubtitleSettings.position ===
+                "middle"
+                ? "top-1/2 -translate-y-1/2"
+                : isCompactPlayerHeight
+                  ? "bottom-14"
+                  : "bottom-19.5 sm:bottom-22"
               }`}
             aria-live="polite"
           >
             <span
-              className="max-w-[92%] whitespace-pre-line rounded-md px-3 py-1.5 text-center leading-relaxed text-white shadow-lg [text-shadow:0_2px_3px_rgba(0,0,0,0.9)]"
+              className={`max-w-[92%] whitespace-pre-line rounded-md text-center text-white shadow-lg [text-shadow:0_2px_3px_rgba(0,0,0,0.9)] ${isCompactPlayerHeight
+                  ? "px-2 py-0.5 text-xs leading-snug"
+                  : "px-3 py-1.5 leading-relaxed"
+                }`}
               style={{
-                fontSize: `${effectiveSubtitleSettings.fontSize}px`,
+                fontSize: isCompactPlayerHeight
+                  ? `${Math.max(10, effectiveSubtitleSettings.fontSize * 0.8)}px`
+                  : `${effectiveSubtitleSettings.fontSize}px`,
                 fontWeight:
                   effectiveSubtitleSettings.fontWeight,
                 opacity:
