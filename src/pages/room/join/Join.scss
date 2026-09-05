@@ -1159,12 +1159,19 @@
 }
 
 .join-page__public-rooms {
-  width: 100%;
+  min-width: 70%;
   margin-top: 28px;
   display: flex;
   flex-direction: column;
   gap: 18px;
   z-index: 1;
+
+  @include mx.max-w(1300px) {
+    min-width: 85%;
+  }
+  @include mx.max-w(870px) {
+    min-width: 100%;
+  }
 }
 
 .join-page__public-rooms__head {
