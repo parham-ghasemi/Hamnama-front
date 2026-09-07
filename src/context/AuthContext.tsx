@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import axios from "axios";
 import api from "../lib/axiosConfig";
 import {
   clearAccessToken,
@@ -25,23 +26,50 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const AUTH_CACHE_KEY = "hamnama.auth.user";
+
+const readCachedUser = (): User | null => {
+  try {
+    const raw = window.localStorage.getItem(AUTH_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as User;
+    if (!parsed?.id || !parsed?.username) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => readCachedUser());
   const [isLoading, setIsLoading] = useState(true);
+
+  const persistUser = (nextUser: User | null) => {
+    if (nextUser) {
+      window.localStorage.setItem(AUTH_CACHE_KEY, JSON.stringify(nextUser));
+    } else {
+      window.localStorage.removeItem(AUTH_CACHE_KEY);
+    }
+    setUser(nextUser);
+  };
 
   const clearSession = () => {
     clearAccessToken();
-    setUser(null);
+    persistUser(null);
   };
 
   const fetchUser = async () => {
     try {
       const { data } = await api.get<User>("/users/me");
-      console.log('data', data)
-      setUser(data);
+      persistUser(data);
     } catch (error) {
       console.error("Failed to fetch user", error);
-      clearSession();
+
+      // A transient connection failure must not destroy an otherwise valid cached
+      // session. Only a server response proving the session is invalid logs out.
+      if (axios.isAxiosError(error) && [401, 403].includes(error.response?.status ?? 0)) {
+        clearSession();
+      }
     }
   };
 
@@ -49,14 +77,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let cancelled = false;
 
     const initializeAuth = async () => {
+      const cachedUser = readCachedUser();
+      if (cachedUser) setUser(cachedUser);
+
       const token = await refreshAccessToken();
 
       if (cancelled) return;
 
-      if (token) {
+      // Always validate an existing cached session when possible. If the request
+      // cannot reach the server, fetchUser preserves the cached auth state.
+      if (token || cachedUser) {
         await fetchUser();
-      } else {
-        setIsLoading(false);
       }
     };
 
@@ -75,7 +106,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Refresh the access JWT slightly before its five-minute lifetime expires.
     const interval = window.setInterval(async () => {
       const token = await refreshAccessToken();
-      if (!token) clearSession();
+      if (token) return;
+
+      // refreshAccessToken can fail because the network is unavailable. Do not
+      // discard cached authentication unless a follow-up request proves that
+      // the server rejected the session.
+      await fetchUser();
     }, 4 * 60 * 1000);
 
     return () => window.clearInterval(interval);

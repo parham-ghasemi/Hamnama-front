@@ -102,8 +102,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [subtitleSubmitError, setSubtitleSubmitError] = useState<string | null>(null);
   const [subtitleSubmitting, setSubtitleSubmitting] = useState(false);
 
-  const lastTouchRef = useRef<{ time: number; x: number } | null>(null);
-
   const playing = isPlaying ?? internalPlaying;
   const time = currentTime ?? internalCurrentTime;
 
@@ -527,60 +525,55 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
   };
 
-  const handleTouchEnd = (
-    e: React.TouchEvent<HTMLDivElement>
-  ) => {
-    const touch = e.changedTouches[0];
+  const isTouchDevice = () =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(pointer: coarse)").matches;
 
-    if (!touch) return;
-
-    const target = e.target as HTMLElement;
-
-    if (
-      target.closest(
-        "button, input, select, textarea"
-      ) &&
-      target !== videoRef.current
-    ) {
-      lastTouchRef.current = null;
-      return;
+  const clearHideControlsTimeout = () => {
+    if (hideControlsTimeoutRef.current) {
+      clearTimeout(hideControlsTimeoutRef.current);
+      hideControlsTimeoutRef.current = null;
     }
-
-    const now = Date.now();
-    const lastTouch = lastTouchRef.current;
-
-    const isDoubleTap =
-      lastTouch &&
-      now - lastTouch.time < 320 &&
-      Math.abs(touch.clientX - lastTouch.x) < 80;
-
-    if (isDoubleTap) {
-      void toggleFullscreen();
-      lastTouchRef.current = null;
-      return;
-    }
-
-    lastTouchRef.current = {
-      time: now,
-      x: touch.clientX,
-    };
   };
 
-  const handleMouseMove = () => {
-    setShowControls(true);
+  const scheduleHideControls = useCallback(() => {
+    clearHideControlsTimeout();
+    if (!playing) return;
 
-    if (hideControlsTimeoutRef.current) {
-      clearTimeout(
-        hideControlsTimeoutRef.current
-      );
+    hideControlsTimeoutRef.current = window.setTimeout(() => {
+      setShowControls(false);
+      hideControlsTimeoutRef.current = null;
+    }, 2500);
+  }, [playing]);
+
+  const showControlsTemporarily = useCallback(() => {
+    setShowControls(true);
+    scheduleHideControls();
+  }, [scheduleHideControls]);
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+
+    if (target.closest("button, input, select, textarea")) {
+      return;
     }
 
     if (playing) {
-      hideControlsTimeoutRef.current =
-        window.setTimeout(() => {
-          setShowControls(false);
-        }, 2500);
+      showControlsTemporarily();
     }
+  };
+
+  const handleVideoClick = () => {
+    if (isTouchDevice()) {
+      showControlsTemporarily();
+      return;
+    }
+
+    togglePlay();
+  };
+
+  const handleMouseMove = () => {
+    showControlsTemporarily();
   };
 
   useEffect(() => {
@@ -759,10 +752,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   useEffect(() => {
     if (!playing) {
+      clearHideControlsTimeout();
       setShowControls(true);
       setIsVideoBuffering(false);
+      return;
     }
-  }, [playing]);
+
+    setShowControls(true);
+    scheduleHideControls();
+
+    return clearHideControlsTimeout;
+  }, [playing, scheduleHideControls]);
 
   useEffect(() => {
     if (
@@ -816,19 +816,19 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       dir="ltr"
       aria-label="پخش‌کننده ویدیو"
       onTouchEnd={handleTouchEnd}
-      onDoubleClick={() => void toggleFullscreen()}
       onMouseMove={handleMouseMove}
       onMouseLeave={() =>
         playing && setShowControls(false)
       }
-      className={`relative group overflow-hidden bg-black rounded-2xl shadow-2xl select-none font-sans text-white h-full w-full ${className}`}
+      className={`relative group overflow-hidden bg-black rounded-2xl shadow-2xl select-none font-sans text-white h-full w-full ${playing && !showControls ? "cursor-none" : ""} ${className}`}
     >
       <video
         ref={videoRef}
         src={src}
         poster={poster}
         autoPlay={autoPlay}
-        onClick={togglePlay}
+        onClick={handleVideoClick}
+        onDoubleClick={() => void toggleFullscreen()}
         onLoadStart={() => {
           updateBufferedRanges();
 

@@ -253,7 +253,7 @@ const ChatMessage = ({
     <div
       id={`chat-message-${message.id}`}
       data-message-id={message.id}
-      className={clsx(message.is_admin_sender && "is-admin-message", 
+      className={clsx(message.is_admin_sender && "is-admin-message",
         "room-page__chat-container__message-block",
         isOwn && "outgoing",
         showAvatar && "has-avatar",
@@ -311,7 +311,7 @@ const ChatMessage = ({
                 }
               >
                 <span className="room-page__chat-container__message-block__messages__message__top__label">
-                  پاسخ به
+                  {message.replying_to_sender_name ? `${message.replying_to_sender_name}:` : "پاسخ به "}
                 </span>
 
                 <span>

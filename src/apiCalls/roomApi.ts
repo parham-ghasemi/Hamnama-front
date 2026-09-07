@@ -30,6 +30,7 @@ export interface RoomMessageResponse {
   sender_avatar: string;
   replying_to: string;
   replying_to_id?: string;
+  replying_to_sender_name?: string;
   content: string;
   created_at: string;
   updated_at: string;

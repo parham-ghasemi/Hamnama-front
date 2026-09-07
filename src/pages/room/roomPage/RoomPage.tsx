@@ -1388,13 +1388,13 @@ const RoomPage = () => {
     setCurrentSubtitleUrl(roomQuery.data.currently_playing_subtitles ?? null);
     setCurrentTime(roomQuery.data.playback_time ?? 0);
     setIsPlaying(roomQuery.data.is_playing ?? false);
-    const statuses: Record<string, ConnectionStatus> = {};
-
-    roomQuery.data.members.forEach((member) => {
-      statuses[member.user_id] = "good";
+    setConnectionStatuses((current) => {
+      const statuses: Record<string, ConnectionStatus> = {};
+      roomQuery.data.members.forEach((member) => {
+        statuses[member.user_id] = current[member.user_id] ?? "medium";
+      });
+      return statuses;
     });
-
-    setConnectionStatuses(statuses);
   }, [roomQuery.data, playRoomSound, user?.id]);
 
   useEffect(() => {
@@ -1585,6 +1585,10 @@ const RoomPage = () => {
             delete copy[leavingId];
             return copy;
           });
+          setConnectionStatuses((prev) => ({
+            ...prev,
+            [leavingId]: "offline",
+          }));
           setSystemMessages((prev) => [
             ...prev,
             {
@@ -1603,6 +1607,10 @@ const RoomPage = () => {
           if (parsed.payload.user_id !== localUserIdRef.current) {
             playRoomSound("otherUserJoined");
           }
+          setConnectionStatuses((prev) => ({
+            ...prev,
+            [parsed.payload.user_id]: "medium",
+          }));
           setSystemMessages((prev) => [
             ...prev,
             {
