@@ -24,6 +24,7 @@ import Home from "./pages/home/Home";
 import NotFound from "./components/notFound/NotFound";
 import { Toaster } from "./components/toast";
 import About from "./pages/about/About";
+import Tutorial from "./pages/tutorial/Tutorial";
 import { AdminSupport } from "./pages/admin";
 import WebsiteAnnouncements from "./components/websiteAnnouncements/WebsiteAnnouncements";
 
@@ -54,6 +55,7 @@ function App() {
                   <Route index element={<Home />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/about-us" element={<About />} />
+                  <Route path="/tutorial" element={<Tutorial />} />
                   <Route path="/plan-details" element={<PlanDetails />} />
                   <Route path="*" element={<NotFound />} />
                 </Route>

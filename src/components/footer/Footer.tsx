@@ -6,6 +6,7 @@ import { SiGmail } from 'react-icons/si';
 // In the host app (react-router-dom) you can swap <a> for <Link to={...}>.
 const LINKS = [
   { href: '/#faq', label: 'سوالات متداول' },
+  { href: '/tutorial', label: 'راهنمای استفاده' },
   { href: '/about-us', label: 'درباره ما' },
   { href: '/about-us#contact', label: 'تماس با ما' },
 ];
