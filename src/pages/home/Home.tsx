@@ -10,7 +10,7 @@ import DownloadApp from './download/DownloadApp'
 import FreeGate from './freeGate/FreeGate'
 import { useTheme } from '../../context/ThemeContext'
 import clsx from 'clsx'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toPersianNumerals } from '../../helpers/NumberConversion'
 import { PiTicketFill, PiPlayFill } from 'react-icons/pi'
 import { SEO } from '../../components/seo/SEO'
@@ -87,7 +87,11 @@ const Home = () => {
         <DownloadApp />
 
         <Reveal as='h2' className='home-page__faq-title' id='faq'>سوالات متداول</Reveal>
-        {/* <h3 className='home-page__faq-subtitle'>آموزش قدم به قدم استفاده از سایت هم‌نما</h3> */}
+        <h3 className='home-page__faq-subtitle'>
+          <Link to={'/tutorial'}>
+            آموزش قدم به قدم استفاده از سایت هم‌نما
+          </Link>
+        </h3>
         <Faq />
       </div>
     </>
