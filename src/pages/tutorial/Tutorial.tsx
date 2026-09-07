@@ -51,7 +51,7 @@ const Tutorial = () => {
   const { isLight } = useTheme();
 
   const scrollToSection = useCallback((id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start', });
   }, []);
 
   return (
@@ -87,7 +87,6 @@ const Tutorial = () => {
               <PiPlayCircleFill />
             </span>
             <strong>ویدیوی آموزش هم‌نما</strong>
-            <span>محل قرارگیری ویدیوی آموزشی</span>
             <small>ویدیوی راهنما در این بخش قرار می‌گیرد.</small>
           </div>
         </Reveal>
@@ -111,7 +110,6 @@ const Tutorial = () => {
                 variant="up"
                 onClick={() => scrollToSection(item.id)}
               >
-                <span className="tutorial-page__toc-card__index">{String(index + 1).padStart(2, '0')}</span>
                 <span className="tutorial-page__toc-card__icon" aria-hidden="true">{item.icon}</span>
                 <span className="tutorial-page__toc-card__body">
                   <strong>{item.title}</strong>
@@ -123,7 +121,7 @@ const Tutorial = () => {
           </div>
         </section>
 
-        <TutorialSection id="getting-started" number="۰۱" title="شروع کار" icon={<PiHouseFill />}>
+        <TutorialSection id="getting-started" title="شروع کار" icon={<PiHouseFill />}>
           <p>
             هم‌نما برای تماشای همزمان فیلم و سریال در یک اتاق مشترک ساخته شده است. نقطه‌ی شروع از صفحه‌ی اصلی
             است؛ در آنجا دو مسیر اصلی می‌بینید: «شروع به تماشا» برای رفتن به صفحه‌ی اتاق‌ها و «خرید اشتراک» برای
@@ -137,7 +135,7 @@ const Tutorial = () => {
           ]} />
         </TutorialSection>
 
-        <TutorialSection id="account" number="۰۲" title="ساخت حساب و ورود" icon={<PiUserCircleFill />}>
+        <TutorialSection id="account" title="ساخت حساب و ورود" icon={<PiUserCircleFill />}>
           <p>
             ورود و ثبت‌نام با شماره موبایل شروع می‌شود. ابتدا هم‌نما بررسی می‌کند شماره قبلاً حساب داشته یا نه.
             اگر حساب وجود داشته باشد، می‌توانید با رمز عبور وارد شوید یا از مسیر رمز یکبارمصرف استفاده کنید.
@@ -151,11 +149,11 @@ const Tutorial = () => {
           </div>
           <div className="tutorial-page__note tutorial-page__note--info">
             <PiLockKeyFill aria-hidden="true" />
-            <span>نشست کاربر در مرورگر حفظ می‌شود و برنامه تلاش می‌کند توکن دسترسی را پیش از انقضا تازه کند؛ در خطای موقت شبکه، اطلاعات محلی کاربر بی‌دلیل پاک نمی‌شود.</span>
+            <span>بعد از ورود، لازم نیست هر بار دوباره وارد حساب شوید؛ تا زمانی که ورود شما معتبر باشد، هم‌نما اطلاعات لازم برای باز کردن بخش‌های مختلف حساب را در مرورگر نگه می‌دارد.</span>
           </div>
         </TutorialSection>
 
-        <TutorialSection id="room-entry" number="۰۳" title="ورود به اتاق" icon={<PiKeyFill />}>
+        <TutorialSection id="room-entry" title="ورود به اتاق" icon={<PiKeyFill />}>
           <p>
             صفحه‌ی «انتخاب اتاق» چند راه برای ورود در اختیار شما می‌گذارد. می‌توانید کد اتاق را دستی وارد کنید،
             مستقیماً یکی از اتاق‌های عمومی فعال را انتخاب کنید، به آخرین اتاق فعال خود برگردید یا وارد اتاق شخصی
@@ -170,11 +168,11 @@ const Tutorial = () => {
           ]} />
           <div className="tutorial-page__note tutorial-page__note--success">
             <PiArrowsClockwise aria-hidden="true" />
-            <span>رفرش کردن یا باز کردن مستقیم لینک اتاق نیز عضویت را از بین نمی‌برد؛ صفحه‌ی اتاق بعد از دریافت اطلاعات اتاق، عضویت شما را دوباره با کد همان اتاق ثبت می‌کند.</span>
+            <span>اگر صفحه را تازه‌سازی کنید یا دوباره لینک اتاق را باز کنید، می‌توانید به همان اتاق برگردید و دوباره به فهرست اعضای آن اضافه شوید.</span>
           </div>
         </TutorialSection>
 
-        <TutorialSection id="room-creation" number="۰۴" title="ساخت اتاق شخصی" icon={<PiVideoCameraFill />}>
+        <TutorialSection id="room-creation" title="ساخت اتاق شخصی" icon={<PiVideoCameraFill />}>
           <p>
             در «ساخت اتاق شخصی» می‌توانید نام، تصویر، نوع دسترسی و سطح دسترسی کنترل پخش را تعیین کنید. نام برای
             اتاق خصوصی اختیاری است، اما برای اتاق عمومی باید نام داشته باشد. تصویر اتاق هم اختیاری است و بعداً
@@ -192,7 +190,7 @@ const Tutorial = () => {
           </p>
         </TutorialSection>
 
-        <TutorialSection id="media" number="۰۵" title="انتخاب فیلم، سریال یا فایل" icon={<PiFilmSlateFill />}>
+        <TutorialSection id="media" title="انتخاب فیلم، سریال یا فایل" icon={<PiFilmSlateFill />}>
           <p>
             داخل اتاق، دکمه‌ی «انتخاب فیلم» منبع پخش را باز می‌کند. سه مسیر واقعی در این بخش وجود دارد: انتخاب از
             آرشیو فیلم و سریال، پخش با لینک مستقیم و آپلود فایل ویدیویی خودتان. بعد از انتخاب محتوا، وضعیت پخش و
@@ -222,17 +220,20 @@ const Tutorial = () => {
             <PiWarningCircleFill aria-hidden="true" />
             <span>کنترل انتخاب و تغییر رسانه تابع مجوز پخش اتاق است؛ اگر اتاق روی «فقط مدیران» باشد، اعضای معمولی امکان تغییر محتوای در حال پخش را ندارند.</span>
           </div>
+          <div className="tutorial-page__note tutorial-page__note--info">
+            <PiWarningCircleFill aria-hidden="true" />
+            <span>در iPhone و iPad با Safari، فایل‌های MKV و لینک‌های مستقیم ویدیو ممکن است پخش نشوند. برای تماشای مطمئن‌تر روی این دستگاه‌ها، بهتر است ویدیوهای خودتان را با فرمت‌هایی مثل MP4 بارگذاری کنید.</span>
+          </div>
         </TutorialSection>
 
-        <TutorialSection id="player" number="۰۶" title="پخش همزمان و کنترل‌های ویدیو" icon={<PiMonitorPlayFill />}>
+        <TutorialSection id="player" title="پخش همزمان و کنترل‌های ویدیو" icon={<PiMonitorPlayFill />}>
           <p>
-            پخش‌کننده‌ی ویدیو وضعیت پخش، زمان فعلی و جابجایی بین قسمت‌ها را در سطح اتاق هماهنگ می‌کند. مدیر یا کاربری
-            که مجوز کنترل پخش دارد می‌تواند پخش/توقف، seek و انتخاب قسمت بعدی را انجام دهد و این رویدادها برای سایر
-            کاربران اتاق ارسال می‌شوند.
+            پخش‌کننده‌ی ویدیو وضعیت تماشا را بین اعضای اتاق هماهنگ می‌کند. کسی که اجازه‌ی کنترل پخش داشته باشد می‌تواند
+            ویدیو را پخش یا متوقف کند، به بخش دیگری از آن برود و در صورت وجود قسمت بعدی، آن را برای همه شروع کند.
           </p>
           <InfoGrid items={[
             ['پخش و توقف', 'دکمه‌ی Play/Pause وضعیت پخش اتاق را تغییر می‌دهد.'],
-            ['جلو/عقب', 'دکمه‌های جابه‌جایی ۱۰ ثانیه‌ای و نوار زمان برای seek استفاده می‌شوند.'],
+            ['جلو/عقب', 'دکمه‌های جابه‌جایی ۱۰ ثانیه‌ای و نوار زمان برای جابجایی در زمان ویدیو استفاده می‌شوند.'],
             ['صدا', 'ولوم و بی‌صدا کردن مستقل داخل پخش‌کننده کنترل می‌شود.'],
             ['تمام‌صفحه', 'پخش‌کننده دکمه‌ی تمام‌صفحه دارد و در صورت پشتیبانی مرورگر می‌تواند وارد حالت Picture-in-Picture هم شود.'],
             ['قسمت بعد', 'برای سریالی که قسمت بعدی در داده‌ی فعلی دارد، امکان رفتن به قسمت بعد و شروع آن از زمان صفر وجود دارد.'],
@@ -247,17 +248,17 @@ const Tutorial = () => {
           </div>
         </TutorialSection>
 
-        <TutorialSection id="subtitles" number="۰۷" title="زیرنویس و شخصی‌سازی آن" icon={<PiNotePencilFill />}>
+        <TutorialSection id="subtitles" title="زیرنویس و شخصی‌سازی آن" icon={<PiNotePencilFill />}>
           <p>
             پخش‌کننده هنگام در دسترس بودن زیرنویس، بخش تنظیمات زیرنویس را فعال می‌کند. برای محتوای آرشیو، زیرنویس‌های
             مربوط به همان فیلم/قسمت از آرشیو خوانده می‌شوند. برای محتوای آپلودی یا اتاق، زیرنویس می‌تواند به صورت فایل
             SRT یا لینک مستقیم SRT ثبت شود و زیرنویس جدید جایگزین زیرنویس قبلی اتاق می‌شود.
           </p>
           <div className="tutorial-page__choice-grid tutorial-page__choice-grid--compact">
-            <Choice icon={<PiNotePencilFill />} title="روشن/خاموش" text="در صورت وجود track، نمایش زیرنویس را فعال یا غیرفعال کنید." />
+            <Choice icon={<PiNotePencilFill />} title="روشن/خاموش" text="وقتی زیرنویس برای ویدیو در دسترس باشد، می‌توانید نمایش آن را روشن یا خاموش کنید." />
             <Choice icon={<PiHeartFill />} title="ظاهر متن" text="اندازه متن، شفافیت متن، شفافیت پس‌زمینه و وزن قلم قابل تنظیم است." />
             <Choice icon={<PiArrowDown />} title="جایگاه" text="زیرنویس بین جایگاه پایین و میانی قابل جابه‌جایی است." />
-            <Choice icon={<PiArrowsClockwise />} title="هماهنگ‌سازی" text="Offset زمانی برای جلو یا عقب بردن زمان نمایش زیرنویس وجود دارد؛ مقدار مثبت یعنی نمایش دیرتر." />
+            <Choice icon={<PiArrowsClockwise />} title="هماهنگ‌سازی" text="با تنظیم زمان‌بندی زیرنویس، می‌توانید آن را کمی جلوتر یا عقب‌تر بیاورید تا با تصویر هماهنگ شود." />
           </div>
           <p>
             برای هر فایل SRT، اعتبار فرمت نیز در رابط بررسی می‌شود. هنگام بارگذاری زیرنویس اختصاصی، فقط یکی از دو
@@ -265,14 +266,14 @@ const Tutorial = () => {
           </p>
         </TutorialSection>
 
-        <TutorialSection id="chat" number="۰۸" title="چت و گفت‌وگوی اتاق" icon={<PiChatCircleDotsFill />}>
+        <TutorialSection id="chat" title="چت و گفت‌وگوی اتاق" icon={<PiChatCircleDotsFill />}>
           <p>
-            چت اتاق کنار پخش‌کننده قرار دارد و پیام‌ها همراه با رویدادهای ورود و خروج اعضا در یک timeline نمایش داده
-            می‌شوند. پیام‌های اتاق به صورت realtime دریافت می‌شوند و برای پیام جدید کاربر دیگر، صدای رویداد قابل پخش است.
+            چت اتاق کنار پخش‌کننده قرار دارد و پیام‌ها همراه با رویدادهای ورود و خروج اعضا در یک فهرست گفتگو نمایش داده
+            می‌شوند. پیام‌های جدید بدون نیاز به تازه‌سازی صفحه نمایش داده می‌شوند و در صورت فعال بودن صداهای رویداد، برای پیام جدید دیگران هم اعلان صوتی پخش می‌شود.
           </p>
           <div className="tutorial-page__chat-features">
             <Feature title="ارسال پیام" text="پیام را بنویسید و با دکمه ارسال یا Enter (بدون Shift/Ctrl/Meta) ارسال کنید." />
-            <Feature title="پاسخ به پیام" text="در دسکتاپ از منوی پیام و در موبایل با swipe روی پیام می‌توانید پاسخ بدهید. روی نقل‌قول پاسخ هم می‌توان به پیام اصلی رفت." />
+            <Feature title="پاسخ به پیام" text="در دسکتاپ از منوی پیام و در موبایل با کشیدن پیام به کنار می‌توانید پاسخ بدهید. روی نقل‌قول پاسخ هم می‌توان به پیام اصلی رفت." />
             <Feature title="ویرایش پیام خودتان" text="از گزینه‌های پیام خودتان وارد ویرایش شوید، متن را اصلاح کنید و ذخیره را بزنید." />
             <Feature title="ایموجی" text="انتخابگر ایموجی کنار فیلد پیام وجود دارد و ایموجی در محل مکان‌نما وارد می‌شود." />
             <Feature title="عرض چت" text="در دسکتاپ دسته‌ی کنار چت را بکشید تا عرض پنل تغییر کند؛ دوبار کلیک روی همان ناحیه عرض پیش‌فرض را برمی‌گرداند." />
@@ -280,20 +281,20 @@ const Tutorial = () => {
           </div>
         </TutorialSection>
 
-        <TutorialSection id="voice-reactions" number="۰۹" title="چت صوتی و واکنش‌ها" icon={<PiMicrophoneFill />}>
+        <TutorialSection id="voice-reactions" title="چت صوتی و واکنش‌ها" icon={<PiMicrophoneFill />}>
           <p>
             چت صوتی به صورت جدا از چت متنی وارد می‌شود. با انتخاب «چت صوتی»، مرورگر از شما دسترسی میکروفون می‌خواهد و
             بعد از اتصال، میکروفون به صورت پیش‌فرض mute است؛ بنابراین ورود به voice chat به معنی باز بودن خودکار میکروفون نیست.
           </p>
           <InfoGrid items={[
             ['میکروفون', 'بعد از ورود به چت صوتی، دکمه‌ی میکروفون برای روشن/خاموش کردن صدای خودتان استفاده می‌شود.'],
-            ['اتصال صوتی', 'اتصال اعضا با WebRTC انجام می‌شود و برنامه برای ارتباط شبکه‌ای از STUN و در صورت دریافت اطلاعات، TURN استفاده می‌کند.'],
+            ['اتصال صوتی', 'بعد از ورود به چت صوتی، صدای اعضای حاضر را از طریق مرورگر می‌شنوید و می‌توانید میکروفون خودتان را هر زمان که خواستید روشن یا خاموش کنید.'],
             ['واکنش سریع', 'دکمه‌ی واکنش پنج انتخاب آماده دارد: 😭، 😂، ❤️، 😍 و 🔥. با انتخاب هرکدام، واکنش به اتاق ارسال و افکت ذرات روی رابط نمایش داده می‌شود.'],
             ['صداهای رویداد', 'ورود و خروج کاربران، پیام جدید و اعلان مدیریت می‌توانند صدای رویداد جداگانه داشته باشند و ولوم هرکدام قابل تنظیم است.'],
           ]} />
         </TutorialSection>
 
-        <TutorialSection id="members" number="۱۰" title="اعضا، مدیران و کنترل اتاق" icon={<PiUsersThreeFill />}>
+        <TutorialSection id="members" title="اعضا، مدیران و کنترل اتاق" icon={<PiUsersThreeFill />}>
           <p>
             بخش «کاربران» لیست اعضای حاضر، تعداد آنلاین‌ها، نقش‌ها و وضعیت اتصال هر نفر را نشان می‌دهد. مدیر می‌تواند
             اعضای دیگر را جست‌وجو کند و برای هر عضو، نقش «عضو» یا «مدیر» تعیین کند یا او را از اتاق اخراج کند.
@@ -309,7 +310,7 @@ const Tutorial = () => {
           </div>
         </TutorialSection>
 
-        <TutorialSection id="settings" number="۱۱" title="تنظیمات اتاق و تجربه‌ی تماشا" icon={<PiGearSixFill />}>
+        <TutorialSection id="settings" title="تنظیمات اتاق و تجربه‌ی تماشا" icon={<PiGearSixFill />}>
           <p>
             پنل تنظیمات اتاق دو گروه اصلی دارد: تنظیمات خود اتاق و تنظیمات تجربه‌ی رابط. سازنده می‌تواند اطلاعات اتاق
             را تغییر دهد و هر کاربری که وارد پنل شود می‌تواند تم و صداهای رویداد خود را تنظیم کند. این تنظیمات باید از
@@ -324,7 +325,7 @@ const Tutorial = () => {
           </div>
         </TutorialSection>
 
-        <TutorialSection id="dashboard" number="۱۲" title="پروفایل و داشبورد کاربر" icon={<PiUserCircleFill />}>
+        <TutorialSection id="dashboard" title="پروفایل و داشبورد کاربر" icon={<PiUserCircleFill />}>
           <p>
             بعد از ورود، بخش کاربری از مسیر /user در دسترس است. در نسخه‌ی فعلی، «اطلاعات کاربر» و «تیکت‌ها» فعال هستند.
             در صفحه اطلاعات کاربر می‌توانید نام کاربری، شماره موبایل، رمز عبور و تصویر پروفایل را مدیریت کنید و گزارش ساعات
@@ -343,7 +344,7 @@ const Tutorial = () => {
           </div>
         </TutorialSection>
 
-        <TutorialSection id="tickets" number="۱۳" title="تیکت و پشتیبانی" icon={<PiTicketFill />}>
+        <TutorialSection id="tickets" title="تیکت و پشتیبانی" icon={<PiTicketFill />}>
           <p>
             برای مشکلات یا درخواست‌هایی که نیاز به پیگیری دارند، از بخش «تیکت‌ها» استفاده کنید. با ثبت تیکت، موضوع و متن
             اولیه ذخیره می‌شود و تیکت در فهرست شخصی شما همراه با شماره، وضعیت و تاریخ دیده می‌شود. با باز کردن تیکت، گفت‌وگوی
@@ -366,18 +367,18 @@ const Tutorial = () => {
           </div>
         </TutorialSection>
 
-        <TutorialSection id="current-state" number="۱۴" title="امکاناتی که هنوز فعال نیستند" icon={<PiWarningCircleFill />}>
+        <TutorialSection id="current-state" title="امکاناتی که هنوز فعال نیستند" icon={<PiWarningCircleFill />}>
           <p>
-            برای اینکه این آموزش دقیق و قابل اعتماد بماند، بخش‌هایی را که رابط کاربری آن‌ها وجود دارد اما در نسخه‌ی فعلی
-            هنوز قابل استفاده نیستند هم صریح می‌گوید. این‌ها نباید به عنوان قابلیت فعال معرفی شوند.
+            چند قابلیت برای مراحل بعدی در نظر گرفته شده‌اند و پس از انتشار، امکانات بیشتری به هم‌نما اضافه می‌کنند.
+            در ادامه می‌بینید هرکدام چه کاری انجام خواهند داد.
           </p>
           <div className="tutorial-page__roadmap">
-            <Roadmap title="پرداخت و خرید اشتراک" text="صفحه‌ی پلن‌ها وجود دارد و پلن‌های تک‌نفره، کاپلی و گروهی را نمایش می‌دهد، اما وضعیت فعلی سایت رایگان است و کنترل‌های خرید توسط حالت فعلی رایگان بودن غیرفعال/پوشانده شده‌اند." />
-            <Roadmap title="پرداخت‌های کاربر" text="صفحه‌ی پرداخت‌ها در داشبورد وجود دارد، اما آیتم آن در منوی کاربر فعلاً غیرفعال است." />
-            <Roadmap title="رتبه‌بندی" text="صفحه‌ی رتبه‌بندی و داده‌های leaderboard در کد وجود دارند، اما ورودی منوی داشبورد فعلاً غیرفعال است." />
-            <Roadmap title="مدیریت اعضای پلن" text="صفحه‌ی مدیریت اعضای پلن در پروژه وجود دارد، اما از منوی داشبورد فعلاً به عنوان صفحه‌ی در حال ساخت نمایش داده می‌شود." />
-            <Roadmap title="اپلیکیشن اندروید و ویندوز" text="صفحه‌ی اصلی این نسخه‌ها را با برچسب «به زودی» نمایش می‌دهد؛ در حال حاضر استفاده‌ی کامل از امکانات از نسخه‌ی تحت وب انجام می‌شود." />
-            <Roadmap title="اشتراک صفحه نمایش" text="این مورد در کارت‌های معرفی صفحه‌ی اصلی به عنوان قابلیت معرفی شده، اما در کد فعلی بخش اتاق پیاده‌سازی اجرایی برای screen sharing وجود ندارد؛ بنابراین در این راهنما به عنوان قابلیت فعال معرفی نمی‌شود." />
+            <Roadmap title="پرداخت و خرید اشتراک" text="با راه‌اندازی این بخش، می‌توانید پلن مناسب خودتان را انتخاب کنید، اشتراک بخرید و امکانات مربوط به پلن را در حساب خود مدیریت کنید." />
+            <Roadmap title="پرداخت‌های کاربر" text="این بخش در آینده تاریخچه‌ی خریدها و پرداخت‌های شما را در یک مکان نمایش می‌دهد تا بتوانید سوابق مالی اشتراک خود را ببینید." />
+            <Roadmap title="رتبه‌بندی" text="پس از انتشار، می‌توانید جایگاه خود را در میان کاربران هم‌نما ببینید و بر اساس زمان تماشا با دیگران مقایسه شوید." />
+            <Roadmap title="مدیریت اعضای پلن" text="در آینده، اگر پلنی داشته باشید که امکان استفاده‌ی چندنفره داشته باشد، می‌توانید اعضای آن را اضافه، حذف و مدیریت کنید." />
+            <Roadmap title="اپلیکیشن اندروید و ویندوز" text="با عرضه‌ی این نسخه‌ها، می‌توانید هم‌نما را مستقیماً روی دستگاه‌های اندرویدی و ویندوزی اجرا کنید و تجربه‌ی تماشا را راحت‌تر ادامه دهید." />
+            <Roadmap title="اشتراک صفحه نمایش" text="با انتشار این قابلیت، می‌توانید صفحه‌نمایش خود را با اعضای اتاق به اشتراک بگذارید؛ برای مثال وقتی می‌خواهید چیزی خارج از پخش‌کننده را برای دوستانتان نشان دهید." />
           </div>
         </TutorialSection>
 
@@ -397,10 +398,9 @@ const Tutorial = () => {
   );
 };
 
-const TutorialSection = ({ id, number, title, icon, children }: { id: string; number: string; title: string; icon: ReactNode; children: ReactNode }) => (
+const TutorialSection = ({ id, title, icon, children }: { id: string; title: string; icon: ReactNode; children: ReactNode }) => (
   <section id={id} className="tutorial-page__section tutorial-page__content-section">
     <Reveal className="tutorial-page__section-heading" variant="up">
-      <span className="tutorial-page__section-heading__number">{number}</span>
       <span className="tutorial-page__section-heading__icon" aria-hidden="true">{icon}</span>
       <div>
         <span className="tutorial-page__section-heading__eyebrow">راهنمای هم‌نما</span>

@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import type { CSSProperties, ElementType, ReactNode } from "react";
+import type { CSSProperties, ElementType, MouseEventHandler, ReactNode } from "react";
 import { useReveal } from "../../../hooks/useReveal";
 import "./Reveal.scss";
 
@@ -13,6 +13,7 @@ type RevealProps = {
   delay?: number;
   /** Entrance flavour. */
   variant?: "up" | "fade" | "scale";
+  onClick?: MouseEventHandler<HTMLElement>;
 };
 
 /**
@@ -28,7 +29,8 @@ const Reveal = ({
   className,
   delay = 0,
   variant = "up",
-  id
+  id,
+  onClick
 }: RevealProps) => {
   const { ref, isVisible } = useReveal<HTMLElement>();
 
@@ -38,6 +40,7 @@ const Reveal = ({
       className={clsx("reveal", `reveal--${variant}`, isVisible && "reveal--in", className)}
       style={delay ? ({ "--reveal-delay": `${delay}ms` } as CSSProperties) : undefined}
       id={id}
+      onClick={onClick}
     >
       {children}
     </Tag>
