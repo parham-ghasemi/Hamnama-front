@@ -21,6 +21,7 @@ import { archiveApi } from "../../../apiCalls/archiveApi";
 
 import {
   getRoom,
+  joinRoom,
   getTurnCredentials,
   getRoomAnnouncements,
   getSharedRoomSubtitles,
@@ -1349,6 +1350,44 @@ const RoomPage = () => {
     staleTime: 0,
   });
 
+  const [roomMembershipReady, setRoomMembershipReady] = useState(false);
+  const joiningRoomRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    setRoomMembershipReady(false);
+    joiningRoomRef.current = null;
+  }, [roomId, user?.id]);
+
+  useEffect(() => {
+    if (!roomId || !user?.id || !roomQuery.data) return;
+
+    const joinKey = `${roomId}:${user.id}`;
+    if (joiningRoomRef.current === joinKey) return;
+    joiningRoomRef.current = joinKey;
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        // Joining is idempotent on the backend, so this also safely restores
+        // membership after a page refresh or a direct room-link visit.
+        await joinRoom(roomQuery.data.code);
+        if (cancelled) return;
+        setRoomMembershipReady(true);
+        await roomQuery.refetch();
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Failed to join room", error);
+          setRoomMembershipReady(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [roomId, user?.id, roomQuery.data?.code, roomQuery.refetch]);
+
 
   useEffect(() => {
     if (!roomQuery.data) return;
@@ -1467,7 +1506,7 @@ const RoomPage = () => {
   };
 
   useEffect(() => {
-    if (!roomId || !user?.id) return;
+    if (!roomId || !user?.id || !roomMembershipReady) return;
 
     const wsBaseUrl = import.meta.env['VITE_WS_BASE_URL'];
     // No realtime backend configured (e.g. local/preview): run in offline mode.
@@ -1840,7 +1879,7 @@ const RoomPage = () => {
       intentionalSocketCloseRef.current = true;
       socket.close();
     };
-  }, [roomId, user?.id, isStealthAdmin, playRoomSound]);
+  }, [roomId, user?.id, isStealthAdmin, playRoomSound, roomMembershipReady]);
 
   useEffect(() => {
     if (!isCreator) {
