@@ -4,6 +4,7 @@ import { toast } from '../../../components/toast';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { adminApi, type AnnouncementType, type AdminAnnouncement } from '../../../apiCalls/adminApi';
 import './Settings.scss';
+import Skeleton from "../../../components/skeleton/Skeleton";
 
 const formatDate = (value: string) => {
   const date = new Date(value);
@@ -86,7 +87,18 @@ const Settings = () => {
   ) => (
     <div className="admin-settings__announcement-list">
       {isLoading ? (
-        <div className="admin-settings__message">در حال بارگذاری اعلان‌ها...</div>
+        Array.from({ length: 3 }).map((_, index) => (
+          <article key={index} className="admin-settings__announcement" aria-hidden="true">
+            <div className="admin-settings__announcement__content">
+              <div className="admin-settings__announcement__top">
+                <Skeleton variant="pill" width={62} height={24} />
+                <Skeleton variant="text" width={82} height={12} />
+              </div>
+              <Skeleton variant="text" width="88%" height={16} />
+              <Skeleton variant="text" width="66%" height={16} />
+            </div>
+          </article>
+        ))
       ) : isError ? (
         <div className="admin-settings__message">خطا در دریافت اعلان‌ها.</div>
       ) : announcements.length === 0 ? (

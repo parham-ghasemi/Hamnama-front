@@ -10,6 +10,7 @@ import {
 import { toast } from '../../../components/toast';
 import { adminApi } from '../../../apiCalls/adminApi';
 import './Tickets.scss';
+import Skeleton from "../../../components/skeleton/Skeleton";
 
 const getStatusInfo = (status: string) => {
   switch (status) {
@@ -109,14 +110,6 @@ const Tickets = () => {
     });
   }, [data, search]);
 
-  if (isLoading) {
-    return (
-      <section className="admin-tickets">
-        <div className="admin-tickets__loading">در حال بارگذاری…</div>
-      </section>
-    );
-  }
-
   if (isError) {
     return (
       <section className="admin-tickets">
@@ -152,7 +145,18 @@ const Tickets = () => {
 
       <div className="admin-tickets__content">
         <div className="admin-tickets__list">
-          {filteredTickets.length === 0 ? (
+          {isLoading ? (
+            Array.from({ length: 7 }).map((_, index) => (
+              <div className="admin-tickets__item admin-tickets__item--skeleton" key={index} aria-hidden="true">
+                <div className="admin-tickets__item__top">
+                  <Skeleton variant="pill" width={68} height={22} />
+                  <Skeleton variant="text" width={74} height={12} />
+                </div>
+                <Skeleton variant="text" width="72%" height={15} />
+                <Skeleton variant="text" width={54} height={11} />
+              </div>
+            ))
+          ) : filteredTickets.length === 0 ? (
             <div className="admin-tickets__empty admin-tickets__empty--inline">
               تیکتی مطابق جستجو یافت نشد.
             </div>
@@ -197,7 +201,17 @@ const Tickets = () => {
         </div>
 
         <div className="admin-tickets__detail">
-          {!selectedTicket ? (
+          {isLoading ? (
+            <div className="admin-tickets__detail--skeleton" aria-hidden="true">
+              <Skeleton variant="text" width={180} height={18} />
+              <Skeleton variant="text" width={96} height={12} />
+              <div className="admin-tickets__detail__skeleton-messages">
+                <Skeleton variant="rect" width="82%" height={74} radius={16} />
+                <Skeleton variant="rect" width="64%" height={58} radius={16} />
+                <Skeleton variant="rect" width="76%" height={68} radius={16} />
+              </div>
+            </div>
+          ) : !selectedTicket ? (
             <div className="admin-tickets__empty admin-tickets__empty--detail">
               <FiMail size={36} />
               <p>یک تیکت را برای مشاهده گفتگو انتخاب کنید.</p>

@@ -11,6 +11,7 @@ import {
 import { supportApi, getSupportWsUrl, type SupportConversation, type SupportMessage } from "../../../apiCalls/supportApi";
 import { toast } from "../../../components/toast";
 import "./Support.scss";
+import Skeleton from "../../../components/skeleton/Skeleton";
 
 const formatDate = (value: string) =>
   new Intl.DateTimeFormat("fa-IR", {
@@ -172,7 +173,15 @@ const AdminSupport = () => {
       <div className="admin-support__content">
         <div className="admin-support__list">
           {isLoading ? (
-            <div className="admin-support__state">در حال بارگذاری گفتگوها…</div>
+            Array.from({ length: 6 }).map((_, index) => (
+              <div className="admin-support__conversation-skeleton" key={index} aria-hidden="true">
+                <Skeleton variant="circle" width={38} height={38} />
+                <div>
+                  <Skeleton variant="text" width={110} height={14} />
+                  <Skeleton variant="text" width={155} height={12} />
+                </div>
+              </div>
+            ))
           ) : isError ? (
             <div className="admin-support__state">بارگذاری گفتگوها ممکن نیست.</div>
           ) : filtered.length === 0 ? (

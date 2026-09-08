@@ -11,6 +11,7 @@ import {
 import { toast } from '../../../components/toast';
 import { adminApi, type AdminUser } from '../../../apiCalls/adminApi';
 import './Users.scss';
+import Skeleton from "../../../components/skeleton/Skeleton";
 import { useAdminAccess } from '../../../components/adminRoute/AdminAccessContext';
 
 type Filter = 'all' | 'banned' | 'active';
@@ -272,7 +273,17 @@ const Users = () => {
 
       <div className="admin-users__table-card">
         {isLoading ? (
-          <div className="admin-users__loading">در حال بارگذاری…</div>
+          <div className="admin-users__table-card__skeleton" aria-busy="true">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div className="admin-users__table-card__skeleton-row" key={index} aria-hidden="true">
+                <Skeleton variant="text" width={index % 2 ? 82 : 112} />
+                <Skeleton variant="text" width={64} />
+                <Skeleton variant="text" width={96} />
+                <Skeleton variant="text" width={72} />
+                <Skeleton variant="pill" width={70} height={28} />
+              </div>
+            ))}
+          </div>
         ) : isError ? (
           <div className="admin-users__empty">
             امکان بارگذاری کاربران وجود ندارد.

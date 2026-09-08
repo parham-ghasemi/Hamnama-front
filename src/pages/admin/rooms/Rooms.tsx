@@ -11,6 +11,7 @@ import { toast } from '../../../components/toast';
 import { useNavigate } from 'react-router-dom';
 import { adminApi } from '../../../apiCalls/adminApi';
 import './Rooms.scss';
+import Skeleton from "../../../components/skeleton/Skeleton";
 
 type Filter = 'all' | 'closed' | 'open';
 
@@ -204,7 +205,17 @@ const Rooms = () => {
 
       <div className="admin-rooms__table-card">
         {isLoading ? (
-          <div className="admin-rooms__loading">در حال بارگذاری…</div>
+          <div className="admin-rooms__table-card__skeleton" aria-busy="true">
+            {Array.from({ length: 7 }).map((_, index) => (
+              <div className="admin-rooms__table-card__skeleton-row" key={index} aria-hidden="true">
+                <Skeleton variant="text" width={index % 2 ? 82 : 112} />
+                <Skeleton variant="text" width={64} />
+                <Skeleton variant="text" width={96} />
+                <Skeleton variant="text" width={72} />
+                <Skeleton variant="pill" width={70} height={28} />
+              </div>
+            ))}
+          </div>
         ) : isError ? (
           <div className="admin-rooms__empty">
             امکان بارگذاری اتاق‌ها وجود ندارد.

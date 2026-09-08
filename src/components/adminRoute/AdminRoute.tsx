@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { adminApi } from '../../apiCalls/adminApi';
 import './AdminRoute.scss';
 import { AdminAccessContext } from './AdminAccessContext';
+import Skeleton from '../skeleton/Skeleton';
 
 interface AdminRouteProps {
   children: React.ReactNode;
@@ -33,10 +34,7 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
 
   if (isLoading || (isDashboard && isAuthenticated && isFetching)) {
     return (
-      <div className="admin-route__loading">
-        <div className="admin-route__loading__spinner" />
-        <p>در حال بررسی دسترسی...</p>
-      </div>
+      <div className="admin-route__loading" aria-busy="true"><Skeleton variant="rect" width={220} height={10} /><Skeleton variant="text" width={110} /></div>
     );
   }
 

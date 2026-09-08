@@ -9,6 +9,7 @@ import { IoCloseOutline } from 'react-icons/io5';
 import clsx from 'clsx';
 import TicketChat from './ticketChatModal/TicketChatModal';
 
+import Skeleton from "../../../components/skeleton/Skeleton";
 // Helper to convert English statuses to Persian and matching CSS classes
 const getStatusInfo = (status: string) => {
   switch (status) {
@@ -93,7 +94,15 @@ const Tickets = () => {
 
         <div className="user-tickets__list-container__body-wrapper">
           {isLoading ? (
-            <p style={{ textAlign: 'center', padding: '1rem' }}>در حال بارگذاری...</p>
+            Array.from({ length: 6 }).map((_, index) => (
+              <div className="user-tickets__list-container__body-wrapper__row" key={index} aria-hidden="true">
+                <div className="user-tickets__list-container__body-wrapper__row__cell"><Skeleton variant="text" width="72%" /></div>
+                <div className="user-tickets__list-container__body-wrapper__row__cell"><Skeleton variant="text" width={52} /></div>
+                <div className="user-tickets__list-container__body-wrapper__row__cell"><Skeleton variant="pill" width={88} height={28} /></div>
+                <div className="user-tickets__list-container__body-wrapper__row__cell"><Skeleton variant="text" width={78} /></div>
+                <div className="user-tickets__list-container__body-wrapper__row__cell icon"><Skeleton variant="circle" width={20} height={20} /></div>
+              </div>
+            ))
           ) : (
             ticketsData?.map((ticket: any) => {
               const statusInfo = getStatusInfo(ticket.status);

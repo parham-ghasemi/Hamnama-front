@@ -451,3 +451,25 @@
     }
   }
 }
+
+.admin-tickets__item--skeleton {
+  pointer-events: none;
+  cursor: default;
+}
+
+.admin-tickets__detail--skeleton {
+  min-height: 100%;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-tickets__detail__skeleton-messages {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+}

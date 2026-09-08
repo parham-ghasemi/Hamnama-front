@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { clearRoomData, getCurrentRoom, getLastActiveRoom, getRoomApiErrorStatus, joinRoom, listPublicRooms, type PublicRoomResponse } from '../../../apiCalls/roomApi';
 import { useNavigate } from 'react-router-dom';
+import Skeleton from "../../../components/skeleton/Skeleton";
 // import { useAuth } from '../../../context/AuthContext';
 import { FaCheck } from 'react-icons/fa6';
 import clsx from 'clsx';
@@ -155,15 +156,16 @@ const Join = () => {
   }
 
   const activeRoom = currentRoomQuery.data ?? null;
+
+  useEffect(() => {
+    if (activeRoom) setIsModalOpen(false);
+  }, [activeRoom]);
+
   const activeRoomLoading = currentRoomQuery.isLoading || currentRoomQuery.isFetching;
   const activeRoomLookupFailed = !!currentRoomQuery.error && getRoomApiErrorStatus(currentRoomQuery.error) !== 404;
   const createRoomDisabled = activeRoomLoading || !!activeRoom || activeRoomLookupFailed;
   const lastRoom = lastRoomQuery.data ?? null;
   const lastRoomLabel = lastRoom?.created_by_name || "آخرین اتاق شما";
-
-  useEffect(() => {
-    if (activeRoom) setIsModalOpen(false);
-  }, [activeRoom]);
 
   return (
     <div className='join-page'>
@@ -202,7 +204,13 @@ const Join = () => {
                 <div className={clsx("join-page__content__main__cards__card__code", copied && 'copied')}>
                   کد شما:
                   <code>
-                    {activeRoom ? activeRoom.code.toLocaleString("fa-IR").replace('٬', "") : "---"}
+                    {currentRoomQuery.isLoading ? (
+                      <Skeleton variant="text" width={74} height={24} />
+                    ) : activeRoom ? (
+                      activeRoom.code.toLocaleString("fa-IR").replace('٬', "")
+                    ) : (
+                      "---"
+                    )}
                   </code>
                   <span onClick={handleCopy} aria-hidden={!activeRoom} >
                     {copied ? (<FaCheck />) : (<IoCopyOutline />)}
@@ -250,11 +258,17 @@ const Join = () => {
                 <div className="join-page__content__main__cards__last__info">
                   <p className="join-page__content__main__cards__last__info__label">آخرین اتاق شما</p>
                   <p className="join-page__content__main__cards__last__info__name">
-                    {lastRoom ? lastRoomLabel : "اتاقی برای بازگشت وجود ندارد"}
-                    {lastRoom && (
-                      <span className="join-page__content__main__cards__last__info__code">
-                        {lastRoom.code.toLocaleString("fa-IR").replace('٬', "")}
-                      </span>
+                    {lastRoomQuery.isLoading ? (
+                      <Skeleton variant="text" width={150} height={18} />
+                    ) : lastRoom ? (
+                      <>
+                        {lastRoomLabel}
+                        <span className="join-page__content__main__cards__last__info__code">
+                          {lastRoom.code.toLocaleString("fa-IR").replace('٬', "")}
+                        </span>
+                      </>
+                    ) : (
+                      "اتاقی برای بازگشت وجود ندارد"
                     )}
                   </p>
                 </div>
@@ -265,7 +279,7 @@ const Join = () => {
                   disabled={!lastRoom || joinLastRoomMutation.isPending || lastRoomQuery.isLoading}
                   onClick={() => lastRoom && joinLastRoomMutation.mutate(lastRoom.code)}
                 >
-                  {joinLastRoomMutation.isPending ? "در حال ورود..." : "بازگشت به اتاق"}
+                  {joinLastRoomMutation.isPending ? "در حال ورود..." : lastRoomQuery.isLoading ? "در حال بارگذاری..." : "بازگشت به اتاق"}
                 </button>
               </div>
 
@@ -298,7 +312,23 @@ const Join = () => {
               </div>
 
               {publicRoomsQuery.isLoading ? (
-                <div className="join-page__public-rooms__empty">در حال دریافت اتاق‌های عمومی...</div>
+                <div className="join-page__public-rooms__grid" aria-busy="true">
+                  {[0, 1, 2].map((index) => (
+                    <article key={index} className="join-page__public-room-card join-page__public-room-card--skeleton">
+                      <div className="join-page__public-room-card__title-row">
+                        <Skeleton variant="text" width={index === 0 ? 128 : 96} height={18} />
+                      </div>
+                      <div className="join-page__public-room-card__image">
+                        <Skeleton variant="rect" width="100%" height="100%" radius={16} />
+                      </div>
+                      <div className="join-page__public-room-card__code">
+                        <span>کد اتاق</span>
+                        <Skeleton variant="text" width={58} height={18} />
+                      </div>
+                      <Skeleton variant="rect" width="100%" height={42} radius={12} />
+                    </article>
+                  ))}
+                </div>
               ) : publicRoomsQuery.data?.length ? (
                 <div className="join-page__public-rooms__grid">
                   {publicRoomsQuery.data.map((room) => (

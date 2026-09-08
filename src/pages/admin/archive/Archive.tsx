@@ -29,6 +29,7 @@ import {
   getScrapeProgressUrl,
 } from '../../../apiCalls/adminApi';
 import './Archive.scss';
+import Skeleton from "../../../components/skeleton/Skeleton";
 
 type Form = Omit<AdminArchiveItem, 'links' | 'related' | 'omdb' | 'files'> & {
   linksJson: string;
@@ -653,7 +654,17 @@ const Archive = () => {
 
       <div className="admin-archive__table-card">
         {archive.isLoading ? (
-          <div className="admin-archive__message"><FiRefreshCw /> در حال بارگذاری آرشیو…</div>
+          <div className="admin-archive__table-card__skeleton" aria-busy="true">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div className="admin-archive__table-card__skeleton-row" key={index} aria-hidden="true">
+                <Skeleton variant="text" width={index % 2 ? 82 : 112} />
+                <Skeleton variant="text" width={64} />
+                <Skeleton variant="text" width={96} />
+                <Skeleton variant="text" width={72} />
+                <Skeleton variant="pill" width={70} height={28} />
+              </div>
+            ))}
+          </div>
         ) : archive.isError ? (
           <div className="admin-archive__message admin-archive__message--error"><FiAlertCircle /> دریافت آرشیو ناموفق بود.</div>
         ) : (

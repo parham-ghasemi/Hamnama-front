@@ -18,6 +18,7 @@ import './UserInfo.scss';
 import { userApi } from '../../../apiCalls/userApi';
 import { toPersianNumerals } from '../../../helpers/NumberConversion';
 import { SEO } from '../../../components/seo/SEO';
+import Skeleton from '../../../components/skeleton/Skeleton';
 
 // --- Types --- //
 interface WatchHistoryItem {
@@ -565,14 +566,14 @@ const UserInfo = () => {
           {isProfileLoading ? (
             <>
               <div className="user-info__top-card__right">
-                <div className="skeleton skeleton--avatar" />
+                <Skeleton variant="circle" width={72} height={72} />
                 <div className="skeleton-stack">
-                  <div className="skeleton skeleton--line" style={{ width: 110 }} />
-                  <div className="skeleton skeleton--line" style={{ width: 74 }} />
+                  <Skeleton variant="text" width={110} />
+                  <Skeleton variant="text" width={74} />
                 </div>
               </div>
               <div className="user-info__top-card__left">
-                <div className="skeleton skeleton--button" />
+                <Skeleton variant="rect" width={157} height={66} radius={12} />
               </div>
             </>
           ) : (
@@ -603,33 +604,33 @@ const UserInfo = () => {
         </div>
 
         <div className="user-info__info-card">
-          {isProfileLoading
-            ? [0, 1, 2].map((i) => (
-              <div className="user-info__info-card__section" key={`skeleton-${i}`}>
-                <div className="user-info__info-card__section__right">
-                  <div className="skeleton skeleton--line" style={{ width: 90 }} />
-                  <div className="skeleton skeleton--line" style={{ width: 150, height: 18 }} />
-                </div>
-                <div className="user-info__info-card__section__left">
-                  <div className="skeleton skeleton--pill" />
-                </div>
-              </div>
-            ))
-            : sections.map((item) => (
-              <div className="user-info__info-card__section" key={item.key}>
-                <div className="user-info__info-card__section__right">
-                  <p>{item.label}</p>
+          {sections.map((item) => (
+            <div className="user-info__info-card__section" key={item.key}>
+              <div className="user-info__info-card__section__right">
+                <p>{item.label}</p>
+                {isProfileLoading ? (
+                  <Skeleton
+                    variant="text"
+                    width={item.key === 'phone' ? 145 : item.key === 'username' ? 110 : 118}
+                    height={18}
+                  />
+                ) : (
                   <span>{item.value}</span>
-                </div>
+                )}
+              </div>
 
-                <div className="user-info__info-card__section__left">
+              <div className="user-info__info-card__section__left">
+                {isProfileLoading ? (
+                  <Skeleton variant="rect" width={170} height={50} radius={16} />
+                ) : (
                   <button onClick={() => handleOpenModal(item.key as any)}>
                     <IoPencilSharp />
                     ویرایش {item.label}
                   </button>
-                </div>
+                )}
               </div>
-            ))}
+            </div>
+          ))}
         </div>
 
         {/* --- Watch History Chart --- */}
@@ -664,7 +665,7 @@ const UserInfo = () => {
             <div className="user-info__chart-title-group">
               <span className="user-info__chart-total">
                 {isChartLoading ? (
-                  <span className="skeleton skeleton--line" style={{ width: 96, display: 'inline-block' }} />
+                  <Skeleton variant="text" width={96} height={16} />
                 ) : (
                   <>مجموع: {toPersianNumerals(displayTotal)} ساعت</>
                 )}

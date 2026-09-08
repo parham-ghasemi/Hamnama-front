@@ -34,3 +34,12 @@
     transform: rotate(360deg);
   }
 }
+
+.admin-route__loading {
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+}

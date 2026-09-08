@@ -1494,3 +1494,21 @@
     width: 200px;
   }
 }
+
+.join-page__public-room-card--skeleton {
+  pointer-events: none;
+
+  .join-page__public-room-card__image {
+    .skeleton {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .join-page__public-room-card__code {
+    .skeleton {
+      display: inline-block;
+      align-self: center;
+    }
+  }
+}

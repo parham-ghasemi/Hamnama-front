@@ -51,19 +51,18 @@ const PageLoader = () => {
   });
 
   const isRoom = isRoomPath(location.pathname);
-  const completedLocationKeyRef = useRef<string | null>(null);
+  const previousPathRef = useRef<string>(location.pathname);
+  const wasRoom = isRoomPath(previousPathRef.current);
+  const isLeavingRoom = wasRoom && !isRoom;
 
-  // This value is derived during render, so the loader is visible in the same
-  // render as the new route. That prevents the old/new page from flashing
-  // between navigation and the useEffect that starts the loading cycle.
-  const routeNeedsLoader = !isRoom && completedLocationKeyRef.current !== location.key;
-
+  const [initialLoadVisible, setInitialLoadVisible] = useState(true);
+  const [roomExitVisible, setRoomExitVisible] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
-  const [isVisible, setIsVisible] = useState(routeNeedsLoader);
-
   const startedAtRef = useRef<number>(performance.now());
   const finishTimerRef = useRef<number | null>(null);
   const exitTimerRef = useRef<number | null>(null);
+  const initialCompleteRef = useRef(false);
+  const roomExitActiveRef = useRef(false);
   const routeIdRef = useRef(0);
 
   const clearTimers = () => {
@@ -71,7 +70,6 @@ const PageLoader = () => {
       window.clearTimeout(finishTimerRef.current);
       finishTimerRef.current = null;
     }
-
     if (exitTimerRef.current !== null) {
       window.clearTimeout(exitTimerRef.current);
       exitTimerRef.current = null;
@@ -79,29 +77,24 @@ const PageLoader = () => {
   };
 
   useEffect(() => {
-    routeIdRef.current += 1;
-    clearTimers();
-
-    if (isRoomPath(location.pathname)) {
-      setIsExiting(false);
-      setIsVisible(false);
-      return;
+    // Keep the previous room path latched until the room-exit loader has
+    // finished. This prevents a later query-state render from losing the
+    // transition while the destination page is still fetching.
+    if (!isRoom && !roomExitActiveRef.current) {
+      previousPathRef.current = location.pathname;
     }
-
-    startedAtRef.current = performance.now();
-    setIsExiting(false);
-    setIsVisible(true);
-  }, [location.key, location.pathname]);
+  }, [isRoom, location.pathname]);
 
   useEffect(() => {
-    if (isRoomPath(location.pathname)) return;
-    if (isAuthLoading || isFetching > 0) {
-      if (finishTimerRef.current !== null) {
-        window.clearTimeout(finishTimerRef.current);
-        finishTimerRef.current = null;
-      }
-      return;
+    if (!initialCompleteRef.current) {
+      startedAtRef.current = performance.now();
+      routeIdRef.current += 1;
     }
+  }, []);
+
+  useEffect(() => {
+    if (initialCompleteRef.current) return;
+    if (isAuthLoading || isFetching > 0) return;
 
     const routeId = routeIdRef.current;
     const elapsed = performance.now() - startedAtRef.current;
@@ -109,23 +102,12 @@ const PageLoader = () => {
 
     const complete = async () => {
       await waitForVisualAssets();
-
-      // These checks intentionally use values captured for the current effect.
-      // routeId is the authoritative guard against a newer navigation.
-      if (
-        routeId !== routeIdRef.current ||
-        isRoomPath(location.pathname) ||
-        isAuthLoading ||
-        isFetching > 0
-      ) {
-        return;
-      }
+      if (routeId !== routeIdRef.current || isAuthLoading || isFetching > 0) return;
 
       setIsExiting(true);
       exitTimerRef.current = window.setTimeout(() => {
-        if (routeId !== routeIdRef.current) return;
-        completedLocationKeyRef.current = location.key;
-        setIsVisible(false);
+        initialCompleteRef.current = true;
+        setInitialLoadVisible(false);
         setIsExiting(false);
         exitTimerRef.current = null;
       }, EXIT_DURATION_MS);
@@ -137,15 +119,48 @@ const PageLoader = () => {
     }, remaining);
 
     return clearTimers;
-  }, [isAuthLoading, isFetching, location.key, location.pathname]);
+  }, [isAuthLoading, isFetching]);
+
+  useEffect(() => {
+    if (isLeavingRoom) roomExitActiveRef.current = true;
+    if (!roomExitActiveRef.current || !initialCompleteRef.current || isRoom) return;
+
+    clearTimers();
+    routeIdRef.current += 1;
+    const routeId = routeIdRef.current;
+    startedAtRef.current = performance.now();
+    setIsExiting(false);
+    setRoomExitVisible(true);
+
+    const waitForRoute = async () => {
+      if (isAuthLoading || isFetching > 0) return;
+      const elapsed = performance.now() - startedAtRef.current;
+      const remaining = Math.max(0, Math.min(420, MIN_DISPLAY_MS) - elapsed);
+      finishTimerRef.current = window.setTimeout(async () => {
+        await waitForVisualAssets();
+        if (routeId !== routeIdRef.current || isFetching > 0 || isAuthLoading) return;
+        setIsExiting(true);
+        exitTimerRef.current = window.setTimeout(() => {
+          if (routeId !== routeIdRef.current) return;
+          setRoomExitVisible(false);
+          roomExitActiveRef.current = false;
+          previousPathRef.current = location.pathname;
+          setIsExiting(false);
+          exitTimerRef.current = null;
+        }, EXIT_DURATION_MS);
+      }, remaining);
+    };
+
+    void waitForRoute();
+    return clearTimers;
+  }, [isLeavingRoom, isAuthLoading, isFetching]);
 
   useEffect(() => clearTimers, []);
 
-  // During navigation routeNeedsLoader becomes true immediately during render,
-  // before the effect above runs. The state keeps the overlay mounted through
-  // the loading/exit phase once that navigation has been recognized.
-  if (isRoom) return null;
-  if (!isVisible && !routeNeedsLoader) return null;
+  const showLoader = initialLoadVisible || roomExitVisible || isLeavingRoom;
+
+  if (isRoom && !initialLoadVisible) return null;
+  if (!showLoader) return null;
 
   return (
     <div
@@ -170,22 +185,14 @@ const PageLoader = () => {
           <div className="page-loader__aperture__halo" />
           <div className="page-loader__aperture__ring page-loader__aperture__ring--outer" />
           <div className="page-loader__aperture__ring page-loader__aperture__ring--inner" />
-          <div className="page-loader__aperture__core">
-            <span />
-          </div>
+          <div className="page-loader__aperture__core"><span /></div>
         </div>
 
         <div className="page-loader__frame" aria-hidden="true">
           <div className="page-loader__frame__edge" />
-          <div className="page-loader__frame__window page-loader__frame__window--one">
-            <span />
-          </div>
-          <div className="page-loader__frame__window page-loader__frame__window--two">
-            <span />
-          </div>
-          <div className="page-loader__frame__window page-loader__frame__window--three">
-            <span />
-          </div>
+          <div className="page-loader__frame__window page-loader__frame__window--one"><span /></div>
+          <div className="page-loader__frame__window page-loader__frame__window--two"><span /></div>
+          <div className="page-loader__frame__window page-loader__frame__window--three"><span /></div>
           <div className="page-loader__frame__scan" />
         </div>
 
@@ -196,21 +203,14 @@ const PageLoader = () => {
         </div>
 
         <div className="page-loader__status" aria-hidden="true">
-          <div className="page-loader__status__rail">
-            <span />
-          </div>
+          <div className="page-loader__status__rail"><span /></div>
           <div className="page-loader__status__meta">
             <span>PLEASE WAIT</span>
-            <span className="page-loader__status__dots">
-              <i />
-              <i />
-              <i />
-            </span>
+            <span className="page-loader__status__dots"><i /><i /><i /></span>
           </div>
         </div>
       </div>
     </div>
   );
 };
-
 export default PageLoader;

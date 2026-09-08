@@ -11,6 +11,7 @@ import {
   YAxis,
 } from 'recharts';
 import './Dashboard.scss';
+import Skeleton from "../../../components/skeleton/Skeleton";
 
 type Period = 'week' | 'month' | 'year' | 'all';
 type ChartRange = 'month' | 'quarter' | 'year' | 'all';
@@ -234,15 +235,7 @@ const Dashboard = () => {
     Object.keys(CHART_RANGE_LABELS) as ChartRange[]
   ).map((k) => ({ value: k, label: CHART_RANGE_LABELS[k] }));
 
-  if (isLoading) {
-    return (
-      <section className="admin-dashboard">
-        <div className="admin-dashboard__loading">در حال بارگذاری…</div>
-      </section>
-    );
-  }
-
-  if (isError || !data) {
+  if (isError) {
     return (
       <section className="admin-dashboard">
         <div className="admin-dashboard__empty">
@@ -261,6 +254,20 @@ const Dashboard = () => {
         </div>
       </header>
 
+      {isLoading ? (
+        <>
+          <div className="admin-dashboard__metrics">
+            {[0, 1, 2, 3].map((index) => (
+              <div className="admin-dashboard__metric-skeleton" key={index}>
+                <Skeleton variant="text" width={72} />
+                <Skeleton variant="text" width={96} height={28} />
+              </div>
+            ))}
+          </div>
+          <div className="admin-dashboard__chart-skeleton"><Skeleton variant="rect" width="100%" height={300} radius={18} /></div>
+        </>
+      ) : (
+        <>
       <div className="admin-dashboard__metrics">
         <MetricCard
           title="کاربران"
@@ -277,7 +284,6 @@ const Dashboard = () => {
           accent="green"
         />
       </div>
-
       <div className="admin-dashboard__charts">
         <div className="admin-dashboard__chart">
           <div className="admin-dashboard__chart__head">
@@ -409,6 +415,8 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+        </>
+      )}
     </section>
   );
 };

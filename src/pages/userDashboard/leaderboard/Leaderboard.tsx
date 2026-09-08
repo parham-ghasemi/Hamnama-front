@@ -4,6 +4,7 @@ import "./Leaderboard.scss";
 import api from "../../../lib/axiosConfig";
 import { PiUserFill } from "react-icons/pi";
 
+import Skeleton from "../../../components/skeleton/Skeleton";
 const DEFAULT_AVATAR = "/assets/images/default-avatar.png";
 const API_BASE_URL = import.meta.env['VITE_BASE_URL'] || "";
 
@@ -39,10 +40,6 @@ export const Leaderboard: React.FC = () => {
     return `${API_BASE_URL}${path}`;
   };
 
-  if (isLoading) {
-    return <div className="user-leaderboard__loading">در حال بارگذاری...</div>;
-  }
-
   if (isError) {
     return (
       <div className="user-leaderboard__error">
@@ -70,7 +67,21 @@ export const Leaderboard: React.FC = () => {
 
         {/* Table Body */}
         <div className="user-leaderboard__list-container__body-wrapper">
-          {users.map((user) => (
+          {isLoading ? (
+            Array.from({ length: 7 }).map((_, index) => (
+              <div className="user-leaderboard__list-container__body-wrapper__row" key={index} aria-hidden="true">
+                <div className="user-leaderboard__list-container__body-wrapper__row__profile-group">
+                  <div className="user-leaderboard__list-container__body-wrapper__row__cell user-leaderboard__list-container__body-wrapper__row__cell--image-only">
+                    <Skeleton variant="circle" width={42} height={42} />
+                  </div>
+                  <div className="user-leaderboard__list-container__body-wrapper__row__cell user-leaderboard__list-container__body-wrapper__row__cell--name"><Skeleton variant="text" width={110} /></div>
+                </div>
+                <div className="user-leaderboard__list-container__body-wrapper__row__cell"><Skeleton variant="text" width={64} /></div>
+                <div className="user-leaderboard__list-container__body-wrapper__row__cell"><Skeleton variant="text" width={76} /></div>
+                <div className="user-leaderboard__list-container__body-wrapper__row__cell"><Skeleton variant="text" width={34} /></div>
+              </div>
+            ))
+          ) : users.map((user) => (
             <div
               key={user.id}
               className="user-leaderboard__list-container__body-wrapper__row"
