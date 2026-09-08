@@ -244,12 +244,34 @@ type ArchiveDropdownProps = {
   onChange: (value: string) => void;
   icon?: React.ReactNode;
   disabled?: boolean;
+  multiple?: boolean;
 };
 
-const ArchiveDropdown: React.FC<ArchiveDropdownProps> = ({ label, value, options, onChange, icon, disabled = false }) => {
+const ArchiveDropdown: React.FC<ArchiveDropdownProps> = ({
+  label,
+  value,
+  options,
+  onChange,
+  icon,
+  disabled = false,
+  multiple = false,
+}) => {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+
+  const selectedValues = multiple
+    ? value.split(",").map((item) => item.trim()).filter(Boolean)
+    : [];
   const selected = options.find((option) => option.value === value) ?? options[0];
+  const allOption = multiple ? options.find((option) => option.value === "") : undefined;
+
+  const triggerLabel = multiple
+    ? selectedValues.length === 0
+      ? allOption?.label ?? "همه"
+      : selectedValues.length === 1
+        ? options.find((option) => option.value === selectedValues[0])?.label ?? allOption?.label ?? "همه"
+        : `${selectedValues.length.toLocaleString("fa-IR")} مورد انتخاب شده`
+    : selected?.label;
 
   useEffect(() => {
     if (!open) return;
@@ -264,25 +286,48 @@ const ArchiveDropdown: React.FC<ArchiveDropdownProps> = ({ label, value, options
     <div className={clsx("archive-dropdown", open && "open")} ref={rootRef}>
       <span className="archive-dropdown__label">{label}</span>
       <button type="button" className="archive-dropdown__trigger" onClick={() => !disabled && setOpen((current) => !current)} aria-expanded={open} disabled={disabled}>
-        <span className="archive-dropdown__value">{icon}{selected?.label}</span>
+        <span className="archive-dropdown__value">{icon}{triggerLabel}</span>
         <TbChevronDown />
       </button>
-      <div className="archive-dropdown__menu" role="listbox">
+      <div className="archive-dropdown__menu" role="listbox" aria-multiselectable={multiple || undefined}>
         <div className="archive-dropdown__menu__inner" role="listbox">
-          {options.map((option) => (
-            <button
-              type="button"
-              key={option.value}
-              className={clsx("archive-dropdown__option", option.value === value && "selected")}
-              onClick={() => {
-                onChange(option.value);
-                setOpen(false);
-              }}
-            >
-              <span>{option.label}</span>
-              {option.value === value && <span className="archive-dropdown__check">✓</span>}
-            </button>
-          ))}
+          {options.map((option) => {
+            const optionSelected = multiple
+              ? option.value === ""
+                ? selectedValues.length === 0
+                : selectedValues.includes(option.value)
+              : option.value === value;
+
+            return (
+              <button
+                type="button"
+                key={option.value}
+                className={clsx("archive-dropdown__option", optionSelected && "selected")}
+                role="option"
+                aria-selected={optionSelected}
+                onClick={() => {
+                  if (!multiple) {
+                    onChange(option.value);
+                    setOpen(false);
+                    return;
+                  }
+
+                  if (option.value === "") {
+                    onChange("");
+                    return;
+                  }
+
+                  const nextValues = optionSelected
+                    ? selectedValues.filter((selectedValue) => selectedValue !== option.value)
+                    : [...selectedValues, option.value];
+                  onChange(nextValues.join(","));
+                }}
+              >
+                <span>{option.label}</span>
+                {optionSelected && <span className="archive-dropdown__check">✓</span>}
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -342,6 +387,7 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
   const [selectedId, setSelectedId] = useState<string | null>(currentPlayingId || null);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [genreFilters, setGenreFilters] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("rates_desc");
   const [page, setPage] = useState(1);
   const [selectedSeason, setSelectedSeason] = useState<number | null>(null);
@@ -358,8 +404,17 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
   const queryClient = useQueryClient();
 
   const listQuery = useQuery({
-    queryKey: ["archiveMediaList", { search, typeFilter, sortBy, page }],
-    queryFn: async () => (await archiveApi.getMediaList({ search, type: typeFilter, sort: sortBy, page, limit: 12 })).data,
+    queryKey: ["archiveMediaList", { search, typeFilter, genreFilters, sortBy, page }],
+    queryFn: async () => (
+      await archiveApi.getMediaList({
+        search,
+        type: typeFilter,
+        genres: genreFilters,
+        sort: sortBy,
+        page,
+        limit: 12,
+      })
+    ).data,
     enabled: isOpen,
     staleTime: 60_000,
   });
@@ -676,8 +731,31 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
             <div className="archive-modal__controls">
               <div className="archive-modal__search"><TbSearch /><input type="search" data-video-keyboard-ignore placeholder="نام فارسی، انگلیسی یا IMDb ID..." value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} /></div>
               <div className="archive-modal__filters">
-                <ArchiveDropdown label="نوع" value={typeFilter} options={[{ value: "", label: "همه انواع" }, { value: "movie", label: "فیلم" }, { value: "series", label: "سریال" }]} onChange={(value) => { setTypeFilter(value); setPage(1); }} />
-                <ArchiveDropdown label="مرتب‌سازی" value={sortBy} options={[{ value: "rates_desc", label: "امتیاز بیشتر" }, { value: "votes_desc", label: "رأی بیشتر" }, { value: "year_desc", label: "جدیدتر" }, { value: "title_asc", label: "عنوان" }]} onChange={(value) => { setSortBy(value); setPage(1); }} />
+                <ArchiveDropdown
+                  label="نوع"
+                  value={typeFilter}
+                  options={[{ value: "", label: "همه انواع" }, { value: "movie", label: "فیلم" }, { value: "series", label: "سریال" }]}
+                  onChange={(value) => { setTypeFilter(value); setPage(1); }}
+                />
+                <ArchiveDropdown
+                  label="ژانر"
+                  value={genreFilters.join(",")}
+                  multiple
+                  options={[
+                    { value: "", label: "همه ژانرها" },
+                    ...Object.entries(movieGenres).map(([value, label]) => ({ value, label })),
+                  ]}
+                  onChange={(value) => {
+                    setGenreFilters(value ? value.split(",").filter(Boolean) : []);
+                    setPage(1);
+                  }}
+                />
+                <ArchiveDropdown
+                  label="مرتب‌سازی"
+                  value={sortBy}
+                  options={[{ value: "rates_desc", label: "امتیاز بیشتر" }, { value: "votes_desc", label: "رأی بیشتر" }, { value: "year_desc", label: "جدیدتر" }, { value: "title_asc", label: "عنوان" }]}
+                  onChange={(value) => { setSortBy(value); setPage(1); }}
+                />
               </div>
             </div>
 

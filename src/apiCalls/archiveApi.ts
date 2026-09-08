@@ -123,13 +123,19 @@ export interface GetMediaListParams {
   search?: string;
   type?: string;
   sort?: string;
+  genres?: string[];
   page?: number;
   limit?: number;
 }
 
 export const archiveApi = {
   getMediaList: (params?: GetMediaListParams) =>
-    api.get<PaginatedMediaResponse>("/media", { params }),
+    api.get<PaginatedMediaResponse>("/media", {
+      params: {
+        ...params,
+        genres: params?.genres?.length ? params.genres.join(",") : undefined,
+      },
+    }),
 
   getMediaDetails: (id: string) =>
     api.get<MediaDetailResponse>(`/media/${id}`),

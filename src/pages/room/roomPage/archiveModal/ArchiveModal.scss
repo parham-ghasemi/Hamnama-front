@@ -258,6 +258,7 @@
 }
 .archive-modal__filters {
   display: flex;
+  flex-wrap: wrap;
   gap: 9px;
 }
 .archive-dropdown {
@@ -296,9 +297,14 @@
   background: rgba(255, 255, 255, 0.055);
 }
 .archive-dropdown__value {
+  min-width: 0;
+  max-width: 100%;
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 12px;
   font-weight: 750;
 }
