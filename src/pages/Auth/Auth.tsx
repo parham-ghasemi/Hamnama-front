@@ -59,11 +59,12 @@ const Auth = () => {
     }
   };
 
-  const handlePasswordSubmit = async (passwordValue: string) => {
+  const handlePasswordSubmit = async (passwordValue: string, turnstileToken: string) => {
     try {
       const { data } = await api.post('/auth/login-password', {
         phone: phoneNumber,
         password: passwordValue,
+        turnstile_token: turnstileToken,
       });
 
       // Save session token and redirect
@@ -90,7 +91,7 @@ const Auth = () => {
     }
   };
 
-  const handleOtpSubmit = async (code: string) => {
+  const handleOtpSubmit = async (code: string, turnstileToken: string) => {
 
     try {
       if (isExistingUser) {
@@ -98,6 +99,7 @@ const Auth = () => {
         const { data } = await api.post('/auth/login-otp', {
           phone: phoneNumber,
           code,
+          turnstile_token: turnstileToken,
         });
 
         await login(data.access_token);
@@ -120,12 +122,17 @@ const Auth = () => {
     }
   };
 
-  const handleRegisterSubmit = async ({ username, password: registerPassword }: { username: string; password: string; }) => {
+  const handleRegisterSubmit = async ({
+    username,
+    password: registerPassword,
+    turnstileToken,
+  }: { username: string; password: string; turnstileToken: string }) => {
     try {
       const { data } = await api.post('/auth/signup', {
         username,
         password: registerPassword,
         token: verificationToken, // Temporary token from step 3
+        turnstile_token: turnstileToken,
       });
 
       // Save final session token and redirect
@@ -181,6 +188,7 @@ const Auth = () => {
           <OtpInput
             phoneNumber={phoneNumber}
             onSubmit={handleOtpSubmit}
+            requireCaptcha={isExistingUser === true}
             onChangePhone={handleChangePhone}
             resendOtp={handleResendOtp}
           />

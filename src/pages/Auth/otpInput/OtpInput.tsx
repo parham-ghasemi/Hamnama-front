@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import './OtpInput.scss';
 import { PiArrowClockwiseBold, PiSpinnerGapBold, PiChatCircleDotsFill } from 'react-icons/pi';
+import Turnstile, { type TurnstileHandle } from '../../../components/turnstile/Turnstile';
 
 interface OtpInputProps {
   phoneNumber: string;
-  onSubmit: (otp: string) => void;
+  onSubmit: (otp: string, turnstileToken: string) => Promise<void>;
+  requireCaptcha?: boolean;
   onChangePhone: () => void;
   resendOtp: () => void;
   isLoading?: boolean;
@@ -15,11 +17,14 @@ const OtpInput = ({
   onSubmit,
   onChangePhone,
   resendOtp,
-  isLoading = false
+  isLoading = false,
+  requireCaptcha = false,
 }: OtpInputProps) => {
   const [otp, setOtp] = useState(['', '', '', '']);
   const [timeLeft, setTimeLeft] = useState(60);
   const [error, setError] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileRef = useRef<TurnstileHandle | null>(null);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -68,7 +73,7 @@ const OtpInput = ({
     inputRefs.current[focusIndex]?.focus();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const code = otp.join('');
 
@@ -77,7 +82,19 @@ const OtpInput = ({
       return;
     }
 
-    onSubmit(code);
+    if (requireCaptcha && !turnstileToken) {
+      setError('لطفاً تأیید امنیتی را کامل کنید');
+      return;
+    }
+
+    try {
+      await onSubmit(code, turnstileToken);
+    } finally {
+      if (requireCaptcha) {
+        turnstileRef.current?.reset();
+        setTurnstileToken('');
+      }
+    }
   };
 
   const handleResend = () => {
@@ -144,6 +161,18 @@ const OtpInput = ({
       </p>
 
       {error && <p className='otp-input__error'>{error}</p>}
+
+      {requireCaptcha && (
+        <div className="otp-input__captcha">
+          <Turnstile
+            ref={turnstileRef}
+            action="login"
+            onToken={setTurnstileToken}
+            onError={() => setTurnstileToken('')}
+            onExpired={() => setTurnstileToken('')}
+          />
+        </div>
+      )}
 
       <button
         type='submit'

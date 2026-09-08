@@ -166,6 +166,14 @@
     @include auth.auth-error;
   }
 
+  &__captcha {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    justify-content: center;
+    margin-top: -2px;
+  }
+
   &__subBtn {
     @include auth.auth-primary-btn;
     margin-top: 12px;

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import Turnstile, { type TurnstileHandle } from "../turnstile/Turnstile";
 import {
   FiSend,
   FiWifi,
@@ -95,6 +96,11 @@ const SupportChatWidget = () => {
   const [connection, setConnection] =
     useState<ConnectionState>("offline");
   const [error, setError] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
+
+  const startCaptchaRef = useRef<TurnstileHandle | null>(null);
+  const messageCaptchaRef = useRef<TurnstileHandle | null>(null);
 
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimer = useRef<number | null>(null);
@@ -316,10 +322,16 @@ const SupportChatWidget = () => {
 
       const visitorName = name.trim() || "ناشناس";
 
+      if (!captchaToken) {
+        setError("لطفاً تأیید امنیتی را کامل کنید.");
+        return;
+      }
+
       const response = await supportApi.createConversation({
         visitor_id: savedVisitorId,
         name: visitorName,
         message: initialMessage.trim(),
+        turnstile_token: captchaToken,
       });
 
       localStorage.setItem(
@@ -347,11 +359,13 @@ const SupportChatWidget = () => {
         setError("شروع گفتگو با مشکل مواجه شد.");
       }
     } finally {
+      startCaptchaRef.current?.reset();
+      setCaptchaToken("");
       setLoading(false);
     }
   };
 
-  const sendMessage = (event: FormEvent) => {
+  const sendMessage = async (event: FormEvent) => {
     event.preventDefault();
 
     const content = message.trim();
@@ -371,20 +385,44 @@ const SupportChatWidget = () => {
       return;
     }
 
-    socketRef.current.send(
-      JSON.stringify({
-        type: "message",
-        payload: { content },
-      }),
-    );
+    if (sendingMessage) return;
 
-    setMessage("");
+    setSendingMessage(true);
+    setError("");
+
+    try {
+      const token = await messageCaptchaRef.current?.execute();
+      if (!token) {
+        setError("تأیید امنیتی انجام نشد. دوباره تلاش کنید.");
+        return;
+      }
+
+      socketRef.current.send(
+        JSON.stringify({
+          type: "message",
+          payload: {
+            content,
+            turnstile_token: token,
+          },
+        }),
+      );
+
+      setMessage("");
+    } catch {
+      setError("تأیید امنیتی انجام نشد. دوباره تلاش کنید.");
+    } finally {
+      messageCaptchaRef.current?.reset();
+      setSendingMessage(false);
+    }
   };
 
   const restart = () => {
     closeSocket();
     localStorage.removeItem(CONVERSATION_KEY);
     setConversation(null);
+    setCaptchaToken("");
+    startCaptchaRef.current?.reset();
+    messageCaptchaRef.current?.reset();
     setError("");
   };
 
@@ -496,6 +534,16 @@ const SupportChatWidget = () => {
                   </div>
                 ) : null}
 
+                <div className="support-chat__captcha">
+                  <Turnstile
+                    ref={startCaptchaRef}
+                    action="support_start"
+                    onToken={setCaptchaToken}
+                    onError={() => setCaptchaToken("")}
+                    onExpired={() => setCaptchaToken("")}
+                  />
+                </div>
+
                 <button
                   className="support-chat__primary"
                   type="submit"
@@ -572,6 +620,16 @@ const SupportChatWidget = () => {
                   </div>
                 ) : null}
 
+                <div className="support-chat__message-captcha" aria-hidden="true">
+                  <Turnstile
+                    ref={messageCaptchaRef}
+                    action="support_message"
+                    appearance="interaction-only"
+                    execution="execute"
+                    size="compact"
+                  />
+                </div>
+
                 {conversation.status === "open" ? (
                   <form
                     className="support-chat__composer"
@@ -591,7 +649,8 @@ const SupportChatWidget = () => {
                       type="submit"
                       disabled={
                         !message.trim() ||
-                        connection !== "connected"
+                        connection !== "connected" ||
+                        sendingMessage
                       }
                       aria-label="ارسال پیام"
                     >

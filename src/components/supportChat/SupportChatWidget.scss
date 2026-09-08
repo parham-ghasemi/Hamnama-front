@@ -923,3 +923,25 @@ $light-muted: #766861;
     transition: none !important;
   }
 }
+
+
+.support-chat__captcha {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: -4px 0 2px;
+  overflow: hidden;
+}
+
+.support-chat__message-captcha {
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  margin: 0 auto 2px;
+}
+
+.support-chat__primary:disabled {
+  cursor: not-allowed;
+}

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import './LoginPassword.scss';
 import { Link } from 'react-router-dom';
 import { PiEyeBold, PiEyeSlashBold, PiSpinnerGapBold, PiLockKeyFill } from 'react-icons/pi';
+import Turnstile, { type TurnstileHandle } from '../../../components/turnstile/Turnstile';
 
 interface LoginPasswordProps {
-  setPassword: (word: string) => void;
+  setPassword: (word: string, turnstileToken: string) => Promise<void>;
   goOtp: () => void;
   isLoading?: boolean;
 }
@@ -13,8 +14,10 @@ const LoginPassword = ({ setPassword, goOtp, isLoading = false }: LoginPasswordP
   const [password, setPasswordValue] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileRef = useRef<TurnstileHandle | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!password.trim()) {
@@ -22,8 +25,18 @@ const LoginPassword = ({ setPassword, goOtp, isLoading = false }: LoginPasswordP
       return;
     }
 
+    if (!turnstileToken) {
+      setError('لطفاً تأیید امنیتی را کامل کنید');
+      return;
+    }
+
     setError('');
-    setPassword(password);
+    try {
+      await setPassword(password, turnstileToken);
+    } finally {
+      turnstileRef.current?.reset();
+      setTurnstileToken('');
+    }
   };
 
   return (
@@ -73,6 +86,16 @@ const LoginPassword = ({ setPassword, goOtp, isLoading = false }: LoginPasswordP
           {error}
         </p>
       )}
+
+      <div className="login-password__captcha">
+        <Turnstile
+          ref={turnstileRef}
+          action="login"
+          onToken={setTurnstileToken}
+          onError={() => setTurnstileToken('')}
+          onExpired={() => setTurnstileToken('')}
+        />
+      </div>
 
       <button
         type='submit'

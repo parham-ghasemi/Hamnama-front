@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import './RegisterInfo.scss';
 import { Link } from 'react-router-dom';
 import { PiEyeBold, PiEyeSlashBold, PiUserFill, PiSpinnerGapBold, PiIdentificationBadgeFill } from 'react-icons/pi';
 import { toast } from '../../../components/toast';
 import clsx from 'clsx';
+import Turnstile, { type TurnstileHandle } from '../../../components/turnstile/Turnstile';
 
 interface RegisterInfoProps {
-  onSubmit: (data: { username: string; password: string }) => void;
+  onSubmit: (data: { username: string; password: string; turnstileToken: string }) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -18,6 +19,8 @@ const RegisterInfo = ({ onSubmit, isLoading = false }: RegisterInfoProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [domError, setDomError] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileRef = useRef<TurnstileHandle | null>(null);
 
   const validatePassword = (pw: string) => {
     if (pw.length < 5) return 'رمز عبور باید حداقل بیش از پنج کاراکتر باشد';
@@ -28,7 +31,7 @@ const RegisterInfo = ({ onSubmit, isLoading = false }: RegisterInfoProps) => {
     return '';
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (password !== repeatPassword) {
@@ -43,7 +46,18 @@ const RegisterInfo = ({ onSubmit, isLoading = false }: RegisterInfoProps) => {
     }
 
     setDomError('');
-    onSubmit({ username, password });
+
+    if (!turnstileToken) {
+      setDomError('لطفاً تأیید امنیتی را کامل کنید');
+      return;
+    }
+
+    try {
+      await onSubmit({ username, password, turnstileToken });
+    } finally {
+      turnstileRef.current?.reset();
+      setTurnstileToken('');
+    }
   };
 
   const isFormFilled = username.trim() !== '' && password.trim() !== '' && repeatPassword.trim() !== '';
@@ -125,6 +139,16 @@ const RegisterInfo = ({ onSubmit, isLoading = false }: RegisterInfoProps) => {
       </div>
 
       {/* {domError && <p className="register-info__error" style={{ color: 'red', marginTop: '10px', textAlign: 'center' }}>{domError}</p>} */}
+
+      <div className="register-info__captcha">
+        <Turnstile
+          ref={turnstileRef}
+          action="signup"
+          onToken={setTurnstileToken}
+          onError={() => setTurnstileToken('')}
+          onExpired={() => setTurnstileToken('')}
+        />
+      </div>
 
       <button
         type="submit"

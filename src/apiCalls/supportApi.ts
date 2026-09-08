@@ -59,6 +59,7 @@ export const supportApi = {
     visitor_id?: string;
     name: string;
     message: string;
+    turnstile_token: string;
   }) => api.post<SupportConversation>("/support/conversations", payload),
 
   getConversation: (id: string, visitorId: string) =>
