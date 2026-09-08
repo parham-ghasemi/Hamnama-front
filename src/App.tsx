@@ -27,6 +27,7 @@ import About from "./pages/about/About";
 import Tutorial from "./pages/tutorial/Tutorial";
 import { AdminSupport } from "./pages/admin";
 import WebsiteAnnouncements from "./components/websiteAnnouncements/WebsiteAnnouncements";
+import PageLoader from "./components/pageLoader/PageLoader";
 
 const queryClient = new QueryClient({});
 
@@ -40,6 +41,7 @@ function App() {
               <ScrollToTop />
               <Toaster position="top-right" />
               <WebsiteAnnouncements />
+              <PageLoader />
               <Routes>
                 <Route path="user" element={<UserDashboardLayout />}>
                   <Route index element={<Navigate to={"info"} replace />} />
