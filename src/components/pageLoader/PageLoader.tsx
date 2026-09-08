@@ -24,15 +24,15 @@ const waitForVisualAssets = async () => {
           image.complete
             ? Promise.resolve()
             : new Promise<void>((resolve) => {
-              const done = () => {
-                image.removeEventListener("load", done);
-                image.removeEventListener("error", done);
-                resolve();
-              };
+                const done = () => {
+                  image.removeEventListener("load", done);
+                  image.removeEventListener("error", done);
+                  resolve();
+                };
 
-              image.addEventListener("load", done, { once: true });
-              image.addEventListener("error", done, { once: true });
-            }),
+                image.addEventListener("load", done, { once: true });
+                image.addEventListener("error", done, { once: true });
+              }),
       ),
     ]),
     new Promise<void>((resolve) => {
@@ -50,9 +50,16 @@ const PageLoader = () => {
     predicate: (query) => query.queryKey[0] !== "websiteAnnouncements",
   });
 
-  const [isVisible, setIsVisible] = useState(() => !isRoomPath(location.pathname));
+  const isRoom = isRoomPath(location.pathname);
+  const completedLocationKeyRef = useRef<string | null>(null);
+
+  // This value is derived during render, so the loader is visible in the same
+  // render as the new route. That prevents the old/new page from flashing
+  // between navigation and the useEffect that starts the loading cycle.
+  const routeNeedsLoader = !isRoom && completedLocationKeyRef.current !== location.key;
+
   const [isExiting, setIsExiting] = useState(false);
-  const [routePending, setRoutePending] = useState(() => !isRoomPath(location.pathname));
+  const [isVisible, setIsVisible] = useState(routeNeedsLoader);
 
   const startedAtRef = useRef<number>(performance.now());
   const finishTimerRef = useRef<number | null>(null);
@@ -72,25 +79,22 @@ const PageLoader = () => {
   };
 
   useEffect(() => {
-    const room = isRoomPath(location.pathname);
     routeIdRef.current += 1;
     clearTimers();
 
-    if (room) {
-      setRoutePending(false);
+    if (isRoomPath(location.pathname)) {
       setIsExiting(false);
       setIsVisible(false);
       return;
     }
 
     startedAtRef.current = performance.now();
-    setRoutePending(true);
     setIsExiting(false);
     setIsVisible(true);
-  }, [location.pathname]);
+  }, [location.key, location.pathname]);
 
   useEffect(() => {
-    if (!routePending || isRoomPath(location.pathname)) return;
+    if (isRoomPath(location.pathname)) return;
     if (isAuthLoading || isFetching > 0) {
       if (finishTimerRef.current !== null) {
         window.clearTimeout(finishTimerRef.current);
@@ -106,9 +110,10 @@ const PageLoader = () => {
     const complete = async () => {
       await waitForVisualAssets();
 
+      // These checks intentionally use values captured for the current effect.
+      // routeId is the authoritative guard against a newer navigation.
       if (
         routeId !== routeIdRef.current ||
-        routePending === false ||
         isRoomPath(location.pathname) ||
         isAuthLoading ||
         isFetching > 0
@@ -119,9 +124,9 @@ const PageLoader = () => {
       setIsExiting(true);
       exitTimerRef.current = window.setTimeout(() => {
         if (routeId !== routeIdRef.current) return;
+        completedLocationKeyRef.current = location.key;
         setIsVisible(false);
         setIsExiting(false);
-        setRoutePending(false);
         exitTimerRef.current = null;
       }, EXIT_DURATION_MS);
     };
@@ -132,11 +137,15 @@ const PageLoader = () => {
     }, remaining);
 
     return clearTimers;
-  }, [isAuthLoading, isFetching, location.pathname, routePending]);
+  }, [isAuthLoading, isFetching, location.key, location.pathname]);
 
   useEffect(() => clearTimers, []);
 
-  if (!isVisible || isRoomPath(location.pathname)) return null;
+  // During navigation routeNeedsLoader becomes true immediately during render,
+  // before the effect above runs. The state keeps the overlay mounted through
+  // the loading/exit phase once that navigation has been recognized.
+  if (isRoom) return null;
+  if (!isVisible && !routeNeedsLoader) return null;
 
   return (
     <div
