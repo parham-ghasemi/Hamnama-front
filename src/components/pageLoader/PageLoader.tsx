@@ -24,15 +24,15 @@ const waitForVisualAssets = async () => {
           image.complete
             ? Promise.resolve()
             : new Promise<void>((resolve) => {
-                const done = () => {
-                  image.removeEventListener("load", done);
-                  image.removeEventListener("error", done);
-                  resolve();
-                };
+              const done = () => {
+                image.removeEventListener("load", done);
+                image.removeEventListener("error", done);
+                resolve();
+              };
 
-                image.addEventListener("load", done, { once: true });
-                image.addEventListener("error", done, { once: true });
-              }),
+              image.addEventListener("load", done, { once: true });
+              image.addEventListener("error", done, { once: true });
+            }),
       ),
     ]),
     new Promise<void>((resolve) => {
@@ -198,7 +198,7 @@ const PageLoader = () => {
 
         <div className="page-loader__copy">
           <span className="page-loader__copy__eyebrow">PREPARING THE NEXT SCENE</span>
-          <h1>در حال آماده‌سازی...</h1>
+          <h1>در حال آماده‌سازی<span className="page-loader__copy__dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></h1>
           <p>صحنه را آماده می‌کنیم تا همه‌چیز درست همان‌طور که باید نمایش داده شود.</p>
         </div>
 
