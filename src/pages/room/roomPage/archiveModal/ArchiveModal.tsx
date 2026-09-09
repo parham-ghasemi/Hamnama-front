@@ -218,7 +218,7 @@ const MediaCard: React.FC<{
       <div className="archive-card__info">
         <strong className="archive-card__title">{item.title_en || item.title_fa}</strong>
         {item.title_fa && item.title_en && <span className="archive-card__fa-title">{item.title_fa}</span>}
-        <span className="archive-card__meta">{clean(item.year)}{item.votes ? ` · ${item.votes} رأی` : ""}</span>
+        <span className="archive-card__meta">{clean(item.year)}{item.genre ? ` · ${item.genre.split(", ").map(g => movieGenres[g]).join(", ")}` : ""}</span>
       </div>
     </button>
     {onToggleFavorite && (

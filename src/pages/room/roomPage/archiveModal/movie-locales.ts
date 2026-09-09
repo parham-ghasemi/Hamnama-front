@@ -22,6 +22,7 @@ export const movieGenres: Record<string, string> = {
   "Mystery": "معمایی",
   "Romance": "عاشقانه",
   "Science Fiction": "علمی‌تخیلی",
+  "Sci-Fi": "علمی‌تخیلی",
   "Thriller": "دلهره‌آور",
   "War": "جنگی",
   "Western": "وسترن",

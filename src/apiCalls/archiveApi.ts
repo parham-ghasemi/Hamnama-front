@@ -62,6 +62,7 @@ export interface MediaListItem {
   votes: string;
   poster?: string;
   enabled?: boolean;
+  genre?: string;
 }
 
 export interface MediaDetailResponse extends MediaListItem {
