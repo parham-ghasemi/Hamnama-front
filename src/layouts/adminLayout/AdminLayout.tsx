@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   FiLayout,
   FiMessageSquare,
@@ -9,6 +10,7 @@ import {
   FiArchive,
 } from 'react-icons/fi';
 import Header from '../../components/header/Header';
+import { adminApi } from '../../apiCalls/adminApi';
 import './AdminLayout.scss';
 
 const navItems = [
@@ -22,6 +24,16 @@ const navItems = [
 ];
 
 const AdminLayout = () => {
+  const { data: notifications } = useQuery({
+    queryKey: ['admin-notifications'],
+    queryFn: () => adminApi.getNotifications().then((res) => res.data),
+    refetchInterval: 15000,
+    staleTime: 10000,
+  });
+
+  const hasTicketNotifications = (notifications?.tickets_needing_response ?? 0) > 0;
+  const hasSupportNotifications = (notifications?.support_needing_response ?? 0) > 0;
+
   return (
     <div className="admin-layout">
       <Header />
@@ -44,6 +56,12 @@ const AdminLayout = () => {
               >
                 <Icon aria-hidden />
                 <span>{label}</span>
+                {to === '/admin/tickets' && hasTicketNotifications ? (
+                  <span className="admin-layout__nav__indicator" aria-label="پاسخ جدید در تیکت‌ها" />
+                ) : null}
+                {to === '/admin/support' && hasSupportNotifications ? (
+                  <span className="admin-layout__nav__indicator" aria-label="پیام جدید در پشتیبانی" />
+                ) : null}
               </NavLink>
             ))}
           </nav>

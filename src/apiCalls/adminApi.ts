@@ -2,6 +2,7 @@ import api from "../lib/axiosConfig";
 import { getAccessToken } from "../lib/authToken";
 
 export interface AdminDashboardResponse {
+  online_users: number;
   stats: {
     users: {
       this_week: number;
@@ -20,6 +21,19 @@ export interface AdminDashboardResponse {
     users_over_time: Array<{ label: string; count: number }>;
     rooms_over_time: Array<{ label: string; count: number }>;
   };
+}
+
+export type WebsiteAnalyticsRange = '30d' | '90d' | '365d' | 'all';
+export type WebsiteAnalyticsAccountFilter = 'all' | 'account' | 'guest';
+
+export interface WebsiteAnalyticsResponse {
+  unique_visitors: number;
+  visits_over_time: Array<{ label: string; count: number }>;
+}
+
+export interface AdminNotificationsResponse {
+  tickets_needing_response: number;
+  support_needing_response: number;
 }
 
 export interface AdminTicketListItem {
@@ -269,6 +283,9 @@ export const getScrapeProgressUrl = (id: string) => {
 export const adminApi = {
   getAccess: () => api.get<{ user_id: string; access_level: number }>("/admin/access"),
   getDashboard: () => api.get<AdminDashboardResponse>("/admin/dashboard"),
+  getWebsiteAnalytics: (range: WebsiteAnalyticsRange, account: WebsiteAnalyticsAccountFilter) =>
+    api.get<WebsiteAnalyticsResponse>('/admin/website-analytics', { params: { range, account } }),
+  getNotifications: () => api.get<AdminNotificationsResponse>('/admin/notifications'),
 
   getTickets: () => api.get<{ tickets: AdminTicketListItem[] }>('/admin/tickets'),
   getTicket: (id: string | number) => api.get<AdminTicketDetails>(`/admin/tickets/${id}`),

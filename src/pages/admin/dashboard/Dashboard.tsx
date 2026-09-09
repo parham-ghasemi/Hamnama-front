@@ -1,6 +1,10 @@
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { adminApi } from '../../../apiCalls/adminApi';
+import {
+  adminApi,
+  type WebsiteAnalyticsAccountFilter,
+  type WebsiteAnalyticsRange,
+} from '../../../apiCalls/adminApi';
 import {
   AreaChart,
   Area,
@@ -15,6 +19,8 @@ import Skeleton from "../../../components/skeleton/Skeleton";
 
 type Period = 'week' | 'month' | 'year' | 'all';
 type ChartRange = 'month' | 'quarter' | 'year' | 'all';
+type WebsiteAccountFilter = WebsiteAnalyticsAccountFilter;
+
 
 const PERIOD_LABELS: Record<Period, string> = {
   week: 'این هفته',
@@ -28,6 +34,19 @@ const CHART_RANGE_LABELS: Record<ChartRange, string> = {
   quarter: '۹۰ روز اخیر',
   year: '۳۶۵ روز اخیر',
   all: 'همه',
+};
+
+const WEBSITE_RANGE_LABELS: Record<WebsiteAnalyticsRange, string> = {
+  '30d': '۳۰ روز اخیر',
+  '90d': '۹۰ روز اخیر',
+  '365d': '۳۶۵ روز اخیر',
+  all: 'همه',
+};
+
+const WEBSITE_ACCOUNT_LABELS: Record<WebsiteAccountFilter, string> = {
+  all: 'همه بازدیدکنندگان',
+  account: 'دارای حساب',
+  guest: 'مهمان‌ها',
 };
 
 const formatJalaliDate = (value: string) => {
@@ -178,12 +197,30 @@ const Dashboard = () => {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['admin-dashboard'],
     queryFn: () => adminApi.getDashboard().then((res) => res.data),
+    refetchInterval: 30000,
   });
 
   const [usersPeriod, setUsersPeriod] = useState<Period>('all');
   const [roomsPeriod, setRoomsPeriod] = useState<Period>('all');
   const [usersChartRange, setUsersChartRange] = useState<ChartRange>('year');
   const [roomsChartRange, setRoomsChartRange] = useState<ChartRange>('year');
+  const [websiteRange, setWebsiteRange] = useState<WebsiteAnalyticsRange>('365d');
+  const [websiteCardAccount, setWebsiteCardAccount] = useState<WebsiteAccountFilter>('all');
+  const [websiteAccount, setWebsiteAccount] = useState<WebsiteAccountFilter>('all');
+
+  const { data: websiteAnalytics, isLoading: isWebsiteAnalyticsLoading } = useQuery({
+    queryKey: ['admin-website-analytics', websiteRange, websiteAccount],
+    queryFn: () =>
+      adminApi.getWebsiteAnalytics(websiteRange, websiteAccount).then((res) => res.data),
+    refetchInterval: 30000,
+  });
+
+  const { data: websiteCardAnalytics } = useQuery({
+    queryKey: ['admin-website-analytics-card', websiteCardAccount],
+    queryFn: () =>
+      adminApi.getWebsiteAnalytics('all', websiteCardAccount).then((res) => res.data),
+    refetchInterval: 30000,
+  });
 
   const userSeriesRaw = useMemo(
     () => data?.charts.users_over_time ?? [],
@@ -217,6 +254,14 @@ const Dashboard = () => {
   const roomChartData = useMemo(
     () => roomSeries.map((point) => ({ ...point, jalali_label: formatJalaliDate(point.label) })),
     [roomSeries]
+  );
+  const websiteChartData = useMemo(
+    () =>
+      (websiteAnalytics?.visits_over_time ?? []).map((point) => ({
+        ...point,
+        jalali_label: formatJalaliDate(point.label),
+      })),
+    [websiteAnalytics]
   );
 
   const getStat = (
@@ -259,7 +304,7 @@ const Dashboard = () => {
           <div className="admin-dashboard__metrics">
             {[0, 1, 2, 3].map((index) => (
               <div className="admin-dashboard__metric-skeleton" key={index}>
-                <Skeleton variant="text" width={72} />
+                <Skeleton variant="text" width={96} />
                 <Skeleton variant="text" width={96} height={28} />
               </div>
             ))}
@@ -283,6 +328,38 @@ const Dashboard = () => {
           onPeriodChange={setRoomsPeriod}
           accent="green"
         />
+        <div className="admin-dashboard__metric admin-dashboard__metric--green">
+          <div className="admin-dashboard__metric__head">
+            <p className="admin-dashboard__metric__title">کاربران آنلاین</p>
+            <span className="admin-dashboard__metric__live">فعال</span>
+          </div>
+          <p className="admin-dashboard__metric__value">
+            {(data?.online_users ?? 0).toLocaleString('fa-IR')}
+          </p>
+          <span className="admin-dashboard__metric__hint">
+            نشست‌های فعال در ۱۰ دقیقه اخیر
+          </span>
+        </div>
+        <div className="admin-dashboard__metric admin-dashboard__metric--primary">
+          <div className="admin-dashboard__metric__head">
+            <p className="admin-dashboard__metric__title">بازدیدکنندگان یکتا</p>
+            <SmoothDropdown
+              value={websiteCardAccount}
+              options={(Object.keys(WEBSITE_ACCOUNT_LABELS) as WebsiteAccountFilter[]).map((key) => ({
+                value: key,
+                label: WEBSITE_ACCOUNT_LABELS[key],
+              }))}
+              onChange={setWebsiteCardAccount}
+              ariaLabel="نوع بازدیدکنندگان"
+            />
+          </div>
+          <p className="admin-dashboard__metric__value">
+            {(websiteCardAnalytics?.unique_visitors ?? 0).toLocaleString('fa-IR')}
+          </p>
+          <span className="admin-dashboard__metric__hint">
+            {WEBSITE_ACCOUNT_LABELS[websiteCardAccount]}
+          </span>
+        </div>
       </div>
       <div className="admin-dashboard__charts">
         <div className="admin-dashboard__chart">
@@ -412,6 +489,91 @@ const Dashboard = () => {
                 />
               </AreaChart>
             </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="admin-dashboard__chart admin-dashboard__chart--wide">
+          <div className="admin-dashboard__chart__head admin-dashboard__chart__head--filters">
+            <div>
+              <p className="admin-dashboard__chart__title">بازدیدهای سایت در طول زمان</p>
+              <span className="admin-dashboard__chart__subtitle">
+                تعداد بازدیدهای ثبت‌شده به تفکیک روز
+              </span>
+            </div>
+            <div className="admin-dashboard__chart__filters">
+              <SmoothDropdown
+                value={websiteRange}
+                options={(Object.keys(WEBSITE_RANGE_LABELS) as WebsiteAnalyticsRange[]).map((key) => ({
+                  value: key,
+                  label: WEBSITE_RANGE_LABELS[key],
+                }))}
+                onChange={setWebsiteRange}
+                ariaLabel="بازه زمانی بازدیدهای سایت"
+              />
+              <SmoothDropdown
+                value={websiteAccount}
+                options={(Object.keys(WEBSITE_ACCOUNT_LABELS) as WebsiteAccountFilter[]).map((key) => ({
+                  value: key,
+                  label: WEBSITE_ACCOUNT_LABELS[key],
+                }))}
+                onChange={setWebsiteAccount}
+                ariaLabel="فیلتر حساب بازدیدهای سایت"
+              />
+            </div>
+          </div>
+          <div className="admin-dashboard__chart__body">
+            {isWebsiteAnalyticsLoading ? (
+              <div className="admin-dashboard__chart__loading">
+                <Skeleton variant="rect" width="100%" height={260} radius={14} />
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={websiteChartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="websiteVisitGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#d04e2f" stopOpacity={0.35} />
+                      <stop offset="100%" stopColor="#d04e2f" stopOpacity={0.02} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    stroke="rgba(255,255,255,0.08)"
+                    strokeDasharray="3 6"
+                    vertical={false}
+                  />
+                  <XAxis
+                    dataKey="jalali_label"
+                    tick={{ fill: 'currentColor', fontSize: 12 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tick={{ fill: 'currentColor', fontSize: 12 }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={36}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      background: 'var(--dash-tooltip-bg)',
+                      border: '1px solid var(--dash-border)',
+                      borderRadius: 10,
+                      color: 'var(--dash-text)',
+                      fontSize: 13,
+                    }}
+                    itemStyle={{ color: 'var(--dash-text)' }}
+                    labelStyle={{ color: 'var(--dash-muted)' }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="count"
+                    stroke="#d04e2f"
+                    fill="url(#websiteVisitGradient)"
+                    strokeWidth={2.5}
+                    activeDot={{ r: 5, strokeWidth: 0 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>
