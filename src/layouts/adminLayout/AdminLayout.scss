@@ -144,14 +144,15 @@
         opacity: 0.85;
       }
 
-      &__item__indicator {
+      &__indicator {
         width: 7px;
         height: 7px;
         margin-inline-start: auto;
         flex-shrink: 0;
         border-radius: 50%;
         background: var(--layout-primary);
-        box-shadow: 0 0 0 3px color-mix(in srgb, var(--layout-primary) 12%, transparent);
+        box-shadow: 0 0 0 3px
+          color-mix(in srgb, var(--layout-primary) 12%, transparent);
       }
 
       &:hover {

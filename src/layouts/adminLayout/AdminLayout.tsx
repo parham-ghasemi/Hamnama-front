@@ -57,10 +57,10 @@ const AdminLayout = () => {
                 <Icon aria-hidden />
                 <span>{label}</span>
                 {to === '/admin/tickets' && hasTicketNotifications ? (
-                  <span className="admin-layout__nav__indicator" aria-label="پاسخ جدید در تیکت‌ها" />
+                  <span className="admin-layout__nav__item__indicator" aria-label="پاسخ جدید در تیکت‌ها" />
                 ) : null}
                 {to === '/admin/support' && hasSupportNotifications ? (
-                  <span className="admin-layout__nav__indicator" aria-label="پیام جدید در پشتیبانی" />
+                  <span className="admin-layout__nav__item__indicator" aria-label="پیام جدید در پشتیبانی" />
                 ) : null}
               </NavLink>
             ))}
