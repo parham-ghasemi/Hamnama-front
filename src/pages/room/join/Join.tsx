@@ -1,12 +1,12 @@
 import { BsPlusLg } from 'react-icons/bs';
 import Header from '../../../components/header/Header';
 import './Join.scss';
-import { IoCopyOutline } from 'react-icons/io5';
-import { PiFilmSlateFill, PiUsersThreeFill, PiClockCounterClockwiseFill, PiPlayFill, PiTrashSimpleFill, PiSpinner, PiImageSquareFill, PiMagnifyingGlass, PiCaretDownBold, PiCaretLeftBold, PiCaretRightBold } from 'react-icons/pi';
+import { IoChevronBackOutline, IoChevronDownOutline, IoChevronForwardOutline, IoCopyOutline, IoSearchOutline } from 'react-icons/io5';
+import { PiFilmSlateFill, PiUsersThreeFill, PiClockCounterClockwiseFill, PiPlayFill, PiTrashSimpleFill, PiSpinner, PiImageSquareFill } from 'react-icons/pi';
 import CreateRoomModal from './createRoomModal/CreateRoomModal';
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { clearRoomData, getCurrentRoom, getLastActiveRoom, getRoomApiErrorStatus, joinRoom, listPublicRooms, type PublicRoomSort } from '../../../apiCalls/roomApi';
+import { clearRoomData, getCurrentRoom, getLastActiveRoom, getRoomApiErrorStatus, joinRoom, listPublicRooms, type PublicRoomResponse, type PublicRoomSort } from '../../../apiCalls/roomApi';
 import { useNavigate } from 'react-router-dom';
 import Skeleton from "../../../components/skeleton/Skeleton";
 // import { useAuth } from '../../../context/AuthContext';
@@ -21,7 +21,7 @@ const Join = () => {
   const [copied, setCopied] = useState(false);
   const [code, setCode] = useState<number | string>("");
   const [publicRoomSearch, setPublicRoomSearch] = useState("");
-  const [publicRoomSearchTerm, setPublicRoomSearchTerm] = useState("");
+  const [debouncedPublicRoomSearch, setDebouncedPublicRoomSearch] = useState("");
   const [publicRoomSort, setPublicRoomSort] = useState<PublicRoomSort>("newest");
   const [publicRoomPage, setPublicRoomPage] = useState(1);
   const [isPublicRoomSortOpen, setIsPublicRoomSortOpen] = useState(false);
@@ -47,46 +47,32 @@ const Join = () => {
   });
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      setPublicRoomSearchTerm(publicRoomSearch.trim());
-      setPublicRoomPage(1);
+    const timer = window.setTimeout(() => {
+      setDebouncedPublicRoomSearch(publicRoomSearch.trim());
     }, 300);
 
-    return () => window.clearTimeout(timeout);
+    return () => window.clearTimeout(timer);
   }, [publicRoomSearch]);
 
   useEffect(() => {
     setPublicRoomPage(1);
-  }, [publicRoomSort]);
+  }, [debouncedPublicRoomSearch, publicRoomSort]);
 
   useEffect(() => {
-    if (!isPublicRoomSortOpen) return;
-
     const handlePointerDown = (event: MouseEvent) => {
-      if (!publicRoomSortRef.current?.contains(event.target as Node)) {
-        setIsPublicRoomSortOpen(false);
-      }
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (publicRoomSortRef.current && !publicRoomSortRef.current.contains(event.target as Node)) {
         setIsPublicRoomSortOpen(false);
       }
     };
 
     document.addEventListener("mousedown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("mousedown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isPublicRoomSortOpen]);
+    return () => document.removeEventListener("mousedown", handlePointerDown);
+  }, []);
 
   const publicRoomsQuery = useQuery({
-    queryKey: ["public-rooms", publicRoomSearchTerm, publicRoomSort, publicRoomPage],
+    queryKey: ["public-rooms", debouncedPublicRoomSearch, publicRoomSort, publicRoomPage],
     queryFn: () => listPublicRooms({
-      search: publicRoomSearchTerm,
+      search: debouncedPublicRoomSearch,
       sort: publicRoomSort,
       page: publicRoomPage,
     }),
@@ -94,14 +80,10 @@ const Join = () => {
   });
 
   useEffect(() => {
-    const totalPages = publicRoomsQuery.data?.total_pages ?? 0;
-
-    if (totalPages > 0 && publicRoomPage > totalPages) {
-      setPublicRoomPage(totalPages);
-    } else if (totalPages === 0 && publicRoomPage !== 1) {
-      setPublicRoomPage(1);
+    if (publicRoomsQuery.data && publicRoomsQuery.data.page !== publicRoomPage) {
+      setPublicRoomPage(publicRoomsQuery.data.page);
     }
-  }, [publicRoomsQuery.data?.total_pages, publicRoomPage]);
+  }, [publicRoomsQuery.data, publicRoomPage]);
 
   const lastRoomQuery = useQuery({
     queryKey: ["last-active-room"],
@@ -223,31 +205,6 @@ const Join = () => {
   const createRoomDisabled = activeRoomLoading || !!activeRoom || activeRoomLookupFailed;
   const lastRoom = lastRoomQuery.data ?? null;
   const lastRoomLabel = lastRoom?.created_by_name || "آخرین اتاق شما";
-  const publicRooms = publicRoomsQuery.data?.rooms ?? [];
-  const publicRoomTotalPages = publicRoomsQuery.data?.total_pages ?? 0;
-  const publicRoomSortLabels: Record<PublicRoomSort, string> = {
-    newest: "جدیدترین",
-    oldest: "قدیمی‌ترین",
-    most_users: "بیشترین کاربر",
-    least_users: "کمترین کاربر",
-    name: "نام اتاق",
-  };
-
-  const getPublicRoomPaginationItems = () => {
-    if (publicRoomTotalPages <= 7) {
-      return Array.from({ length: publicRoomTotalPages }, (_, index) => index + 1) as Array<number | "left-ellipsis" | "right-ellipsis">;
-    }
-
-    if (publicRoomPage <= 4) {
-      return [1, 2, 3, 4, 5, "right-ellipsis", publicRoomTotalPages] as Array<number | "left-ellipsis" | "right-ellipsis">;
-    }
-
-    if (publicRoomPage >= publicRoomTotalPages - 3) {
-      return [1, "left-ellipsis", publicRoomTotalPages - 4, publicRoomTotalPages - 3, publicRoomTotalPages - 2, publicRoomTotalPages - 1, publicRoomTotalPages] as Array<number | "left-ellipsis" | "right-ellipsis">;
-    }
-
-    return [1, "left-ellipsis", publicRoomPage - 1, publicRoomPage, publicRoomPage + 1, "right-ellipsis", publicRoomTotalPages] as Array<number | "left-ellipsis" | "right-ellipsis">;
-  };
 
   return (
     <div className='join-page'>
@@ -388,14 +345,14 @@ const Join = () => {
                 <div>
                   <p className="join-page__public-rooms__eyebrow">اتاق‌های عمومی</p>
                   <h2 id="public-rooms-title">به جمع دیگران بپیوندید</h2>
-                  <span>اتاق‌های عمومی فعال را جست‌وجو، مرتب و مستقیم انتخاب کنید.</span>
+                  <span>اتاق‌های عمومی فعال را مستقیم انتخاب و وارد شوید.</span>
                 </div>
                 <PiUsersThreeFill aria-hidden="true" />
               </div>
 
-              <div className="join-page__public-rooms__controls">
+              <div className="join-page__public-rooms__toolbar">
                 <label className="join-page__public-rooms__search">
-                  <PiMagnifyingGlass aria-hidden="true" />
+                  <IoSearchOutline aria-hidden="true" />
                   <input
                     type="search"
                     value={publicRoomSearch}
@@ -408,33 +365,42 @@ const Join = () => {
                 <div className="join-page__public-rooms__sort" ref={publicRoomSortRef}>
                   <button
                     type="button"
-                    className="join-page__public-rooms__sort__trigger"
+                    className={clsx(
+                      "join-page__public-rooms__sort__trigger",
+                      isPublicRoomSortOpen && "is-open",
+                    )}
                     aria-haspopup="listbox"
                     aria-expanded={isPublicRoomSortOpen}
                     onClick={() => setIsPublicRoomSortOpen((open) => !open)}
                   >
-                    <span>مرتب‌سازی: {publicRoomSortLabels[publicRoomSort]}</span>
-                    <PiCaretDownBold aria-hidden="true" />
+                    <span>{publicRoomSort === "newest" ? "جدیدترین" : publicRoomSort === "oldest" ? "قدیمی‌ترین" : publicRoomSort === "most_users" ? "بیشترین کاربران" : publicRoomSort === "least_users" ? "کمترین کاربران" : "نام اتاق"}</span>
+                    <IoChevronDownOutline aria-hidden="true" />
                   </button>
 
                   {isPublicRoomSortOpen && (
                     <div className="join-page__public-rooms__sort__menu" role="listbox" aria-label="مرتب‌سازی اتاق‌ها">
-                      {(Object.keys(publicRoomSortLabels) as PublicRoomSort[]).map((sort) => (
+                      {[
+                        ["newest", "جدیدترین"],
+                        ["oldest", "قدیمی‌ترین"],
+                        ["most_users", "بیشترین کاربران"],
+                        ["least_users", "کمترین کاربران"],
+                        ["name", "نام اتاق"],
+                      ].map(([value, label]) => (
                         <button
-                          key={sort}
+                          key={value}
                           type="button"
                           role="option"
-                          aria-selected={publicRoomSort === sort}
+                          aria-selected={publicRoomSort === value}
                           className={clsx(
                             "join-page__public-rooms__sort__option",
-                            publicRoomSort === sort && "is-selected",
+                            publicRoomSort === value && "is-active",
                           )}
                           onClick={() => {
-                            setPublicRoomSort(sort);
+                            setPublicRoomSort(value as PublicRoomSort);
                             setIsPublicRoomSortOpen(false);
                           }}
                         >
-                          {publicRoomSortLabels[sort]}
+                          {label}
                         </button>
                       ))}
                     </div>
@@ -444,17 +410,16 @@ const Join = () => {
 
               {publicRoomsQuery.isLoading ? (
                 <div className="join-page__public-rooms__grid" aria-busy="true">
-                  {Array.from({ length: 3 }, (_, index) => index).map((index) => (
+                  {[0, 1, 2, 3, 4, 5].map((index) => (
                     <article key={index} className="join-page__public-room-card join-page__public-room-card--skeleton">
                       <div className="join-page__public-room-card__title-row">
                         <Skeleton variant="text" width={index % 2 === 0 ? 128 : 96} height={18} />
                       </div>
-                      <div className="join-page__public-room-card__meta">
-                        <Skeleton variant="text" width={120} height={14} />
-                        <Skeleton variant="text" width={70} height={14} />
-                      </div>
                       <div className="join-page__public-room-card__image">
                         <Skeleton variant="rect" width="100%" height="100%" radius={16} />
+                      </div>
+                      <div className="join-page__public-room-card__meta">
+                        <Skeleton variant="text" width={110} height={16} />
                       </div>
                       <div className="join-page__public-room-card__code">
                         <span>کد اتاق</span>
@@ -464,15 +429,16 @@ const Join = () => {
                     </article>
                   ))}
                 </div>
-              ) : publicRooms.length ? (
+              ) : publicRoomsQuery.error ? (
+                <div className="join-page__public-rooms__empty">بارگذاری اتاق‌های عمومی با خطا مواجه شد.</div>
+              ) : publicRoomsQuery.data?.rooms?.length ? (
                 <>
                   <div className="join-page__public-rooms__grid">
-                    {publicRooms.map((room) => (
+                    {publicRoomsQuery.data.rooms.map((room: PublicRoomResponse) => (
                       <article key={room.id} className="join-page__public-room-card">
                         <div className="join-page__public-room-card__title-row">
-                          <h3 title={room.name}>{room.name}</h3>
+                          <h3>{room.name}</h3>
                         </div>
-
                         <div className="join-page__public-room-card__image">
                           {room.image ? (
                             <img src={`${import.meta.env.VITE_BASE_URL ?? ""}${room.image}`} alt="" />
@@ -481,6 +447,10 @@ const Join = () => {
                               <PiImageSquareFill />
                             </span>
                           )}
+                        </div>
+                        <div className="join-page__public-room-card__meta">
+                          <span>سازنده: {room.creator_username}</span>
+                          <span>{room.member_count.toLocaleString("fa-IR")} نفر</span>
                         </div>
                         <div className="join-page__public-room-card__code">
                           <span>کد اتاق</span>
@@ -498,56 +468,48 @@ const Join = () => {
                     ))}
                   </div>
 
-                  {publicRoomTotalPages > 1 && (
-                    <nav className="join-page__public-rooms__pagination" aria-label="صفحه‌بندی اتاق‌های عمومی">
+                  {publicRoomsQuery.data.total_pages > 1 && (
+                    <div className="join-page__public-rooms__pagination" aria-label="صفحات اتاق‌های عمومی">
                       <button
                         type="button"
-                        className="join-page__public-rooms__pagination__arrow"
-                        disabled={publicRoomPage === 1}
-                        onClick={() => setPublicRoomPage((page) => Math.max(1, page - 1))}
+                        className="join-page__public-rooms__pagination__nav"
+                        disabled={publicRoomPage <= 1}
                         aria-label="صفحه قبلی"
+                        onClick={() => setPublicRoomPage((page) => Math.max(1, page - 1))}
                       >
-                        <PiCaretRightBold aria-hidden="true" />
+                        <IoChevronForwardOutline aria-hidden="true" />
                       </button>
 
-                      <div className="join-page__public-rooms__pagination__pages">
-                        {getPublicRoomPaginationItems().map((item, index) => (
-                          typeof item === "number" ? (
-                            <button
-                              key={item}
-                              type="button"
-                              className={clsx(
-                                "join-page__public-rooms__pagination__page",
-                                publicRoomPage === item && "is-active",
-                              )}
-                              aria-current={publicRoomPage === item ? "page" : undefined}
-                              onClick={() => setPublicRoomPage(item)}
-                            >
-                              {item.toLocaleString("fa-IR")}
-                            </button>
-                          ) : (
-                            <span key={`${item}-${index}`} className="join-page__public-rooms__pagination__ellipsis" aria-hidden="true">
-                              …
-                            </span>
-                          )
-                        ))}
-                      </div>
+                      {Array.from({ length: publicRoomsQuery.data.total_pages }, (_, index) => index + 1).map((page) => (
+                        <button
+                          key={page}
+                          type="button"
+                          className={clsx(
+                            "join-page__public-rooms__pagination__page",
+                            page === publicRoomPage && "is-active",
+                          )}
+                          aria-current={page === publicRoomPage ? "page" : undefined}
+                          onClick={() => setPublicRoomPage(page)}
+                        >
+                          {page.toLocaleString("fa-IR")}
+                        </button>
+                      ))}
 
                       <button
                         type="button"
-                        className="join-page__public-rooms__pagination__arrow"
-                        disabled={publicRoomPage >= publicRoomTotalPages}
-                        onClick={() => setPublicRoomPage((page) => Math.min(publicRoomTotalPages, page + 1))}
+                        className="join-page__public-rooms__pagination__nav"
+                        disabled={publicRoomPage >= publicRoomsQuery.data.total_pages}
                         aria-label="صفحه بعدی"
+                        onClick={() => setPublicRoomPage((page) => Math.min(publicRoomsQuery.data!.total_pages, page + 1))}
                       >
-                        <PiCaretLeftBold aria-hidden="true" />
+                        <IoChevronBackOutline aria-hidden="true" />
                       </button>
-                    </nav>
+                    </div>
                   )}
                 </>
               ) : (
                 <div className="join-page__public-rooms__empty">
-                  {publicRoomSearchTerm ? "نتیجه‌ای برای جست‌وجوی شما پیدا نشد." : "در حال حاضر اتاق عمومی فعالی وجود ندارد."}
+                  {debouncedPublicRoomSearch ? "اتاقی با این جست‌وجو پیدا نشد." : "در حال حاضر اتاق عمومی فعالی وجود ندارد."}
                 </div>
               )}
             </section>
