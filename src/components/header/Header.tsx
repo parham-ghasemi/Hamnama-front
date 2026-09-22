@@ -1,10 +1,10 @@
 import './Header.scss';
-import { PiCaretRightBold, PiUserFill, PiListBold } from "react-icons/pi";
+import { PiCaretRightBold, PiListBold } from "react-icons/pi";
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import UsernameDropdown from './usernameDropdown/UsernameDropdown';
-import { FaPlay } from 'react-icons/fa6';
+import { FaPlay, FaUser } from 'react-icons/fa6';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -86,7 +86,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 {user?.profile_picture ? (
                   <img src={`${import.meta.env['VITE_BASE_URL']}${user?.profile_picture}`} alt="profile picture" />
                 ) : (
-                  <PiUserFill />
+                  <FaUser />
                 )}
               </div>
               <div
