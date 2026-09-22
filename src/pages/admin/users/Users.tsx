@@ -5,6 +5,8 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiUserPlus,
+  FiPlus,
+  FiEdit2,
   FiShield,
   FiSlash,
 } from 'react-icons/fi';
@@ -20,6 +22,19 @@ interface DropdownOption<T extends string> {
   value: T;
   label: string;
 }
+
+type UserModalState =
+  | { mode: 'create' }
+  | { mode: 'edit'; user: AdminUser }
+  | null;
+
+type UserFormState = {
+  username: string;
+  phone_number: string;
+  password: string;
+  is_admin: boolean;
+  access_level: '1' | '2' | '3';
+};
 
 interface SmoothDropdownProps<T extends string> {
   value: T;
@@ -127,6 +142,14 @@ const Users = () => {
   const [sort, setSort] = useState('-created_at');
   const [filter, setFilter] = useState<Filter>('all');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [userModal, setUserModal] = useState<UserModalState>(null);
+  const [userForm, setUserForm] = useState<UserFormState>({
+    username: '',
+    phone_number: '',
+    password: '',
+    is_admin: false,
+    access_level: '1',
+  });
   const [banReason, setBanReason] = useState('');
   const [banDuration, setBanDuration] = useState<'1week' | '1month' | '3months' | '6months' | '1year' | 'forever'>('1week');
   const params = useMemo(
@@ -152,6 +175,22 @@ const Users = () => {
     },
   });
 
+  const createUserMutation = useMutation({
+    mutationFn: (payload: {
+      username: string;
+      phone_number: string;
+      password: string;
+      is_admin?: boolean;
+      access_level?: number;
+    }) => adminApi.createUser(payload),
+    onSuccess: async () => {
+      toast.success('کاربر جدید ایجاد شد');
+      setUserModal(null);
+      await queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+    },
+    onError: () => toast.error('ایجاد کاربر با مشکل مواجه شد'),
+  });
+
   const updateUserMutation = useMutation({
     mutationFn: ({
       id,
@@ -162,6 +201,7 @@ const Users = () => {
     }) => adminApi.updateUser(id, payload),
     onSuccess: async () => {
       toast.success('اطلاعات کاربر به‌روزرسانی شد');
+      setUserModal(null);
       await queryClient.invalidateQueries({ queryKey: ['admin-users'] });
     },
     onError: () => toast.error('به‌روزرسانی کاربر با مشکل مواجه شد'),
@@ -195,6 +235,89 @@ const Users = () => {
     },
     onError: () => toast.error('امکان رفع مسدودی وجود ندارد'),
   });
+
+  const openCreateUserModal = () => {
+    setUserForm({
+      username: '',
+      phone_number: '',
+      password: '',
+      is_admin: false,
+      access_level: '1',
+    });
+    setUserModal({ mode: 'create' });
+  };
+
+  const openEditUserModal = (user: AdminUser) => {
+    setUserForm({
+      username: user.username,
+      phone_number: user.phone_number,
+      password: '',
+      is_admin: user.is_admin,
+      access_level: String(user.access_level) as '1' | '2' | '3',
+    });
+    setUserModal({ mode: 'edit', user });
+  };
+
+  const closeUserModal = () => {
+    if (createUserMutation.isPending || updateUserMutation.isPending) return;
+    setUserModal(null);
+  };
+
+  const handleUserSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const username = userForm.username.trim();
+    const phoneNumber = userForm.phone_number.trim();
+    const password = userForm.password.trim();
+
+    if (!username || !phoneNumber) {
+      toast.error('نام کاربری و شماره تلفن الزامی است');
+      return;
+    }
+
+    if (userModal?.mode === 'create') {
+      if (!password) {
+        toast.error('رمز عبور الزامی است');
+        return;
+      }
+
+      createUserMutation.mutate({
+        username,
+        phone_number: phoneNumber,
+        password,
+        ...(isFullAccess
+          ? {
+              is_admin: userForm.is_admin,
+              access_level: Number(userForm.access_level),
+            }
+          : {}),
+      });
+      return;
+    }
+
+    if (!userModal || userModal.mode !== 'edit') return;
+
+    const payload: Record<string, unknown> = {
+      username,
+      phone_number: phoneNumber,
+    };
+
+    if (password) {
+      payload.password = password;
+    }
+
+    if (isFullAccess) {
+      if (userForm.is_admin !== userModal.user.is_admin) {
+        payload.is_admin = userForm.is_admin;
+      }
+
+      if (userForm.is_admin && Number(userForm.access_level) !== userModal.user.access_level) {
+        payload.access_level = Number(userForm.access_level);
+      }
+    }
+
+    updateUserMutation.mutate({ id: userModal.user.id, payload });
+  };
 
   const handleToggleAdmin = (user: { id: string; is_admin: boolean }) => {
     if (user.is_admin && !isFullAccess) {
@@ -231,9 +354,19 @@ const Users = () => {
           <p className="admin-users__eyebrow">کاربران</p>
           <h1 className="admin-users__title">مدیریت کاربران</h1>
         </div>
-        <span className="admin-users__count">
-          {pagination?.total ?? 0} کاربر
-        </span>
+        <div className="admin-users__header-actions">
+          <span className="admin-users__count">
+            {pagination?.total ?? 0} کاربر
+          </span>
+          <button
+            type="button"
+            className="admin-users__action admin-users__action--primary"
+            onClick={openCreateUserModal}
+          >
+            <FiPlus />
+            کاربر جدید
+          </button>
+        </div>
       </header>
 
       <div className="admin-users__toolbar">
@@ -369,6 +502,15 @@ const Users = () => {
                           <button
                             type="button"
                             className="admin-users__action"
+                            onClick={() => openEditUserModal(user)}
+                            disabled={updateUserMutation.isPending}
+                          >
+                            <FiEdit2 />
+                            ویرایش
+                          </button>
+                          <button
+                            type="button"
+                            className="admin-users__action"
                             onClick={() => handleToggleAdmin(user)}
                             disabled={updateUserMutation.isPending || (user.is_admin && !isFullAccess)}
                           >
@@ -428,6 +570,126 @@ const Users = () => {
           </>
         )}
       </div>
+
+      {userModal ? (
+        <div
+          className="admin-users__modal"
+          onClick={closeUserModal}
+          role="presentation"
+        >
+          <div
+            className="admin-users__modal__card admin-users__modal__card--editor"
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="user-modal-title"
+          >
+            <h3 id="user-modal-title">
+              {userModal.mode === 'create' ? 'ایجاد کاربر جدید' : 'ویرایش کاربر'}
+            </h3>
+            <form onSubmit={handleUserSubmit} className="admin-users__modal__form">
+              <label>
+                <span>نام کاربری</span>
+                <input
+                  type="text"
+                  value={userForm.username}
+                  onChange={(event) =>
+                    setUserForm((current) => ({ ...current, username: event.target.value }))
+                  }
+                  autoComplete="off"
+                  required
+                />
+              </label>
+              <label>
+                <span>شماره تلفن</span>
+                <input
+                  type="text"
+                  value={userForm.phone_number}
+                  onChange={(event) =>
+                    setUserForm((current) => ({ ...current, phone_number: event.target.value }))
+                  }
+                  inputMode="tel"
+                  autoComplete="off"
+                  required
+                />
+              </label>
+              <label>
+                <span>رمز عبور{userModal.mode === 'edit' ? ' جدید (اختیاری)' : ''}</span>
+                <input
+                  type="password"
+                  value={userForm.password}
+                  onChange={(event) =>
+                    setUserForm((current) => ({ ...current, password: event.target.value }))
+                  }
+                  autoComplete="new-password"
+                  required={userModal.mode === 'create'}
+                  placeholder={userModal.mode === 'edit' ? 'برای تغییر رمز وارد کنید' : ''}
+                />
+              </label>
+
+              {isFullAccess ? (
+                <>
+                  <label className="admin-users__modal__toggle">
+                    <input
+                      type="checkbox"
+                      checked={userForm.is_admin}
+                      onChange={(event) =>
+                        setUserForm((current) => ({
+                          ...current,
+                          is_admin: event.target.checked,
+                        }))
+                      }
+                    />
+                    <span>این کاربر ادمین باشد</span>
+                  </label>
+
+                  {userForm.is_admin ? (
+                    <label>
+                      <span>سطح دسترسی</span>
+                      <SmoothDropdown
+                        value={userForm.access_level}
+                        options={[
+                          { value: '1', label: 'سطح ۱' },
+                          { value: '2', label: 'سطح ۲' },
+                          { value: '3', label: 'سطح ۳' },
+                        ]}
+                        onChange={(value) =>
+                          setUserForm((current) => ({ ...current, access_level: value }))
+                        }
+                        ariaLabel="سطح دسترسی کاربر"
+                      />
+                    </label>
+                  ) : null}
+                </>
+              ) : null}
+
+              {userModal.mode === 'edit' ? (
+                <span className="admin-users__modal__hint">
+                  رمز عبور فقط زمانی تغییر می‌کند که مقدار جدید وارد کنید.
+                </span>
+              ) : null}
+
+              <div className="admin-users__modal__actions">
+                <button
+                  type="button"
+                  className="admin-users__action"
+                  onClick={closeUserModal}
+                  disabled={createUserMutation.isPending || updateUserMutation.isPending}
+                >
+                  انصراف
+                </button>
+                <button
+                  type="submit"
+                  className="admin-users__action admin-users__action--primary"
+                  disabled={createUserMutation.isPending || updateUserMutation.isPending}
+                >
+                  {userModal.mode === 'create' ? 'ایجاد کاربر' : 'ذخیره تغییرات'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
 
       {selectedUserId ? (
         <div

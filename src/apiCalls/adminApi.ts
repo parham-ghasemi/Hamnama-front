@@ -76,6 +76,14 @@ export interface AdminUser {
   banned_at?: string;
 }
 
+export interface AdminCreateUserPayload {
+  username: string;
+  phone_number: string;
+  password: string;
+  is_admin?: boolean;
+  access_level?: number;
+}
+
 export interface AdminUsersResponse {
   users: AdminUser[];
   pagination: {
@@ -294,6 +302,7 @@ export const adminApi = {
   reopenTicket: (id: string | number) => api.post(`/admin/tickets/${id}/reopen`),
 
   listUsers: (params: Record<string, string | number | boolean | undefined>) => api.get<AdminUsersResponse>('/admin/users', { params }),
+  createUser: (payload: AdminCreateUserPayload) => api.post('/admin/users', payload),
   updateUser: (id: string, payload: Record<string, unknown>) => api.patch(`/admin/users/${id}`, payload),
   banUser: (id: string, payload: { reason: string; duration: | '1week' | '1month' | '3months' | '6months' | '1year' | 'forever'; }) => api.post(`/admin/users/${id}/ban`, payload),
   unbanUser: (id: string) => api.post(`/admin/users/${id}/unban`),

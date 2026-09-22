@@ -69,6 +69,13 @@
     color: var(--users-text);
   }
 
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
   &__count {
     display: inline-flex;
     align-items: center;
@@ -301,6 +308,20 @@
       cursor: not-allowed;
     }
 
+    &--primary {
+      color: var(--users-primary);
+      border-color: color-mix(
+        in srgb,
+        var(--users-primary) 28%,
+        var(--users-border)
+      );
+      background: color-mix(in srgb, var(--users-primary) 10%, transparent);
+
+      &:hover:not(:disabled) {
+        background: color-mix(in srgb, var(--users-primary) 16%, transparent);
+      }
+    }
+
     &--danger {
       color: var(--users-red);
       border-color: color-mix(
@@ -398,6 +419,10 @@
 
     &__card {
       width: min(440px, 100%);
+
+      &--editor {
+        width: min(500px, 100%);
+      }
       padding: 22px 24px;
       border-radius: 16px;
       background: var(--users-surface);
@@ -438,7 +463,7 @@
       }
 
       textarea,
-      input[type="datetime-local"] {
+      input:not([type="checkbox"]) {
         border: 1px solid var(--users-border);
         background: var(--users-input-bg);
         color: var(--users-text);
@@ -477,6 +502,12 @@
         accent-color: var(--users-primary);
         cursor: pointer;
       }
+    }
+
+    &__hint {
+      color: var(--users-muted);
+      font-size: 12px;
+      line-height: 1.6;
     }
 
     &__actions {

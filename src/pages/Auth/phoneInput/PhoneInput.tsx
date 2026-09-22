@@ -30,12 +30,12 @@ const PhoneInput = ({ setPhoneNumber, isLoading = false }: PhoneInputProps) => {
     }
 
     // 3. Validate the final formatted string
-    const iranianPhoneRegex = /^09\d{9}$/;
-    if (!iranianPhoneRegex.test(formattedNumber)) {
-      console.log(formattedNumber)
-      setError('شماره موبایل وارد شده معتبر نیست');
-      return;
-    }
+    // const iranianPhoneRegex = /^09\d{9}$/;
+    // if (!iranianPhoneRegex.test(formattedNumber)) {
+    //   console.log(formattedNumber)
+    //   setError('شماره موبایل وارد شده معتبر نیست');
+    //   return;
+    // }
 
     setError('');
 
