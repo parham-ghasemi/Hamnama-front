@@ -49,12 +49,24 @@ export interface CreateRoomResponse {
   code: number;
 }
 
+export type PublicRoomSort = "newest" | "oldest" | "most_users" | "least_users" | "name";
+
 export interface PublicRoomResponse {
   id: string;
   code: number;
   name: string;
   image?: string;
   created_at: string;
+  creator_username: string;
+  member_count: number;
+}
+
+export interface PublicRoomsResponse {
+  rooms: PublicRoomResponse[];
+  page: number;
+  per_page: number;
+  total: number;
+  total_pages: number;
 }
 
 export interface JoinRoomResponse {
@@ -125,9 +137,19 @@ export async function createRoom(request: CreateRoomRequest) {
   return data;
 }
 
-export async function listPublicRooms() {
-  const { data } = await api.get<{ rooms: PublicRoomResponse[] }>(`/rooms/public`);
-  return data.rooms ?? [];
+export async function listPublicRooms(params: {
+  search?: string;
+  sort?: PublicRoomSort;
+  page?: number;
+} = {}) {
+  const { data } = await api.get<PublicRoomsResponse>(`/rooms/public`, {
+    params: {
+      search: params.search || undefined,
+      sort: params.sort || "newest",
+      page: params.page || 1,
+    },
+  });
+  return data;
 }
 
 export async function updateRoomSettings(
