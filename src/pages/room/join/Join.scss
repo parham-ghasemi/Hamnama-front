@@ -1227,15 +1227,19 @@
 .join-page__public-rooms__search {
   flex: 1 1 auto;
   min-width: 0;
-  min-height: 46px;
-  border-radius: 14px;
+  min-height: 54px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 0 14px;
+  padding: 0 16px 0 0;
   box-sizing: border-box;
-  @include mx.cinema-surface;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.07) inset;
+  background: rgba(255, 255, 255, 0.035);
+  transition:
+    border-color mx.$dur-fast ease,
+    background-color mx.$dur-fast ease,
+    box-shadow mx.$dur-fast ease;
 
   > svg {
     flex: 0 0 auto;
@@ -1247,13 +1251,13 @@
   input {
     min-width: 0;
     width: 100%;
-    height: 100%;
+    height: 44px;
     border: 0;
     outline: 0;
     background: transparent;
     color: inherit;
     font: inherit;
-    font-size: 12px;
+    font-size: 16px;
 
     &::placeholder {
       color: color.adjust(dark.$color-gray, $alpha: -0.1);
@@ -1264,23 +1268,52 @@
     }
   }
 
+  > button {
+    flex: 0 0 auto;
+    height: 100%;
+    padding: 0 24px;
+    border: 0;
+    border-radius: 9px 0 0 9px;
+    background: rgba(208, 78, 47, 0.1);
+    color: dark.$color-primary;
+    font-size: 16px;
+    cursor: pointer;
+    transition:
+      background-color mx.$dur-fast ease,
+      color mx.$dur-fast ease;
+
+    &:hover {
+      background: rgba(208, 78, 47, 0.16);
+    }
+  }
+
   &:focus-within {
-    box-shadow:
-      0 0 0 1px rgba(208, 78, 47, 0.3) inset,
-      0 8px 24px -18px rgba(208, 78, 47, 0.5);
+    border-color: rgba(208, 78, 47, 0.35);
+    background: rgba(255, 255, 255, 0.045);
+    box-shadow: 0 0 0 3px rgba(208, 78, 47, 0.07);
   }
 
   @include mx.light {
-    box-shadow: 0 0 0 1px rgba(9, 9, 9, 0.09) inset;
+    border-color: rgba(9, 9, 9, 0.1);
+    background: rgba(9, 9, 9, 0.025);
 
     > svg {
       color: light.$color-primary;
     }
 
+    > button {
+      background: rgba(139, 91, 130, 0.09);
+      color: light.$color-primary;
+
+      &:hover {
+        background: rgba(139, 91, 130, 0.15);
+      }
+    }
+
     &:focus-within {
-      box-shadow:
-        0 0 0 1px rgba(139, 91, 130, 0.3) inset,
-        0 8px 24px -18px rgba(139, 91, 130, 0.35);
+      border-color: rgba(139, 91, 130, 0.3);
+      background: rgba(9, 9, 9, 0.035);
+      box-shadow: 0 0 0 3px rgba(139, 91, 130, 0.06);
     }
   }
 }
@@ -1297,35 +1330,37 @@
 
 .join-page__public-rooms__sort__trigger {
   width: 100%;
-  min-height: 46px;
+  min-height: 54px;
   padding: 0 13px;
-  border: 0;
-  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   color: inherit;
+  background: rgba(255, 255, 255, 0.035);
   font: inherit;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  @include mx.cinema-surface;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.07) inset;
-  transition: box-shadow mx.$dur-fast ease, transform mx.$dur-fast ease;
+  transition:
+    border-color mx.$dur-fast ease,
+    background-color mx.$dur-fast ease,
+    box-shadow mx.$dur-fast ease;
 
   > svg {
     flex: 0 0 auto;
-    font-size: 16px;
+    font-size: 17px;
     color: dark.$color-primary;
     transition: transform mx.$dur-fast ease;
   }
 
   &.is-open,
   &:hover {
-    box-shadow:
-      0 0 0 1px rgba(208, 78, 47, 0.2) inset,
-      0 8px 24px -20px rgba(208, 78, 47, 0.45);
+    border-color: rgba(208, 78, 47, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 0 3px rgba(208, 78, 47, 0.06);
   }
 
   &.is-open > svg {
@@ -1333,7 +1368,8 @@
   }
 
   @include mx.light {
-    box-shadow: 0 0 0 1px rgba(9, 9, 9, 0.09) inset;
+    border-color: rgba(9, 9, 9, 0.1);
+    background: rgba(9, 9, 9, 0.025);
 
     > svg {
       color: light.$color-primary;
@@ -1341,9 +1377,9 @@
 
     &.is-open,
     &:hover {
-      box-shadow:
-        0 0 0 1px rgba(139, 91, 130, 0.2) inset,
-        0 8px 24px -20px rgba(139, 91, 130, 0.35);
+      border-color: rgba(139, 91, 130, 0.28);
+      background: rgba(9, 9, 9, 0.035);
+      box-shadow: 0 0 0 3px rgba(139, 91, 130, 0.05);
     }
   }
 }
@@ -1360,6 +1396,7 @@
     0 0 0 1px rgba(255, 255, 255, 0.08) inset;
   z-index: 20;
   animation: join-public-sort-in 140ms ease-out;
+  backdrop-filter: blur(10px);
 }
 
 @keyframes join-public-sort-in {
@@ -1382,7 +1419,7 @@
   background: transparent;
   color: inherit;
   font: inherit;
-  font-size: 11px;
+  font-size: 14px;
   text-align: right;
   cursor: pointer;
 
@@ -1696,7 +1733,7 @@
   background: rgba(255, 255, 255, 0.045);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.07) inset;
   font: inherit;
-  font-size: 11px;
+  font-size: 16px;
   font-weight: 700;
   cursor: pointer;
   transition:
@@ -1719,7 +1756,11 @@
 
   &.is-active {
     color: #fff;
-    background: linear-gradient(180deg, dark.$color-primary-hover 0%, dark.$color-primary-bg 100%);
+    background: linear-gradient(
+      180deg,
+      dark.$color-primary-hover 0%,
+      dark.$color-primary-bg 100%
+    );
     box-shadow: 0 8px 20px -14px rgba(208, 78, 47, 0.8);
   }
 
@@ -1735,7 +1776,11 @@
 
     &.is-active {
       color: #fff;
-      background: linear-gradient(180deg, light.$color-primary 0%, light.$color-primary-bg 100%);
+      background: linear-gradient(
+        180deg,
+        light.$color-primary 0%,
+        light.$color-primary-bg 100%
+      );
     }
   }
 }

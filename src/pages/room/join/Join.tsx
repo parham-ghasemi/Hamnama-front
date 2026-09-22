@@ -1,10 +1,10 @@
 import { BsPlusLg } from 'react-icons/bs';
 import Header from '../../../components/header/Header';
 import './Join.scss';
-import { IoChevronBackOutline, IoChevronDownOutline, IoChevronForwardOutline, IoCopyOutline, IoSearchOutline } from 'react-icons/io5';
+import { IoChevronBackOutline, IoChevronDownOutline, IoChevronForwardOutline, IoCopyOutline } from 'react-icons/io5';
 import { PiFilmSlateFill, PiUsersThreeFill, PiClockCounterClockwiseFill, PiPlayFill, PiTrashSimpleFill, PiSpinner, PiImageSquareFill } from 'react-icons/pi';
 import CreateRoomModal from './createRoomModal/CreateRoomModal';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { clearRoomData, getCurrentRoom, getLastActiveRoom, getRoomApiErrorStatus, joinRoom, listPublicRooms, type PublicRoomResponse, type PublicRoomSort } from '../../../apiCalls/roomApi';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +14,7 @@ import { FaCheck } from 'react-icons/fa6';
 import clsx from 'clsx';
 import { toast } from '../../../components/toast';
 import { useConfirmationModal } from '../../../context/ConfirmModalContext/ConfirmaModalContext';
+import { FaSearch } from 'react-icons/fa';
 
 
 const Join = () => {
@@ -21,7 +22,7 @@ const Join = () => {
   const [copied, setCopied] = useState(false);
   const [code, setCode] = useState<number | string>("");
   const [publicRoomSearch, setPublicRoomSearch] = useState("");
-  const [debouncedPublicRoomSearch, setDebouncedPublicRoomSearch] = useState("");
+  const [submittedPublicRoomSearch, setSubmittedPublicRoomSearch] = useState("");
   const [publicRoomSort, setPublicRoomSort] = useState<PublicRoomSort>("newest");
   const [publicRoomPage, setPublicRoomPage] = useState(1);
   const [isPublicRoomSortOpen, setIsPublicRoomSortOpen] = useState(false);
@@ -47,16 +48,13 @@ const Join = () => {
   });
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setDebouncedPublicRoomSearch(publicRoomSearch.trim());
-    }, 300);
-
-    return () => window.clearTimeout(timer);
-  }, [publicRoomSearch]);
-
-  useEffect(() => {
     setPublicRoomPage(1);
-  }, [debouncedPublicRoomSearch, publicRoomSort]);
+  }, [submittedPublicRoomSearch, publicRoomSort]);
+
+  const handlePublicRoomSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmittedPublicRoomSearch(publicRoomSearch.trim());
+  };
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -70,9 +68,9 @@ const Join = () => {
   }, []);
 
   const publicRoomsQuery = useQuery({
-    queryKey: ["public-rooms", debouncedPublicRoomSearch, publicRoomSort, publicRoomPage],
+    queryKey: ["public-rooms", submittedPublicRoomSearch, publicRoomSort, publicRoomPage],
     queryFn: () => listPublicRooms({
-      search: debouncedPublicRoomSearch,
+      search: submittedPublicRoomSearch,
       sort: publicRoomSort,
       page: publicRoomPage,
     }),
@@ -351,8 +349,7 @@ const Join = () => {
               </div>
 
               <div className="join-page__public-rooms__toolbar">
-                <label className="join-page__public-rooms__search">
-                  <IoSearchOutline aria-hidden="true" />
+                <form className="join-page__public-rooms__search" onSubmit={handlePublicRoomSearchSubmit}>
                   <input
                     type="search"
                     value={publicRoomSearch}
@@ -360,7 +357,10 @@ const Join = () => {
                     placeholder="جست‌وجوی نام اتاق یا سازنده..."
                     aria-label="جست‌وجوی اتاق‌های عمومی"
                   />
-                </label>
+                  <button type="submit" aria-label="جست‌وجو">
+                    <FaSearch />
+                  </button>
+                </form>
 
                 <div className="join-page__public-rooms__sort" ref={publicRoomSortRef}>
                   <button
@@ -509,7 +509,7 @@ const Join = () => {
                 </>
               ) : (
                 <div className="join-page__public-rooms__empty">
-                  {debouncedPublicRoomSearch ? "اتاقی با این جست‌وجو پیدا نشد." : "در حال حاضر اتاق عمومی فعالی وجود ندارد."}
+                  {submittedPublicRoomSearch ? "اتاقی با این جست‌وجو پیدا نشد." : "در حال حاضر اتاق عمومی فعالی وجود ندارد."}
                 </div>
               )}
             </section>
