@@ -125,8 +125,8 @@ const FILTER_OPTIONS: DropdownOption<Filter>[] = [
 ];
 
 const SORT_OPTIONS: DropdownOption<string>[] = [
-  { value: '-created_at', label: 'جدیدترین' },
-  { value: 'created_at', label: 'قدیمی‌ترین' },
+  { value: 'created_at', label: 'جدیدترین' },
+  { value: '-created_at', label: 'قدیمی‌ترین' },
   { value: 'username', label: 'نام کاربری' },
   { value: '-username', label: 'نام کاربری (معکوس)' },
 ];
@@ -287,9 +287,9 @@ const Users = () => {
         password,
         ...(isFullAccess
           ? {
-              is_admin: userForm.is_admin,
-              access_level: Number(userForm.access_level),
-            }
+            is_admin: userForm.is_admin,
+            access_level: Number(userForm.access_level),
+          }
           : {}),
       });
       return;

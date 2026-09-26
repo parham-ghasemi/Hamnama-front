@@ -109,8 +109,8 @@ const FILTER_OPTIONS: DropdownOption<Filter>[] = [
 ];
 
 const SORT_OPTIONS: DropdownOption<string>[] = [
-  { value: '-created_at', label: 'جدیدترین' },
-  { value: 'created_at', label: 'قدیمی‌ترین' },
+  { value: 'created_at', label: 'جدیدترین' },
+  { value: '-created_at', label: 'قدیمی‌ترین' },
   { value: 'code', label: 'کد اتاق' },
   { value: '-code', label: 'کد اتاق (معکوس)' },
 ];
