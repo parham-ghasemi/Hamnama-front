@@ -88,7 +88,7 @@ const SupportChatWidget = () => {
 
   const [conversation, setConversation] =
     useState<SupportConversation | null>(null);
-  const [name, setName] = useState(getStored(NAME_KEY));
+  const [name, setName] = useState(getStored(NAME_KEY) === "ناشناس" ? "" : getStored(NAME_KEY));
   const [message, setMessage] = useState("");
   const [initialMessage, setInitialMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -424,6 +424,7 @@ const SupportChatWidget = () => {
     startCaptchaRef.current?.reset();
     messageCaptchaRef.current?.reset();
     setError("");
+    setName(getStored(NAME_KEY) === "ناشناس" ? "" : getStored(NAME_KEY));
   };
 
   const handleMessageKeyDown = (
