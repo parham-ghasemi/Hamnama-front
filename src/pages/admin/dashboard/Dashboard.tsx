@@ -37,6 +37,7 @@ const CHART_RANGE_LABELS: Record<ChartRange, string> = {
 };
 
 const WEBSITE_RANGE_LABELS: Record<WebsiteAnalyticsRange, string> = {
+  '24h': '۲۴ ساعت اخیر',
   '30d': '۳۰ روز اخیر',
   '90d': '۹۰ روز اخیر',
   '365d': '۳۶۵ روز اخیر',
@@ -218,7 +219,7 @@ const Dashboard = () => {
   const { data: websiteCardAnalytics } = useQuery({
     queryKey: ['admin-website-analytics-card', websiteCardAccount],
     queryFn: () =>
-      adminApi.getWebsiteAnalytics('all', websiteCardAccount).then((res) => res.data),
+      adminApi.getWebsiteAnalytics('24h', websiteCardAccount).then((res) => res.data),
     refetchInterval: 30000,
   });
 
@@ -357,7 +358,7 @@ const Dashboard = () => {
             {(websiteCardAnalytics?.unique_visitors ?? 0).toLocaleString('fa-IR')}
           </p>
           <span className="admin-dashboard__metric__hint">
-            {WEBSITE_ACCOUNT_LABELS[websiteCardAccount]}
+            ۲۴ ساعت اخیر
           </span>
         </div>
       </div>

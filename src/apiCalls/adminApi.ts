@@ -23,7 +23,7 @@ export interface AdminDashboardResponse {
   };
 }
 
-export type WebsiteAnalyticsRange = '30d' | '90d' | '365d' | 'all';
+export type WebsiteAnalyticsRange = '24h' | '30d' | '90d' | '365d' | 'all';
 export type WebsiteAnalyticsAccountFilter = 'all' | 'account' | 'guest';
 
 export interface WebsiteAnalyticsResponse {
