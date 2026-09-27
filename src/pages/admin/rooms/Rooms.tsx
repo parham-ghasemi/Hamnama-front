@@ -13,7 +13,7 @@ import { adminApi } from '../../../apiCalls/adminApi';
 import './Rooms.scss';
 import Skeleton from "../../../components/skeleton/Skeleton";
 
-type Filter = 'all' | 'closed' | 'open';
+type Filter = 'all' | 'closed' | 'open' | 'exclude_hidden';
 
 interface DropdownOption<T extends string> {
   value: T;
@@ -106,6 +106,7 @@ const FILTER_OPTIONS: DropdownOption<Filter>[] = [
   { value: 'all', label: 'همه' },
   { value: 'closed', label: 'بسته‌شده' },
   { value: 'open', label: 'باز' },
+  { value: 'exclude_hidden', label: 'فعال' }
 ];
 
 const SORT_OPTIONS: DropdownOption<string>[] = [
@@ -123,12 +124,14 @@ const Rooms = () => {
   const [filter, setFilter] = useState<Filter>('all');
   const [sort, setSort] = useState('-created_at');
 
+
   const params = useMemo(
     () => ({
       search,
       page,
       limit: 10,
       sort,
+      exclude_hidden: filter === 'exclude_hidden' ? true : undefined,
       closed:
         filter === 'closed' ? true : filter === 'open' ? false : undefined,
       is_public: undefined,
