@@ -7,7 +7,7 @@ import { PiUserFill } from 'react-icons/pi';
 import { useConfirmationModal } from '../../../context/ConfirmModalContext/ConfirmaModalContext';
 import { toast } from '../../toast';
 import { FaUserLock } from 'react-icons/fa6';
-import { TbCheck, TbCopy, TbLink, TbRefresh } from 'react-icons/tb';
+import { TbRefresh } from 'react-icons/tb';
 import { useEffect, useState, type MouseEvent } from 'react';
 import { userApi } from '../../../apiCalls/userApi';
 
@@ -19,56 +19,46 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [inviteLink, setInviteLink] = useState('');
-  const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteLoading, setInviteLoading] = useState(false);
   const [inviteRefreshing, setInviteRefreshing] = useState(false);
-  const [inviteCopied, setInviteCopied] = useState(false);
 
-  const loadInvite = async () => {
-    setInviteLoading(true);
-
-    try {
-      const { data } = await userApi.getInvite();
-      setInviteLink(buildInviteLink(data.token));
-    } catch (error) {
-      console.error('Failed to load invite link', error);
-      toast.error('خطا در دریافت لینک دعوت');
-    } finally {
-      setInviteLoading(false);
-    }
-  };
-
-  const handleInviteClick = () => {
-    if (!inviteOpen && !inviteLink && !inviteLoading) {
-      void loadInvite();
+  const handleInviteClick = async () => {
+    if (!inviteLink) {
+      toast.error('لینک دعوت هنوز آماده نیست');
+      return;
     }
 
-    setInviteOpen((current) => !current);
-  };
-
-  const handleCopyInvite = async (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-
-    if (!inviteLink) return;
+    const shareData = {
+      title: 'دعوت به هم‌نما',
+      text: `${user?.username ?? 'یک دوست'} از شما دعوت کرده به هم‌نما بپیوندید.`,
+      url: inviteLink,
+    };
 
     try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+
       await navigator.clipboard.writeText(inviteLink);
-      setInviteCopied(true);
-      window.setTimeout(() => setInviteCopied(false), 1500);
+      toast.success('لینک دعوت کپی شد');
     } catch (error) {
-      console.error('Copy invite link failed', error);
-      toast.error('کپی لینک انجام نشد');
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+
+      console.error('Share invite link failed', error);
+      toast.error('اشتراک‌گذاری لینک دعوت انجام نشد');
     }
   };
 
   const handleRefreshInvite = async (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
+
+    if (inviteRefreshing) return;
     setInviteRefreshing(true);
 
     try {
       const { data } = await userApi.refreshInvite();
       setInviteLink(buildInviteLink(data.token));
-      setInviteCopied(false);
       toast.success('لینک دعوت جدید ساخته شد');
     } catch (error) {
       console.error('Failed to refresh invite link', error);
@@ -79,11 +69,24 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
   };
 
   useEffect(() => {
-    if (!isOpen) {
-      setInviteOpen(false);
-      setInviteCopied(false);
-    }
-  }, [isOpen]);
+    if (!isOpen || inviteLink || inviteLoading) return;
+
+    const fetchInvite = async () => {
+      setInviteLoading(true);
+
+      try {
+        const { data } = await userApi.getInvite();
+        setInviteLink(buildInviteLink(data.token));
+      } catch (error) {
+        console.error('Failed to load invite link', error);
+        toast.error('خطا در دریافت لینک دعوت');
+      } finally {
+        setInviteLoading(false);
+      }
+    };
+
+    void fetchInvite();
+  }, [isOpen, inviteLink, inviteLoading]);
 
   const bodyItems = [
     {
@@ -159,54 +162,24 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
             }
 
             <li
-              className={clsx('username-dropdown__body__invite-trigger', inviteOpen && 'is-open')}
               onClick={handleInviteClick}
+              title={inviteLoading ? 'در حال آماده‌سازی لینک دعوت' : 'اشتراک‌گذاری لینک دعوت'}
             >
               <BsGiftFill />
               <span>دعوت از دوستان</span>
-            </li>
-          </ul>
-
-          {inviteOpen && (
-            <div
-              className="username-dropdown__invite"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <div className="username-dropdown__invite__label">
-                <TbLink />
-                <span>لینک دعوت شخصی شما</span>
-              </div>
-
-              <div className="username-dropdown__invite__link">
-                <span dir="ltr">
-                  {inviteLoading ? 'در حال دریافت لینک...' : inviteLink || 'لینک در دسترس نیست'}
-                </span>
-                <button
-                  type="button"
-                  onClick={handleCopyInvite}
-                  disabled={!inviteLink || inviteLoading || inviteRefreshing}
-                  aria-label="کپی لینک دعوت"
-                  title={inviteCopied ? 'کپی شد' : 'کپی لینک'}
-                >
-                  {inviteCopied ? <TbCheck /> : <TbCopy />}
-                </button>
-              </div>
 
               <button
                 type="button"
-                className="username-dropdown__invite__refresh"
+                className="username-dropdown__body__invite-refresh"
                 onClick={handleRefreshInvite}
-                disabled={inviteLoading || inviteRefreshing}
+                disabled={inviteRefreshing}
+                aria-label="ساخت لینک دعوت جدید"
+                title="ساخت لینک دعوت جدید"
               >
                 <TbRefresh className={inviteRefreshing ? 'is-spinning' : ''} />
-                <span>{inviteRefreshing ? 'در حال ساخت...' : 'ساخت لینک جدید'}</span>
               </button>
-
-              <p className="username-dropdown__invite__tip">
-                با ساخت لینک جدید، لینک قبلی دیگر معتبر نخواهد بود.
-              </p>
-            </div>
-          )}
+            </li>
+          </ul>
         </div>
 
         <div className='username-dropdown__footer'>

@@ -21,8 +21,6 @@ const Auth = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const inviteToken = (searchParams.get('invite') ?? '').trim();
-  const [inviteUsername, setInviteUsername] = useState<string | null>(null);
-  const [inviteInvalid, setInviteInvalid] = useState(false);
   const [step, setStep] = useState<AuthStep>('phone');
   const [phoneNumber, setPhoneNumber] = useState('');
 
@@ -38,46 +36,6 @@ const Auth = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  useEffect(() => {
-    if (isAuthLoading || isAuthenticated) return;
-
-    if (!inviteToken) {
-      setInviteUsername(null);
-      setInviteInvalid(false);
-      return;
-    }
-
-    let cancelled = false;
-
-    const loadInvite = async () => {
-      try {
-        const { data } = await api.get<{ valid: boolean; username: string }>(
-          `/invites/${encodeURIComponent(inviteToken)}`,
-        );
-
-        if (!cancelled) {
-          setInviteUsername(data.valid ? data.username : null);
-          setInviteInvalid(!data.valid);
-        }
-      } catch (error) {
-        if (cancelled) return;
-
-        if (error instanceof AxiosError && error.response?.status === 404) {
-          setInviteUsername(null);
-          setInviteInvalid(true);
-          return;
-        }
-
-        console.error('Failed to validate invite link', error);
-      }
-    };
-
-    void loadInvite();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [inviteToken, isAuthLoading, isAuthenticated]);
 
   // Helper to extract backend error messages and show toast
   const showErrorToast = (error: unknown, defaultMsg: string) => {
@@ -228,18 +186,6 @@ const Auth = () => {
 
       <div className="auth-container__panel">
         <div className="auth-container__sprockets" aria-hidden="true" />
-
-        {inviteUsername && (
-          <div className="auth-container__invite-notice">
-            با دعوت <strong dir="ltr">{inviteUsername}</strong> به هم‌نما خوش آمدید.
-          </div>
-        )}
-
-        {inviteInvalid && (
-          <div className="auth-container__invite-notice auth-container__invite-notice--invalid">
-            این لینک دعوت دیگر معتبر نیست؛ ثبت‌نام همچنان امکان‌پذیر است.
-          </div>
-        )}
 
         {step === 'phone' && (
           <PhoneInput setPhoneNumber={handlePhoneSubmit} />
