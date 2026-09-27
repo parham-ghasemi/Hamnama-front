@@ -1,6 +1,10 @@
 import api from "../lib/axiosConfig";
 
 export const userApi = {
+  getInvite: () => api.get<{ token: string }>('/users/me/invite'),
+
+  refreshInvite: () => api.post<{ token: string }>('/users/me/invite/refresh'),
+
   updateUsername: (username: string) =>
     api.patch('/users/me/username', { username }),
 
