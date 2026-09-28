@@ -1,4 +1,3 @@
-import { BsPlusLg } from 'react-icons/bs';
 import Header from '../../../components/header/Header';
 import './Join.scss';
 import { IoChevronBackOutline, IoChevronDownOutline, IoChevronForwardOutline, IoCopyOutline } from 'react-icons/io5';
@@ -254,8 +253,19 @@ const Join = () => {
                   </span>
                 </div>
 
-                <button className="join-page__content__main__cards__card__enter" disabled={!activeRoom || activeRoomLoading} onClick={() => activeRoom && nav(`/room/${activeRoom.id}`)} >
-                  ورود
+                <button
+                  className="join-page__content__main__cards__card__enter"
+                  disabled={activeRoomLoading || createRoomDisabled}
+                  onClick={() => {
+                    if (activeRoom) {
+                      nav(`/room/${activeRoom.id}`);
+                      return;
+                    }
+
+                    setIsModalOpen(true);
+                  }}
+                >
+                  {activeRoomLoading ? "در حال بررسی..." : activeRoom ? "ورود" : "ساخت اتاق شخصی"}
                 </button>
               </div>
 
@@ -320,22 +330,6 @@ const Join = () => {
                 </button>
               </div>
 
-              <div
-                className={`join-page__content__main__cards__card--create${createRoomDisabled ? " is-disabled" : ""}`}
-                role="button"
-                tabIndex={createRoomDisabled ? -1 : 0}
-                aria-disabled={createRoomDisabled}
-                onClick={() => !createRoomDisabled && setIsModalOpen(true)}
-                onKeyDown={(event) => {
-                  if (!createRoomDisabled && (event.key === "Enter" || event.key === " ")) {
-                    event.preventDefault();
-                    setIsModalOpen(true);
-                  }
-                }}
-              >
-                <p>{activeRoomLoading ? "در حال بررسی اتاق..." : "ساخت اتاق شخصی"}</p>
-                <span><BsPlusLg strokeWidth={1} /></span>
-              </div>
             </div>
 
             <section className="join-page__public-rooms" aria-labelledby="public-rooms-title">

@@ -28,8 +28,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const items: SidebarItem[] = [
     { text: 'اطلاعات کاربر', link: '/user/info', disabled: false },
     { text: 'تیکت ها', link: '/user/ticket', disabled: false },
+    { text: 'رتبه بندی', link: '/user/leaderboard', disabled: false },
     { text: 'پرداخت ها', link: '/user/payments', disabled: true },
-    { text: 'رتبه بندی', link: '/user/leaderboard', disabled: true },
     { text: 'مدیریت اعضا', link: '/user/plan-users', disabled: true },
   ];
 
