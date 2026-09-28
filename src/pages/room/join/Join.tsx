@@ -199,7 +199,6 @@ const Join = () => {
 
   const activeRoomLoading = currentRoomQuery.isLoading || currentRoomQuery.isFetching;
   const activeRoomLookupFailed = !!currentRoomQuery.error && getRoomApiErrorStatus(currentRoomQuery.error) !== 404;
-  const createRoomDisabled = activeRoomLoading || !!activeRoom || activeRoomLookupFailed;
   const lastRoom = lastRoomQuery.data ?? null;
   const lastRoomLabel = lastRoom?.created_by_name || "آخرین اتاق شما";
 
@@ -255,7 +254,7 @@ const Join = () => {
 
                 <button
                   className="join-page__content__main__cards__card__enter"
-                  disabled={activeRoomLoading || createRoomDisabled}
+                  disabled={activeRoomLoading || (!activeRoom && activeRoomLookupFailed)}
                   onClick={() => {
                     if (activeRoom) {
                       nav(`/room/${activeRoom.id}`);
