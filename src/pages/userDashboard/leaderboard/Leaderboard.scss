@@ -171,10 +171,6 @@
               width: 90%;
               transform: translateY(5px);
             }
-
-            @include mx.max-w(768px) {
-              width: auto;
-            }
           }
 
           &--name {
@@ -193,8 +189,8 @@
             object-fit: cover;
 
             @include mx.max-w(768px) {
-              width: 46px;
-              height: 46px;
+              width: 50px;
+              height: 50px;
             }
           }
 
@@ -213,7 +209,7 @@
           // Mobile Cell Layout
           @include mx.max-w(768px) {
             &:not(:first-of-type) {
-              width: 100%;
+              width: auto;
               flex-direction: row;
               justify-content: space-between;
               align-items: center;
