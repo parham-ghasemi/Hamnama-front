@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import UsernameDropdown from './usernameDropdown/UsernameDropdown';
 import { FaPlay, FaUser } from 'react-icons/fa6';
+import clsx from 'clsx';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -52,11 +53,18 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       {/* Left side: Actions & User Menu */}
       <div className="header__left">
         <button
-          className="header__left__watchbtn"
+          className={clsx("header__left__watchbtn", isAuthenticated && 'authenticated')}
           onClick={() => { isAuthenticated ? nav('/join-room') : nav('/auth') }}
         >
           {
             window.innerWidth >= 576 ? (
+              <>
+                <PiCaretRightBold className="header__left__watchbtn__Icon" style={{ strokeWidth: 10 }} />
+                <p className="header__left__watchbtn__text">
+                  شروع به تماشا
+                </p>
+              </>
+            ) : isAuthenticated ? (
               <>
                 <PiCaretRightBold className="header__left__watchbtn__Icon" style={{ strokeWidth: 10 }} />
                 <p className="header__left__watchbtn__text">

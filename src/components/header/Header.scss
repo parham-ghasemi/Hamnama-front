@@ -246,6 +246,18 @@
         padding: 0;
         font-size: 16px;
       }
+
+      &.authenticated {
+        @include mx.max-w(576px) {
+          min-width: 0;
+          max-width: none;
+          padding: 0 10px;
+          font-size: 13px;
+          > p {
+            transform: translateY(1px);
+          }
+        }
+      }
     }
 
     // --- User Profile / Login Section ---
