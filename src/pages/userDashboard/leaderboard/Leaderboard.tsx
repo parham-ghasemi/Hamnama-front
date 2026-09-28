@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import "./Leaderboard.scss";
 import api from "../../../lib/axiosConfig";
 import { PiUserFill } from "react-icons/pi";
 
 import Skeleton from "../../../components/skeleton/Skeleton";
+import { useAuth } from "../../../context/AuthContext";
 const DEFAULT_AVATAR = "/assets/images/default-avatar.png";
 const API_BASE_URL = import.meta.env['VITE_BASE_URL'] || "";
 
@@ -28,6 +29,9 @@ const fetchLeaderboard = async (): Promise<LeaderboardResponse> => {
 };
 
 export const Leaderboard: React.FC = () => {
+  const { user: currentUser } = useAuth();
+  const currentUserRowRef = useRef<HTMLDivElement | null>(null);
+
   const { data, isLoading, isError, error } = useQuery<LeaderboardResponse, Error>({
     queryKey: ["leaderboard"],
     queryFn: fetchLeaderboard,
@@ -39,6 +43,23 @@ export const Leaderboard: React.FC = () => {
     if (path.startsWith("http")) return path;
     return `${API_BASE_URL}${path}`;
   };
+
+  useEffect(() => {
+    if (isLoading || !data || !currentUser?.id || !currentUserRowRef.current) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      currentUserRowRef.current?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+        block: "center",
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [currentUser?.id, data, isLoading]);
 
   if (isError) {
     return (
@@ -84,7 +105,13 @@ export const Leaderboard: React.FC = () => {
           ) : users.map((user) => (
             <div
               key={user.id}
-              className="user-leaderboard__list-container__body-wrapper__row"
+              ref={user.id === currentUser?.id ? currentUserRowRef : undefined}
+              className={`user-leaderboard__list-container__body-wrapper__row${
+                user.id === currentUser?.id
+                  ? " user-leaderboard__list-container__body-wrapper__row--current-user"
+                  : ""
+              }`}
+              aria-current={user.id === currentUser?.id ? "true" : undefined}
             >
               {/* CHILD 1: Profile Group (Avatar + Username) */}
               <div className="user-leaderboard__list-container__body-wrapper__row__profile-group">

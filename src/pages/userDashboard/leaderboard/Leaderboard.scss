@@ -88,6 +88,34 @@
           background: light.$color-card-bg;
         }
 
+        &--current-user {
+          background:
+            linear-gradient(90deg, rgba(208, 79, 47, 0), rgba(208, 79, 47, 0)),
+            rgba(255, 255, 255, 0);
+          outline: 1px solid rgba(208, 78, 47, 0.5);
+          box-shadow:
+            0 0 0 1px rgba(208, 78, 47, 0.12),
+            0 14px 34px -24px rgba(208, 78, 47, 0.9);
+
+          @include mx.light {
+            background:
+              linear-gradient(
+                90deg,
+                rgba(139, 91, 130, 0.14),
+                rgba(139, 91, 130, 0.04)
+              ),
+              light.$color-card-bg;
+            outline-color: rgba(139, 91, 130, 0.45);
+            box-shadow:
+              0 0 0 1px rgba(139, 91, 130, 0.08),
+              0 14px 34px -24px rgba(139, 91, 130, 0.55);
+          }
+
+          .user-leaderboard__list-container__body-wrapper__row__cell__text {
+            font-weight: 800;
+          }
+        }
+
         // Podium: the top three rows get a warmer light leak.
         &:nth-child(-n + 3)::after {
           content: "";
