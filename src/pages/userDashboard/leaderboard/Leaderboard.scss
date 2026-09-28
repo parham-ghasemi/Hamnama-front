@@ -90,7 +90,11 @@
 
         &--current-user {
           background:
-            linear-gradient(90deg, rgba(208, 79, 47, 0), rgba(208, 79, 47, 0)),
+            linear-gradient(
+              90deg,
+              rgba(208, 78, 47, 0.16),
+              rgba(208, 78, 47, 0.05)
+            ),
             rgba(255, 255, 255, 0);
           outline: 1px solid rgba(208, 78, 47, 0.5);
           box-shadow:
