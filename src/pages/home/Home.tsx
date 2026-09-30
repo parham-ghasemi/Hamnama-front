@@ -7,6 +7,7 @@ import Faq from './faq/Faq'
 import CinemaAmbience from './ambience/CinemaAmbience'
 import Reveal from './reveal/Reveal'
 import DownloadApp from './download/DownloadApp'
+import Archive from './archive/Archive'
 import FreeGate from './freeGate/FreeGate'
 import { useTheme } from '../../context/ThemeContext'
 import clsx from 'clsx'
@@ -80,6 +81,8 @@ const Home = () => {
         <PlanCards />
 
         <FeatureGrid />
+
+        <Archive />
 
         <Reveal as='h2' className='home-page__download-title'>
           اپلیکیشن <span>هم‌نما</span> در راه است!
