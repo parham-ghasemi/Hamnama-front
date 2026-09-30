@@ -192,6 +192,10 @@
           0 10px 22px -14px rgba(104, 61, 96, 0.8);
       }
 
+      > * {
+        transform: translateX(3px);
+      }
+
       // Light sweep, same family as the home page CTAs.
       &::before {
         content: "";
@@ -222,7 +226,7 @@
         }
 
         .header__left__watchbtn__Icon {
-          transform: translateX(-2px) scale(1.1); // RTL-friendly direction
+          transform: translateX(4px); // RTL-friendly direction
         }
       }
 
@@ -254,7 +258,11 @@
           padding: 0 10px;
           font-size: 13px;
           > p {
-            transform: translateY(1px);
+            transform: translateY(1px) translateX(3px);
+          }
+
+          > * {
+            transform: translateX(3px);
           }
         }
       }
