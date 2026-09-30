@@ -14,27 +14,22 @@ const archiveFeatures = [
   {
     icon: <PiWarningCircleBold />,
     title: 'گزارش خرابی',
-    description: 'وقتی چیزی درست نبود، سریع خبر بده.',
   },
   {
     icon: <PiHeartStraightFill />,
     title: 'علاقه‌مندی‌ها',
-    description: 'انتخاب‌هایت را برای بعد نگه دار.',
   },
   {
     icon: <PiSlidersHorizontal />,
     title: 'فیلتر و مرتب‌سازی',
-    description: 'بین هزاران عنوان، دقیق‌تر بگرد.',
   },
   {
     icon: <PiFilmStripFill />,
     title: 'انتخاب نوع',
-    description: 'فیلم یا سریال، همان چیزی که می‌خواهی.',
   },
   {
     icon: <PiMagnifyingGlassBold />,
     title: 'جست‌وجوی سریع',
-    description: 'اسم موردنظرت را مستقیم پیدا کن.',
   },
 ];
 
@@ -45,34 +40,38 @@ const Archive = () => {
     <section className="home-archive" aria-labelledby="home-archive-title">
       <div className="home-archive__glow" aria-hidden="true" />
 
-      <Reveal as="h2" id="home-archive-title" className="home-archive__title" variant="up">
-        فیلم و سریال موردنظرت را <span>راحت‌تر پیدا کن</span>
+      <Reveal className="home-archive__header" variant="up">
+        <span className="home-archive__eyebrow">
+          <PiFilmStripFill aria-hidden="true" />
+          آرشیو هم‌نما
+        </span>
+
+        <h2 id="home-archive-title" className="home-archive__title">
+          فیلم و سریال موردنظرت را <span>راحت‌تر پیدا کن</span>
+        </h2>
       </Reveal>
 
-      <div className="home-archive__layout">
-        <Reveal className="home-archive__content" variant="up" delay={110}>
-          <div className="home-archive__intro">
-            <span className="home-archive__intro__eyebrow">
-              <PiFilmStripFill aria-hidden="true" />
-              آرشیو بزرگ هم‌نما
-            </span>
-            <p className="home-archive__description">
-              بیشتر از <strong>۲۰٬۰۰۰ فیلم و سریال</strong> منتظرته؛ با ابزارهای آرشیو، عنوانی که
-              دنبالش هستی را سریع پیدا کن و مستقیم وارد اتاق تماشا شو.
-            </p>
-          </div>
+      <div className="home-archive__inner">
+        <Reveal className="home-archive__copy" variant="up">
+          <p className="home-archive__description">
+            از بین <strong>بیش از ۲۰٬۰۰۰ فیلم و سریال</strong> بگرد، چیزی که می‌خواهی را
+            سریع پیدا کن و با ابزارهای آرشیو، انتخابت را دقیق‌تر کن.
+          </p>
 
           <div className="home-archive__features" aria-label="امکانات آرشیو">
             {archiveFeatures.map((feature, index) => (
-              <div className="home-archive__feature" key={`home-archive-feature-${index}`}>
+              <Reveal
+                as="span"
+                className="home-archive__feature"
+                key={`home-archive-feature-${index}`}
+                delay={index * 60}
+                variant="up"
+              >
                 <span className="home-archive__feature__icon" aria-hidden="true">
                   {feature.icon}
                 </span>
-                <span className="home-archive__feature__body">
-                  <strong>{feature.title}</strong>
-                  <span>{feature.description}</span>
-                </span>
-              </div>
+                <span>{feature.title}</span>
+              </Reveal>
             ))}
           </div>
 
@@ -88,19 +87,38 @@ const Archive = () => {
               </span>
               <span className="home-archive__cta__sheen" aria-hidden="true" />
             </button>
-            <span className="home-archive__hint">انتخاب کن، اتاق بساز و با دوستات شروع کن</span>
+
+            <span className="home-archive__hint">
+              جست‌وجو، انتخاب و شروع تماشا؛ همه‌چیز یک‌جا
+            </span>
           </div>
         </Reveal>
 
-        <Reveal className="home-archive__preview-wrap" variant="fade" delay={170}>
-          <div className="home-archive__preview-glow" aria-hidden="true" />
-          <figure className="home-archive__preview">
+        <Reveal className="home-archive__visual" variant="fade" delay={120}>
+          <div className="home-archive__visual__film-glow" aria-hidden="true" />
+          <div className="home-archive__screen">
+            <div className="home-archive__screen__topbar" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </div>
+
             <img
               src=""
-              alt="اسکرین‌شات آرشیو فیلم و سریال هم‌نما"
-              className="home-archive__preview__image"
+              alt="تصویر آرشیو فیلم و سریال هم‌نما"
+              className="home-archive__screen__image"
             />
-          </figure>
+
+            <div className="home-archive__screen__placeholder" aria-hidden="true">
+              <PiFilmStripFill />
+              <span>تصویر آرشیو اینجا قرار می‌گیرد</span>
+            </div>
+          </div>
+
+          <div className="home-archive__visual__caption">
+            <span className="home-archive__visual__caption__dot" />
+            <span>بیش از ۲۰٬۰۰۰ انتخاب برای یک شب سینمایی</span>
+          </div>
         </Reveal>
       </div>
     </section>
