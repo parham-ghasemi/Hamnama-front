@@ -72,6 +72,11 @@
     flex-direction: column;
     align-items: flex-start;
     text-align: right;
+
+    @include mx.max-w(820px) {
+      align-items: center;
+      text-align: center;
+    }
   }
 
   &__eyebrow {
@@ -113,9 +118,9 @@
   &__title {
     margin: 0 auto;
     max-width: 900px;
-    font-size: clamp(36px, 4vw, 56px);
+    font-weight: 700;
+    font-size: 45px;
     line-height: 1.38;
-    font-weight: 750;
     letter-spacing: -0.03em;
     text-align: center;
 
@@ -162,8 +167,15 @@
       }
     }
 
+    @include mx.max-w(1024px) {
+      font-size: 36px;
+    }
+
     @include mx.max-w(820px) {
       max-width: 760px;
+    }
+    @include mx.max-w(768px) {
+      font-size: 28px;
     }
 
     @include mx.max-w(560px) {
@@ -172,7 +184,24 @@
     }
 
     @include mx.max-w(420px) {
-      font-size: 25px;
+      font-size: 23px;
+    }
+  }
+
+  &__subheading {
+    margin: 0 0 3px;
+    color: dark.$color-white;
+    font-size: clamp(20px, 2vw, 27px);
+    line-height: 1.45;
+    font-weight: 850;
+    letter-spacing: -0.02em;
+
+    @include mx.light {
+      color: light.$color-primary-bg;
+    }
+
+    @include mx.max-w(820px) {
+      display: none;
     }
   }
 
@@ -197,6 +226,12 @@
       color: light.$color-dark-gray;
     }
 
+    @include mx.max-w(820px) {
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+    }
+
     @include mx.max-w(560px) {
       margin-top: 13px;
       font-size: 14px;
@@ -211,6 +246,12 @@
     width: 100%;
     max-width: 670px;
     margin-top: 24px;
+
+    @include mx.max-w(820px) {
+      justify-content: center;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
     @include mx.max-w(560px) {
       gap: 7px;
@@ -289,8 +330,15 @@
     gap: 11px;
     margin-top: 27px;
 
-    @include mx.max-w(560px) {
+    @include mx.max-w(820px) {
+      align-items: center;
       width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+    }
+
+    @include mx.max-w(560px) {
       margin-top: 20px;
     }
   }
@@ -387,7 +435,7 @@
     }
 
     @include mx.max-w(560px) {
-      width: 100%;
+      width: min(90vw, 420px);
       min-width: 0;
       height: 56px;
       font-size: 15px;
@@ -442,11 +490,16 @@
 
   &__hint {
     color: color.adjust(dark.$color-gray, $lightness: -18%);
+    text-align: right;
     font-size: 11.5px;
     font-weight: 600;
 
     @include mx.light {
       color: color.adjust(light.$color-gray, $lightness: -20%);
+    }
+
+    @include mx.max-w(820px) {
+      text-align: center;
     }
 
     @include mx.max-w(560px) {

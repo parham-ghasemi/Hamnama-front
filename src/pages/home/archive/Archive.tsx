@@ -53,6 +53,10 @@ const Archive = () => {
 
       <div className="home-archive__inner">
         <Reveal className="home-archive__copy" variant="up">
+          <h3 className="home-archive__subheading">
+            همه‌چیز برای پیدا کردن فیلم بعدی
+          </h3>
+
           <p className="home-archive__description">
             از بین <strong>بیش از ۲۰٬۰۰۰ فیلم و سریال</strong> بگرد، چیزی که می‌خواهی را
             سریع پیدا کن و با ابزارهای آرشیو، انتخابت را دقیق‌تر کن.
