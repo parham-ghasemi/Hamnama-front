@@ -571,12 +571,57 @@
       inset: 0;
       z-index: 2;
       pointer-events: none;
-      background: repeating-linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.028) 0 1px,
-        transparent 1px 5px
-      );
-      opacity: 0.55;
+      opacity: 1; // was 0.55, the layers below are already subtle
+      background:
+        // glass sheen
+        linear-gradient(
+          115deg,
+          transparent 28%,
+          rgba(255, 255, 255, 0.07) 42%,
+          rgba(255, 255, 255, 0.02) 52%,
+          transparent 62%
+        ),
+        // vignette
+        radial-gradient(
+            ellipse at 50% 40%,
+            transparent 52%,
+            rgba(0, 0, 0, 0.55) 100%
+          ),
+        // bottom fade
+        linear-gradient(0deg, transparent 58%, rgba(11, 10, 10, 0.897) 100%),
+        // scanlines
+        repeating-linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.03) 0 1px,
+            transparent 1px 4px
+          );
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      mix-blend-mode: soft-light;
+      opacity: 0.9;
+      background:
+        radial-gradient(
+          circle at 12% 8%,
+          rgba(208, 78, 47, 0.75),
+          transparent 55%
+        ),
+        radial-gradient(
+          circle at 92% 95%,
+          rgba(98, 60, 160, 0.6),
+          transparent 55%
+        );
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05); // crisp inner edge
+      transition: opacity mx.$dur-slow mx.$ease-out-soft;
+    }
+
+    &:hover::after {
+      opacity: 0.45; // grade eases off so the screenshot "comes alive" on hover
     }
 
     &:hover {
@@ -625,107 +670,17 @@
       border-radius: 17px;
     }
 
-    &__topbar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 3;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      height: 34px;
-      padding: 0 13px;
-      box-sizing: border-box;
-      background: linear-gradient(
-        180deg,
-        rgba(5, 5, 5, 0.5),
-        rgba(5, 5, 5, 0.15)
-      );
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-
-      span {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.2);
-      }
-
-      @include mx.light {
-        background: rgba(255, 255, 255, 0.82);
-        border-bottom-color: rgba(0, 0, 0, 0.045);
-
-        span {
-          background: rgba(0, 0, 0, 0.16);
-        }
-      }
-    }
-
     &__image {
       position: absolute;
-      inset: 34px 0 0;
-      width: 100%;
-      height: calc(100% - 34px);
-      object-fit: cover;
-      display: block;
+      top: 2px;
+      bottom: 2px;
+      left: 2px;
+      right: 2px;
+      width: auto;
+      border-radius: inherit;
       z-index: 1;
-      opacity: 0;
-    }
-
-    &__placeholder {
-      display: none;
-      position: absolute;
-      inset: 34px 0 0;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 12px;
-      color: color.adjust(dark.$color-white, $alpha: -0.35);
-      background:
-        radial-gradient(
-          circle at center,
-          rgba(208, 78, 47, 0.09),
-          transparent 42%
-        ),
-        linear-gradient(135deg, rgba(208, 78, 47, 0.025), transparent 55%);
-      font-size: 13px;
-      font-weight: 700;
-
-      > svg {
-        font-size: 52px;
-        color: rgba(208, 78, 47, 0.56);
-        filter: drop-shadow(0 7px 20px rgba(208, 78, 47, 0.24));
-      }
-
-      .home-archive__screen__image[src=""] + & {
-        display: flex;
-      }
-
-      @include mx.light {
-        color: light.$color-dark-gray;
-        background:
-          radial-gradient(
-            circle at center,
-            rgba(139, 91, 130, 0.08),
-            transparent 42%
-          ),
-          linear-gradient(135deg, rgba(139, 91, 130, 0.035), transparent 55%);
-
-        > svg {
-          color: rgba(139, 91, 130, 0.56);
-          filter: none;
-        }
-      }
-
-      @include mx.max-w(560px) {
-        font-size: 11px;
-
-        > svg {
-          font-size: 42px;
-        }
-      }
+      opacity: 0.9;
+      filter: contrast(1.08) saturate(1.15) brightness(0.95);
     }
   }
 

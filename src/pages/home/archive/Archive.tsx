@@ -101,22 +101,11 @@ const Archive = () => {
         <Reveal className="home-archive__visual" variant="fade" delay={120}>
           <div className="home-archive__visual__film-glow" aria-hidden="true" />
           <div className="home-archive__screen">
-            <div className="home-archive__screen__topbar" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-            </div>
-
             <img
-              src=""
+              src="/homepage/Archive.webp"
               alt="تصویر آرشیو فیلم و سریال هم‌نما"
               className="home-archive__screen__image"
             />
-
-            <div className="home-archive__screen__placeholder" aria-hidden="true">
-              <PiFilmStripFill />
-              <span>تصویر آرشیو اینجا قرار می‌گیرد</span>
-            </div>
           </div>
 
           <div className="home-archive__visual__caption">
