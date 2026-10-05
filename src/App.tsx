@@ -23,6 +23,7 @@ import AdminRoute from "./components/adminRoute/AdminRoute";
 import { AdminDashboard, AdminTickets, AdminUsers, AdminRooms, AdminSettings, AdminArchive, AdminPlanPayments } from "./pages/admin";
 import { ConfirmationModalProvider } from "./context/ConfirmModalContext/ConfirmaModalContext";
 import Home from "./pages/home/Home";
+import PaymentCallback from "./pages/paymentCallback/PaymentCallback";
 import NotFound from "./components/notFound/NotFound";
 import { Toaster } from "./components/toast";
 import About from "./pages/about/About";
@@ -56,7 +57,7 @@ function App() {
                 </Route>
 
                 <Route element={<DesktopLayout />}>
-                  <Route index element={<Home />} />
+                  <Route index element={<PaymentCallback />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/about-us" element={<About />} />
                   <Route path="/tutorial" element={<Tutorial />} />
