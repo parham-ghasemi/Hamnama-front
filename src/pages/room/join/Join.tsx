@@ -14,6 +14,8 @@ import clsx from 'clsx';
 import { toast } from '../../../components/toast';
 import { useConfirmationModal } from '../../../context/ConfirmModalContext/ConfirmaModalContext';
 import { FaSearch } from 'react-icons/fa';
+import { useAuth } from '../../../context/AuthContext';
+import { billingApi, type PrivatePlanRoom } from '../../../apiCalls/billingApi';
 
 
 const Join = () => {
@@ -28,6 +30,11 @@ const Join = () => {
   const publicRoomSortRef = useRef<HTMLDivElement>(null);
   const nav = useNavigate();
   const { openConfirmation } = useConfirmationModal();
+  const { user } = useAuth();
+  const billingConfigQuery = useQuery({ queryKey: ['billing-public'], queryFn: () => billingApi.getPublicConfig().then(r => r.data), staleTime: 30_000 });
+  const roomsEnabled = !!user && !billingConfigQuery.isLoading && !(billingConfigQuery.data?.is_paid === true && !user.current_plan);
+  const paidLocked = billingConfigQuery.data?.is_paid === true && !!user && !user.current_plan;
+  const privateRoomsQuery = useQuery({ queryKey: ['private-plan-rooms'], queryFn: () => billingApi.getPrivateRooms().then(r => r.data), enabled: roomsEnabled && !!user?.current_plan && billingConfigQuery.data?.is_paid === true, staleTime: 10_000 });
 
   // const { isAuthenticated } = useAuth();
   // useEffect(() => {
@@ -40,6 +47,7 @@ const Join = () => {
   const currentRoomQuery = useQuery({
     queryKey: ["current-room"],
     queryFn: getCurrentRoom,
+    enabled: roomsEnabled,
     retry: (failureCount, error) => {
       const status = getRoomApiErrorStatus(error);
       return status !== 404 && status !== 410 && failureCount < 2;
@@ -74,6 +82,7 @@ const Join = () => {
       page: publicRoomPage,
     }),
     staleTime: 15_000,
+    enabled: roomsEnabled,
   });
 
   useEffect(() => {
@@ -85,6 +94,7 @@ const Join = () => {
   const lastRoomQuery = useQuery({
     queryKey: ["last-active-room"],
     queryFn: getLastActiveRoom,
+    enabled: roomsEnabled,
     retry: (failureCount, error) => {
       const status = getRoomApiErrorStatus(error);
       return status !== 404 && status !== 410 && failureCount < 2;
@@ -97,6 +107,10 @@ const Join = () => {
       nav(`/room/${data.id}`);
     },
     onError: (error) => {
+      if (getRoomApiErrorStatus(error) === 402) {
+        toast.error('برای ورود به اتاق اشتراک فعال لازم است', { description: 'یک پلن انتخاب کنید تا امکان ساخت و ورود به اتاق فعال شود.' });
+        return;
+      }
       if (getRoomApiErrorStatus(error) === 409) {
         toast.error("امکان ورود به اتاق وجود ندارد", {
           description:
@@ -161,6 +175,8 @@ const Join = () => {
   });
 
   const handleJoin = () => {
+    if (!user) { nav(`/auth?redirect=${encodeURIComponent('/join-room')}`); return; }
+    if (paidLocked) { toast.error('ابتدا یک پلن فعال تهیه کنید'); return; }
     const roomCode = Number(code);
     if (!Number.isInteger(roomCode) || roomCode <= 0 || joinRoomMutation.isPending) return;
 
@@ -218,6 +234,16 @@ const Join = () => {
               </p>
             </div>
 
+            {paidLocked && (
+              <div className="join-page__plan-gate">
+                <div>
+                  <strong>برای استفاده از اتاق‌ها اشتراک فعال لازم است</strong>
+                  <span>در حالت پولی، ساختن و پیوستن به اتاق فقط برای اعضای پلن فعال امکان‌پذیر است.</span>
+                </div>
+                <button type="button" onClick={() => nav('/plan-details')}>مشاهده پلن‌ها</button>
+              </div>
+            )}
+
             <div className="join-page__content__main__cards">
               <div className="join-page__content__main__cards__card">
                 <span className="join-page__content__main__cards__card__badge" aria-hidden="true">
@@ -225,7 +251,7 @@ const Join = () => {
                 </span>
 
                 <button className={clsx("join-page__content__main__cards__card__del", clearRoomDataMutation.isPending && "pending")}
-                  disabled={!activeRoom || activeRoomLoading || clearRoomDataMutation.isPending}
+                  disabled={paidLocked || !activeRoom || activeRoomLoading || clearRoomDataMutation.isPending}
                   onClick={handleClearRoomData}>
                   {clearRoomDataMutation.isPending ? <PiSpinner /> : <PiTrashSimpleFill />}
                 </button>
@@ -254,7 +280,7 @@ const Join = () => {
 
                 <button
                   className="join-page__content__main__cards__card__enter"
-                  disabled={activeRoomLoading || (!activeRoom && activeRoomLookupFailed)}
+                  disabled={paidLocked || activeRoomLoading || (!activeRoom && activeRoomLookupFailed)}
                   onClick={() => {
                     if (activeRoom) {
                       nav(`/room/${activeRoom.id}`);
@@ -290,7 +316,7 @@ const Join = () => {
                 <button
                   className="join-page__content__main__cards__card__enter"
                   onClick={handleJoin}
-                  disabled={joinRoomMutation.isPending}
+                  disabled={paidLocked || joinRoomMutation.isPending}
                 >
                   {joinRoomMutation.isPending ? "در حال ورود..." : "پیوستن"}
                 </button>
@@ -322,7 +348,7 @@ const Join = () => {
                 <button
                   className="join-page__content__main__cards__last__action"
                   type="button"
-                  disabled={!lastRoom || joinLastRoomMutation.isPending || lastRoomQuery.isLoading}
+                  disabled={paidLocked || !lastRoom || joinLastRoomMutation.isPending || lastRoomQuery.isLoading}
                   onClick={() => lastRoom && joinLastRoomMutation.mutate(lastRoom.code)}
                 >
                   {joinLastRoomMutation.isPending ? "در حال ورود..." : lastRoomQuery.isLoading ? "در حال بارگذاری..." : "بازگشت به اتاق"}
@@ -330,6 +356,30 @@ const Join = () => {
               </div>
 
             </div>
+
+            {roomsEnabled && privateRoomsQuery.data?.rooms?.length ? (
+              <section className="join-page__private-rooms" aria-labelledby="private-rooms-title">
+                <div className="join-page__private-rooms__head">
+                  <div>
+                    <p>اتاق‌های خصوصی پلن شما</p>
+                    <h2 id="private-rooms-title">اولویت با دوستان شما</h2>
+                    <span>فقط اعضای همین پلن می‌توانند این اتاق‌ها را ببینند و وارد شوند.</span>
+                  </div>
+                  <PiUsersThreeFill aria-hidden="true" />
+                </div>
+                <div className="join-page__private-rooms__grid">
+                  {privateRoomsQuery.data.rooms.map((room: PrivatePlanRoom) => (
+                    <article className="join-page__private-room-card" key={room.id}>
+                      <div className="join-page__private-room-card__image">
+                        {room.image ? <img src={`${import.meta.env.VITE_BASE_URL ?? ''}${room.image}`} alt="" /> : <PiImageSquareFill />}
+                      </div>
+                      <div className="join-page__private-room-card__body"><strong>{room.name}</strong><span>سازنده: {room.creator_username}</span><span>{room.member_count.toLocaleString('fa-IR')} نفر</span></div>
+                      <button type="button" disabled={joinRoomMutation.isPending} onClick={() => joinRoomMutation.mutate(room.code)}>{joinRoomMutation.isPending ? 'در حال ورود...' : 'ورود به اتاق'}</button>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
             <section className="join-page__public-rooms" aria-labelledby="public-rooms-title">
               <div className="join-page__public-rooms__head">
@@ -452,7 +502,7 @@ const Join = () => {
                         <button
                           type="button"
                           className="join-page__public-room-card__join"
-                          disabled={joinRoomMutation.isPending}
+                          disabled={paidLocked || joinRoomMutation.isPending}
                           onClick={() => joinRoomMutation.mutate(room.code)}
                         >
                           {joinRoomMutation.isPending ? "در حال ورود..." : "پیوستن"}

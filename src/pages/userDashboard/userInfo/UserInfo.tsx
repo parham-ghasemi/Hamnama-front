@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PiCameraLight } from 'react-icons/pi';
 import { IoPencilSharp, IoClose, IoChevronDown, IoTrashOutline, IoImageOutline } from 'react-icons/io5';
 import { toast } from '../../../components/toast';
@@ -458,6 +459,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 const UserInfo = () => {
   const { user, isLoading: isUserLoading } = useAuth();
+  const navigate = useNavigate();
 
   const [editingField, setEditingField] = useState<'username' | 'phone' | 'password' | 'profilePicture' | null>(null);
   const [isModalActive, setIsModalActive] = useState(false);
@@ -592,12 +594,16 @@ const UserInfo = () => {
                 </div>
                 <div className="user-info__top-card__right__subinfo">
                   <p>وضعیت اشتراک</p>
-                  <span>اشتراک ندارید</span>
+                  <span>{user?.current_plan ? `${user.current_plan.title} · ${user.current_plan.duration_months.toLocaleString('fa-IR')} ماهه` : 'اشتراک ندارید'}</span>
                 </div>
               </div>
 
               <div className="user-info__top-card__left">
-                <button>خرید اشتراک</button>
+                {user?.current_plan ? (
+                  <button type="button" onClick={() => navigate('/user/plan-users')}>مدیریت پلن</button>
+                ) : (
+                  <button type="button" onClick={() => navigate('/plan-details')}>خرید اشتراک</button>
+                )}
               </div>
             </>
           )}

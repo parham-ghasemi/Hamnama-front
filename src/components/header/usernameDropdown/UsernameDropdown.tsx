@@ -128,8 +128,12 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
         <span className="username-dropdown__sprockets" aria-hidden="true" />
 
         <div className='username-dropdown__header'>
-          <p>اشتراک ندارید</p>
-          <button>خرید اشتراک</button>
+          <p>{user?.current_plan ? `پلن فعلی: ${user.current_plan.title}` : 'اشتراک ندارید'}</p>
+          {user?.current_plan ? (
+            <button type="button" onClick={() => navigate('/user/plan-users')}>مدیریت پلن</button>
+          ) : (
+            <button type="button" onClick={() => navigate('/plan-details')}>خرید اشتراک</button>
+          )}
         </div>
 
         <div className='username-dropdown__body'>

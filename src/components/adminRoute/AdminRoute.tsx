@@ -18,7 +18,7 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
 
   const {
     data: access,
-    isFetching,
+    isLoading: isAccessLoading,
     isError,
     error,
   } = useQuery({
@@ -32,9 +32,15 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
 
   const accessLevel = access?.access_level ?? 0;
 
-  if (isLoading || (isDashboard && isAuthenticated && isFetching)) {
+  if (
+    isLoading ||
+    (isDashboard && isAuthenticated && isAccessLoading && !access)
+  ) {
     return (
-      <div className="admin-route__loading" aria-busy="true"><Skeleton variant="rect" width={220} height={10} /><Skeleton variant="text" width={110} /></div>
+      <div className="admin-route__loading" aria-busy="true">
+        <Skeleton variant="rect" width={220} height={10} />
+        <Skeleton variant="text" width={110} />
+      </div>
     );
   }
 

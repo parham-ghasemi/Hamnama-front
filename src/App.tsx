@@ -14,11 +14,13 @@ import TicketChat from "./pages/userDashboard/tickets/ticketChat/TicketChat";
 import Leaderboard from "./pages/userDashboard/leaderboard/Leaderboard";
 import Join from "./pages/room/join/Join";
 import PlanUsers from "./pages/userDashboard/planUsers/PlanUsers";
+import PaymentResult from "./pages/paymentResult/PaymentResult";
+import PlanInvite from "./pages/planInvite/PlanInvite";
 import { AuthProvider } from "./context/AuthContext";
 import RoomPage from "./pages/room/roomPage/RoomPage";
 import AdminLayout from "./layouts/adminLayout/AdminLayout";
 import AdminRoute from "./components/adminRoute/AdminRoute";
-import { AdminDashboard, AdminTickets, AdminUsers, AdminRooms, AdminSettings, AdminArchive } from "./pages/admin";
+import { AdminDashboard, AdminTickets, AdminUsers, AdminRooms, AdminSettings, AdminArchive, AdminPlanPayments } from "./pages/admin";
 import { ConfirmationModalProvider } from "./context/ConfirmModalContext/ConfirmaModalContext";
 import Home from "./pages/home/Home";
 import NotFound from "./components/notFound/NotFound";
@@ -59,6 +61,8 @@ function App() {
                   <Route path="/about-us" element={<About />} />
                   <Route path="/tutorial" element={<Tutorial />} />
                   <Route path="/plan-details" element={<PlanDetails />} />
+                  <Route path="/payment-result" element={<PaymentResult />} />
+                  <Route path="/plan-invite" element={<PlanInvite />} />
                   <Route path="*" element={<NotFound />} />
                 </Route>
 
@@ -71,6 +75,7 @@ function App() {
                   <Route path="settings" element={<AdminSettings />} />
                   <Route path="support" element={<AdminSupport />} />
                   <Route path="archive" element={<AdminArchive />} />
+                  <Route path="plan-payments" element={<AdminPlanPayments />} />
                 </Route>
 
                 <Route path="join-room" element={<Join />} />

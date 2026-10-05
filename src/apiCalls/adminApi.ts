@@ -342,3 +342,20 @@ export const adminApi = {
   getSubtitleHealthReport: () => api.get<SubtitleHealthReport>('/admin/subtitles/report'),
   getInvalidSubtitleItems: (params?: { page?: number; limit?: number }) => api.get<AdminArchiveResponse>('/admin/subtitles/invalid', { params }),
 };
+
+export interface AdminBillingSettings { is_paid:boolean; global_discount_percent:number; free_overlay_title:string; free_overlay_message:string }
+export interface AdminBillingOffer { id:string; months:number; base_price_irr:number; base_price_toman:number; discount_percent:number }
+export interface AdminBillingPlan { id:string; title:string; max_users:number; discount_percent:number; durations:AdminBillingOffer[] }
+export interface AdminBillingPlansResponse { plans:AdminBillingPlan[] }
+export interface AdminDiscountCode { id:string; code:string; discount_percent:number; expires_at:string; max_uses?:number; used_count:number; reserved_count:number; active:boolean }
+export interface AdminDiscountCodesResponse { codes:AdminDiscountCode[] }
+
+export const billingAdminApi = {
+  getBillingSettings: () => api.get<AdminBillingSettings>('/admin/billing/settings'),
+  updateBillingSettings: (payload: { is_paid?:boolean; global_discount_percent?:number; free_overlay_title?:string; free_overlay_message?:string }) => api.patch<AdminBillingSettings>('/admin/billing/settings', payload),
+  getBillingPlans: () => api.get<AdminBillingPlansResponse>('/admin/billing/plans'),
+  updateBillingPlanDiscount: (id:string, discount_percent:number) => api.patch<AdminBillingPlan>(`/admin/billing/plans/${id}`, { discount_percent }),
+  updateBillingOffer: (id:string, payload:{base_price_irr:number;discount_percent:number}) => api.patch<AdminBillingOffer>(`/admin/billing/offers/${id}`, payload),
+  getDiscountCodes: () => api.get<AdminDiscountCodesResponse>('/admin/billing/discount-codes'),
+  createDiscountCode: (payload:{code:string;discount_percent:number;expires_at:string;max_uses?:number|null}) => api.post<AdminDiscountCode>('/admin/billing/discount-codes', payload),
+};

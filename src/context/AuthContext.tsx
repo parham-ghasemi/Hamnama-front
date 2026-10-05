@@ -7,12 +7,27 @@ import {
   setAccessToken,
 } from "../lib/authToken";
 
+export interface UserPlanSummary {
+  user_plan_id: string;
+  owner_user_id: string;
+  plan_id: string;
+  title: string;
+  max_users: number;
+  duration_months: number;
+  starts_at: string;
+  expires_at: string;
+  status: 'active' | 'frozen';
+  is_plan_admin: boolean;
+  member_count: number;
+}
+
 export interface User {
   id: string;
   username: string;
   phone_number: string;
   profile_picture: string;
   is_admin: boolean;
+  current_plan: UserPlanSummary | null;
 }
 
 interface AuthContextType {

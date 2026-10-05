@@ -7,6 +7,7 @@ import Rooms from "./rooms/Rooms";
 import Settings from "./settings/Settings";
 import Support from "./support/Support";
 import Archive from "./archive/Archive";
+import PlanPayments from "./planPayments/PlanPayments";
 
 const protect = <P extends object>(component: ComponentType<P>, minimumLevel: 1 | 2 | 3) =>
   AdminAccessGuard(component, minimumLevel);
@@ -18,3 +19,4 @@ export const AdminRooms = protect(Rooms, 3);
 export const AdminSettings = protect(Settings, 2);
 export const AdminSupport = protect(Support, 1);
 export const AdminArchive = protect(Archive, 3);
+export const AdminPlanPayments = protect(PlanPayments, 3);

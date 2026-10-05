@@ -1,126 +1,134 @@
-import { PiCaretDownFill, PiHeartFill, PiTicketFill } from 'react-icons/pi';
-import './PlanCards.scss';
+import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { BsPeopleFill, BsPersonFill } from 'react-icons/bs';
-import { Link } from 'react-router-dom';
-import { toPersianNumerals } from '../../../helpers/NumberConversion';
-import Reveal from '../reveal/Reveal';
-import FreeGate from '../freeGate/FreeGate';
+import {
+  PiCaretDownFill,
+  PiHeartFill,
+  PiTicketFill,
+} from 'react-icons/pi';
 import type { JSX } from 'react';
+import { billingApi, type BillingPlan } from '../../../apiCalls/billingApi';
+import { toPersianNumerals } from '../../../helpers/NumberConversion';
+import FreeGate from '../freeGate/FreeGate';
+import Reveal from '../reveal/Reveal';
+import './PlanCards.scss';
 
-interface plan {
-  icon: JSX.Element,
-  title: string,
-  desc: string,
-  numberOfUsers: number,
-  price: string,
-  // price: number,
-  discount?: { percent: number, newPrice: number, daysLeft: number },
-}
+const ICONS: Record<string, JSX.Element> = {
+  group: <BsPeopleFill />,
+  couple: <PiHeartFill />,
+  single: <BsPersonFill />,
+};
+
+const DESCS: Record<string, string> = {
+  group: 'مناسب جمع دوستان و خانوادگی',
+  couple: 'با پارتنرت فیلم ببین',
+  single: 'مناسب خرید تنها',
+};
 
 const PlanCards = () => {
-  const plans: plan[] = [
-    {
-      icon: <BsPeopleFill />,
-      title: 'پلن گروهی',
-      desc: 'مناسب جمع دوستان و خانوادگی',
-      numberOfUsers: 7,
-      price: '000،000',
-      // discount: { percent: 15, newPrice: 79000, daysLeft: 30 },
-    },
-    {
-      icon: <PiHeartFill />,
-      title: 'پلن کاپلی',
-      desc: 'با پارتنرت فیلم ببین',
-      numberOfUsers: 2,
-      price: '000،000',
-      // discount: { percent: 15, newPrice: 79000, daysLeft: 30 },
-    },
-    {
-      icon: <BsPersonFill />,
-      title: 'پلن تک نفره',
-      desc: 'مناسب خرید تنها',
-      numberOfUsers: 1,
-      price: '000،000',
-      // discount: { percent: 15, newPrice: 79000, daysLeft: 30 },
-    },
-  ] as plan[]
+  const navigate = useNavigate();
+  const { data, isLoading } = useQuery({
+    queryKey: ['billing-public'],
+    queryFn: () => billingApi.getPublicConfig().then((response) => response.data),
+    staleTime: 30_000,
+  });
+
+  const plans = (data?.plans ?? []).slice().reverse();
 
   return (
-    <Reveal className='home-planCards' variant='fade'>
-      {/* <div className='home-planCards__blob-top'></div> */}
-      <div className='home-planCards__blob-bottom'></div>
+    <Reveal className="home-planCards" variant="fade">
+      <div className="home-planCards__blob-bottom" />
 
-      {
-        plans.map((plan, ind) => (
-          <FreeGate
-            className='home-planCards__gate'
-            key={`homeplancards-${ind}`}
-            radius={26}
-          >
-            <div className='home-planCards__card'>
-              <div className="home-planCards__card__icon">
-                {plan.icon}
-              </div>
+      {isLoading
+        ? [0, 1, 2].map((index) => (
+            <div className="home-planCards__card" key={index} />
+          ))
+        : plans.map((plan: BillingPlan) => {
+            const offer =
+              plan.durations.find((duration) => duration.months === 1) ??
+              plan.durations[0];
+            const hasPrice = (offer?.price_toman ?? 0) > 0;
 
-              <h4 className='home-planCards__card__title'>{plan.title}</h4>
-              <p className='home-planCards__card__desc'>{plan.desc}</p>
+            return (
+              <FreeGate
+                className="home-planCards__gate"
+                key={plan.id}
+                radius={26}
+              >
+                <div className="home-planCards__card">
+                  <div className="home-planCards__card__icon">
+                    {ICONS[plan.id]}
+                  </div>
 
-              <div className='home-planCards__card__sep' />
-
-              <p className='home-planCards__card__users-title'>تعداد کاربر</p>
-              <p className='home-planCards__card__users'>
-                {`${toPersianNumerals(plan.numberOfUsers)} نفر`}
-              </p>
-
-              <div className='home-planCards__card__price-container'>
-                {
-                  plan.discount && (
-                    <div className='home-planCards__card__price-container__discount'>
-                      <div className="home-planCards__card__price-container__discount__old-price">
-                        {
-                          toPersianNumerals(
-                            plan.price.toLocaleString().replace(',', "،")
-                          )
-                        }
-                      </div>
-
-                      <div className="home-planCards__card__price-container__discount__discount-percent">
-                        <PiCaretDownFill />
-                        {`${toPersianNumerals(plan.discount.percent)}%`}
-                      </div>
-                    </div>
-                  )
-                }
-                <div className='home-planCards__card__price-container__current-price'>
-                  <p className='home-planCards__card__price-container__current-price__main'>
-                    {toPersianNumerals(plan.discount ? plan.discount.newPrice.toLocaleString().replace(',', "،") : plan.price)}
-                    <span>
-                      هــــزار تومــان
-                    </span>
+                  <h4 className="home-planCards__card__title">{plan.title}</h4>
+                  <p className="home-planCards__card__desc">
+                    {DESCS[plan.id]}
                   </p>
 
-                  {
-                    plan.discount && (
-                      <p className='home-planCards__card__price-container__current-price__sub'>
-                        {`مدت زمان ${toPersianNumerals(plan.discount.daysLeft)} روز `}
+                  <div className="home-planCards__card__sep" />
+
+                  <p className="home-planCards__card__users-title">تعداد کاربر</p>
+                  <p className="home-planCards__card__users">
+                    {toPersianNumerals(plan.max_users)} نفر
+                  </p>
+
+                  <div className="home-planCards__card__price-container">
+                    {offer && offer.discount_percent > 0 && (
+                      <div className="home-planCards__card__price-container__discount">
+                        <div className="home-planCards__card__price-container__discount__old-price">
+                          {toPersianNumerals(
+                            offer.base_price_toman.toLocaleString('fa-IR'),
+                          )}
+                        </div>
+                        <div className="home-planCards__card__price-container__discount__discount-percent">
+                          <PiCaretDownFill />
+                          {toPersianNumerals(offer.discount_percent)}%
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="home-planCards__card__price-container__current-price">
+                      <p className="home-planCards__card__price-container__current-price__main">
+                        {hasPrice
+                          ? toPersianNumerals(
+                              offer!.price_toman.toLocaleString('fa-IR'),
+                            )
+                          : '—'}
+                        <span> تومان</span>
                       </p>
-                    )
-                  }
+                      <p className="home-planCards__card__price-container__current-price__sub">
+                        مدت ۱ ماه
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    className="home-planCards__card__buyBtn"
+                    type="button"
+                    onClick={() =>
+                      navigate(`/plan-details?plan=${plan.id}`)
+                    }
+                    disabled={!hasPrice}
+                  >
+                    <PiTicketFill aria-hidden="true" />
+                    خرید
+                  </button>
+
+                  <button
+                    type="button"
+                    className="home-planCards__card__more"
+                    onClick={() =>
+                      navigate(`/plan-details?plan=${plan.id}`)
+                    }
+                  >
+                    مشاهده تمام ویژگی ها
+                  </button>
                 </div>
-              </div>
-
-              <button className='home-planCards__card__buyBtn'>
-                <PiTicketFill aria-hidden='true' />
-                خرید
-              </button>
-
-              <Link to={'/plan-details'} className="home-planCards__card__more">مشاهده تمام ویژگی ها</Link>
-            </div>
-          </FreeGate>
-        ))
-      }
+              </FreeGate>
+            );
+          })}
     </Reveal>
-  )
-}
+  );
+};
 
-export default PlanCards
+export default PlanCards;

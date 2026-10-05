@@ -21,6 +21,8 @@ const Auth = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const inviteToken = (searchParams.get('invite') ?? '').trim();
+  const redirectParam = (searchParams.get('redirect') ?? '').trim();
+  const redirectPath = redirectParam.startsWith('/') ? redirectParam : '/';
   const [step, setStep] = useState<AuthStep>('phone');
   const [phoneNumber, setPhoneNumber] = useState('');
 
@@ -32,9 +34,9 @@ const Auth = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/', { replace: true });
+      navigate(redirectPath, { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, redirectPath]);
 
 
   // Helper to extract backend error messages and show toast
@@ -80,7 +82,7 @@ const Auth = () => {
       await login(data.access_token);
 
       toast.success('با موفقیت وارد شدید');
-      navigate('/');
+      navigate(redirectPath);
     } catch (error) {
       showErrorToast(error, 'رمز عبور اشتباه است');
     }
@@ -113,7 +115,7 @@ const Auth = () => {
 
         await login(data.access_token);
         toast.success('با موفقیت وارد شدید');
-        navigate('/');
+        navigate(redirectPath);
       } else {
         // Signup flow: Validate OTP to get the temporary verification token
         const { data } = await api.post('/auth/validate-otp', {
@@ -148,7 +150,7 @@ const Auth = () => {
       // Save final session token and redirect
       await login(data.access_token);
       toast.success('حساب کاربری با موفقیت ساخته شد');
-      navigate('/');
+      navigate(redirectPath);
     } catch (error) {
       showErrorToast(error, 'خطا در ساخت حساب کاربری');
     }

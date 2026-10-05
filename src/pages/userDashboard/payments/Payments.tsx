@@ -1,26 +1,50 @@
+import { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { billingApi, type BillingPayment } from '../../../apiCalls/billingApi';
 import { SEO } from '../../../components/seo/SEO';
-import { toPersianNumerals } from '../../../helpers/NumberConversion';
+import { toast } from '../../../components/toast';
 import './Payments.scss';
 
-// Fake data array structured to mimic your rows
-const PAYMENTS_DATA = [
-  {
-    id: '001',
-    date: '1404/10/22',
-    planType: { title: 'پلن کاپلی', duration: 'یک ماهه' },
-    amount: 109000,
-    status: 'پرداخت شده',
-  },
-  {
-    id: '002',
-    date: '1404/10/22',
-    planType: { title: 'پلن کاپلی', duration: 'یک ماهه' },
-    amount: 109000,
-    status: 'پرداخت نشده',
-  }
-];
+const statusLabel = (status: string) =>
+  ({
+    paid: 'پرداخت شده',
+    pending: 'در انتظار پرداخت',
+    failed: 'ناموفق',
+    cancelled: 'لغو شده',
+  })[status] ?? status;
+
+const statusClass = (status: string) =>
+  status === 'paid' ? 'green' : status === 'pending' ? 'amber' : 'red';
+
+const dateLabel = (value: string) =>
+  new Date(value).toLocaleDateString('fa-IR');
 
 const Payments = () => {
+  const [page, setPage] = useState(1);
+  const queryClient = useQueryClient();
+  const paymentsQuery = useQuery({
+    queryKey: ['billing-payments', page],
+    queryFn: () => billingApi.getPayments(page, 20).then((response) => response.data),
+    staleTime: 10_000,
+  });
+
+  const reconcile = useMutation({
+    mutationFn: (paymentID: string) => billingApi.reconcilePayment(paymentID),
+    onSuccess: (response) => {
+      void queryClient.invalidateQueries({ queryKey: ['billing-payments'] });
+      void queryClient.invalidateQueries({ queryKey: ['billing-plan-users'] });
+
+      if (response.data.status === 'success') {
+        toast.success('پرداخت تایید و اشتراک فعال شد');
+      } else if (response.data.status === 'failed') {
+        toast.error('این پرداخت تایید نشد');
+      } else {
+        toast.info('تایید پرداخت هنوز تکمیل نشده است');
+      }
+    },
+    onError: () => toast.error('بررسی پرداخت ممکن نبود'),
+  });
+
   return (
     <>
       <SEO
@@ -30,59 +54,122 @@ const Payments = () => {
         noindex
       />
 
-      <div className='user-payments'>
-        <div className='user-payments__blob' />
-        <div className='user-payments__list-container'>
+      <div className="user-payments">
+        <div className="user-payments__blob" />
 
-          {/* Header Section */}
-          <div className='user-payments__list-container__header'>
-            <div className='user-payments__list-container__header__cell'>تاریخ سفارش</div>
-            <div className='user-payments__list-container__header__cell'>نوع سفارش</div>
-            <div className='user-payments__list-container__header__cell'>شماره سفارش</div>
-            <div className='user-payments__list-container__header__cell'>مبلغ پرداختی</div>
-            <div className='user-payments__list-container__header__cell'>وضعیت پرداخت</div>
+        <div className="user-payments__list-container">
+          <div className="user-payments__list-container__header">
+            <div className="user-payments__list-container__header__cell">
+              تاریخ سفارش
+            </div>
+            <div className="user-payments__list-container__header__cell">
+              نوع سفارش
+            </div>
+            <div className="user-payments__list-container__header__cell">
+              شماره سفارش
+            </div>
+            <div className="user-payments__list-container__header__cell">
+              مبلغ پرداختی
+            </div>
+            <div className="user-payments__list-container__header__cell">
+              وضعیت پرداخت
+            </div>
           </div>
 
-          {/* Dynamic Body Section */}
-          <div className='user-payments__list-container__body-wrapper'>
-            {PAYMENTS_DATA.map((payment) => (
-              <div key={payment.id} className='user-payments__list-container__body-wrapper__row'>
-
-                <div className='user-payments__list-container__body-wrapper__row__cell'>
-                  {toPersianNumerals(payment.date)}
-                </div>
-
-                <div className='user-payments__list-container__body-wrapper__row__cell'>
-                  <span className='user-payments__list-container__body-wrapper__row__cell__text'>
-                    {payment.planType.title}
-                  </span>
-                  {payment.planType.duration}
-                </div>
-
-                <div className='user-payments__list-container__body-wrapper__row__cell'>
-                  {payment.id}
-                </div>
-
-                <div className='user-payments__list-container__body-wrapper__row__cell'>
-                  {
-                    toPersianNumerals(payment.amount.toLocaleString().replace(',', "،"))
-                  }
-                </div>
-
-                {/* Conditional Tailwind utility class applied here */}
-                <div className={`user-payments__list-container__body-wrapper__row__cell ${payment.status === 'پرداخت نشده' ? 'red' : 'green'
-                  }`}>
-                  {payment.status}
-                </div>
-
+          <div className="user-payments__list-container__body-wrapper">
+            {paymentsQuery.isLoading ? (
+              <div className="user-payments__state">
+                در حال دریافت سوابق پرداخت...
               </div>
-            ))}
+            ) : paymentsQuery.error ? (
+              <div className="user-payments__state">
+                دریافت سوابق پرداخت ممکن نبود.
+              </div>
+            ) : paymentsQuery.data?.payments.length ? (
+              paymentsQuery.data.payments.map((payment: BillingPayment) => (
+                <div
+                  key={payment.id}
+                  className="user-payments__list-container__body-wrapper__row"
+                >
+                  <div className="user-payments__list-container__body-wrapper__row__cell">
+                    {dateLabel(payment.created_at)}
+                  </div>
+                  <div className="user-payments__list-container__body-wrapper__row__cell">
+                    <span className="user-payments__list-container__body-wrapper__row__cell__text">
+                      {payment.plan_title}
+                    </span>
+                    {payment.duration_months.toLocaleString('fa-IR')} ماه
+                  </div>
+                  <div
+                    className="user-payments__list-container__body-wrapper__row__cell"
+                    title={payment.id}
+                  >
+                    {payment.id.slice(0, 8)}…
+                  </div>
+                  <div className="user-payments__list-container__body-wrapper__row__cell">
+                    {payment.amount_toman.toLocaleString('fa-IR')} تومان
+                  </div>
+                  <div
+                    className={`user-payments__list-container__body-wrapper__row__cell ${statusClass(payment.status)}`}
+                  >
+                    {statusLabel(payment.status)}
+                    {payment.status === 'pending' && payment.authority && (
+                      <button
+                        type="button"
+                        className="user-payments__reconcile"
+                        disabled={reconcile.isPending}
+                        onClick={() => reconcile.mutate(payment.id)}
+                      >
+                        بررسی
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="user-payments__state">
+                هنوز پرداختی برای حساب شما ثبت نشده است.
+              </div>
+            )}
           </div>
 
+          {!!paymentsQuery.data?.pagination.pages &&
+            paymentsQuery.data.pagination.pages > 1 && (
+              <div className="user-payments__pagination">
+                <button
+                  type="button"
+                  disabled={page <= 1 || paymentsQuery.isFetching}
+                  onClick={() => setPage((current) => Math.max(1, current - 1))}
+                >
+                  صفحه قبل
+                </button>
+                <span>
+                  {paymentsQuery.data.pagination.page.toLocaleString('fa-IR')} /{' '}
+                  {paymentsQuery.data.pagination.pages.toLocaleString('fa-IR')}
+                </span>
+                <button
+                  type="button"
+                  disabled={
+                    page >= paymentsQuery.data.pagination.pages ||
+                    paymentsQuery.isFetching
+                  }
+                  onClick={() =>
+                    setPage((current) =>
+                      Math.min(
+                        paymentsQuery.data?.pagination.pages ?? current,
+                        current + 1,
+                      ),
+                    )
+                  }
+                >
+                  صفحه بعد
+                </button>
+              </div>
+            )}
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
 export default Payments;

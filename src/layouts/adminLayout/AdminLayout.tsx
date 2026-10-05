@@ -8,22 +8,26 @@ import {
   FiSettings,
   FiMessageCircle,
   FiArchive,
+  FiCreditCard,
 } from 'react-icons/fi';
 import Header from '../../components/header/Header';
+import { useAdminAccess } from '../../components/adminRoute/AdminAccessContext';
 import { adminApi } from '../../apiCalls/adminApi';
 import './AdminLayout.scss';
 
 const navItems = [
-  { to: '/admin/dashboard', label: 'داشبورد', icon: FiLayout },
-  { to: '/admin/tickets', label: 'تیکت‌ها', icon: FiMessageSquare },
-  { to: '/admin/support', label: 'گفتگوهای پشتیبانی', icon: FiMessageCircle },
-  { to: '/admin/users', label: 'کاربران', icon: FiUsers },
-  { to: '/admin/rooms', label: 'اتاق‌ها', icon: FiMonitor },
-  { to: '/admin/settings', label: 'تنظیمات', icon: FiSettings },
-  { to: '/admin/archive', label: 'مدیریت آرشیو', icon: FiArchive },
+  { to: '/admin/dashboard', label: 'داشبورد', icon: FiLayout, minLevel: 1 },
+  { to: '/admin/tickets', label: 'تیکت‌ها', icon: FiMessageSquare, minLevel: 1 },
+  { to: '/admin/support', label: 'گفتگوهای پشتیبانی', icon: FiMessageCircle, minLevel: 1 },
+  { to: '/admin/users', label: 'کاربران', icon: FiUsers, minLevel: 2 },
+  { to: '/admin/rooms', label: 'اتاق‌ها', icon: FiMonitor, minLevel: 3 },
+  { to: '/admin/settings', label: 'تنظیمات', icon: FiSettings, minLevel: 2 },
+  { to: '/admin/archive', label: 'مدیریت آرشیو', icon: FiArchive, minLevel: 3 },
+  { to: '/admin/plan-payments', label: 'پلن‌ها و پرداخت‌ها', icon: FiCreditCard, minLevel: 3 },
 ];
 
 const AdminLayout = () => {
+  const { accessLevel } = useAdminAccess();
   const { data: notifications } = useQuery({
     queryKey: ['admin-notifications'],
     queryFn: () => adminApi.getNotifications().then((res) => res.data),
@@ -46,7 +50,7 @@ const AdminLayout = () => {
           </div>
 
           <nav className="admin-layout__nav">
-            {navItems.map(({ to, label, icon: Icon }) => (
+            {navItems.filter(item => accessLevel >= item.minLevel).map(({ to, label, icon: Icon }) => (
               <NavLink
                 key={to}
                 to={to}

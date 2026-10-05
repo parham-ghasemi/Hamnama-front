@@ -5,6 +5,15 @@
 @use "../_dash" as dash;
 
 .plan-users {
+  &__notice {
+    margin-bottom: 1rem;
+    padding: 0.85rem 1rem;
+    border-radius: 0.75rem;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    line-height: 1.8;
+  }
+
   @include mx.flex-center;
   min-height: 100%;
   width: 100%;
@@ -241,5 +250,186 @@
         }
       }
     }
+  }
+  &__state {
+    padding: 50px;
+    text-align: center;
+    color: #aaa9b9;
+
+    button {
+      display: block;
+      margin: 16px auto 0;
+      padding: 11px 18px;
+      border: 0;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+  }
+
+  &__summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 18px;
+      border-radius: 16px;
+      background: #1d1d2a;
+    }
+
+    span {
+      color: #9e9dac;
+    }
+  }
+
+  &__invite,
+  &__requests {
+    margin-bottom: 16px;
+    padding: 20px;
+    border-radius: 18px;
+    background: #1d1d2a;
+  }
+
+  &__invite {
+    p {
+      color: #aaa9b9;
+    }
+
+    &__actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 13px;
+      border: 0;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    code {
+      display: block;
+      margin-top: 12px;
+      padding: 10px;
+      overflow-wrap: anywhere;
+      border-radius: 10px;
+      background: #171722;
+      color: #88d9b3;
+    }
+  }
+
+  &__request {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 12px 0;
+    border-top: 1px solid #333345;
+
+    > div:first-child {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    span {
+      color: #9998a8;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 13px;
+      border: 0;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  }
+
+  &__cards {
+    &__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    &__card {
+      padding: 16px;
+      border-radius: 16px;
+      background: #1d1d2a;
+
+      &__user-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        img,
+        p {
+          display: grid;
+          place-items: center;
+          width: 42px;
+          height: 42px;
+          margin: 0;
+          border-radius: 50%;
+          object-fit: cover;
+          background: #303043;
+        }
+      }
+
+      &__since {
+        margin: 12px 0;
+        color: #9998a8;
+      }
+
+      &__kick {
+        padding: 9px 12px;
+        border: 0;
+        border-radius: 9px;
+        cursor: pointer;
+      }
+
+      &--add {
+        display: grid;
+        place-items: center;
+        text-align: center;
+        cursor: pointer;
+      }
+
+      &__add-icon {
+        font-size: 24px;
+      }
+    }
+  }
+
+  @include mx.max-w(720px) {
+    &__summary {
+      grid-template-columns: 1fr;
+    }
+
+    &__request {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+
+}
+
+
+.is-spin {
+  animation: plan-spin 1s linear infinite;
+}
+
+@keyframes plan-spin {
+  to {
+    transform: rotate(360deg);
   }
 }

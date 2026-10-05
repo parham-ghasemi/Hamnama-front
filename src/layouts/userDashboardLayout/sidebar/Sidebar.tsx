@@ -20,7 +20,7 @@ interface SidebarItem {
 const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const nav = useNavigate();
   const location = useLocation();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   const [noticeIndex, setNoticeIndex] = useState<number | null>(null);
   const noticeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -29,8 +29,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     { text: 'اطلاعات کاربر', link: '/user/info', disabled: false },
     { text: 'تیکت ها', link: '/user/ticket', disabled: false },
     { text: 'رتبه بندی', link: '/user/leaderboard', disabled: false },
-    { text: 'پرداخت ها', link: '/user/payments', disabled: true },
-    { text: 'مدیریت اعضا', link: '/user/plan-users', disabled: true },
+    { text: 'پرداخت ها', link: '/user/payments', disabled: false },
+    { text: 'مدیریت اعضا', link: '/user/plan-users', disabled: !user?.current_plan },
   ];
 
   useEffect(() => {
@@ -114,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                 <span className="user-sidebar__item-notice" aria-hidden="true">
                   <FaHourglassHalf className="user-sidebar__item-notice-icon" />
                   <span className="user-sidebar__item-notice-text">
-                    این صفحه در حال ساخت است
+                    {item.link === '/user/plan-users' ? 'ابتدا یک پلن فعال بگیرید' : 'این صفحه در حال ساخت است'}
                   </span>
                 </span>
               )}
