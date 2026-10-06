@@ -5,202 +5,128 @@
 
 .plan-details {
   position: relative;
-  isolation: isolate;
-  min-height: calc(100vh - 90px);
-  width: 100%;
-  padding: 126px 24px 64px;
-  box-sizing: border-box;
+  min-height: 100%;
+  padding: 150px 18px 70px;
   overflow: hidden;
 
-  &__ambient {
-    position: absolute;
-    z-index: -1;
-    border-radius: 50%;
-    pointer-events: none;
-    filter: blur(16px);
-
-    &--one {
-      width: 680px;
-      height: 520px;
-      top: -220px;
-      right: -180px;
-      background: radial-gradient(
-        circle,
-        rgba(208, 78, 47, 0.18) 0%,
-        rgba(208, 78, 47, 0) 68%
-      );
-    }
-
-    &--two {
-      width: 760px;
-      height: 520px;
-      bottom: -280px;
-      left: -260px;
-      background: radial-gradient(
-        circle,
-        rgba(224, 163, 64, 0.1) 0%,
-        rgba(224, 163, 64, 0) 70%
-      );
-    }
+  &__blob {
+    @include mx.background-blob(980px, 620px, -120px, auto, auto, 8%);
   }
 
   &__header {
-    width: min(1180px, 100%);
-    margin: 0 auto 46px;
+    position: relative;
+    z-index: 1;
+    width: min(720px, 100%);
+    margin: 0 auto 42px;
     text-align: center;
 
-    &__eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(208, 78, 47, 0.22);
-      background: rgba(208, 78, 47, 0.08);
+    > span {
       color: dark.$color-primary;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
-
-      svg {
-        font-size: 17px;
-      }
+      letter-spacing: 0.02em;
 
       @include mx.light {
-        background: rgba(139, 91, 130, 0.08);
-        border-color: rgba(139, 91, 130, 0.2);
         color: light.$color-primary;
       }
     }
 
     h1 {
-      max-width: 800px;
-      margin: 18px auto 0;
-      font-size: clamp(32px, 4.2vw, 52px);
-      line-height: 1.24;
+      margin: 8px 0 10px;
+      color: dark.$color-white;
+      font-size: clamp(30px, 4vw, 44px);
       font-weight: 800;
-      letter-spacing: -1px;
+      line-height: 1.2;
 
-      span {
-        color: dark.$color-primary;
-
-        @include mx.light {
-          color: light.$color-primary;
-        }
+      @include mx.light {
+        color: light.$color-black;
       }
     }
 
-    > p {
-      max-width: 690px;
-      margin: 16px auto 0;
-      color: color.adjust(dark.$color-gray, $lightness: -8%);
-      line-height: 2;
-      font-size: 15px;
+    p {
+      margin: 0 auto;
+      max-width: 570px;
+      color: dark.$color-gray;
+      font-size: 13px;
+      line-height: 1.9;
 
       @include mx.light {
         color: light.$color-dark-gray;
-      }
-    }
-
-    &__current {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      margin-top: 18px;
-      padding: 9px 13px;
-      border-radius: 12px;
-      background: rgba(83, 193, 148, 0.09);
-      border: 1px solid rgba(83, 193, 148, 0.2);
-      color: dark.$color-green;
-      font-size: 13px;
-
-      svg {
-        font-size: 16px;
-      }
-
-      strong {
-        color: dark.$color-white;
-
-        @include mx.light {
-          color: light.$color-black;
-        }
-      }
-
-      @include mx.light {
-        color: light.$color-green;
       }
     }
   }
 
   &__grid {
     position: relative;
-    width: min(1180px, 100%);
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    z-index: 1;
+    display: flex;
     align-items: stretch;
-    gap: 24px;
+    justify-content: center;
+    gap: 23.8px;
+    max-width: 1210px;
+    margin: 0 auto;
   }
 
   &__card {
+    @include mx.flex-center;
+    flex: 1 1 0;
+    flex-direction: column;
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    min-width: 0;
-    min-height: 700px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 24px 22px 24px;
+    width: 100%;
+    max-width: 376px;
+    min-height: 610px;
+    padding: 22px 22px 18px;
     border-radius: 26px;
     box-sizing: border-box;
+    outline: none;
 
     @include mx.cinema-surface;
     @include mx.ambient-shadow(0.9);
 
     transition:
-      transform mx.$dur-base mx.$ease-out-soft,
-      box-shadow mx.$dur-base mx.$ease-out-soft;
+      transform mx.$dur-slow mx.$ease-out-soft,
+      box-shadow mx.$dur-slow mx.$ease-out-soft;
 
     &::before {
-      @include mx.gradient-border(
-        26px,
-        rgba(255, 255, 255, 0.24),
-        rgba(255, 255, 255, 0.03)
-      );
-      z-index: 5;
+      @include mx.gradient-border(26px);
+      z-index: 4;
     }
 
     &::after {
       content: "";
       position: absolute;
-      top: 0;
-      left: 20%;
-      right: 20%;
+      top: -1px;
+      left: 22%;
+      right: 22%;
       height: 1px;
       background: linear-gradient(
         90deg,
         transparent,
-        rgba(208, 78, 47, 0.95),
+        rgba(208, 78, 47, 0.9),
         transparent
       );
-      opacity: 0.5;
+      opacity: 0.55;
       z-index: 5;
       pointer-events: none;
     }
 
-    @include mx.light {
-      background: light.$color-card-bg;
-      box-shadow: 0 14px 34px -22px
-        color.adjust(light.$color-black, $alpha: -0.55);
+    &:hover,
+    &:focus-within {
+      transform: translateY(-10px);
+      @include mx.ambient-shadow(1.3);
 
-      &::before {
-        @include mx.gradient-border(
-          26px,
-          rgba(139, 91, 130, 0.3),
-          rgba(0, 0, 0, 0.03)
-        );
+      .plan-details__card__icon {
+        background: rgba(208, 78, 47, 0.17);
+
+        svg {
+          transform: scale(1.07);
+        }
       }
+    }
 
+    @include mx.light {
       &::after {
         background: linear-gradient(
           90deg,
@@ -211,86 +137,46 @@
       }
     }
 
-    &:hover {
-      transform: translateY(-8px);
-      @include mx.ambient-shadow(1.5);
-    }
-
-    &--featured {
-      transform: translateY(-14px);
-      box-shadow:
-        0 22px 42px -24px rgba(0, 0, 0, 0.95),
-        0 18px 36px -28px rgba(208, 78, 47, 0.75);
-
-      @include mx.light {
-        box-shadow: 0 22px 42px -22px
-          color.adjust(light.$color-black, $alpha: -0.45);
-      }
-
-      &:hover {
-        transform: translateY(-20px);
-      }
-    }
-
-    &__spot {
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      background: radial-gradient(
-        380px 280px at 50% 0%,
-        rgba(208, 78, 47, 0.1),
-        transparent 70%
-      );
-      pointer-events: none;
-    }
-
-    &__badge {
-      margin-top: 12px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(208, 78, 47, 0.12);
-      border: 1px solid rgba(208, 78, 47, 0.24);
-      color: dark.$color-primary;
-      font-size: 11px;
-      font-weight: 800;
-      z-index: 1;
-
-      @include mx.light {
-        color: light.$color-primary;
-        background: rgba(139, 91, 130, 0.1);
-        border-color: rgba(139, 91, 130, 0.2);
-      }
-    }
-
     &__icon {
-      width: 76px;
-      height: 76px;
-      margin-top: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 18px;
+      @include mx.flex-center;
+      position: relative;
+      z-index: 1;
+      width: 72px;
+      height: 72px;
+      flex: 0 0 auto;
+      border-radius: 17px;
       background: rgba(255, 255, 255, 0.06);
       box-shadow:
         0 0 0 1px rgba(255, 255, 255, 0.06) inset,
-        0 12px 26px -18px rgba(208, 78, 47, 0.95);
-      color: dark.$color-primary;
-      font-size: 42px;
-      z-index: 1;
+        0 10px 26px -16px rgba(208, 78, 47, 0.9);
+      transition: background-color mx.$dur-base ease;
+
+      svg {
+        color: dark.$color-primary;
+        font-size: 40px;
+        filter: drop-shadow(0 4px 12px rgba(208, 78, 47, 0.35));
+        transition: transform mx.$dur-base mx.$ease-out-soft;
+      }
 
       @include mx.light {
         background: light.$color-primary;
-        color: light.$color-white;
+        box-shadow: 0 8px 18px -12px
+          color.adjust(light.$color-black, $alpha: -0.5);
+
+        svg {
+          color: light.$color-white;
+          filter: none;
+        }
       }
     }
 
     &__title {
-      margin: 20px 0 0;
-      color: dark.$color-primary;
-      font-size: 32px;
-      line-height: 1.2;
-      font-weight: 800;
+      position: relative;
       z-index: 1;
+      margin: 22px 0 4px;
+      color: dark.$color-primary;
+      font-size: 33px;
+      font-weight: 800;
 
       @include mx.light {
         color: light.$color-primary;
@@ -298,37 +184,36 @@
     }
 
     &__description {
-      min-height: 52px;
-      margin: 10px 10px 0;
-      color: color.adjust(dark.$color-gray, $lightness: -4%);
-      line-height: 1.9;
-      font-size: 13px;
-      text-align: center;
+      position: relative;
       z-index: 1;
+      margin: 0;
+      color: dark.$color-gray;
+      font-size: 13px;
 
       @include mx.light {
         color: light.$color-dark-gray;
       }
     }
 
-    &__separator {
-      width: 66%;
+    &__sep {
+      position: relative;
+      z-index: 1;
+      width: 58%;
       height: 8px;
-      margin: 18px 0;
-      opacity: 0.65;
+      margin: 19px 0 16px;
       @include mx.sprockets(4px, 12px, rgba(255, 255, 255, 0.28));
       mask-image: linear-gradient(
         90deg,
         transparent,
-        #000 20%,
-        #000 80%,
+        #000 25%,
+        #000 75%,
         transparent
       );
       -webkit-mask-image: linear-gradient(
         90deg,
         transparent,
-        #000 20%,
-        #000 80%,
+        #000 25%,
+        #000 75%,
         transparent
       );
 
@@ -337,59 +222,58 @@
       }
     }
 
-    &__capacity {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 11px 13px;
-      border-radius: 13px;
-      background: rgba(255, 255, 255, 0.035);
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    &__users {
+      position: relative;
       z-index: 1;
-      box-sizing: border-box;
+      text-align: center;
+
+      span,
+      strong {
+        display: block;
+      }
 
       span {
-        color: color.adjust(dark.$color-gray, $lightness: -3%);
-        font-size: 12px;
+        color: dark.$color-gray;
+        font-size: 11px;
+        font-weight: 600;
       }
 
       strong {
+        margin-top: 2px;
         color: dark.$color-white;
-        font-size: 14px;
-
-        @include mx.light {
-          color: light.$color-black;
-        }
+        font-size: 22px;
       }
 
       @include mx.light {
-        background: rgba(9, 9, 9, 0.035);
-        box-shadow: inset 0 0 0 1px rgba(9, 9, 9, 0.08);
+        span {
+          color: light.$color-gray;
+        }
+
+        strong {
+          color: light.$color-black;
+        }
       }
     }
 
     &__durations {
+      position: relative;
+      z-index: 1;
       width: 100%;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
-      margin-top: 12px;
-      z-index: 1;
+      margin-top: 17px;
 
       button {
+        @include mx.flex-center;
         min-width: 0;
-        min-height: 68px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        padding: 7px 4px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        gap: 7px;
+        min-height: 48px;
+        padding: 0 8px;
+        border: 1px solid rgba(255, 255, 255, 0.09);
         border-radius: 13px;
         background: rgba(255, 255, 255, 0.03);
-        color: color.adjust(dark.$color-gray, $lightness: -3%);
+        color: dark.$color-gray;
         cursor: pointer;
         font: inherit;
         transition:
@@ -399,7 +283,8 @@
           color mx.$dur-fast ease;
 
         svg {
-          font-size: 18px;
+          flex: 0 0 auto;
+          font-size: 17px;
         }
 
         span {
@@ -421,7 +306,7 @@
         }
 
         @include mx.light {
-          border-color: rgba(9, 9, 9, 0.08);
+          border-color: rgba(9, 9, 9, 0.09);
           background: rgba(9, 9, 9, 0.03);
           color: light.$color-dark-gray;
 
@@ -440,66 +325,45 @@
     }
 
     &__price {
-      width: 100%;
-      margin-top: 14px;
-      border-radius: 17px;
-      overflow: hidden;
+      position: relative;
       z-index: 1;
-      background: rgba(255, 255, 255, 0.035);
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-
-      @include mx.light {
-        background: rgba(9, 9, 9, 0.03);
-        box-shadow: inset 0 0 0 1px rgba(9, 9, 9, 0.08);
-      }
+      width: 100%;
+      margin-top: 18px;
+      text-align: center;
 
       &__discount {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 9px;
-        padding: 7px 10px;
-        background:
-          linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.14),
-            rgba(255, 255, 255, 0)
-          ),
-          linear-gradient(135deg, #d0512f, #a83a27);
-        color: dark.$color-white;
-        font-size: 11px;
+        gap: 10px;
+        min-height: 26px;
 
         span {
-          opacity: 0.78;
+          color: dark.$color-gray;
+          font-size: 11px;
           text-decoration: line-through;
         }
 
         strong {
+          color: dark.$color-primary;
+          font-size: 11px;
           font-weight: 800;
-        }
-
-        @include mx.light {
-          background: light.$color-primary-bg;
         }
       }
 
-      &__value {
-        display: flex;
-        align-items: baseline;
-        justify-content: center;
-        gap: 7px;
-        padding: 12px 10px 0;
+      &__main {
+        margin: 5px 0 0;
         color: dark.$color-white;
-        font-size: 38px;
-        line-height: 1;
+        font-size: 36px;
         font-weight: 800;
+        line-height: 1;
         letter-spacing: -1px;
 
-        small {
+        span {
+          color: dark.$color-gray;
           font-size: 12px;
           font-weight: 500;
           letter-spacing: 0;
-          color: color.adjust(dark.$color-gray, $lightness: -4%);
         }
 
         @include mx.light {
@@ -507,12 +371,11 @@
         }
       }
 
-      &__caption {
+      small {
         display: block;
-        padding: 7px 10px 13px;
-        text-align: center;
-        color: color.adjust(dark.$color-gray, $lightness: -2%);
-        font-size: 11px;
+        margin-top: 8px;
+        color: dark.$color-gray;
+        font-size: 10px;
 
         @include mx.light {
           color: light.$color-dark-gray;
@@ -521,82 +384,68 @@
     }
 
     &__coupon {
-      width: 100%;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 8px;
-      margin-top: 10px;
+      position: relative;
       z-index: 1;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
-      &__field {
+      > svg {
+        flex: 0 0 auto;
+        color: dark.$color-primary;
+        font-size: 16px;
+      }
+
+      input {
         min-width: 0;
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        padding: 0 11px;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        transition:
-          border-color mx.$dur-fast ease,
-          box-shadow mx.$dur-fast ease;
+        flex: 1 1 auto;
+        padding: 6px 0;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: dark.$color-white;
+        font: inherit;
+        font-size: 11px;
 
-        svg {
-          flex: 0 0 auto;
-          color: dark.$color-primary;
-          font-size: 17px;
-        }
-
-        input {
-          min-width: 0;
-          width: 100%;
-          padding: 11px 0;
-          border: 0;
-          outline: 0;
-          background: transparent;
-          color: dark.$color-white;
-          font: inherit;
-          font-size: 12px;
-        }
-
-        &:focus-within {
-          border-color: rgba(208, 78, 47, 0.4);
-          box-shadow: 0 0 0 3px rgba(208, 78, 47, 0.08);
-        }
-
-        @include mx.light {
-          background: light.$color-white;
-          border-color: rgba(9, 9, 9, 0.1);
-
-          input {
-            color: light.$color-black;
-          }
-
-          &:focus-within {
-            border-color: rgba(139, 91, 130, 0.35);
-            box-shadow: 0 0 0 3px rgba(139, 91, 130, 0.08);
-          }
+        &::placeholder {
+          color: color.adjust(dark.$color-gray, $alpha: -0.25);
         }
       }
 
       > button {
-        min-width: 54px;
-        padding: 0 13px;
+        flex: 0 0 auto;
+        padding: 5px 9px;
         border: 0;
-        border-radius: 12px;
-        background: rgba(208, 78, 47, 0.13);
+        border-radius: 8px;
+        background: rgba(208, 78, 47, 0.11);
         color: dark.$color-primary;
         cursor: pointer;
         font: inherit;
-        font-size: 12px;
+        font-size: 10px;
         font-weight: 800;
 
         &:disabled {
           opacity: 0.45;
           cursor: not-allowed;
         }
+      }
 
-        @include mx.light {
+      @include mx.light {
+        border-bottom-color: rgba(9, 9, 9, 0.1);
+
+        input {
+          color: light.$color-black;
+
+          &::placeholder {
+            color: color.adjust(light.$color-gray, $alpha: -0.15);
+          }
+        }
+
+        > button {
           background: rgba(139, 91, 130, 0.1);
           color: light.$color-primary;
         }
@@ -604,21 +453,23 @@
     }
 
     &__buy {
+      position: relative;
+      z-index: 1;
       width: 100%;
-      min-height: 52px;
+      min-height: 50px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      margin-top: 12px;
-      padding: 0 16px;
+      margin-top: 15px;
+      padding: 0 15px;
       border: 0;
       border-radius: 14px;
       background: dark.$color-primary-bg;
       color: dark.$color-white;
       cursor: pointer;
       font: inherit;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 800;
       box-shadow: 0 16px 32px -20px rgba(208, 78, 47, 0.95);
       transition:
@@ -627,7 +478,7 @@
         opacity mx.$dur-fast ease;
 
       svg {
-        font-size: 19px;
+        font-size: 18px;
       }
 
       &:hover:not(:disabled) {
@@ -636,14 +487,12 @@
       }
 
       &:disabled {
-        opacity: 0.6;
+        opacity: 0.58;
         cursor: not-allowed;
       }
 
       @include mx.light {
         background: light.$color-primary-bg;
-        color: light.$color-white;
-        box-shadow: 0 14px 28px -20px rgba(104, 61, 96, 0.95);
 
         &:hover:not(:disabled) {
           background: light.$color-primary-bg-hover;
@@ -652,32 +501,37 @@
     }
 
     &__features {
+      position: relative;
+      z-index: 1;
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 9px;
+      gap: 7px;
       margin: auto 0 0;
-      padding-top: 18px;
+      padding: 15px 0 0;
       border-top: 1px dashed rgba(255, 255, 255, 0.1);
       list-style: none;
-      z-index: 1;
 
       li {
         display: flex;
         align-items: flex-start;
         gap: 8px;
-        color: color.adjust(dark.$color-gray, $lightness: -2%);
-        font-size: 11.5px;
-        line-height: 1.75;
+        color: dark.$color-gray;
+        font-size: 10.5px;
+        line-height: 1.7;
 
         svg {
           flex: 0 0 auto;
           margin-top: 3px;
           color: dark.$color-primary;
-          font-size: 15px;
+          font-size: 14px;
         }
+      }
 
-        @include mx.light {
+      @include mx.light {
+        border-top-color: rgba(9, 9, 9, 0.1);
+
+        li {
           color: light.$color-dark-gray;
 
           svg {
@@ -685,65 +539,53 @@
           }
         }
       }
-
-      @include mx.light {
-        border-top-color: rgba(9, 9, 9, 0.1);
-      }
     }
 
     &--skeleton {
       pointer-events: none;
-
-      > .skeleton,
-      .plan-details__card__skeleton-duration {
-        flex: 0 0 auto;
-      }
+      align-items: stretch;
     }
 
-    &__skeleton-divider {
-      width: 64%;
+    &__skeleton-sep {
+      width: 58%;
       height: 8px;
-      margin: 8px 0;
-      border-radius: 99px;
+      margin: 8px auto;
+      border-radius: 999px;
       background: rgba(255, 255, 255, 0.05);
     }
 
-    &__skeleton-duration {
+    &__skeleton-durations {
       width: 100%;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
-      margin-top: 4px;
+      margin-top: 17px;
     }
   }
 
   &__state {
-    width: min(620px, 100%);
+    position: relative;
+    z-index: 1;
+    width: min(560px, 100%);
     margin: 0 auto;
     padding: 42px 30px;
     border-radius: 24px;
     text-align: center;
-    box-sizing: border-box;
 
     @include mx.cinema-surface;
     @include mx.ambient-shadow(0.9);
 
-    svg {
-      margin-bottom: 12px;
-      font-size: 38px;
-      color: dark.$color-primary;
-    }
-
     h2 {
       margin: 0;
-      font-size: 20px;
+      color: dark.$color-white;
+      font-size: 19px;
     }
 
     p {
       margin: 10px 0 0;
       color: dark.$color-gray;
-      line-height: 1.9;
       font-size: 13px;
+      line-height: 1.9;
     }
 
     button {
@@ -753,14 +595,14 @@
       border-radius: 12px;
       background: dark.$color-primary-bg;
       color: dark.$color-white;
+      cursor: pointer;
       font: inherit;
       font-weight: 800;
-      cursor: pointer;
     }
 
     @include mx.light {
-      svg {
-        color: light.$color-primary;
+      h2 {
+        color: light.$color-black;
       }
 
       p {
@@ -779,9 +621,7 @@
 
   @include mx.reduced-motion {
     &__card,
-    &__card:hover,
-    &__card--featured,
-    &__card--featured:hover {
+    &__card:hover {
       transform: none;
     }
 
@@ -791,35 +631,34 @@
     }
   }
 
-  @include mx.max-w(1020px) {
-    padding-top: 108px;
+  @include mx.max-w(1060px) {
+    padding-top: 125px;
 
     &__grid {
+      display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       max-width: 780px;
     }
 
-    &__card--featured {
-      transform: none;
+    &__card {
+      max-width: none;
+    }
 
-      &:hover {
-        transform: translateY(-8px);
-      }
+    &__card:nth-child(3) {
+      grid-column: 1 / -1;
+      justify-self: center;
+      width: min(100%, 376px);
     }
   }
 
   @include mx.max-w(720px) {
-    padding: 96px 16px 40px;
+    padding: 96px 15px 40px;
 
     &__header {
-      margin-bottom: 32px;
+      margin-bottom: 30px;
 
       h1 {
-        font-size: 30px;
-      }
-
-      > p {
-        font-size: 13px;
+        font-size: 31px;
       }
     }
 
@@ -829,23 +668,23 @@
       gap: 18px;
     }
 
+    &__card:nth-child(3) {
+      grid-column: auto;
+      width: 100%;
+    }
+
     &__card {
       min-height: auto;
-      padding: 22px 18px;
+      padding: 22px 18px 18px;
 
-      &:hover,
-      &--featured:hover {
-        transform: none;
-      }
-
-      &--featured {
+      &:hover {
         transform: none;
       }
     }
   }
 
   @include mx.max-w(420px) {
-    padding-inline: 12px;
+    padding-inline: 11px;
 
     &__card {
       border-radius: 20px;
@@ -855,17 +694,20 @@
       }
 
       &__icon {
-        width: 68px;
-        height: 68px;
-        font-size: 36px;
+        width: 66px;
+        height: 66px;
+
+        svg {
+          font-size: 36px;
+        }
       }
 
       &__title {
         font-size: 28px;
       }
 
-      &__price__value {
-        font-size: 34px;
+      &__price__main {
+        font-size: 33px;
       }
     }
   }

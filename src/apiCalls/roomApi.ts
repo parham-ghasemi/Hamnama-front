@@ -1,6 +1,5 @@
 import api from "../lib/axiosConfig";
-import axios from "axios";
-import { getApiErrorMessage } from "../lib/apiError";
+import { getApiErrorMessage, getApiErrorStatus } from "../lib/apiError";
 
 export interface SubtitleCue {
   start: number;
@@ -250,10 +249,6 @@ export async function kickRoomMember(roomId: string, userId: string) {
 }
 
 
-export function getRoomApiErrorStatus(error: unknown): number | undefined {
-  return axios.isAxiosError(error) ? error.response?.status : undefined;
-}
-
 export interface RoomSubtitleResponse {
   id: string;
   filename: string;
@@ -305,4 +300,8 @@ export async function submitRoomSubtitle(
 
 export function getRoomApiErrorMessage(error: unknown, fallback = "عملیات انجام نشد."): string {
   return getApiErrorMessage(error, fallback);
+}
+
+export function getRoomApiErrorStatus(error: unknown): number | undefined {
+  return getApiErrorStatus(error);
 }

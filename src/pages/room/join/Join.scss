@@ -1977,3 +1977,217 @@
     }
   }
 }
+.join-page {
+  &__private-rooms {
+    margin-top: 30px;
+
+    &__head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+
+      p,
+      h2,
+      span {
+        margin: 0;
+      }
+
+      p {
+        margin-bottom: 5px;
+        color: dark.$color-primary;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      h2 {
+        font-size: 22px;
+        font-weight: 800;
+      }
+
+      span {
+        display: block;
+        margin-top: 5px;
+        color: dark.$color-gray;
+        font-size: 11px;
+      }
+
+      > svg {
+        flex: 0 0 auto;
+        color: dark.$color-primary;
+        font-size: 31px;
+      }
+
+      @include mx.light {
+        p,
+        > svg {
+          color: light.$color-primary;
+        }
+
+        span {
+          color: light.$color-dark-gray;
+        }
+      }
+    }
+
+    &__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 13px;
+    }
+  }
+
+  &__private-room-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 82px minmax(0, 1fr);
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+    padding: 12px;
+    border-radius: 18px;
+    isolation: isolate;
+    overflow: hidden;
+    box-sizing: border-box;
+
+    @include mx.cinema-surface;
+    @include mx.ambient-shadow(0.7);
+
+    &::before {
+      @include mx.gradient-border(18px);
+      opacity: 0.8;
+    }
+
+    transition:
+      transform mx.$dur-base mx.$ease-out-soft,
+      box-shadow mx.$dur-base mx.$ease-out-soft;
+
+    &:hover {
+      transform: translateY(-4px);
+      @include mx.ambient-shadow(1);
+
+      &::before {
+        opacity: 1;
+      }
+    }
+
+    &__image {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      width: 82px;
+      height: 82px;
+      overflow: hidden;
+      border-radius: 13px;
+      background:
+        radial-gradient(100% 90% at 50% 0%, rgba(208, 78, 47, 0.2), transparent 68%),
+        rgba(9, 9, 9, 0.5);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      svg {
+        color: dark.$color-primary;
+        font-size: 27px;
+      }
+
+      @include mx.light {
+        background: rgba(139, 91, 130, 0.08);
+        box-shadow: 0 0 0 1px rgba(9, 9, 9, 0.06) inset;
+
+        svg {
+          color: light.$color-primary;
+        }
+      }
+    }
+
+    &__body {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+
+      strong {
+        overflow: hidden;
+        color: dark.$color-white;
+        font-size: 14px;
+        font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      span {
+        overflow: hidden;
+        color: dark.$color-gray;
+        font-size: 10px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      @include mx.light {
+        strong {
+          color: light.$color-black;
+        }
+
+        span {
+          color: light.$color-dark-gray;
+        }
+      }
+    }
+
+    > button {
+      grid-column: 1 / -1;
+      position: relative;
+      z-index: 1;
+      min-height: 40px;
+      border: 0;
+      border-radius: 11px;
+      background: dark.$color-primary-bg;
+      color: dark.$color-white;
+      cursor: pointer;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      transition:
+        transform mx.$dur-fast mx.$ease-out-soft,
+        background-color mx.$dur-fast ease,
+        opacity mx.$dur-fast ease;
+
+      &:hover:not(:disabled) {
+        transform: translateY(-1px);
+        background: dark.$color-primary-bg-hover;
+      }
+
+      &:disabled {
+        opacity: 0.58;
+        cursor: not-allowed;
+      }
+
+      @include mx.light {
+        background: light.$color-primary-bg;
+
+        &:hover:not(:disabled) {
+          background: light.$color-primary-bg-hover;
+        }
+      }
+    }
+  }
+
+  @include mx.max-w(650px) {
+    &__private-rooms__head {
+      align-items: flex-start;
+
+      > svg {
+        display: none;
+      }
+    }
+  }
+}
