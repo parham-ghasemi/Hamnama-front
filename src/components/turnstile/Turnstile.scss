@@ -1,4 +1,9 @@
+@use "../../styles/abstracts/variables" as dark;
+@use "../../styles/abstracts/variables.light" as light;
+@use "../../styles/abstracts/mixins" as mx;
+
 .turnstile {
+  position: relative;
   width: min(100%, 420px);
   min-height: 65px;
   display: flex;
@@ -6,12 +11,145 @@
   align-items: center;
   margin: 0 auto;
   overflow: hidden;
+  transition: opacity mx.$dur-base ease, transform mx.$dur-base mx.$ease-out-soft;
 
-  iframe {
-    max-width: 100%;
+  &__widget {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-height: 65px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    iframe {
+      max-width: 100%;
+    }
+  }
+
+  &__loading {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    color: dark.$color-gray;
+    font-size: 12px;
+    font-weight: 700;
+    pointer-events: none;
+    transition: opacity 180ms ease, transform 220ms mx.$ease-out-soft;
+
+    @include mx.light {
+      color: light.$color-dark-gray;
+    }
+  }
+
+  &__spinner {
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    border-top-color: dark.$color-primary;
+    animation: turnstile-spinner 0.8s linear infinite;
+
+    @include mx.light {
+      border-color: rgba(9, 9, 9, 0.1);
+      border-top-color: light.$color-primary;
+    }
+  }
+
+  &__loading-text {
+    display: inline-flex;
+    align-items: baseline;
+    direction: rtl;
+    white-space: nowrap;
+  }
+
+  &__loading-dots {
+    display: inline-block;
+    width: 1.2em;
+    overflow: hidden;
+    letter-spacing: 0.06em;
+    animation: turnstile-dots 1.05s steps(3, end) infinite;
+  }
+
+  &__error-state {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 14px;
+    box-sizing: border-box;
+    color: dark.$color-red;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    background: rgba(14, 14, 14, 0.12);
+
+    @include mx.light {
+      background: rgba(255, 255, 255, 0.28);
+      color: light.$color-red;
+    }
+  }
+
+  &.is-loading &__loading {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  &.is-ready &__loading {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  &.has-error &__loading {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  &.has-error &__widget {
+    opacity: 0;
+  }
+
+  &.is-silent {
+    min-height: 0;
+
+    .turnstile__widget {
+      min-height: 0;
+    }
+  }
+
+  @include mx.reduced-motion {
+    transition: none;
+
+    &__spinner,
+    &__loading-dots {
+      animation: none;
+    }
   }
 }
 
-.turnstile:empty {
-  min-height: 0;
+@keyframes turnstile-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes turnstile-dots {
+  0% {
+    width: 0.2em;
+  }
+  33% {
+    width: 0.5em;
+  }
+  66% {
+    width: 0.85em;
+  }
+  100% {
+    width: 1.2em;
+  }
 }

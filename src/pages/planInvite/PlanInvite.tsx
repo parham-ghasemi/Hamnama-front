@@ -1,7 +1,14 @@
 import { useEffect, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { PiCheckCircleFill, PiUsersThreeFill } from 'react-icons/pi';
+import {
+  PiArrowLeftBold,
+  PiCheckCircleFill,
+  PiClockFill,
+  PiSpinner,
+  PiUsersThreeFill,
+  PiXCircleFill,
+} from 'react-icons/pi';
 import { billingApi } from '../../apiCalls/billingApi';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from '../../components/toast';
@@ -67,64 +74,120 @@ const PlanInvite = () => {
       />
 
       <main className="plan-invite">
-        <div className="plan-invite__card">
-          <PiUsersThreeFill className="plan-invite__icon" />
+        <div className="plan-invite__grain" aria-hidden="true" />
+        <div className="plan-invite__blob plan-invite__blob--one" aria-hidden="true" />
+        <div className="plan-invite__blob plan-invite__blob--two" aria-hidden="true" />
+
+        <section className="plan-invite__card" aria-labelledby="plan-invite-title">
+          <div className="plan-invite__spot" aria-hidden="true" />
 
           {preview.isLoading ? (
             <div className="plan-invite__loading">
-              <Skeleton variant="circle" width={54} height={54} />
-              <Skeleton variant="text" width="55%" height={22} />
-              <Skeleton variant="text" width="80%" />
+              <div className="plan-invite__mark plan-invite__mark--pending">
+                <PiClockFill />
+              </div>
+              <span className="plan-invite__eyebrow">در حال دریافت دعوت</span>
+              <Skeleton variant="text" width="72%" height={34} />
+              <Skeleton variant="text" width="88%" height={18} />
+              <div className="plan-invite__loading__stats">
+                <Skeleton variant="rect" width="100%" height={72} />
+                <Skeleton variant="rect" width="100%" height={72} />
+              </div>
+              <div className="plan-invite__loading__button">
+                <Skeleton variant="rect" width="100%" height={48} />
+              </div>
             </div>
           ) : preview.error || !preview.data ? (
             <>
-              <h1>لینک دعوت معتبر نیست</h1>
-              <p>
+              <div className="plan-invite__mark plan-invite__mark--failed">
+                <PiXCircleFill />
+              </div>
+
+              <span className="plan-invite__eyebrow">دعوت نامعتبر</span>
+
+              <h1 id="plan-invite-title">این دعوت روی پرده نیست.</h1>
+
+              <p className="plan-invite__description">
                 این لینک ممکن است منقضی شده باشد یا پلن دیگر فعال نباشد.
               </p>
-              <Link to="/">بازگشت</Link>
+
+              <div className="plan-invite__actions">
+                <Link className="plan-invite__actions__primary" to="/">
+                  <span>بازگشت به خانه</span>
+                  <PiArrowLeftBold />
+                </Link>
+              </div>
             </>
           ) : (
             <>
-              <h1>دعوت به {preview.data.plan_title}</h1>
-              <p>
-                <strong>{preview.data.owner_username}</strong> شما را به پلن خود
-                دعوت کرده است.
+              <div className="plan-invite__mark plan-invite__mark--invite">
+                <PiUsersThreeFill />
+              </div>
+
+              <span className="plan-invite__eyebrow">دعوت به عضویت</span>
+
+              <h1 id="plan-invite-title">
+                دعوت به {preview.data.plan_title}
+              </h1>
+
+              <p className="plan-invite__description">
+                <strong>{preview.data.owner_username}</strong> شما را به پلن خود دعوت کرده است.
               </p>
 
               <div className="plan-invite__meta">
-                <span>
-                  ظرفیت: {preview.data.max_users.toLocaleString('fa-IR')} نفر
-                </span>
-                <span>
-                  اعضای فعلی:{' '}
-                  {preview.data.member_count.toLocaleString('fa-IR')} نفر
-                </span>
+                <div className="plan-invite__meta__item">
+                  <span>ظرفیت پلن</span>
+                  <strong>{preview.data.max_users.toLocaleString('fa-IR')}</strong>
+                  <small>نفر</small>
+                </div>
+                <div className="plan-invite__meta__item">
+                  <span>اعضای فعلی</span>
+                  <strong>{preview.data.member_count.toLocaleString('fa-IR')}</strong>
+                  <small>نفر</small>
+                </div>
               </div>
 
               {alreadyOnPlan ? (
-                <div className="plan-invite__notice">
+                <div className="plan-invite__notice plan-invite__notice--muted">
                   <PiCheckCircleFill />
-                  شما در حال حاضر عضو یک پلن فعال هستید.
+                  <span>شما در حال حاضر عضو یک پلن فعال هستید.</span>
                 </div>
               ) : capacityFull ? (
-                <div className="plan-invite__notice">
-                  ظرفیت این پلن تکمیل شده است.
+                <div className="plan-invite__notice plan-invite__notice--muted">
+                  <PiUsersThreeFill />
+                  <span>ظرفیت این پلن تکمیل شده است.</span>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  disabled={requestJoin.isPending}
-                  onClick={() => requestJoin.mutate()}
-                >
-                  {requestJoin.isPending
-                    ? 'در حال ارسال...'
-                    : 'درخواست عضویت'}
-                </button>
+                <div className="plan-invite__actions">
+                  <button
+                    type="button"
+                    className="plan-invite__actions__primary"
+                    disabled={requestJoin.isPending}
+                    onClick={() => requestJoin.mutate()}
+                  >
+                    {requestJoin.isPending ? (
+                      <>
+                        <PiSpinner className="is-spin" />
+                        <span>در حال ارسال...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>درخواست عضویت</span>
+                        <PiArrowLeftBold />
+                      </>
+                    )}
+                  </button>
+                </div>
               )}
             </>
           )}
-        </div>
+
+          <div className="plan-invite__code" aria-hidden="true">
+            <span />
+            HAMNAMA INVITATION
+            <span />
+          </div>
+        </section>
       </main>
     </>
   );

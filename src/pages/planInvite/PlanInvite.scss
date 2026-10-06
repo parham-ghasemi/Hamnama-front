@@ -1,77 +1,460 @@
+@use "../../styles/abstracts/variables" as dark;
+@use "../../styles/abstracts/variables.light" as light;
+@use "../../styles/abstracts/mixins" as mx;
+
 .plan-invite {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 70vh;
-  padding: 40px 20px;
+  box-sizing: border-box;
+  padding: 112px 20px 52px;
+  overflow: hidden;
+
+  &__grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.45;
+    background: repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.035) 0 1px,
+      transparent 1px 4px
+    );
+
+    @include mx.light {
+      display: none;
+    }
+  }
+
+  &__blob {
+    position: absolute;
+    z-index: -1;
+    width: 520px;
+    height: 520px;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(24px);
+
+    &--one {
+      top: -180px;
+      right: -160px;
+      background: radial-gradient(circle, rgba(208, 78, 47, 0.18), transparent 69%);
+    }
+
+    &--two {
+      bottom: -220px;
+      left: -170px;
+      background: radial-gradient(circle, rgba(224, 163, 64, 0.1), transparent 70%);
+    }
+
+    @include mx.light {
+      display: none;
+    }
+  }
 
   &__card {
-    width: min(540px, 100%);
-    padding: 42px 34px;
-    border-radius: 28px;
-    background: rgba(18, 18, 28, 0.92);
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    width: min(640px, 100%);
+    min-height: 420px;
+    padding: 44px 38px 30px;
+    border-radius: 26px;
+    box-sizing: border-box;
     text-align: center;
+
+    @include mx.cinema-surface;
+    @include mx.ambient-shadow(1);
+
+    &::before {
+      @include mx.gradient-border(26px);
+      z-index: 5;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 12px;
+      left: 22px;
+      right: 22px;
+      height: 6px;
+      opacity: 0.4;
+      pointer-events: none;
+      @include mx.sprockets(4px, 12px);
+    }
+
+    @include mx.light {
+      &::before {
+        @include mx.gradient-border(26px, rgba(139, 91, 130, 0.3), rgba(0, 0, 0, 0.04));
+      }
+    }
+
+    @include mx.max-w(600px) {
+      min-height: 0;
+      padding: 34px 20px 25px;
+      border-radius: 21px;
+
+      &::before {
+        border-radius: 21px;
+      }
+    }
   }
 
-  &__loading {
-    display: grid;
-    justify-items: center;
-    gap: 14px;
+  &__spot {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(420px 320px at 50% 0%, rgba(208, 78, 47, 0.13), transparent 70%);
+
+    @include mx.light {
+      background: radial-gradient(420px 320px at 50% 0%, rgba(139, 91, 130, 0.09), transparent 70%);
+    }
   }
 
-  &__icon {
-    margin-bottom: 18px;
-    font-size: 76px;
+  &__mark {
+    width: 82px;
+    height: 82px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 24px;
+    font-size: 44px;
+
+    &--invite {
+      background: rgba(208, 78, 47, 0.1);
+      color: dark.$color-primary;
+      box-shadow: 0 18px 30px -22px rgba(208, 78, 47, 0.9);
+    }
+
+    &--failed {
+      background: rgba(178, 56, 64, 0.09);
+      color: dark.$color-red;
+      box-shadow: 0 18px 30px -22px rgba(178, 56, 64, 0.75);
+    }
+
+    &--pending {
+      background: rgba(232, 182, 93, 0.1);
+      color: #e8b65d;
+      box-shadow: 0 18px 30px -22px rgba(232, 182, 93, 0.75);
+      animation: plan-invite-pulse 2.6s ease-in-out infinite;
+    }
+
+    @include mx.light {
+      &--invite {
+        background: rgba(139, 91, 130, 0.1);
+        color: light.$color-primary;
+        box-shadow: 0 18px 30px -22px rgba(104, 61, 96, 0.75);
+      }
+
+      &--failed {
+        background: rgba(178, 56, 64, 0.08);
+        color: light.$color-red;
+      }
+    }
+  }
+
+  &__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: dark.$color-gray;
+    font-size: 11px;
+    font-weight: 700;
+
+    @include mx.light {
+      color: light.$color-dark-gray;
+    }
   }
 
   h1 {
-    margin: 0 0 12px;
+    max-width: 540px;
+    margin: 12px auto 0;
+    color: dark.$color-white;
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.35;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+
+    @include mx.light {
+      color: light.$color-black;
+    }
   }
 
-  p {
-    color: #bdbdcc;
+  &__description {
+    max-width: 500px;
+    margin: 12px auto 0;
+    color: dark.$color-gray;
     line-height: 2;
+    font-size: 13px;
+
+    strong {
+      color: dark.$color-white;
+      font-weight: 800;
+
+      @include mx.light {
+        color: light.$color-black;
+      }
+    }
+
+    @include mx.light {
+      color: light.$color-dark-gray;
+    }
   }
 
   &__meta {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
+    width: min(460px, 100%);
+    margin: 22px auto 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
-    margin: 22px 0;
 
-    span {
-      padding: 10px 14px;
-      border-radius: 12px;
-      background: #262633;
-      color: #ddd;
+    &__item {
+      min-height: 76px;
+      padding: 13px 14px;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-rows: auto auto;
+      align-content: center;
+      gap: 3px 8px;
+      border-radius: 14px;
+      text-align: right;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+
+      span {
+        grid-column: 1 / -1;
+        color: dark.$color-gray;
+        font-size: 10px;
+        font-weight: 700;
+      }
+
+      strong {
+        color: dark.$color-white;
+        font-size: 20px;
+        line-height: 1.2;
+      }
+
+      small {
+        align-self: end;
+        color: dark.$color-gray;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      @include mx.light {
+        background: rgba(9, 9, 9, 0.025);
+        border-color: rgba(9, 9, 9, 0.08);
+
+        span,
+        small {
+          color: light.$color-gray;
+        }
+
+        strong {
+          color: light.$color-black;
+        }
+      }
     }
-  }
 
-  button,
-  a {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 13px 24px;
-    border: 0;
-    border-radius: 12px;
-    background: #fff;
-    color: #171721;
-    cursor: pointer;
-    text-decoration: none;
+    @include mx.max-w(500px) {
+      grid-template-columns: 1fr;
+    }
   }
 
   &__notice {
-    padding: 14px;
-    border-radius: 14px;
-    background: #2a2a39;
-    color: #ddd;
+    width: min(460px, 100%);
+    margin: 20px auto 0;
+    min-height: 48px;
+    padding: 11px 13px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 13px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.7;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    color: dark.$color-gray;
 
     svg {
-      margin-left: 8px;
-      vertical-align: middle;
+      flex: 0 0 auto;
+      color: dark.$color-primary;
+      font-size: 17px;
     }
+
+    @include mx.light {
+      background: rgba(9, 9, 9, 0.03);
+      border-color: rgba(9, 9, 9, 0.08);
+      color: light.$color-dark-gray;
+
+      svg {
+        color: light.$color-primary;
+      }
+    }
+  }
+
+  &__actions {
+    position: relative;
+    z-index: 1;
+    margin: 22px auto 0;
+    width: min(460px, 100%);
+    display: flex;
+    justify-content: center;
+
+    &__primary {
+      width: 100%;
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 13px;
+      background: dark.$color-primary-bg;
+      color: dark.$color-white;
+      box-shadow: 0 16px 30px -18px rgba(208, 78, 47, 0.9);
+      text-decoration: none;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition:
+        transform mx.$dur-fast mx.$ease-out-soft,
+        background-color mx.$dur-fast ease,
+        box-shadow mx.$dur-base mx.$ease-out-soft;
+
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        background: dark.$color-primary-bg-hover;
+        box-shadow: 0 20px 36px -18px rgba(208, 78, 47, 1);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+      }
+
+      &:disabled {
+        opacity: 0.55;
+        cursor: progress;
+      }
+
+      @include mx.light {
+        background: light.$color-primary-bg;
+        color: light.$color-white;
+        box-shadow: 0 14px 28px -18px rgba(104, 61, 96, 0.9);
+
+        &:hover:not(:disabled) {
+          background: light.$color-primary-bg-hover;
+        }
+      }
+    }
+
+    .is-spin {
+      animation: plan-invite-spin 0.9s linear infinite;
+    }
+  }
+
+  &__loading {
+    width: min(460px, 100%);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 11px;
+
+    &__stats {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    &__button {
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    @include mx.max-w(500px) {
+      &__stats {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+
+  &__code {
+    position: relative;
+    margin-top: 24px;
+    padding-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    direction: ltr;
+    color: rgba(255, 255, 255, 0.34);
+    font-size: 9px;
+    letter-spacing: 1.8px;
+
+    @include mx.sprockets(0, 11px, rgba(255, 255, 255, 0.14));
+    background-position: top center;
+    background-size: 11px 11px;
+
+    span {
+      width: 6px;
+      height: 6px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: dark.$color-primary;
+      box-shadow: 0 0 12px rgba(208, 78, 47, 0.75);
+    }
+
+    @include mx.light {
+      color: light.$color-gray;
+      @include mx.sprockets(0, 11px, rgba(9, 9, 9, 0.14));
+      background-position: top center;
+      background-size: 11px 11px;
+
+      span {
+        background: light.$color-primary;
+        box-shadow: 0 0 12px rgba(104, 61, 96, 0.4);
+      }
+    }
+  }
+
+  @include mx.reduced-motion {
+    &__mark--pending,
+    .is-spin {
+      animation: none;
+    }
+
+    &__actions__primary {
+      transition: none;
+    }
+  }
+}
+
+@keyframes plan-invite-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes plan-invite-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
   }
 }

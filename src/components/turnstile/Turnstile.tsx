@@ -108,8 +108,10 @@ const Turnstile = forwardRef<TurnstileHandle, TurnstileProps>(
     const pendingResolveRef = useRef<((token: string) => void) | null>(null);
     const pendingRejectRef = useRef<((reason?: unknown) => void) | null>(null);
     const [loadError, setLoadError] = useState(false);
+    const [ready, setReady] = useState(false);
 
     const siteKey = String(import.meta.env.VITE_TURNSTILE_SITE_KEY || "").trim();
+    const hasVisibleChallenge = appearance !== "interaction-only";
 
     useImperativeHandle(ref, () => ({
       execute: () => {
@@ -151,11 +153,14 @@ const Turnstile = forwardRef<TurnstileHandle, TurnstileProps>(
 
     useEffect(() => {
       if (!containerRef.current || !siteKey) {
+        setReady(false);
         setLoadError(!siteKey);
         return;
       }
 
       let cancelled = false;
+      setReady(false);
+      setLoadError(false);
 
       loadTurnstile()
         .then(() => {
@@ -198,9 +203,12 @@ const Turnstile = forwardRef<TurnstileHandle, TurnstileProps>(
               pendingRejectRef.current = null;
             },
           });
+
+          setReady(true);
         })
         .catch(() => {
           if (!cancelled) {
+            setReady(false);
             setLoadError(true);
             onErrorRef.current?.();
           }
@@ -218,13 +226,36 @@ const Turnstile = forwardRef<TurnstileHandle, TurnstileProps>(
       };
     }, [action, appearance, execution, size, siteKey, theme]);
 
+    const stateClass = `${loadError ? "has-error" : ready ? "is-ready" : "is-loading"}${hasVisibleChallenge ? "" : " is-silent"}`;
+
     return (
       <div
-        ref={containerRef}
-        className={`turnstile ${className}`.trim()}
+        className={`turnstile ${stateClass} ${className}`.trim()}
         style={style}
-        aria-hidden={loadError}
-      />
+        aria-hidden={loadError || !hasVisibleChallenge}
+        aria-busy={!ready && !loadError}
+        aria-live={hasVisibleChallenge ? "polite" : undefined}
+      >
+        <div ref={containerRef} className="turnstile__widget" />
+
+        {hasVisibleChallenge ? (
+          <div className="turnstile__loading" aria-hidden={ready || loadError}>
+            <span className="turnstile__spinner" aria-hidden="true" />
+            <span className="turnstile__loading-text">
+              <span>در حال آماده‌سازی</span>
+              <span className="turnstile__loading-dots" aria-hidden="true">
+                …
+              </span>
+            </span>
+          </div>
+        ) : null}
+
+        {hasVisibleChallenge && loadError ? (
+          <div className="turnstile__error-state">
+            <span>بارگذاری تأیید امنیتی انجام نشد.</span>
+          </div>
+        ) : null}
+      </div>
     );
   },
 );

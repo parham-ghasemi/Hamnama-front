@@ -32,7 +32,6 @@
         background-color: light.$color-primary-bg;
       }
 
-      // Hide table header on mobile
       @include mx.max-w(768px) {
         display: none;
       }
@@ -74,13 +73,19 @@
           background: light.$color-card-bg;
         }
 
-        // Card Transformation on Mobile
         @include mx.max-w(768px) {
-          flex-direction: column;
-          align-items: stretch;
+          display: grid;
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-areas:
+            "date"
+            "plan"
+            "amount"
+            "order"
+            "status";
+          align-items: center;
           height: auto;
-          padding: 18px 20px;
-          gap: 12px;
+          padding: 17px 18px 16px;
+          gap: 10px;
           border-radius: 20px;
         }
 
@@ -118,88 +123,124 @@
             }
           }
 
-          // Responsive Cell Adjustments
           @include mx.max-w(768px) {
             width: 100%;
+            min-width: 0;
             flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 15px;
+            justify-content: flex-start;
+            align-items: baseline;
+            gap: 8px;
+            text-align: right;
+            direction: rtl;
+            font-size: 14px;
+            line-height: 1.5;
 
             &::before {
+              flex: 0 0 auto;
+              margin-left: 0;
               color: color.adjust(dark.$color-white, $alpha: -0.4);
-              font-size: 14px;
-              font-weight: 500;
+              font-size: 12px;
+              font-weight: 600;
 
               @include mx.light {
                 color: light.$color-gray;
               }
             }
 
-            // Inline subtitle/currency alignment
             &__text {
               font-size: 13px;
-              margin-right: 4px;
+              margin-right: 0;
             }
           }
 
-          // Mobile Row Labels using nth-child
           &:nth-child(1) {
-            // Amount
             @include mx.max-w(768px) {
-              font-size: 17px;
-              font-weight: 800;
-              padding-bottom: 8px;
+              grid-area: date;
+              width: 100%;
+              justify-content: space-between;
+              align-items: center;
+              padding-bottom: 9px;
               border-bottom: 1px dashed
-                color.adjust(dark.$color-white, $alpha: -0.85);
-
-              @include mx.light {
-                border-bottom-color: color.adjust(
-                  light.$color-light-gray,
-                  $alpha: -0.5
-                );
-              }
+                color.adjust(dark.$color-white, $alpha: -0.86);
+              font-size: 13px;
+              font-weight: 600;
 
               &::before {
-                content: "مبلغ پرداخت:";
-                font-size: 15px;
-                font-weight: 700;
+                content: "تاریخ سفارش:";
+                font-size: 12px;
               }
             }
           }
 
           &:nth-child(2) {
-            // Status
             @include mx.max-w(768px) {
-              &::before {
-                content: "وضعیت:";
-              }
-            }
-          }
+              grid-area: plan;
+              justify-content: flex-start;
+              font-size: 15px;
+              font-weight: 800;
+              white-space: nowrap;
+              overflow: hidden;
 
-          &:nth-child(3) {
-            // Date
-            @include mx.max-w(768px) {
               &::before {
-                content: "تاریخ:";
+                content: "نوع سفارش:";
+              }
+
+              .user-payments__list-container__body-wrapper__row__cell__text {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
               }
             }
           }
 
           &:nth-child(4) {
-            // Tracking ID
             @include mx.max-w(768px) {
+              grid-area: amount;
+              justify-content: flex-start;
+              font-size: 16px;
+              font-weight: 900;
+              white-space: nowrap;
+
               &::before {
-                content: "شماره پیگیری:";
+                content: "مبلغ:";
+              }
+            }
+          }
+
+          &:nth-child(3) {
+            @include mx.max-w(768px) {
+              grid-area: order;
+              justify-content: flex-start;
+              direction: rtl;
+              font-size: 14px;
+              font-weight: 700;
+              white-space: nowrap;
+
+              &::before {
+                content: "شماره سفارش:";
               }
             }
           }
 
           &:nth-child(5) {
-            // Payment Method
             @include mx.max-w(768px) {
+              grid-area: status;
+              justify-content: space-between;
+              align-items: center;
+              padding-top: 9px;
+              border-top: 1px dashed
+                color.adjust(dark.$color-white, $alpha: -0.9);
+
               &::before {
-                content: "نوع پرداخت:";
+                content: "وضعیت پرداخت:";
+              }
+
+              @include mx.light {
+                border-top-color: color.adjust(
+                  light.$color-light-gray,
+                  $alpha: -0.5
+                );
               }
             }
           }
@@ -222,6 +263,18 @@
 .user-payments__list-container__body-wrapper__row--skeleton {
   pointer-events: none;
   opacity: 0.8;
+
+  @include mx.max-w(768px) {
+    display: flex;
+
+    .user-payments__list-container__body-wrapper__row__cell {
+      width: 100%;
+
+      &::before {
+        display: none;
+      }
+    }
+  }
 }
 
 .user-payments__reconcile {
@@ -243,6 +296,12 @@
   @include mx.light {
     border-color: rgba(9, 9, 9, 0.08);
     background: rgba(9, 9, 9, 0.03);
+  }
+
+  @include mx.max-w(768px) {
+    margin-top: 0;
+    margin-right: auto;
+    padding: 5px 9px;
   }
 }
 
