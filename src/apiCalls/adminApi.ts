@@ -212,6 +212,9 @@ export interface AdminArchiveReport {
   file_url?: string;
   report_type: string;
   custom_text?: string;
+  status: 'open' | 'completed';
+  completed_at?: string;
+  completed_by?: string;
   created_at: string;
 }
 
@@ -268,6 +271,7 @@ export interface AdminArchiveItem {
   imdb_votes?: string;
   files: AdminArchiveFileInput[];
   enabled: boolean;
+  view_count: number;
 }
 
 export interface AdminArchiveResponse {
@@ -325,7 +329,7 @@ export const adminApi = {
   getArchiveJobStatus: (id: string) => api.get<ArchiveJobStatusResponse>(`/admin/scrape/${id}`),
   getScrapeJobs: () => api.get<ScrapeJobsResponse>('/admin/scrape'),
 
-  listArchive: (params?: { search?: string; type?: string; page?: number; limit?: number }) =>
+  listArchive: (params?: { search?: string; type?: string; sort?: string; page?: number; limit?: number }) =>
     api.get<AdminArchiveResponse>('/admin/archive', { params }),
   getArchiveItem: (id: string) => api.get<AdminArchiveItem>(`/admin/archive/${id}`),
   createArchiveItem: (payload: Record<string, unknown>) =>
@@ -334,8 +338,13 @@ export const adminApi = {
     api.patch<AdminArchiveItem>(`/admin/archive/${id}`, payload),
   deleteArchiveItem: (id: string) => api.delete(`/admin/archive/${id}`),
   setArchiveItemEnabled: (id: string, enabled: boolean) => api.patch<{ success: boolean; enabled: boolean }>(`/admin/archive/${id}/enabled`, { enabled }),
-  getArchiveReports: (id: string) => api.get<AdminArchiveReportsResponse>(`/admin/archive/${id}/reports`),
-  getArchiveReportGroups: () => api.get<AdminArchiveReportGroupsResponse>('/admin/archive/reports'),
+  getArchiveReports: (id: string, status: 'open' | 'completed' | 'all' = 'open') =>
+    api.get<AdminArchiveReportsResponse>(`/admin/archive/${id}/reports`, { params: { status } }),
+  getArchiveReportGroups: (status: 'open' | 'completed' | 'all' = 'open') =>
+    api.get<AdminArchiveReportGroupsResponse>('/admin/archive/reports', { params: { status } }),
+  setArchiveReportStatus: (id: string, status: 'open' | 'completed') =>
+    api.patch<{ success: boolean }>(`/admin/archive/reports/${id}/status`, { status }),
+  deleteArchiveReport: (id: string) => api.delete(`/admin/archive/reports/${id}`),
 
   triggerSubtitleSync: () => api.post<SubtitleSyncResponse>('/admin/subtitles/sync'),
   getSubtitleSyncStatus: (id: string) => api.get<SubtitleSyncStatusResponse>(`/admin/subtitles/sync/${id}`),

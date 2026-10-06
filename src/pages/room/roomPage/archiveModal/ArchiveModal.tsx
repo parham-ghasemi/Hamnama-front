@@ -510,6 +510,10 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, closeModal, onSelec
 
   const selectFile = (file: MediaFileItem) => {
     if (!detail) return;
+
+    // Count explicit playable-file selections without blocking playback if analytics fails.
+    void archiveApi.incrementMediaView(detail.id).catch(() => undefined);
+
     onSelectMedia({
       id: detail.id,
       title: `${detail.title_en} (${detail.title_fa})`,

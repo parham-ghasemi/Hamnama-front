@@ -32,7 +32,7 @@ import './Archive.scss';
 import Skeleton from "../../../components/skeleton/Skeleton";
 import { getApiErrorMessage } from '../../../lib/apiError';
 
-type Form = Omit<AdminArchiveItem, 'links' | 'related' | 'omdb' | 'files'> & {
+type Form = Omit<AdminArchiveItem, 'links' | 'related' | 'omdb' | 'files' | 'view_count'> & {
   linksJson: string;
   relatedJson: string;
   omdbJson: string;
@@ -87,6 +87,9 @@ interface ArchiveDropdownProps<T extends string> {
   ariaLabel?: string;
   className?: string;
 }
+
+type ArchiveReportStatusFilter = 'open' | 'completed' | 'all';
+type ArchiveSort = 'title_asc' | 'title_desc' | 'views_desc' | 'views_asc' | 'rating_desc' | 'rating_asc' | 'year_desc' | 'year_asc';
 
 function ArchiveDropdown<T extends string>({ value, options, onChange, ariaLabel, className = '' }: ArchiveDropdownProps<T>) {
   const [open, setOpen] = useState(false);
@@ -154,6 +157,23 @@ const formTypeOptions: ArchiveDropdownOption<'movie' | 'series'>[] = [
   { value: 'series', label: 'سریال' },
 ];
 
+const archiveSortOptions: ArchiveDropdownOption<ArchiveSort>[] = [
+  { value: 'title_asc', label: 'عنوان: الف تا ی' },
+  { value: 'title_desc', label: 'عنوان: ی تا الف' },
+  { value: 'views_desc', label: 'بیشترین بازدید' },
+  { value: 'views_asc', label: 'کمترین بازدید' },
+  { value: 'rating_desc', label: 'بیشترین امتیاز' },
+  { value: 'rating_asc', label: 'کمترین امتیاز' },
+  { value: 'year_desc', label: 'جدیدترین سال' },
+  { value: 'year_asc', label: 'قدیمی‌ترین سال' },
+];
+
+const archiveReportStatusOptions: ArchiveDropdownOption<ArchiveReportStatusFilter>[] = [
+  { value: 'open', label: 'باز' },
+  { value: 'completed', label: 'تکمیل‌شده' },
+  { value: 'all', label: 'همه' },
+];
+
 const jobLabel = (status: string) =>
   status === 'running' ? 'در حال اجرا' : status === 'completed' ? 'پایان یافته' : 'ناموفق';
 
@@ -181,6 +201,7 @@ const Archive = () => {
   const qc = useQueryClient();
   const [search, setSearch] = useState('');
   const [type, setType] = useState('');
+  const [archiveSort, setArchiveSort] = useState<ArchiveSort>('title_asc');
   const [page, setPage] = useState(1);
   const [form, setForm] = useState<Form | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -190,6 +211,7 @@ const Archive = () => {
   const [subtitleJobId, setSubtitleJobId] = useState<string | null>(null);
   const [reportGroupOpen, setReportGroupOpen] = useState<string | null>(null);
   const [showReports, setShowReports] = useState(false);
+  const [reportStatus, setReportStatus] = useState<ArchiveReportStatusFilter>('open');
   const [showJobs, setShowJobs] = useState(false);
   const [showSubtitleReport, setShowSubtitleReport] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -199,8 +221,8 @@ const Archive = () => {
   const scrapeStreamToastRef = useRef<Set<string>>(new Set());
 
   const params = useMemo(
-    () => ({ search, type: type || undefined, page, limit: 12 }),
-    [search, type, page],
+    () => ({ search, type: type || undefined, sort: archiveSort, page, limit: 12 }),
+    [search, type, archiveSort, page],
   );
 
   const archive = useQuery({
@@ -338,14 +360,14 @@ const Archive = () => {
   });
 
   const reportGroups = useQuery({
-    queryKey: ['admin-archive-report-groups'],
-    queryFn: () => adminApi.getArchiveReportGroups().then((r) => r.data.items),
+    queryKey: ['admin-archive-report-groups', reportStatus],
+    queryFn: () => adminApi.getArchiveReportGroups(reportStatus).then((r) => r.data.items),
     enabled: showReports,
   });
 
   const reports = useQuery({
-    queryKey: ['admin-archive-reports', reportGroupOpen],
-    queryFn: () => adminApi.getArchiveReports(reportGroupOpen as string).then((r) => r.data.reports),
+    queryKey: ['admin-archive-reports', reportGroupOpen, reportStatus],
+    queryFn: () => adminApi.getArchiveReports(reportGroupOpen as string, reportStatus).then((r) => r.data.reports),
     enabled: Boolean(reportGroupOpen),
   });
 
@@ -461,6 +483,26 @@ const Archive = () => {
         ? { ...current, files: current.files.map((file, i) => (i === index ? { ...file, ...patch } : file)) }
         : current,
     );
+
+  const reportStatusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: 'open' | 'completed' }) => adminApi.setArchiveReportStatus(id, status),
+    onSuccess: (_, variables) => {
+      toast.success(variables.status === 'completed' ? 'گزارش تکمیل شد' : 'گزارش دوباره باز شد');
+      void qc.invalidateQueries({ queryKey: ['admin-archive-report-groups'] });
+      void qc.invalidateQueries({ queryKey: ['admin-archive-reports'] });
+    },
+    onError: () => toast.error('تغییر وضعیت گزارش انجام نشد'),
+  });
+
+  const removeReport = useMutation({
+    mutationFn: (id: string) => adminApi.deleteArchiveReport(id),
+    onSuccess: () => {
+      toast.success('گزارش حذف شد');
+      void qc.invalidateQueries({ queryKey: ['admin-archive-report-groups'] });
+      void qc.invalidateQueries({ queryKey: ['admin-archive-reports'] });
+    },
+    onError: () => toast.error('حذف گزارش با مشکل مواجه شد'),
+  });
 
   const closeReports = () => {
     setShowReports(false);
@@ -591,7 +633,7 @@ const Archive = () => {
           <div><span>تاریخچه عملیات</span><strong>{scrapeJobList.length.toLocaleString('fa-IR')}</strong></div>
           <FiClock />
         </button>
-        <button type="button" className="admin-archive__utility-card" onClick={() => { setReportGroupOpen(null); setShowReports(true); }}>
+        <button type="button" className="admin-archive__utility-card" onClick={() => { setReportStatus('open'); setReportGroupOpen(null); setShowReports(true); }}>
           <div><span>گزارش‌های کاربران</span><strong>{reportGroups.data?.length?.toLocaleString('fa-IR') ?? '۰'}</strong></div>
           <FiFlag />
         </button>
@@ -651,6 +693,15 @@ const Archive = () => {
             ariaLabel="نوع محتوا"
           />
         </div>
+        <div className="admin-archive__select-wrap">
+          <span>مرتب‌سازی</span>
+          <ArchiveDropdown
+            value={archiveSort}
+            options={archiveSortOptions}
+            onChange={(value) => { setArchiveSort(value); setPage(1); }}
+            ariaLabel="مرتب‌سازی آرشیو"
+          />
+        </div>
       </div>
 
       <div className="admin-archive__table-card">
@@ -679,6 +730,7 @@ const Archive = () => {
                     <th>نوع</th>
                     <th>سال</th>
                     <th>امتیاز</th>
+                    <th>بازدید</th>
                     <th>فایل</th>
                     <th>گزارش</th>
                     <th>عملیات</th>
@@ -711,12 +763,13 @@ const Archive = () => {
                       <td><span className="admin-archive__type-pill">{item.type === 'series' ? 'سریال' : 'فیلم'}</span></td>
                       <td>{item.year || '—'}</td>
                       <td><span className="admin-archive__rating">{item.rating || '—'}</span></td>
+                      <td><span className="admin-archive__view-count">{item.view_count ? item.view_count.toLocaleString('fa-IR') : 0}</span></td>
                       <td><span className="admin-archive__file-count">{item.files.length.toLocaleString('fa-IR')}</span></td>
                       <td>
                         <button
                           type="button"
                           className="admin-archive__table-action admin-archive__table-action--report"
-                          onClick={() => { setShowSubtitleReport(false); setShowReports(true); setReportGroupOpen(item.id); }}
+                          onClick={() => { setShowSubtitleReport(false); setReportStatus('open'); setShowReports(true); setReportGroupOpen(item.id); }}
                         >
                           <FiFlag />
                           گزارش‌ها
@@ -741,7 +794,7 @@ const Archive = () => {
                       </td>
                     </tr>
                   )) : (
-                    <tr><td colSpan={8}><div className="admin-archive__empty-table"><FiFilm /> آیتمی با این فیلتر پیدا نشد.</div></td></tr>
+                    <tr><td colSpan={9}><div className="admin-archive__empty-table"><FiFilm /> آیتمی با این فیلتر پیدا نشد.</div></td></tr>
                   )}
                 </tbody>
               </table>
@@ -901,6 +954,20 @@ const Archive = () => {
               <div><span>مرکز گزارش‌ها</span><h2>عنوان‌های دارای گزارش</h2><p>هر عنوان را باز کنید تا جزئیات گزارش‌های کاربران را ببینید.</p></div>
               <button type="button" onClick={closeReports} aria-label="بستن"><FiX /></button>
             </header>
+            <div className="admin-archive__reports-toolbar">
+              <div>
+                <span>وضعیت گزارش‌ها</span>
+                <div className="">
+                  <ArchiveDropdown
+                    value={reportStatus}
+                    options={archiveReportStatusOptions}
+                    onChange={(value) => { setReportStatus(value); setReportGroupOpen(null); }}
+                    ariaLabel="وضعیت گزارش‌ها"
+                  />
+                </div>
+              </div>
+              <small>گزارش‌های باز در صف رسیدگی هستند؛ گزارش‌های تکمیل‌شده برای سوابق نگه داشته می‌شوند.</small>
+            </div>
             <div className="admin-archive__reports-index">
               {reportGroups.isLoading ? <div className="admin-archive__message"><FiRefreshCw /> در حال دریافت گزارش‌ها…</div> : reportGroups.data?.length ? reportGroups.data.map((group: AdminArchiveReportGroup) => {
                 const open = reportGroupOpen === group.media_id;
@@ -928,11 +995,39 @@ const Archive = () => {
                               {reports.data.map((report: AdminArchiveReport) => (
                                 <article key={report.id} className="admin-archive__report">
                                   <div className="admin-archive__report-head">
-                                    <div><strong>{reportTypeLabel[report.report_type] || report.report_type}</strong><span>{report.username || 'کاربر بدون نام'} · {report.phone || 'شماره ثبت نشده'}</span></div>
-                                    <time>{new Date(report.created_at).toLocaleString('fa-IR')}</time>
+                                    <div>
+                                      <strong>{reportTypeLabel[report.report_type] || report.report_type}</strong>
+                                      <span>{report.username || 'کاربر بدون نام'} · {report.phone || 'شماره ثبت نشده'}</span>
+                                    </div>
+                                    <div className="admin-archive__report-head-meta">
+                                      <span className={`admin-archive__report-status admin-archive__report-status--${report.status}`}>
+                                        {report.status === 'completed' ? 'تکمیل‌شده' : 'باز'}
+                                      </span>
+                                      <time>{new Date(report.created_at).toLocaleString('fa-IR')}</time>
+                                    </div>
                                   </div>
                                   <div className="admin-archive__report-target">{report.target_type === 'media' ? 'کل عنوان' : report.target_type === 'episode' ? `فصل ${report.season}، قسمت ${report.episode}` : `فایل: ${report.file_url}`}</div>
                                   {report.custom_text && <p>{report.custom_text}</p>}
+                                  <div className="admin-archive__report-actions">
+                                    <button
+                                      type="button"
+                                      className="admin-archive__report-action admin-archive__report-action--complete"
+                                      disabled={reportStatusMutation.isPending}
+                                      onClick={() => reportStatusMutation.mutate({ id: report.id, status: report.status === 'completed' ? 'open' : 'completed' })}
+                                    >
+                                      {report.status === 'completed' ? <FiRefreshCw /> : <FiCheckCircle />}
+                                      {report.status === 'completed' ? 'باز کردن مجدد' : 'تکمیل گزارش'}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="admin-archive__report-action admin-archive__report-action--delete"
+                                      disabled={removeReport.isPending}
+                                      onClick={() => window.confirm('این گزارش برای همیشه حذف شود؟') && removeReport.mutate(report.id)}
+                                    >
+                                      <FiTrash2 />
+                                      حذف گزارش
+                                    </button>
+                                  </div>
                                 </article>
                               ))}
                             </div>

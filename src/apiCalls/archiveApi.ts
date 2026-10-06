@@ -166,6 +166,9 @@ export const archiveApi = {
   createArchiveReport: (mediaId: string, payload: ArchiveReportInput) =>
     api.post(`/media/${encodeURIComponent(mediaId)}/reports`, payload),
 
+  incrementMediaView: (mediaId: string) =>
+    api.post<{ success: boolean; view_count: number }>(`/media/${encodeURIComponent(mediaId)}/view`),
+
   getSubtitlesUrl: (
     mediaId: string,
     params?: { season?: number | null; episode?: number | null }

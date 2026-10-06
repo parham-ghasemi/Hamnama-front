@@ -1,14 +1,18 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  FiBookOpen,
   FiCheck,
   FiClock,
+  FiEdit2,
   FiMessageCircle,
+  FiPlus,
   FiSearch,
   FiSend,
+  FiTrash2,
   FiXCircle,
 } from "react-icons/fi";
-import { supportApi, getSupportWsUrl, type SupportConversation, type SupportMessage } from "../../../apiCalls/supportApi";
+import { supportApi, getSupportWsUrl, type SupportConversation, type SupportDefaultAnswer, type SupportMessage } from "../../../apiCalls/supportApi";
 import { toast } from "../../../components/toast";
 import "./Support.scss";
 import Skeleton from "../../../components/skeleton/Skeleton";
@@ -36,6 +40,10 @@ const AdminSupport = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [reply, setReply] = useState("");
   const [connected, setConnected] = useState(false);
+  const [showDefaultAnswers, setShowDefaultAnswers] = useState(false);
+  const [answerTitle, setAnswerTitle] = useState("");
+  const [answerContent, setAnswerContent] = useState("");
+  const [editingAnswerId, setEditingAnswerId] = useState<string | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
@@ -43,6 +51,12 @@ const AdminSupport = () => {
     queryKey: ["admin-support-conversations"],
     queryFn: async () => (await supportApi.listAdminConversations()).data.conversations,
     refetchInterval: 15000,
+  });
+
+  const defaultAnswersQuery = useQuery({
+    queryKey: ["admin-support-default-answers"],
+    queryFn: async () => (await supportApi.listDefaultAnswers()).data.answers,
+    staleTime: 60_000,
   });
 
   const selected = useMemo(
@@ -68,6 +82,53 @@ const AdminSupport = () => {
     },
     onError: () => toast.error("بستن گفتگو با مشکل مواجه شد"),
   });
+
+  const saveDefaultAnswerMutation = useMutation({
+    mutationFn: (payload: { id?: string; title: string; content: string }) =>
+      payload.id
+        ? supportApi.updateDefaultAnswer(payload.id, { title: payload.title, content: payload.content })
+        : supportApi.createDefaultAnswer({ title: payload.title, content: payload.content }),
+    onSuccess: async () => {
+      toast.success(editingAnswerId ? "پاسخ پیش‌فرض ویرایش شد" : "پاسخ پیش‌فرض ایجاد شد");
+      setAnswerTitle("");
+      setAnswerContent("");
+      setEditingAnswerId(null);
+      await queryClient.invalidateQueries({ queryKey: ["admin-support-default-answers"] });
+    },
+    onError: () => toast.error("ذخیره پاسخ پیش‌فرض با مشکل مواجه شد"),
+  });
+
+  const deleteDefaultAnswerMutation = useMutation({
+    mutationFn: (id: string) => supportApi.deleteDefaultAnswer(id),
+    onSuccess: async () => {
+      toast.success("پاسخ پیش‌فرض حذف شد");
+      await queryClient.invalidateQueries({ queryKey: ["admin-support-default-answers"] });
+    },
+    onError: () => toast.error("حذف پاسخ پیش‌فرض با مشکل مواجه شد"),
+  });
+
+  const resetDefaultAnswerForm = () => {
+    setAnswerTitle("");
+    setAnswerContent("");
+    setEditingAnswerId(null);
+  };
+
+  const editDefaultAnswer = (answer: SupportDefaultAnswer) => {
+    setEditingAnswerId(answer.id);
+    setAnswerTitle(answer.title);
+    setAnswerContent(answer.content);
+    setShowDefaultAnswers(true);
+  };
+
+  const submitDefaultAnswer = (event: FormEvent) => {
+    event.preventDefault();
+    if (!answerTitle.trim() || !answerContent.trim()) return;
+    saveDefaultAnswerMutation.mutate({
+      id: editingAnswerId ?? undefined,
+      title: answerTitle.trim(),
+      content: answerContent.trim(),
+    });
+  };
 
   useEffect(() => {
     socketRef.current?.close();
@@ -168,7 +229,80 @@ const AdminSupport = () => {
             placeholder="جستجو بر اساس نام یا پیام"
           />
         </label>
+        <button
+          type="button"
+          className={`admin-support__answers-toggle ${showDefaultAnswers ? "is-active" : ""}`}
+          onClick={() => setShowDefaultAnswers((value) => !value)}
+        >
+          <FiBookOpen />
+          مدیریت پاسخ‌های پیش‌فرض
+        </button>
       </div>
+
+      {showDefaultAnswers && (
+        <section className="admin-support__answers-manager">
+          <div className="admin-support__answers-manager__head">
+            <div>
+              <span className="admin-support__eyebrow">پاسخ‌های آماده</span>
+              <h2>{editingAnswerId ? "ویرایش پاسخ پیش‌فرض" : "ساخت پاسخ پیش‌فرض"}</h2>
+            </div>
+            {editingAnswerId && (
+              <button type="button" className="admin-support__answers-cancel" onClick={resetDefaultAnswerForm}>
+                لغو ویرایش
+              </button>
+            )}
+          </div>
+          <form className="admin-support__answers-form" onSubmit={submitDefaultAnswer}>
+            <input
+              value={answerTitle}
+              onChange={(event) => setAnswerTitle(event.target.value)}
+              maxLength={80}
+              placeholder="عنوان کوتاه، مثل: مشکل ورود"
+            />
+            <textarea
+              value={answerContent}
+              onChange={(event) => setAnswerContent(event.target.value)}
+              maxLength={2000}
+              rows={3}
+              placeholder="متنی که قرار است برای کاربر ارسال شود…"
+            />
+            <button type="submit" disabled={!answerTitle.trim() || !answerContent.trim() || saveDefaultAnswerMutation.isPending}>
+              {editingAnswerId ? <FiEdit2 /> : <FiPlus />}
+              {editingAnswerId ? "ذخیره تغییرات" : "افزودن پاسخ"}
+            </button>
+          </form>
+          <div className="admin-support__answers-list">
+            {defaultAnswersQuery.isLoading ? (
+              <div className="admin-support__answers-empty">در حال دریافت پاسخ‌های پیش‌فرض…</div>
+            ) : defaultAnswersQuery.data?.length ? (
+              defaultAnswersQuery.data.map((answer) => (
+                <article className="admin-support__answer-card" key={answer.id}>
+                  <div>
+                    <strong>{answer.title}</strong>
+                    <p>{answer.content}</p>
+                  </div>
+                  <div className="admin-support__answer-card__actions">
+                    <button type="button" onClick={() => editDefaultAnswer(answer)} aria-label={`ویرایش ${answer.title}`}>
+                      <FiEdit2 />
+                    </button>
+                    <button
+                      type="button"
+                      className="is-danger"
+                      disabled={deleteDefaultAnswerMutation.isPending}
+                      onClick={() => window.confirm(`پاسخ «${answer.title}» حذف شود؟`) && deleteDefaultAnswerMutation.mutate(answer.id)}
+                      aria-label={`حذف ${answer.title}`}
+                    >
+                      <FiTrash2 />
+                    </button>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <div className="admin-support__answers-empty">هنوز پاسخ پیش‌فرضی ساخته نشده است.</div>
+            )}
+          </div>
+        </section>
+      )}
 
       <div className="admin-support__content">
         <div className="admin-support__list">
@@ -273,7 +407,20 @@ const AdminSupport = () => {
               </div>
 
               {details.status === "open" ? (
-                <form className="admin-support__composer" onSubmit={sendReply}>
+                <div className="admin-support__composer-wrap">
+                  {defaultAnswersQuery.data?.length ? (
+                    <div className="admin-support__quick-answers" aria-label="پاسخ‌های پیش‌فرض">
+                      <span><FiBookOpen /> پاسخ‌های پیش‌فرض</span>
+                      <div>
+                        {defaultAnswersQuery.data.map((answer) => (
+                          <button type="button" key={answer.id} onClick={() => setReply(answer.content)} title="قرار دادن متن در کادر پاسخ">
+                            {answer.title}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                  <form className="admin-support__composer" onSubmit={sendReply}>
                   <textarea
                     value={reply}
                     onChange={(event) => setReply(event.target.value)}
@@ -285,7 +432,8 @@ const AdminSupport = () => {
                     <FiSend />
                     ارسال پاسخ
                   </button>
-                </form>
+                  </form>
+                </div>
               ) : null}
             </>
           )}

@@ -59,7 +59,8 @@
   &__count {
     padding: 8px 14px;
     border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--support-primary) 22%, transparent);
+    border: 1px solid
+      color-mix(in srgb, var(--support-primary) 22%, transparent);
     background: color-mix(in srgb, var(--support-primary) 10%, transparent);
     color: var(--support-primary);
     font-size: 12px;
@@ -67,6 +68,11 @@
   }
 
   &__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
     label {
       width: min(420px, 100%);
       display: flex;
@@ -79,7 +85,11 @@
       color: var(--support-muted);
 
       &:focus-within {
-        border-color: color-mix(in srgb, var(--support-primary) 45%, var(--support-border));
+        border-color: color-mix(
+          in srgb,
+          var(--support-primary) 45%,
+          var(--support-border)
+        );
       }
 
       input {
@@ -95,6 +105,255 @@
         &::placeholder {
           color: var(--support-muted);
         }
+      }
+    }
+  }
+
+  &__answers-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 42px;
+    padding: 9px 12px;
+    border: 1px solid var(--support-border);
+    border-radius: 11px;
+    background: var(--support-surface);
+    color: var(--support-muted);
+    font: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+
+    &.is-active,
+    &:hover {
+      border-color: color-mix(
+        in srgb,
+        var(--support-primary) 38%,
+        var(--support-border)
+      );
+      background: color-mix(
+        in srgb,
+        var(--support-primary) 8%,
+        var(--support-surface)
+      );
+      color: var(--support-primary);
+    }
+  }
+
+  &__answers-manager {
+    padding: 16px;
+    border: 1px solid var(--support-border);
+    border-radius: 16px;
+    background: var(--support-surface);
+  }
+
+  &__answers-manager__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    h2 {
+      font-size: 15px;
+      font-weight: 800;
+    }
+  }
+
+  &__answers-cancel {
+    padding: 7px 9px;
+    border: 1px solid var(--support-border);
+    border-radius: 9px;
+    background: var(--support-hover);
+    color: var(--support-muted);
+    font: inherit;
+    font-size: 10px;
+    font-weight: 750;
+    cursor: pointer;
+  }
+
+  &__answers-form {
+    display: grid;
+    grid-template-columns: minmax(180px, 0.7fr) minmax(0, 1.5fr) auto;
+    align-items: center;
+    gap: 9px;
+
+    input,
+    textarea {
+      min-width: 0;
+      border: 1px solid var(--support-border);
+      border-radius: 10px;
+      background: var(--support-input);
+      color: var(--support-text);
+      outline: 0;
+      font: inherit;
+      font-size: 11px;
+      line-height: 1.7;
+      padding: 16px 10px;
+
+      &:focus {
+        border-color: color-mix(
+          in srgb,
+          var(--support-primary) 45%,
+          var(--support-border)
+        );
+      }
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 42px;
+    }
+
+    > button {
+      min-width: 112px;
+      padding: 16px 0;
+      border: 0;
+      border-radius: 10px;
+      background: var(--support-primary);
+      color: #fff;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      @include mx.flex-center;
+
+      &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  &__answers-list {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
+  &__answer-card {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 11px;
+    border: 1px solid var(--support-border);
+    border-radius: 11px;
+    background: var(--support-hover);
+
+    strong {
+      display: block;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    p {
+      margin: 4px 0 0;
+      color: var(--support-muted);
+      font-size: 10px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    &__actions {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: flex-start;
+      gap: 6px;
+
+      button {
+        width: 30px;
+        height: 30px;
+        display: inline-grid;
+        place-items: center;
+        border: 1px solid var(--support-border);
+        border-radius: 8px;
+        background: var(--support-surface);
+        color: var(--support-muted);
+        cursor: pointer;
+
+        &:hover {
+          color: var(--support-primary);
+          border-color: color-mix(
+            in srgb,
+            var(--support-primary) 34%,
+            var(--support-border)
+          );
+        }
+
+        &.is-danger:hover {
+          color: #d97c7c;
+          border-color: rgba(214, 107, 107, 0.35);
+        }
+      }
+    }
+  }
+
+  &__answers-empty {
+    padding: 13px;
+    border: 1px dashed var(--support-border);
+    border-radius: 10px;
+    color: var(--support-muted);
+    font-size: 10px;
+    text-align: center;
+  }
+
+  &__composer-wrap {
+    border-top: 1px solid var(--support-border);
+  }
+
+  &__quick-answers {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 20px 0;
+
+    > span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--support-muted);
+      font-size: 9px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    > div {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    button {
+      padding: 6px 8px;
+      border: 1px solid
+        color-mix(in srgb, var(--support-primary) 22%, var(--support-border));
+      border-radius: 999px;
+      background: color-mix(
+        in srgb,
+        var(--support-primary) 6%,
+        var(--support-surface)
+      );
+      color: var(--support-primary);
+      font: inherit;
+      font-size: 9px;
+      font-weight: 800;
+      cursor: pointer;
+
+      &:hover {
+        border-color: color-mix(
+          in srgb,
+          var(--support-primary) 38%,
+          var(--support-border)
+        );
+        background: color-mix(
+          in srgb,
+          var(--support-primary) 11%,
+          var(--support-surface)
+        );
       }
     }
   }
@@ -132,12 +391,22 @@
     font: inherit;
     text-align: start;
     cursor: pointer;
-    transition: border-color 160ms ease, background 160ms ease;
+    transition:
+      border-color 160ms ease,
+      background 160ms ease;
 
     &:hover,
     &.is-active {
-      border-color: color-mix(in srgb, var(--support-primary) 34%, var(--support-border));
-      background: color-mix(in srgb, var(--support-primary) 7%, var(--support-surface));
+      border-color: color-mix(
+        in srgb,
+        var(--support-primary) 34%,
+        var(--support-border)
+      );
+      background: color-mix(
+        in srgb,
+        var(--support-primary) 7%,
+        var(--support-surface)
+      );
     }
 
     &__top {
@@ -279,7 +548,11 @@
     &.is-admin {
       align-self: flex-end;
       background: color-mix(in srgb, var(--support-primary) 13%, transparent);
-      border-color: color-mix(in srgb, var(--support-primary) 24%, var(--support-border));
+      border-color: color-mix(
+        in srgb,
+        var(--support-primary) 24%,
+        var(--support-border)
+      );
       border-bottom-right-radius: 6px;
     }
 
@@ -305,8 +578,7 @@
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 10px;
-    padding: 14px 20px 18px;
-    border-top: 1px solid var(--support-border);
+    padding: 10px 20px 18px;
 
     textarea {
       min-width: 0;
@@ -322,7 +594,11 @@
       line-height: 1.65;
 
       &:focus {
-        border-color: color-mix(in srgb, var(--support-primary) 45%, var(--support-border));
+        border-color: color-mix(
+          in srgb,
+          var(--support-primary) 45%,
+          var(--support-border)
+        );
       }
     }
 
@@ -398,6 +674,29 @@
 
     &__detail__actions {
       width: 100%;
+    }
+
+    &__toolbar {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    &__answers-toggle {
+      width: 100%;
+    }
+
+    &__answers-form {
+      grid-template-columns: 1fr;
+    }
+
+    &__answers-form > button {
+      min-height: 42px;
+    }
+
+    &__quick-answers {
+      align-items: flex-start;
+      flex-direction: column;
+      padding-inline: 14px;
     }
 
     &__composer {

@@ -19,6 +19,14 @@ export interface SupportConversation {
   messages: SupportMessage[];
 }
 
+export interface SupportDefaultAnswer {
+  id: string;
+  title: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface SupportConversationListItem {
   id: string;
   visitor_id: string;
@@ -77,4 +85,13 @@ export const supportApi = {
 
   closeAdminConversation: (id: string) =>
     api.post<{ success: boolean }>(`/admin/support/conversations/${id}/close`),
+
+  listDefaultAnswers: () =>
+    api.get<{ answers: SupportDefaultAnswer[] }>("/admin/support/default-answers"),
+  createDefaultAnswer: (payload: { title: string; content: string }) =>
+    api.post<SupportDefaultAnswer>("/admin/support/default-answers", payload),
+  updateDefaultAnswer: (id: string, payload: { title: string; content: string }) =>
+    api.patch<SupportDefaultAnswer>(`/admin/support/default-answers/${id}`, payload),
+  deleteDefaultAnswer: (id: string) =>
+    api.delete(`/admin/support/default-answers/${id}`),
 };
