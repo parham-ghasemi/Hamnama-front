@@ -1976,10 +1976,10 @@
       flex-direction: column;
     }
   }
-}
-.join-page {
+
   &__private-rooms {
     margin-top: 30px;
+    min-width: 70%;
 
     &__head {
       display: flex;
@@ -2082,7 +2082,11 @@
       overflow: hidden;
       border-radius: 13px;
       background:
-        radial-gradient(100% 90% at 50% 0%, rgba(208, 78, 47, 0.2), transparent 68%),
+        radial-gradient(
+          100% 90% at 50% 0%,
+          rgba(208, 78, 47, 0.2),
+          transparent 68%
+        ),
         rgba(9, 9, 9, 0.5);
       box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
 
