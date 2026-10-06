@@ -4,6 +4,7 @@ import {
   getAccessToken,
   refreshAccessToken,
 } from "./authToken";
+import { getApiErrorMessage } from "./apiError";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
@@ -50,6 +51,21 @@ api.interceptors.response.use(
 
     if (status === 403) {
       console.log("not allowed");
+    }
+
+    if (error?.response) {
+      const normalizedMessage = getApiErrorMessage(error, 'عملیات انجام نشد. لطفاً دوباره تلاش کنید.');
+      error.message = normalizedMessage;
+      if (typeof error.response.data === 'string') {
+        error.response.data = normalizedMessage;
+      } else if (error.response.data && typeof error.response.data === 'object') {
+        error.response.data = {
+          ...error.response.data,
+          message: normalizedMessage,
+        };
+      } else {
+        error.response.data = { message: normalizedMessage };
+      }
     }
 
     return Promise.reject(error);

@@ -1,5 +1,6 @@
 import api from "../lib/axiosConfig";
 import axios from "axios";
+import { getApiErrorMessage } from "../lib/apiError";
 
 export interface SubtitleCue {
   start: number;
@@ -303,13 +304,5 @@ export async function submitRoomSubtitle(
 }
 
 export function getRoomApiErrorMessage(error: unknown, fallback = "عملیات انجام نشد."): string {
-  if (axios.isAxiosError(error)) {
-    const data = error.response?.data;
-    if (typeof data === "string" && data.trim()) return data.trim();
-    if (data && typeof data === "object" && "message" in data) {
-      const message = (data as { message?: unknown }).message;
-      if (typeof message === "string" && message.trim()) return message.trim();
-    }
-  }
-  return error instanceof Error && error.message ? error.message : fallback;
+  return getApiErrorMessage(error, fallback);
 }

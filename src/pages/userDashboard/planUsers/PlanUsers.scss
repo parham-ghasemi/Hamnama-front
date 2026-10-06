@@ -5,430 +5,794 @@
 @use "../_dash" as dash;
 
 .plan-users {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+  box-sizing: border-box;
+
   &__notice {
-    margin-bottom: 1rem;
-    padding: 0.85rem 1rem;
-    border-radius: 0.75rem;
-    background: rgba(245, 158, 11, 0.1);
-    border: 1px solid rgba(245, 158, 11, 0.25);
-    line-height: 1.8;
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    margin-bottom: 18px;
+    padding: 13px 15px;
+    border-radius: 15px;
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.22);
+    color: #e8b65d;
+    line-height: 1.9;
+    font-size: 13px;
+
+    svg {
+      flex: 0 0 auto;
+      margin-top: 3px;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    strong {
+      color: inherit;
+    }
+
+    @include mx.light {
+      background: rgba(180, 120, 30, 0.08);
+      border-color: rgba(180, 120, 30, 0.2);
+      color: #9b6714;
+    }
   }
 
-  @include mx.flex-center;
-  min-height: 100%;
-  width: 100%;
-  padding: 24px 16px;
+  &__hero {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 28px;
+    min-height: 240px;
+    padding: 28px 30px 24px;
+    border-radius: 24px;
+    box-sizing: border-box;
 
-  &__cards {
-    @include mx.flex-center;
-    flex-wrap: wrap;
-    width: 100%;
-    max-width: 689px;
-    gap: 32px;
+    @include mx.cinema-surface;
+    @include mx.ambient-shadow(0.9);
 
-    @include mx.max-w(768px) {
-      gap: 20px;
+    &::before {
+      @include mx.gradient-border(24px);
+      z-index: 4;
     }
 
-    @include mx.max-w(480px) {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 16px;
+    &__backdrop {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(
+          460px 270px at 8% 100%,
+          rgba(224, 163, 64, 0.12),
+          transparent 70%
+        ),
+        radial-gradient(
+          520px 310px at 100% 0%,
+          rgba(208, 78, 47, 0.2),
+          transparent 68%
+        );
     }
 
-    &__card {
-      @include dash.row(17px);
-      height: 271px;
-      width: 196px;
-      padding: 24px 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition:
-        transform ease 200ms,
-        box-shadow ease 200ms;
+    &__heading,
+    &__stats {
+      position: relative;
+      z-index: 1;
+    }
 
-      @include mx.light {
-        background: light.$color-card-bg;
-        outline: light.$card-outline;
-        box-shadow: 0 3px 6px 0 color.adjust(light.$color-black, $alpha: -0.92);
-      }
-
-      &:not(&--add):hover {
-        @include dash.row-hover;
-      }
-
-      // Responsive adjustments for mobile devices
-      @include mx.max-w(480px) {
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        justify-content: space-between;
-        padding: 16px;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-
-      &__user-info {
-        @include mx.flex-center;
-        flex-direction: column;
-        gap: 12px;
-
-        @include mx.max-w(480px) {
-          flex-direction: row;
-          gap: 12px;
-        }
-
-        > img {
-          height: 60px;
-          width: 60px;
-          border-radius: 100%;
-          object-fit: cover;
-
-          @include mx.max-w(480px) {
-            height: 48px;
-            width: 48px;
-          }
-        }
-
-        > p {
-          font-size: 28px;
-          font-weight: 800;
-          height: 60px;
-          width: 60px;
-          background: linear-gradient(
-            160deg,
-            rgba(224, 163, 64, 0.9) 0%,
-            rgba(208, 78, 47, 0.9) 100%
-          );
-          color: #fff;
-          box-shadow: 0 10px 20px -14px rgba(208, 78, 47, 0.9);
-          border-radius: 100%;
-          @include mx.flex-center;
-
-          @include mx.light {
-            background-color: color.adjust(light.$color-gray, $alpha: -0.85);
-            color: light.$color-black;
-          }
-
-          @include mx.max-w(480px) {
-            height: 48px;
-            width: 48px;
-            font-size: 22px;
-          }
-        }
-
-        > span {
-          font-size: 16px;
-          font-weight: 700;
-
-          @include mx.light {
-            color: light.$color-black;
-          }
-
-          @include mx.max-w(480px) {
-            font-size: 15px;
-          }
-        }
-      }
-
-      &__since {
+    &__heading {
+      > span {
+        display: inline-block;
+        color: dark.$color-gray;
         font-size: 12px;
         font-weight: 600;
-        text-align: center;
-        padding: 12px 0;
-        flex: 1;
+      }
 
-        @include mx.light {
+      h1 {
+        margin: 8px 0 0;
+        color: dark.$color-primary;
+        font-size: clamp(30px, 4vw, 46px);
+        line-height: 1.15;
+        font-weight: 800;
+      }
+
+      p {
+        max-width: 600px;
+        margin: 12px 0 0;
+        color: color.adjust(dark.$color-gray, $lightness: -4%);
+        line-height: 1.9;
+        font-size: 13px;
+      }
+
+      @include mx.light {
+        > span,
+        p {
+          color: light.$color-dark-gray;
+        }
+
+        h1 {
+          color: light.$color-primary;
+        }
+      }
+    }
+
+    &__stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(88px, 1fr));
+      gap: 9px;
+      min-width: 300px;
+    }
+
+    &__stat {
+      min-width: 0;
+      padding: 12px 13px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.045);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+      text-align: center;
+
+      span {
+        display: block;
+        color: dark.$color-gray;
+        font-size: 11px;
+      }
+
+      strong {
+        display: block;
+        margin-top: 5px;
+        color: dark.$color-white;
+        font-size: 16px;
+      }
+
+      @include mx.light {
+        background: rgba(9, 9, 9, 0.035);
+        box-shadow: inset 0 0 0 1px rgba(9, 9, 9, 0.08);
+
+        span {
           color: light.$color-gray;
         }
 
-        @include mx.max-w(480px) {
-          padding: 0;
-          text-align: right;
+        strong {
+          color: light.$color-black;
+        }
+      }
+    }
+
+    &--skeleton {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+
+      .plan-users__hero__stats {
+        width: min(480px, 100%);
+        margin-top: auto;
+      }
+    }
+  }
+
+  &__content {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+    align-items: start;
+    gap: 18px;
+    margin-top: 18px;
+  }
+
+  &__panel {
+    position: relative;
+    overflow: hidden;
+    padding: 22px;
+    border-radius: 20px;
+
+    @include dash.row(20px);
+
+    &__heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 17px;
+
+      > div {
+        > span {
+          display: block;
+          color: dark.$color-gray;
           font-size: 11px;
         }
-      }
 
-      &__kick {
-        background-color: color.adjust(#ce1d1d, $alpha: -0.52);
-        border-radius: 6px;
-        padding: 8px 12px;
-        width: 111px;
-        font-size: 11px;
-        font-weight: 700;
-        border: none;
-        cursor: pointer;
-        transition: background-color ease 200ms;
-
-        @include mx.light {
-          background-color: color.adjust(#ce1d1d, $alpha: -0.82);
-          color: #be1212;
-        }
-
-        &:hover {
-          background-color: color.adjust(#ce1d1d, $alpha: -0.32);
-
-          @include mx.light {
-            background-color: color.adjust(#ce1d1d, $alpha: -0.72);
-          }
-        }
-
-        @include mx.max-w(480px) {
-          width: auto;
-          white-space: nowrap;
-        }
-      }
-
-      &__add-icon {
-        height: 61px;
-        width: 61px;
-        background-color: rgba(208, 78, 47, 0.24);
-        color: color.adjust(dark.$color-yellow, $lightness: 6%);
-        border-radius: 100%;
-        @include mx.flex-center;
-        font-size: 28px;
-        transition:
-          background-color ease 200ms,
-          transform ease 200ms;
-
-        @include mx.light {
-          background-color: color.adjust(light.$color-primary, $alpha: -0.85);
-          color: light.$color-primary;
-        }
-
-        @include mx.max-w(480px) {
-          height: 42px;
-          width: 42px;
+        h2 {
+          margin: 5px 0 0;
+          color: dark.$color-white;
           font-size: 20px;
         }
       }
 
-      &__add-text {
-        font-size: 14px;
-        font-weight: 700;
-        margin-top: 24px;
+      @include mx.light {
+        > div {
+          > span {
+            color: light.$color-gray;
+          }
 
-        @include mx.light {
+          h2 {
+            color: light.$color-black;
+          }
+        }
+      }
+    }
+  }
+
+  &__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(208, 78, 47, 0.09);
+    border: 1px solid rgba(208, 78, 47, 0.17);
+    color: dark.$color-primary;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  &__member-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  &__member {
+    position: relative;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-height: 72px;
+    padding: 10px 11px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.035);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.055);
+    transition:
+      transform mx.$dur-fast mx.$ease-out-soft,
+      background-color mx.$dur-fast ease;
+
+    &__avatar,
+    &--add__icon {
+      flex: 0 0 auto;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      overflow: hidden;
+      background: linear-gradient(
+        160deg,
+        rgba(224, 163, 64, 0.9),
+        rgba(208, 78, 47, 0.9)
+      );
+      color: #fff;
+      font-size: 19px;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    &__identity {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      strong {
+        overflow: hidden;
+        color: dark.$color-white;
+        font-size: 13px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      span {
+        color: dark.$color-gray;
+        font-size: 10px;
+      }
+
+      @include mx.light {
+        strong {
           color: light.$color-black;
         }
 
-        @include mx.max-w(480px) {
-          margin-top: 0;
+        span {
+          color: light.$color-gray;
         }
+      }
+    }
+
+    &__owner {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-right: auto;
+      padding: 5px 7px;
+      border-radius: 999px;
+      background: rgba(83, 193, 148, 0.09);
+      color: dark.$color-green;
+      font-size: 10px;
+      font-weight: 700;
+
+      svg {
+        font-size: 12px;
+      }
+    }
+
+    &__remove {
+      width: 32px;
+      height: 32px;
+      margin-right: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 10px;
+      background: rgba(178, 56, 64, 0.08);
+      color: dark.$color-red;
+      cursor: pointer;
+      font: inherit;
+
+      &:hover {
+        background: rgba(178, 56, 64, 0.15);
+      }
+
+      &:disabled {
+        opacity: 0.45;
+        cursor: progress;
+      }
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    &--add {
+      min-height: 72px;
+      border: 1px dashed rgba(208, 78, 47, 0.25);
+      color: dark.$color-primary;
+      background: rgba(208, 78, 47, 0.035);
+      cursor: pointer;
+      text-align: right;
+
+      &__icon {
+        background: rgba(208, 78, 47, 0.12);
+        color: dark.$color-primary;
+        font-size: 18px;
+      }
+
+      strong,
+      small {
+        display: block;
+      }
+
+      strong {
+        font-size: 13px;
+      }
+
+      small {
+        margin-top: 3px;
+        color: dark.$color-gray;
+        font-size: 10px;
+      }
+    }
+
+    &--skeleton {
+      pointer-events: none;
+    }
+
+    @include mx.light {
+      background: rgba(9, 9, 9, 0.025);
+      box-shadow: inset 0 0 0 1px rgba(9, 9, 9, 0.07);
+
+      &:hover {
+        background: rgba(9, 9, 9, 0.045);
       }
 
       &--add {
-        cursor: pointer;
-        border-style: dashed;
-
-        @include mx.max-w(480px) {
-          justify-content: center;
-          gap: 12px;
-          min-height: 68px;
-        }
-
-        &:hover {
-          background-color: color.adjust(dark.$color-light-gray, $alpha: -0.9);
-
-          @include mx.light {
-            background-color: rgba(0, 0, 0, 0.03);
-          }
-
-          .plan-users__cards__card__add-icon {
-            transform: scale(1.08);
-            background-color: rgba(208, 78, 47, 0.36);
-
-            @include mx.light {
-              background-color: color.adjust(
-                light.$color-primary,
-                $alpha: -0.75
-              );
-            }
-          }
-        }
+        background: rgba(139, 91, 130, 0.035);
+        border-color: rgba(139, 91, 130, 0.25);
       }
     }
   }
-  &__state {
-    padding: 50px;
-    text-align: center;
-    color: #aaa9b9;
+
+  &__aside {
+    display: grid;
+    gap: 18px;
+  }
+
+  &__panel--invite,
+  &__panel--member-note {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  &__panel__icon {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: rgba(208, 78, 47, 0.1);
+    color: dark.$color-primary;
+    font-size: 20px;
+
+    @include mx.light {
+      background: rgba(139, 91, 130, 0.1);
+      color: light.$color-primary;
+    }
+  }
+
+  &__panel--invite,
+  &__panel--member-note {
+    > div:not(.plan-users__panel__icon):first-of-type,
+    > span:first-of-type {
+      color: dark.$color-gray;
+      font-size: 11px;
+    }
+
+    h2 {
+      margin: -4px 0 0;
+      color: dark.$color-white;
+      font-size: 19px;
+    }
+
+    p {
+      margin: 0;
+      color: dark.$color-gray;
+      line-height: 1.9;
+      font-size: 12px;
+    }
+
+    @include mx.light {
+      h2 {
+        color: light.$color-black;
+      }
+
+      p {
+        color: light.$color-dark-gray;
+      }
+    }
+  }
+
+  &__invite-url {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 3px;
+    padding: 10px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+
+    code {
+      display: block;
+      overflow: hidden;
+      color: dark.$color-gray;
+      font-size: 10px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    @include mx.light {
+      background: rgba(9, 9, 9, 0.025);
+      border-color: rgba(9, 9, 9, 0.08);
+    }
+  }
+
+  &__invite-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
 
     button {
-      display: block;
-      margin: 16px auto 0;
-      padding: 11px 18px;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
       border: 0;
       border-radius: 12px;
+      background: rgba(208, 78, 47, 0.09);
+      color: dark.$color-primary;
       cursor: pointer;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+
+      &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
     }
   }
 
-  &__summary {
+  &__request-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: 8px;
+  }
 
-    > div {
+  &__request {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 9px;
+    padding: 9px;
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.035);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+
+    &__avatar {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: 11px;
+      background: rgba(208, 78, 47, 0.1);
+      color: dark.$color-primary;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    &__body {
+      min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      padding: 18px;
-      border-radius: 16px;
-      background: #1d1d2a;
-    }
+      gap: 3px;
 
-    span {
-      color: #9e9dac;
-    }
-  }
+      strong {
+        overflow: hidden;
+        color: dark.$color-white;
+        font-size: 12px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
 
-  &__invite,
-  &__requests {
-    margin-bottom: 16px;
-    padding: 20px;
-    border-radius: 18px;
-    background: #1d1d2a;
-  }
-
-  &__invite {
-    p {
-      color: #aaa9b9;
+      span {
+        color: dark.$color-gray;
+        font-size: 9px;
+      }
     }
 
     &__actions {
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+      gap: 5px;
 
-    button {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 10px 13px;
-      border: 0;
-      border-radius: 10px;
-      cursor: pointer;
-    }
+      button {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: 9px;
+        cursor: pointer;
 
-    code {
-      display: block;
-      margin-top: 12px;
-      padding: 10px;
-      overflow-wrap: anywhere;
-      border-radius: 10px;
-      background: #171722;
-      color: #88d9b3;
+        &:first-child {
+          background: rgba(83, 193, 148, 0.1);
+          color: dark.$color-green;
+        }
+
+        &:last-child {
+          background: rgba(178, 56, 64, 0.08);
+          color: dark.$color-red;
+        }
+
+        &:disabled {
+          opacity: 0.45;
+          cursor: not-allowed;
+        }
+      }
     }
   }
 
-  &__request {
+  &__panel--details {
+    display: grid;
+    gap: 0;
+  }
+
+  &__detail-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 15px;
-    padding: 12px 0;
-    border-top: 1px solid #333345;
+    padding: 10px 0;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
 
-    > div:first-child {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+    &:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
     }
 
     span {
-      color: #9998a8;
+      color: dark.$color-gray;
+      font-size: 11px;
+    }
+
+    strong {
+      color: dark.$color-white;
+      font-size: 12px;
+    }
+
+    @include mx.light {
+      border-bottom-color: rgba(9, 9, 9, 0.08);
+
+      strong {
+        color: light.$color-black;
+      }
+
+      span {
+        color: light.$color-gray;
+      }
+    }
+  }
+
+  &--state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+  }
+
+  &__state-card {
+    width: min(520px, 100%);
+    padding: 38px 30px;
+    text-align: center;
+    border-radius: 24px;
+
+    @include mx.cinema-surface;
+    @include mx.ambient-shadow(0.9);
+
+    &__icon {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 18px;
+      background: rgba(208, 78, 47, 0.1);
+      color: dark.$color-primary;
+      font-size: 27px;
+    }
+
+    > span {
+      color: dark.$color-gray;
+      font-size: 11px;
+    }
+
+    h1 {
+      margin: 8px 0 0;
+      color: dark.$color-white;
+      font-size: 22px;
+    }
+
+    p {
+      margin: 10px auto 0;
+      color: dark.$color-gray;
+      line-height: 1.95;
+      font-size: 12px;
     }
 
     button {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 10px 13px;
+      margin-top: 20px;
+      padding: 11px 18px;
       border: 0;
-      border-radius: 10px;
+      border-radius: 12px;
+      background: dark.$color-primary-bg;
+      color: dark.$color-white;
       cursor: pointer;
-    }
-  }
-
-  &__cards {
-    &__grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 12px;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
     }
 
-    &__card {
-      padding: 16px;
-      border-radius: 16px;
-      background: #1d1d2a;
-
-      &__user-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-
-        img,
-        p {
-          display: grid;
-          place-items: center;
-          width: 42px;
-          height: 42px;
-          margin: 0;
-          border-radius: 50%;
-          object-fit: cover;
-          background: #303043;
-        }
+    @include mx.light {
+      > span,
+      p {
+        color: light.$color-dark-gray;
       }
 
-      &__since {
-        margin: 12px 0;
-        color: #9998a8;
+      h1 {
+        color: light.$color-black;
       }
 
-      &__kick {
-        padding: 9px 12px;
-        border: 0;
-        border-radius: 9px;
-        cursor: pointer;
-      }
-
-      &--add {
-        display: grid;
-        place-items: center;
-        text-align: center;
-        cursor: pointer;
-      }
-
-      &__add-icon {
-        font-size: 24px;
+      button {
+        background: light.$color-primary-bg;
       }
     }
   }
 
-  @include mx.max-w(720px) {
-    &__summary {
+  .is-spin {
+    animation: plan-users-spin 0.9s linear infinite;
+  }
+
+  @include mx.max-w(1100px) {
+    &__content {
       grid-template-columns: 1fr;
     }
 
-    &__request {
-      align-items: flex-start;
-      flex-direction: column;
+    &__aside {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
+  @include mx.max-w(760px) {
+    &__hero {
+      grid-template-columns: 1fr;
+      gap: 18px;
+      padding: 22px 20px;
+
+      &__stats {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+
+    &__member-grid {
+      grid-template-columns: 1fr;
+    }
+
+    &__aside {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @include mx.max-w(480px) {
+    &__hero {
+      min-height: 0;
+
+      &__stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      &__stat {
+        padding-inline: 7px;
+      }
+    }
+
+    &__panel {
+      padding: 17px;
+      border-radius: 18px;
+    }
+
+    &__member {
+      &__owner {
+        display: none;
+      }
+    }
+  }
 }
 
-
-.is-spin {
-  animation: plan-spin 1s linear infinite;
-}
-
-@keyframes plan-spin {
+@keyframes plan-users-spin {
   to {
     transform: rotate(360deg);
   }

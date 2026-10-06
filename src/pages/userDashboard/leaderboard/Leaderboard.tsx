@@ -6,6 +6,7 @@ import { PiUserFill } from "react-icons/pi";
 
 import Skeleton from "../../../components/skeleton/Skeleton";
 import { useAuth } from "../../../context/AuthContext";
+import { getApiErrorMessage } from "../../../lib/apiError";
 const DEFAULT_AVATAR = "/assets/images/default-avatar.png";
 const API_BASE_URL = import.meta.env['VITE_BASE_URL'] || "";
 
@@ -64,7 +65,7 @@ export const Leaderboard: React.FC = () => {
   if (isError) {
     return (
       <div className="user-leaderboard__error">
-        {error?.message || "خطایی در دریافت اطلاعات رخ داد"}
+        {getApiErrorMessage(error, "دریافت اطلاعات جدول رتبه‌بندی ممکن نبود.")}
       </div>
     );
   }

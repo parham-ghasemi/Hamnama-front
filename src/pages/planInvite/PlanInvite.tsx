@@ -1,34 +1,14 @@
 import { useEffect, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { PiCheckCircleFill, PiUsersThreeFill } from 'react-icons/pi';
 import { billingApi } from '../../apiCalls/billingApi';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from '../../components/toast';
+import { getApiErrorMessage } from '../../lib/apiError';
+import Skeleton from '../../components/skeleton/Skeleton';
 import { SEO } from '../../components/seo/SEO';
 import './PlanInvite.scss';
-
-const getErrorMessage = (error: unknown, fallback: string) => {
-  if (error instanceof AxiosError) {
-    const data = error.response?.data;
-
-    if (typeof data === 'string' && data) {
-      return data;
-    }
-
-    if (
-      data &&
-      typeof data === 'object' &&
-      'message' in data &&
-      typeof data.message === 'string'
-    ) {
-      return data.message;
-    }
-  }
-
-  return fallback;
-};
 
 const PlanInvite = () => {
   const [params] = useSearchParams();
@@ -53,7 +33,7 @@ const PlanInvite = () => {
       void queryClient.invalidateQueries({ queryKey: ['plan-invite', token] });
     },
     onError: (error) =>
-      toast.error(getErrorMessage(error, 'ارسال درخواست عضویت ممکن نبود')),
+      toast.error(getApiErrorMessage(error, 'ارسال درخواست عضویت ممکن نبود.')),
   });
 
   const redirect = useMemo(
@@ -91,7 +71,11 @@ const PlanInvite = () => {
           <PiUsersThreeFill className="plan-invite__icon" />
 
           {preview.isLoading ? (
-            <p>در حال بررسی لینک دعوت...</p>
+            <div className="plan-invite__loading">
+              <Skeleton variant="circle" width={54} height={54} />
+              <Skeleton variant="text" width="55%" height={22} />
+              <Skeleton variant="text" width="80%" />
+            </div>
           ) : preview.error || !preview.data ? (
             <>
               <h1>لینک دعوت معتبر نیست</h1>

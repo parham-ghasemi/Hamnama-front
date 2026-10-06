@@ -1,16 +1,17 @@
 import { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { userApi } from '../../../apiCalls/userApi'; // <-- Adjust import path as needed
-import './Tickets.scss';
 import { FiChevronLeft } from 'react-icons/fi';
 import { BsPlusLg } from 'react-icons/bs';
 import { IoCloseOutline } from 'react-icons/io5';
 import clsx from 'clsx';
+import { userApi } from '../../../apiCalls/userApi';
 import TicketChat from './ticketChatModal/TicketChatModal';
+import { toast } from '../../../components/toast';
+import Skeleton from '../../../components/skeleton/Skeleton';
+import { getApiErrorMessage } from '../../../lib/apiError';
+import './Tickets.scss';
 
-import Skeleton from "../../../components/skeleton/Skeleton";
-// Helper to convert English statuses to Persian and matching CSS classes
 const getStatusInfo = (status: string) => {
   switch (status) {
     case 'answered':
@@ -24,7 +25,6 @@ const getStatusInfo = (status: string) => {
   }
 };
 
-// Helper for formatting ISO dates to Persian Date
 const formatDate = (isoDate: string) => {
   if (!isoDate) return '';
   return new Intl.DateTimeFormat('fa-IR').format(new Date(isoDate));
@@ -37,46 +37,48 @@ const Tickets = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [ticketSubject, setTicketSubject] = useState('');
   const [ticketDescription, setTicketDescription] = useState('');
-  const [activeChatTicketId, setActiveChatTicketId] = useState<string | null>(null);
+  const [activeChatTicketId, setActiveChatTicketId] = useState<string | null>(
+    null,
+  );
 
-  // Fetch Tickets
-  const { data: ticketsData, isLoading } = useQuery({
+  const {
+    data: ticketsData,
+    isLoading,
+    error: ticketsError,
+  } = useQuery({
     queryKey: ['tickets'],
-    queryFn: async () => {
-      const response = await userApi.getTickets();
-      return response.data.tickets || [];
-    }
+    queryFn: () => userApi.getTickets().then((response) => response.data.tickets || []),
   });
 
-  // Create Ticket Mutation
   const createTicketMutation = useMutation({
-    mutationFn: (data: { subject: string; message: string }) => userApi.createTicket(data),
+    mutationFn: (data: { subject: string; message: string }) =>
+      userApi.createTicket(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      void queryClient.invalidateQueries({ queryKey: ['tickets'] });
       setTicketSubject('');
       setTicketDescription('');
       setIsModalOpen(false);
+      toast.success('تیکت شما ثبت شد.');
     },
     onError: (error) => {
-      console.error("Failed to create ticket", error);
-      // Optional: Add toast notification here
-    }
+      toast.error(getApiErrorMessage(error, 'ثبت تیکت انجام نشد.'));
+    },
   });
 
-  const handleCreateTicket = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCreateTicket = (event: React.FormEvent) => {
+    event.preventDefault();
     createTicketMutation.mutate({
       subject: ticketSubject,
-      message: ticketDescription
+      message: ticketDescription,
     });
   };
 
   const handleTicketClick = (ticketId: string | number) => {
     if (window.innerWidth <= 768) {
       navigate(`/user/ticket/${ticketId}`);
-    } else {
-      setActiveChatTicketId(String(ticketId));
+      return;
     }
+    setActiveChatTicketId(String(ticketId));
   };
 
   return (
@@ -85,87 +87,149 @@ const Tickets = () => {
 
       <div className="user-tickets__list-container">
         <div className="user-tickets__list-container__header">
-          <div className="user-tickets__list-container__header__cell">موضوع</div>
-          <div className="user-tickets__list-container__header__cell">شماره تیکت</div>
-          <div className="user-tickets__list-container__header__cell">وضعیت</div>
-          <div className="user-tickets__list-container__header__cell">تاریخ</div>
+          <div className="user-tickets__list-container__header__cell">
+            موضوع
+          </div>
+          <div className="user-tickets__list-container__header__cell">
+            شماره تیکت
+          </div>
+          <div className="user-tickets__list-container__header__cell">
+            وضعیت
+          </div>
+          <div className="user-tickets__list-container__header__cell">
+            تاریخ
+          </div>
           <div className="user-tickets__list-container__header__cell icon" />
         </div>
 
         <div className="user-tickets__list-container__body-wrapper">
           {isLoading ? (
             Array.from({ length: 6 }).map((_, index) => (
-              <div className="user-tickets__list-container__body-wrapper__row" key={index} aria-hidden="true">
-                <div className="user-tickets__list-container__body-wrapper__row__cell"><Skeleton variant="text" width="72%" /></div>
-                <div className="user-tickets__list-container__body-wrapper__row__cell"><Skeleton variant="text" width={52} /></div>
-                <div className="user-tickets__list-container__body-wrapper__row__cell"><Skeleton variant="pill" width={88} height={28} /></div>
-                <div className="user-tickets__list-container__body-wrapper__row__cell"><Skeleton variant="text" width={78} /></div>
-                <div className="user-tickets__list-container__body-wrapper__row__cell icon"><Skeleton variant="circle" width={20} height={20} /></div>
+              <div
+                className="user-tickets__list-container__body-wrapper__row"
+                key={index}
+                aria-hidden="true"
+              >
+                <div className="user-tickets__list-container__body-wrapper__row__cell">
+                  <Skeleton variant="text" width="72%" />
+                </div>
+                <div className="user-tickets__list-container__body-wrapper__row__cell">
+                  <Skeleton variant="text" width={52} />
+                </div>
+                <div className="user-tickets__list-container__body-wrapper__row__cell">
+                  <Skeleton variant="pill" width={88} height={28} />
+                </div>
+                <div className="user-tickets__list-container__body-wrapper__row__cell">
+                  <Skeleton variant="text" width={78} />
+                </div>
+                <div className="user-tickets__list-container__body-wrapper__row__cell icon">
+                  <Skeleton variant="circle" width={20} height={20} />
+                </div>
               </div>
             ))
-          ) : (
-            ticketsData?.map((ticket: any) => {
+          ) : ticketsError ? (
+            <div className="user-tickets__error">
+              {getApiErrorMessage(
+                ticketsError,
+                'دریافت تیکت‌ها انجام نشد. لطفاً دوباره تلاش کنید.',
+              )}
+            </div>
+          ) : ticketsData?.length ? (
+            ticketsData.map((ticket: any) => {
               const statusInfo = getStatusInfo(ticket.status);
+
               return (
-                <div
+                <button
                   key={ticket.id}
+                  type="button"
                   className="user-tickets__list-container__body-wrapper__row"
                   onClick={() => handleTicketClick(ticket.id)}
                 >
-                  <div className="user-tickets__list-container__body-wrapper__row__cell">{ticket.subject}</div>
-                  <div className="user-tickets__list-container__body-wrapper__row__cell">{ticket.id}</div>
-                  <div className={`user-tickets__list-container__body-wrapper__row__cell ${statusInfo.colorClass}`}>
+                  <span className="user-tickets__list-container__body-wrapper__row__cell">
+                    {ticket.subject}
+                  </span>
+                  <span className="user-tickets__list-container__body-wrapper__row__cell">
+                    {ticket.id}
+                  </span>
+                  <span
+                    className={clsx(
+                      'user-tickets__list-container__body-wrapper__row__cell',
+                      statusInfo.colorClass,
+                    )}
+                  >
                     {statusInfo.text}
-                  </div>
-                  <div className="user-tickets__list-container__body-wrapper__row__cell">{formatDate(ticket.created_at)}</div>
-                  <div className="user-tickets__list-container__body-wrapper__row__cell icon">
+                  </span>
+                  <span className="user-tickets__list-container__body-wrapper__row__cell">
+                    {formatDate(ticket.created_at)}
+                  </span>
+                  <span className="user-tickets__list-container__body-wrapper__row__cell icon">
                     <FiChevronLeft strokeWidth={4} />
-                  </div>
-                </div>
+                  </span>
+                </button>
               );
             })
-          )}
-          {!isLoading && ticketsData?.length === 0 && (
-            <p style={{ textAlign: 'center', padding: '1rem' }}>تیکتی یافت نشد.</p>
+          ) : (
+            <p className="user-tickets__empty">تیکتی یافت نشد.</p>
           )}
         </div>
       </div>
 
-      <button className="user-tickets__new-ticket" onClick={() => setIsModalOpen(true)}>
-        <p>
-          ثبت تیکت جدید
-        </p>
-        <span><BsPlusLg strokeWidth={1} /></span>
+      <button
+        className="user-tickets__new-ticket"
+        type="button"
+        onClick={() => setIsModalOpen(true)}
+      >
+        <p>ثبت تیکت جدید</p>
+        <span>
+          <BsPlusLg strokeWidth={1} />
+        </span>
       </button>
 
-      {/* Modal Overlay */}
-      <div className={clsx('user-tickets__modal-overlay', { 'is-active': isModalOpen })} onClick={() => setIsModalOpen(false)}>
-        <div className="user-tickets__modal-content" onClick={(e) => e.stopPropagation()}>
+      <div
+        className={clsx('user-tickets__modal-overlay', {
+          'is-active': isModalOpen,
+        })}
+        onClick={() => setIsModalOpen(false)}
+      >
+        <div
+          className="user-tickets__modal-content"
+          onClick={(event) => event.stopPropagation()}
+        >
           <div className="user-tickets__modal-content__header">
             <h3>ثبت تیکت جدید</h3>
-            <span className="close-icon" onClick={() => setIsModalOpen(false)}>
+            <button
+              className="close-icon"
+              type="button"
+              onClick={() => setIsModalOpen(false)}
+              aria-label="بستن"
+            >
               <IoCloseOutline />
-            </span>
+            </button>
           </div>
 
-          <form onSubmit={handleCreateTicket} className="user-tickets__modal-content__form">
+          <form
+            onSubmit={handleCreateTicket}
+            className="user-tickets__modal-content__form"
+          >
             <div className="input-group">
-              <label>موضوع تیکت</label>
+              <label htmlFor="ticket-subject">موضوع تیکت</label>
               <input
+                id="ticket-subject"
                 type="text"
                 required
                 value={ticketSubject}
-                onChange={(e) => setTicketSubject(e.target.value)}
+                onChange={(event) => setTicketSubject(event.target.value)}
                 placeholder="عنوان مشکل خود را وارد کنید..."
               />
             </div>
 
             <div className="input-group">
-              <label>توضیحات</label>
+              <label htmlFor="ticket-description">توضیحات</label>
               <textarea
+                id="ticket-description"
                 required
                 value={ticketDescription}
-                onChange={(e) => setTicketDescription(e.target.value)}
+                onChange={(event) => setTicketDescription(event.target.value)}
                 placeholder="جزئیات مشکل خود را بنویسید..."
               />
             </div>
@@ -176,16 +240,24 @@ const Tickets = () => {
                 className="submit-btn"
                 disabled={createTicketMutation.isPending}
               >
-                {createTicketMutation.isPending ? 'در حال ارسال...' : 'ارسال تیکت'}
+                {createTicketMutation.isPending
+                  ? 'در حال ارسال...'
+                  : 'ارسال تیکت'}
               </button>
-              <button type="button" className="cancel-btn" onClick={() => setIsModalOpen(false)}>انصراف</button>
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={() => setIsModalOpen(false)}
+              >
+                انصراف
+              </button>
             </div>
           </form>
         </div>
       </div>
 
       <TicketChat
-        isOpen={!!activeChatTicketId}
+        isOpen={Boolean(activeChatTicketId)}
         onClose={() => setActiveChatTicketId(null)}
         ticketId={activeChatTicketId}
       />

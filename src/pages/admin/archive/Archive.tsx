@@ -30,6 +30,7 @@ import {
 } from '../../../apiCalls/adminApi';
 import './Archive.scss';
 import Skeleton from "../../../components/skeleton/Skeleton";
+import { getApiErrorMessage } from '../../../lib/apiError';
 
 type Form = Omit<AdminArchiveItem, 'links' | 'related' | 'omdb' | 'files'> & {
   linksJson: string;
@@ -269,7 +270,7 @@ const Archive = () => {
         if (status === 'completed') {
           toast.success('اسکرپ آرشیو با موفقیت به پایان رسید');
         } else {
-          toast.error(error ? `اسکرپ آرشیو ناموفق بود: ${error}` : 'اسکرپ آرشیو ناموفق بود');
+          toast.error(error ? getApiErrorMessage(error, 'اسکرپ آرشیو ناموفق بود.') : 'اسکرپ آرشیو ناموفق بود.');
         }
       };
 
@@ -616,7 +617,7 @@ const Archive = () => {
                 <div className="admin-archive__job-meta">
                   <time>{new Date(job.created_at).toLocaleString('fa-IR')}</time>
                   {job.finished_at && <time>پایان: {new Date(job.finished_at).toLocaleString('fa-IR')}</time>}
-                  {job.error && <small>{job.error}</small>}
+                  {job.error && <small>{getApiErrorMessage(job.error, 'خطایی در پردازش آرشیو رخ داد.')}</small>}
                 </div>
               </div>
             )) : <p className="admin-archive__empty-inline">هنوز عملیاتی ثبت نشده است.</p>}

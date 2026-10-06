@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import Turnstile, { type TurnstileHandle } from "../turnstile/Turnstile";
+import { getApiErrorMessage } from "../../lib/apiError";
 import {
   FiSend,
   FiWifi,
@@ -224,8 +225,10 @@ const SupportChatWidget = () => {
 
           if (data.type === "error") {
             setError(
-              data.payload?.message ||
-              "ارتباط با پشتیبانی با مشکل مواجه شد.",
+              getApiErrorMessage(
+                data.payload?.message,
+                "ارتباط با پشتیبانی با مشکل مواجه شد.",
+              ),
             );
           }
         } catch {

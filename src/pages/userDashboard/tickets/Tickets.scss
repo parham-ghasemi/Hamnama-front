@@ -60,6 +60,9 @@
       &__row {
         @include mx.flex-center;
         @include dash.row(17px);
+        border: 0;
+        font: inherit;
+        text-align: inherit;
         justify-content: space-evenly;
 
         width: 100%;

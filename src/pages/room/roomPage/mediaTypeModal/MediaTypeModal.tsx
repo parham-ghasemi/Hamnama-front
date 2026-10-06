@@ -1,5 +1,6 @@
 import './MediaTypeModal.scss';
 import clsx from "clsx";
+import { getApiErrorMessage } from "../../../../lib/apiError";
 import { useState } from "react";
 import { BsLink45Deg } from "react-icons/bs";
 import { IoClose, IoCloudUploadOutline } from "react-icons/io5";
@@ -97,7 +98,7 @@ const MediaTypeModal = ({
       await onSubmitUpload(videoFile, subtitleFile, setUploadProgress);
       resetUpload();
     } catch (error) {
-      setUploadError(error instanceof Error ? error.message : "آپلود فایل‌ها انجام نشد.");
+      setUploadError(getApiErrorMessage(error, "آپلود فایل‌ها انجام نشد."));
       setUploading(false);
     }
   };

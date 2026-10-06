@@ -22,7 +22,6 @@ import AdminLayout from "./layouts/adminLayout/AdminLayout";
 import AdminRoute from "./components/adminRoute/AdminRoute";
 import { AdminDashboard, AdminTickets, AdminUsers, AdminRooms, AdminSettings, AdminArchive, AdminPlanPayments } from "./pages/admin";
 import { ConfirmationModalProvider } from "./context/ConfirmModalContext/ConfirmaModalContext";
-import Home from "./pages/home/Home";
 import PaymentCallback from "./pages/paymentCallback/PaymentCallback";
 import NotFound from "./components/notFound/NotFound";
 import { Toaster } from "./components/toast";

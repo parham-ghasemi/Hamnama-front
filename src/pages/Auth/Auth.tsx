@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { AxiosError } from 'axios';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from '../../components/toast';
+import { getApiErrorMessage } from '../../lib/apiError';
 import api from '../../lib/axiosConfig'; // Adjust this import to where your axios config is saved
 
 import PhoneInput from './phoneInput/PhoneInput';
@@ -39,14 +39,8 @@ const Auth = () => {
   }, [isAuthenticated, navigate, redirectPath]);
 
 
-  // Helper to extract backend error messages and show toast
   const showErrorToast = (error: unknown, defaultMsg: string) => {
-    if (error instanceof AxiosError && error.response?.data) {
-      // Assuming your Go backend sends plain text errors
-      toast.error(error.response.data.message);
-    } else {
-      toast.error(defaultMsg);
-    }
+    toast.error(getApiErrorMessage(error, defaultMsg));
   };
 
   const handlePhoneSubmit = async (phone: string) => {

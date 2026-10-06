@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { PiCameraLight } from 'react-icons/pi';
 import { IoPencilSharp, IoClose, IoChevronDown, IoTrashOutline, IoImageOutline } from 'react-icons/io5';
 import { toast } from '../../../components/toast';
-import { AxiosError } from 'axios';
+import { getApiErrorMessage } from '../../../lib/apiError';
 import { useQuery } from '@tanstack/react-query';
 import {
   LineChart,
@@ -97,9 +97,7 @@ const UpdateUsernameForm = ({ onClose }: { onClose: () => void }) => {
       toast.success('نام کاربری با موفقیت بروزرسانی شد');
       onClose();
     } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        toast.error(error.response.data || 'خطا در تغییر نام کاربری');
-      }
+      toast.error(getApiErrorMessage(error, 'تغییر نام کاربری انجام نشد.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -136,9 +134,7 @@ const UpdatePasswordForm = ({ onClose }: { onClose: () => void }) => {
       toast.success('رمز عبور با موفقیت تغییر کرد');
       onClose();
     } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        toast.error(error.response.data || 'خطا در تغییر رمز عبور');
-      }
+      toast.error(getApiErrorMessage(error, 'تغییر رمز عبور انجام نشد.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -190,9 +186,7 @@ const UpdatePhoneForm = ({ onClose }: { onClose: () => void }) => {
       toast.success('کد تایید ارسال شد');
       setStep('verify');
     } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        toast.error(error.response.data || 'خطا در ارسال کد');
-      }
+      toast.error(getApiErrorMessage(error, 'ارسال کد تأیید انجام نشد.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -207,9 +201,7 @@ const UpdatePhoneForm = ({ onClose }: { onClose: () => void }) => {
       toast.success('شماره موبایل با موفقیت تغییر کرد');
       onClose();
     } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        toast.error(error.response.data || 'کد وارد شده اشتباه است');
-      }
+      toast.error(getApiErrorMessage(error, 'کد واردشده صحیح نیست.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -313,9 +305,7 @@ const UpdateProfilePictureForm = ({ onClose }: { onClose: () => void }) => {
       toast.success('عکس پروفایل با موفقیت آپلود شد');
       onClose();
     } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        toast.error(error.response.data || 'خطا در آپلود عکس');
-      }
+      toast.error(getApiErrorMessage(error, 'آپلود تصویر انجام نشد.'));
     } finally {
       setIsUploading(false);
     }
@@ -329,9 +319,7 @@ const UpdateProfilePictureForm = ({ onClose }: { onClose: () => void }) => {
       toast.success('عکس پروفایل با موفقیت حذف شد');
       onClose();
     } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        toast.error(error.response.data || 'خطا در حذف عکس');
-      }
+      toast.error(getApiErrorMessage(error, 'حذف تصویر انجام نشد.'));
     } finally {
       setIsDeleting(false);
     }

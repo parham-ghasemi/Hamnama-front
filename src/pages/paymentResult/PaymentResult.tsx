@@ -2,11 +2,15 @@ import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import {
+  PiArrowLeftBold,
   PiCheckCircleFill,
+  PiClockFill,
+  PiCreditCardFill,
   PiSpinner,
   PiXCircleFill,
 } from 'react-icons/pi';
 import { billingApi } from '../../apiCalls/billingApi';
+import { getApiErrorMessage } from '../../lib/apiError';
 import { toast } from '../../components/toast';
 import { useAuth } from '../../context/AuthContext';
 import { SEO } from '../../components/seo/SEO';
@@ -30,16 +34,16 @@ const PaymentResult = () => {
       queryClient.invalidateQueries({ queryKey: ['billing-plan-users'] }),
       queryClient.invalidateQueries({ queryKey: ['billing-current-plan'] }),
     ]);
-    // fetchUser is intentionally excluded: it is recreated by AuthContext on render.
-    // Running this effect only for the callback status prevents an invalidation loop.
+    // fetchUser is recreated by AuthContext on render. The callback status is
+    // the only dependency that should trigger this refresh sequence.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryClient, status]);
 
   useEffect(() => {
     if (status !== 'success' || !user?.current_plan) return;
 
-    toast.success('پرداخت با موفقیت انجام شد', {
-      description: `شما اکنون روی ${user.current_plan.title} هستید.`,
+    toast.success('پرداخت با موفقیت انجام شد.', {
+      description: `اشتراک ${user.current_plan.title} برای حساب شما فعال شد.`,
     });
   }, [status, user?.current_plan?.title]);
 
@@ -54,21 +58,23 @@ const PaymentResult = () => {
       if (response.data.status === 'success') {
         await fetchUser();
         await queryClient.invalidateQueries({ queryKey: ['billing-payments'] });
-        await queryClient.invalidateQueries({
-          queryKey: ['billing-plan-users'],
-        });
+        await queryClient.invalidateQueries({ queryKey: ['billing-plan-users'] });
         window.location.replace(
           `/payment-result?status=success&payment_id=${encodeURIComponent(paymentID)}`,
         );
-      } else if (response.data.status === 'failed') {
+        return;
+      }
+
+      if (response.data.status === 'failed') {
         window.location.replace(
           `/payment-result?status=failed&payment_id=${encodeURIComponent(paymentID)}`,
         );
-      } else {
-        toast.info('تایید پرداخت هنوز تکمیل نشده است. دوباره بررسی کنید.');
+        return;
       }
-    } catch {
-      toast.error('بررسی پرداخت ممکن نبود');
+
+      toast.info('تأیید پرداخت هنوز تکمیل نشده است. کمی بعد دوباره بررسی کنید.');
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, 'بررسی پرداخت ممکن نبود.'));
     } finally {
       setReconciling(false);
     }
@@ -76,7 +82,13 @@ const PaymentResult = () => {
 
   const successful = status === 'success';
   const failed = status === 'failed';
-  const processing = status === 'processing' || (!successful && !failed);
+  const processing = !successful && !failed;
+
+  const eyebrow = successful
+    ? 'تراکنش تکمیل شد'
+    : failed
+      ? 'تراکنش ناموفق'
+      : 'در انتظار تأیید';
 
   return (
     <>
@@ -87,59 +99,93 @@ const PaymentResult = () => {
       />
 
       <main className="payment-result">
-        <div className="payment-result__card">
-          {successful ? (
-            <PiCheckCircleFill className="payment-result__icon payment-result__icon--success" />
-          ) : failed ? (
-            <PiXCircleFill className="payment-result__icon payment-result__icon--failed" />
-          ) : (
-            <PiSpinner className="payment-result__icon payment-result__icon--pending" />
-          )}
+        <div className="payment-result__grain" aria-hidden="true" />
+        <div className="payment-result__blob payment-result__blob--one" aria-hidden="true" />
+        <div className="payment-result__blob payment-result__blob--two" aria-hidden="true" />
+
+        <section className="payment-result__card">
+          <div className="payment-result__spot" aria-hidden="true" />
+
+          <div className={`payment-result__mark payment-result__mark--${successful ? 'success' : failed ? 'failed' : 'pending'}`}>
+            {successful ? (
+              <PiCheckCircleFill />
+            ) : failed ? (
+              <PiXCircleFill />
+            ) : (
+              <PiClockFill />
+            )}
+          </div>
+
+          <span className="payment-result__eyebrow">
+            <PiCreditCardFill />
+            {eyebrow}
+          </span>
 
           <h1>
             {successful
-              ? 'پرداخت موفق بود'
+              ? 'پرداختت با موفقیت روی پرده رفت.'
               : failed
-                ? 'پرداخت انجام نشد'
-                : 'در حال بررسی پرداخت'}
+                ? 'پرداخت کامل نشد.'
+                : 'هنوز داریم نتیجه را بررسی می‌کنیم.'}
           </h1>
 
-          <p>
-            {successful ? (
-              user?.current_plan ? (
-                `پرداخت ثبت شد و ${user.current_plan.title} برای حساب شما فعال است.`
-              ) : (
-                'پرداخت ثبت شد. وضعیت اشتراک حساب شما در حال بروزرسانی است.'
-              )
-            ) : failed ? (
-              'پرداخت تایید نشد یا لغو شد. هیچ پلنی بدون تایید سرور فعال نمی‌شود.'
-            ) : (
-              'پرداخت به درگاه گزارش شده، اما تأیید یا ثبت نهایی در سرور کامل نشده است. می‌توانید دوباره بررسی کنید.'
-            )}
+          <p className="payment-result__description">
+            {successful
+              ? user?.current_plan
+                ? `اشتراک ${user.current_plan.title} برای حساب شما فعال شده است. می‌توانید از امکانات اشتراک استفاده کنید.`
+                : 'پرداخت ثبت شده است و اطلاعات اشتراک شما در حال بروزرسانی است.'
+              : failed
+                ? 'پرداخت تأیید نشد یا لغو شده است. هیچ اشتراکی بدون تأیید نهایی سرور فعال نمی‌شود.'
+                : 'ممکن است بازگشت از درگاه قبل از پایان تأیید انجام شده باشد. وضعیت را دوباره بررسی کنید؛ تا قبل از تأیید، اشتراک فعال نمی‌شود.'}
           </p>
+
+          {paymentID && (
+            <div className="payment-result__reference" dir="ltr">
+              <span>شناسه پرداخت</span>
+              <code>{paymentID}</code>
+            </div>
+          )}
 
           <div className="payment-result__actions">
             {successful && (
-              <Link to="/user/payments">مشاهده پرداخت‌ها</Link>
+              <Link className="payment-result__actions__primary" to="/user/payments">
+                <span>مشاهده پرداخت‌ها</span>
+                <PiArrowLeftBold />
+              </Link>
             )}
 
             {processing && paymentID && (
               <button
                 type="button"
+                className="payment-result__actions__primary"
                 onClick={() => void reconcile()}
                 disabled={reconciling}
               >
-                {reconciling
-                  ? 'در حال بررسی...'
-                  : 'بررسی دوباره پرداخت'}
+                {reconciling ? (
+                  <>
+                    <PiSpinner className="is-spin" />
+                    بررسی پرداخت
+                  </>
+                ) : (
+                  <>
+                    بررسی دوباره
+                    <PiArrowLeftBold />
+                  </>
+                )}
               </button>
             )}
 
-            <Link to={successful ? '/user/info' : '/plan-details'}>
-              ادامه
+            <Link className="payment-result__actions__ghost" to={successful ? '/user/info' : '/plan-details'}>
+              <span>{successful ? 'بازگشت به حساب' : 'بازگشت به پلن‌ها'}</span>
             </Link>
           </div>
-        </div>
+
+          <div className="payment-result__code" aria-hidden="true">
+            <span />
+            HAMNAMA PAYMENT
+            <span />
+          </div>
+        </section>
       </main>
     </>
   );

@@ -1,49 +1,32 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-import { FiCheck, FiCreditCard, FiPercent, FiSave, FiTag } from 'react-icons/fi';
+import { FiCheck, FiCreditCard, FiSave, FiTag } from 'react-icons/fi';
 import {
   billingAdminApi,
   type AdminBillingPlan,
 } from '../../../apiCalls/adminApi';
 import { toast } from '../../../components/toast';
+import Skeleton from '../../../components/skeleton/Skeleton';
+import { getApiErrorMessage } from '../../../lib/apiError';
 import './PlanPayments.scss';
-
-const errorText = (error: unknown, fallback: string) => {
-  if (error instanceof AxiosError) {
-    const data = error.response?.data;
-
-    if (typeof data === 'string' && data) {
-      return data;
-    }
-
-    if (
-      data &&
-      typeof data === 'object' &&
-      'message' in data &&
-      typeof data.message === 'string'
-    ) {
-      return data.message;
-    }
-  }
-
-  return fallback;
-};
 
 const PlanPayments = () => {
   const queryClient = useQueryClient();
+
   const settingsQuery = useQuery({
     queryKey: ['admin-billing-settings'],
     queryFn: () => billingAdminApi.getBillingSettings().then((r) => r.data),
     staleTime: 30_000,
     refetchOnWindowFocus: false,
   });
+
   const plansQuery = useQuery({
     queryKey: ['admin-billing-plans'],
     queryFn: () => billingAdminApi.getBillingPlans().then((r) => r.data),
     staleTime: 30_000,
     refetchOnWindowFocus: false,
   });
+
   const codesQuery = useQuery({
     queryKey: ['admin-discount-codes'],
     queryFn: () => billingAdminApi.getDiscountCodes().then((r) => r.data),
@@ -52,6 +35,7 @@ const PlanPayments = () => {
   });
 
   const [paid, setPaid] = useState(false);
+  const [savedPaid, setSavedPaid] = useState(false);
   const [globalDiscount, setGlobalDiscount] = useState(0);
   const [overlayTitle, setOverlayTitle] = useState('');
   const [overlayMessage, setOverlayMessage] = useState('');
@@ -70,6 +54,7 @@ const PlanPayments = () => {
     if (!settingsQuery.data) return;
 
     setPaid(settingsQuery.data.is_paid);
+    setSavedPaid(settingsQuery.data.is_paid);
     setGlobalDiscount(settingsQuery.data.global_discount_percent);
     setOverlayTitle(settingsQuery.data.free_overlay_title);
     setOverlayMessage(settingsQuery.data.free_overlay_message);
@@ -105,28 +90,29 @@ const PlanPayments = () => {
         free_overlay_message: overlayMessage,
       }),
     onSuccess: () => {
-      toast.success('تنظیمات ذخیره شد');
+      setSavedPaid(paid);
+      toast.success('تنظیمات ذخیره شد.');
       void queryClient.invalidateQueries({
         queryKey: ['admin-billing-settings'],
       });
       void queryClient.invalidateQueries({ queryKey: ['billing-public'] });
     },
     onError: (error) =>
-      toast.error(errorText(error, 'ذخیره تنظیمات ممکن نبود')),
+      toast.error(getApiErrorMessage(error, 'ذخیره تنظیمات ممکن نبود.')),
   });
 
   const updatePlanDiscountMutation = useMutation({
     mutationFn: (payload: { id: string; discount: number }) =>
       billingAdminApi.updateBillingPlanDiscount(payload.id, payload.discount),
     onSuccess: () => {
-      toast.success('تخفیف پلن ذخیره شد');
+      toast.success('تخفیف پلن ذخیره شد.');
       void queryClient.invalidateQueries({
         queryKey: ['admin-billing-plans'],
       });
       void queryClient.invalidateQueries({ queryKey: ['billing-public'] });
     },
     onError: (error) =>
-      toast.error(errorText(error, 'ذخیره تخفیف پلن ممکن نبود')),
+      toast.error(getApiErrorMessage(error, 'ذخیره تخفیف پلن ممکن نبود.')),
   });
 
   const updateOfferMutation = useMutation({
@@ -136,14 +122,14 @@ const PlanPayments = () => {
         discount_percent: payload.discount,
       }),
     onSuccess: () => {
-      toast.success('قیمت و تخفیف ذخیره شد');
+      toast.success('قیمت و تخفیف ذخیره شد.');
       void queryClient.invalidateQueries({
         queryKey: ['admin-billing-plans'],
       });
       void queryClient.invalidateQueries({ queryKey: ['billing-public'] });
     },
     onError: (error) =>
-      toast.error(errorText(error, 'ذخیره قیمت ممکن نبود')),
+      toast.error(getApiErrorMessage(error, 'ذخیره قیمت ممکن نبود.')),
   });
 
   const createCodeMutation = useMutation({
@@ -159,18 +145,15 @@ const PlanPayments = () => {
       setCodeDiscount('');
       setCodeExpiry('');
       setCodeMaxUses('');
-      toast.success('کد تخفیف ساخته شد');
+      toast.success('کد تخفیف ساخته شد.');
       void queryClient.invalidateQueries({
         queryKey: ['admin-discount-codes'],
       });
     },
-    onError: (error) => toast.error(errorText(error, 'ساخت کد تخفیف ممکن نبود')),
+    onError: (error) =>
+      toast.error(getApiErrorMessage(error, 'ساخت کد تخفیف ممکن نبود.')),
   });
 
-  const busy =
-    settingsMutation.isPending ||
-    updatePlanDiscountMutation.isPending ||
-    updateOfferMutation.isPending;
   const hasUnpriced = useMemo(
     () =>
       plansQuery.data?.plans.some((plan) =>
@@ -190,70 +173,131 @@ const PlanPayments = () => {
         <FiCreditCard aria-hidden />
       </header>
 
-      <div className="admin-billing__mode">
-        <div>
-          <strong>حالت سایت</strong>
-          <span>{paid ? 'نسخه پولی فعال است' : 'نسخه رایگان فعال است'}</span>
-        </div>
-        <label className="admin-billing__switch">
-          <input
-            type="checkbox"
-            checked={paid}
-            onChange={(event) => setPaid(event.target.checked)}
-            disabled={busy}
-          />
-          <span />
-        </label>
-        {paid && hasUnpriced && (
-          <small>
-            قبل از فعال‌سازی نسخه پولی، هر ۹ قیمت باید مقدار معتبر داشته باشند.
-          </small>
-        )}
-      </div>
-
       <div className="admin-billing__settings admin-billing__card">
-        <div className="admin-billing__section-title">
-          <FiPercent />
-          <h2>تخفیف سراسری و گیت رایگان</h2>
-        </div>
+        {settingsQuery.isLoading ? (
+          <div className="admin-billing__settings-loading" aria-busy="true">
+            <Skeleton variant="text" width="120px" />
+            <Skeleton variant="text" width="220px" height={28} />
+            <Skeleton variant="text" width="70%" />
+            <Skeleton variant="pill" width={58} height={32} />
+          </div>
+        ) : settingsQuery.error ? (
+          <div className="admin-billing__state admin-billing__state--error">
+            <strong>دریافت تنظیمات سایت انجام نشد.</strong>
+            <span>
+              {getApiErrorMessage(
+                settingsQuery.error,
+                'بارگذاری تنظیمات ممکن نبود.',
+              )}
+            </span>
+            <button
+              type="button"
+              onClick={() => void settingsQuery.refetch()}
+            >
+              تلاش دوباره
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="admin-billing__mode-head">
+              <div>
+                <span>وضعیت سایت</span>
+                <h2>{paid ? 'نسخه پولی فعال' : 'نسخه رایگان فعال'}</h2>
+                <p>
+                  تغییر این کلید فقط فرم را تغییر می‌دهد؛ برای اعمال وضعیت جدید،
+                  ذخیره تنظیمات را بزنید.
+                </p>
+              </div>
 
-        <div className="admin-billing__form-grid">
-          <label>
-            تخفیف کل سایت (%)
-            <input
-              type="number"
-              min={0}
-              max={100}
-              value={globalDiscount}
-              onChange={(event) => setGlobalDiscount(Number(event.target.value))}
-            />
-          </label>
-          <label>
-            عنوان گیت رایگان
-            <input
-              value={overlayTitle}
-              onChange={(event) => setOverlayTitle(event.target.value)}
-            />
-          </label>
-          <label className="wide">
-            پیام گیت رایگان
-            <textarea
-              value={overlayMessage}
-              onChange={(event) => setOverlayMessage(event.target.value)}
-              rows={3}
-            />
-          </label>
-        </div>
+              <label
+                className="admin-billing__switch"
+                aria-label="تغییر وضعیت نسخه پولی"
+              >
+                <input
+                  type="checkbox"
+                  checked={paid}
+                  onChange={(event) => setPaid(event.target.checked)}
+                  disabled={settingsMutation.isPending}
+                />
+                <span />
+              </label>
+            </div>
 
-        <button
-          className="admin-billing__primary"
-          type="button"
-          disabled={settingsMutation.isPending}
-          onClick={() => settingsMutation.mutate()}
-        >
-          <FiSave />
-          ذخیره تنظیمات
-        </button>
+            <div className="admin-billing__status-note">
+              <span className={paid ? 'is-paid' : 'is-free'} />
+              <strong>
+                {savedPaid === paid
+                  ? 'آخرین وضعیت ذخیره‌شده'
+                  : 'تغییر ذخیره‌نشده'}
+              </strong>
+              <span>
+                {savedPaid ? 'سایت پولی است' : 'سایت رایگان است'}
+              </span>
+            </div>
+
+            {paid && hasUnpriced && (
+              <div className="admin-billing__warning">
+                قبل از فعال‌سازی نسخه پولی، هر ۹ قیمت باید مقدار معتبر داشته
+                باشند.
+              </div>
+            )}
+
+            <div className="admin-billing__form-grid">
+              <label>
+                تخفیف کل سایت (%)
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={globalDiscount}
+                  onChange={(event) =>
+                    setGlobalDiscount(Number(event.target.value))
+                  }
+                />
+              </label>
+
+              <label>
+                عنوان گیت رایگان
+                <input
+                  value={overlayTitle}
+                  onChange={(event) => setOverlayTitle(event.target.value)}
+                />
+              </label>
+
+              <label className="wide">
+                پیام گیت رایگان
+                <textarea
+                  value={overlayMessage}
+                  onChange={(event) => setOverlayMessage(event.target.value)}
+                  rows={3}
+                />
+              </label>
+            </div>
+
+            <div className="admin-billing__settings-actions">
+              <div>
+                <FiSave />
+                <span>
+                  {savedPaid === paid
+                    ? 'تنظیمات آماده ذخیره هستند.'
+                    : 'وضعیت سایت تغییر کرده و هنوز ذخیره نشده است.'}
+                </span>
+              </div>
+
+              <button
+                className="admin-billing__primary"
+                type="button"
+                disabled={settingsMutation.isPending}
+                onClick={() => settingsMutation.mutate()}
+              >
+                <FiSave />
+                {settingsMutation.isPending
+                  ? 'در حال ذخیره...'
+                  : 'ذخیره تنظیمات'}
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="admin-billing__card">
@@ -267,7 +311,29 @@ const PlanPayments = () => {
         </p>
 
         {plansQuery.isLoading ? (
-          <p>در حال بارگذاری...</p>
+          <div className="admin-billing__loading-list">
+            {[0, 1, 2].map((item) => (
+              <div className="admin-billing__loading-card" key={item}>
+                <Skeleton variant="text" width="160px" height={22} />
+                <Skeleton variant="text" width="100%" height={54} />
+                <Skeleton variant="text" width="100%" height={54} />
+                <Skeleton variant="text" width="100%" height={54} />
+              </div>
+            ))}
+          </div>
+        ) : plansQuery.error ? (
+          <div className="admin-billing__state admin-billing__state--error">
+            <strong>دریافت قیمت پلن‌ها انجام نشد.</strong>
+            <span>
+              {getApiErrorMessage(
+                plansQuery.error,
+                'بارگذاری قیمت‌ها ممکن نبود.',
+              )}
+            </span>
+            <button type="button" onClick={() => void plansQuery.refetch()}>
+              تلاش دوباره
+            </button>
+          </div>
         ) : (
           plansQuery.data?.plans.map((plan: AdminBillingPlan) => (
             <div className="admin-billing__plan" key={plan.id}>
@@ -276,6 +342,7 @@ const PlanPayments = () => {
                   <h3>{plan.title}</h3>
                   <span>حداکثر {plan.max_users} نفر</span>
                 </div>
+
                 <label>
                   تخفیف پلن (%)
                   <input
@@ -322,7 +389,8 @@ const PlanPayments = () => {
                       <div>
                         <strong>{offer.months} ماه</strong>
                         <span>
-                          {Number(value.price || 0).toLocaleString('en-US')} ریال
+                          {Number(value.price || 0).toLocaleString('en-US')}{' '}
+                          ریال
                         </span>
                       </div>
 
@@ -401,6 +469,7 @@ const PlanPayments = () => {
               placeholder="HAMNAMA10"
             />
           </label>
+
           <label>
             درصد
             <input
@@ -411,6 +480,7 @@ const PlanPayments = () => {
               onChange={(event) => setCodeDiscount(event.target.value)}
             />
           </label>
+
           <label>
             تاریخ انقضا
             <input
@@ -419,6 +489,7 @@ const PlanPayments = () => {
               onChange={(event) => setCodeExpiry(event.target.value)}
             />
           </label>
+
           <label>
             حداکثر استفاده
             <input
@@ -429,11 +500,15 @@ const PlanPayments = () => {
               placeholder="نامحدود"
             />
           </label>
+
           <button
             className="admin-billing__primary"
             type="button"
             disabled={
-              !code || !codeExpiry || !codeDiscount || createCodeMutation.isPending
+              !code ||
+              !codeExpiry ||
+              !codeDiscount ||
+              createCodeMutation.isPending
             }
             onClick={() => createCodeMutation.mutate()}
           >
@@ -443,20 +518,46 @@ const PlanPayments = () => {
         </div>
 
         <div className="admin-billing__codes">
-          {codesQuery.data?.codes.map((item) => (
-            <div className="admin-billing__code-row" key={item.id}>
-              <strong>{item.code}</strong>
-              <span>{item.discount_percent}%</span>
-              <span>{new Date(item.expires_at).toLocaleString('fa-IR')}</span>
-              <span>
-                {item.used_count + item.reserved_count}
-                {item.max_uses != null ? ` / ${item.max_uses}` : ''} استفاده
-              </span>
-              <b>{item.active ? 'فعال' : 'منقضی'}</b>
+          {codesQuery.isLoading ? (
+            <div className="admin-billing__code-loading">
+              {[0, 1, 2].map((item) => (
+                <Skeleton variant="rect" height={48} key={item} />
+              ))}
             </div>
-          ))}
-          {!codesQuery.isLoading && !codesQuery.data?.codes.length && (
-            <p>کد تخفیفی ساخته نشده است.</p>
+          ) : codesQuery.error ? (
+            <div className="admin-billing__state admin-billing__state--error">
+              <strong>دریافت کدهای تخفیف انجام نشد.</strong>
+              <span>
+                {getApiErrorMessage(
+                  codesQuery.error,
+                  'بارگذاری کدهای تخفیف ممکن نبود.',
+                )}
+              </span>
+              <button type="button" onClick={() => void codesQuery.refetch()}>
+                تلاش دوباره
+              </button>
+            </div>
+          ) : (
+            <>
+              {codesQuery.data?.codes.map((item) => (
+                <div className="admin-billing__code-row" key={item.id}>
+                  <strong>{item.code}</strong>
+                  <span>{item.discount_percent}%</span>
+                  <span>
+                    {new Date(item.expires_at).toLocaleString('fa-IR')}
+                  </span>
+                  <span>
+                    {item.used_count + item.reserved_count}
+                    {item.max_uses != null ? ` / ${item.max_uses}` : ''} استفاده
+                  </span>
+                  <b>{item.active ? 'فعال' : 'منقضی'}</b>
+                </div>
+              ))}
+
+              {!codesQuery.data?.codes.length && (
+                <p>کد تخفیفی ساخته نشده است.</p>
+              )}
+            </>
           )}
         </div>
       </div>

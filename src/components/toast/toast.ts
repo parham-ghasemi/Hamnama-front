@@ -11,6 +11,7 @@
  * The store is framework-agnostic; <Toaster /> subscribes to it.
  */
 import type { ReactNode } from "react";
+import { getApiErrorMessage } from "../../lib/apiError";
 
 export type ToastType =
   | "default"
@@ -113,16 +114,31 @@ export const resolveDuration = (record: ToastRecord) => {
   return record.duration;
 };
 
+const normalizeErrorToastContent = (value: ReactNode): ReactNode => {
+  if (typeof value !== "string") return value;
+  return /[\u0600-\u06FF]/.test(value)
+    ? value
+    : getApiErrorMessage(value, "عملیات انجام نشد. لطفاً دوباره تلاش کنید.");
+};
+
 const create =
   (type: ToastType) =>
-    (title: ReactNode, options: ToastOptions = {}): ToastId => {
+  (title: ReactNode, options: ToastOptions = {}): ToastId => {
       const id = options.id ?? `toast-${++counter}`;
+      const normalizedTitle =
+        type === "error" ? normalizeErrorToastContent(title) : title;
+      const normalizedDescription =
+        type === "error" && typeof options.description === "string"
+          ? normalizeErrorToastContent(options.description)
+          : options.description;
+
       return upsert({
         dismissible: true,
         ...options,
         id,
         type,
-        title,
+        title: normalizedTitle,
+        description: normalizedDescription,
         createdAt: Date.now(),
       });
     };

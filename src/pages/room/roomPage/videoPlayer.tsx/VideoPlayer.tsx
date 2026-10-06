@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { getApiErrorMessage } from "../../../../lib/apiError";
 import {
   Play,
   Pause,
@@ -491,7 +492,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       setSubtitleSourceUrl("");
       setSubtitleSubmitError(null);
     } catch (error) {
-      setSubtitleSubmitError(error instanceof Error ? error.message : "ثبت زیرنویس انجام نشد.");
+      setSubtitleSubmitError(getApiErrorMessage(error, "ثبت زیرنویس انجام نشد."));
     } finally {
       setSubtitleSubmitting(false);
     }

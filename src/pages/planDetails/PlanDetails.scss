@@ -4,309 +4,875 @@
 @use "sass:color";
 
 .plan-details {
-  min-height: 90vh;
-  @include mx.flex-center;
-  flex-wrap: wrap; // Allows cards to wrap to the next line on smaller screens
-  gap: 28px;
-  margin-top: 104px; // 52px * 2
-  padding: 0 24px;
+  position: relative;
+  isolation: isolate;
+  min-height: calc(100vh - 90px);
+  width: 100%;
+  padding: 126px 24px 64px;
   box-sizing: border-box;
+  overflow: hidden;
 
-  @include mx.max-w(768px) {
-    margin-top: 90px;
+  &__ambient {
+    position: absolute;
+    z-index: -1;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(16px);
+
+    &--one {
+      width: 680px;
+      height: 520px;
+      top: -220px;
+      right: -180px;
+      background: radial-gradient(
+        circle,
+        rgba(208, 78, 47, 0.18) 0%,
+        rgba(208, 78, 47, 0) 68%
+      );
+    }
+
+    &--two {
+      width: 760px;
+      height: 520px;
+      bottom: -280px;
+      left: -260px;
+      background: radial-gradient(
+        circle,
+        rgba(224, 163, 64, 0.1) 0%,
+        rgba(224, 163, 64, 0) 70%
+      );
+    }
+  }
+
+  &__header {
+    width: min(1180px, 100%);
+    margin: 0 auto 46px;
+    text-align: center;
+
+    &__eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(208, 78, 47, 0.22);
+      background: rgba(208, 78, 47, 0.08);
+      color: dark.$color-primary;
+      font-size: 13px;
+      font-weight: 700;
+
+      svg {
+        font-size: 17px;
+      }
+
+      @include mx.light {
+        background: rgba(139, 91, 130, 0.08);
+        border-color: rgba(139, 91, 130, 0.2);
+        color: light.$color-primary;
+      }
+    }
+
+    h1 {
+      max-width: 800px;
+      margin: 18px auto 0;
+      font-size: clamp(32px, 4.2vw, 52px);
+      line-height: 1.24;
+      font-weight: 800;
+      letter-spacing: -1px;
+
+      span {
+        color: dark.$color-primary;
+
+        @include mx.light {
+          color: light.$color-primary;
+        }
+      }
+    }
+
+    > p {
+      max-width: 690px;
+      margin: 16px auto 0;
+      color: color.adjust(dark.$color-gray, $lightness: -8%);
+      line-height: 2;
+      font-size: 15px;
+
+      @include mx.light {
+        color: light.$color-dark-gray;
+      }
+    }
+
+    &__current {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 18px;
+      padding: 9px 13px;
+      border-radius: 12px;
+      background: rgba(83, 193, 148, 0.09);
+      border: 1px solid rgba(83, 193, 148, 0.2);
+      color: dark.$color-green;
+      font-size: 13px;
+
+      svg {
+        font-size: 16px;
+      }
+
+      strong {
+        color: dark.$color-white;
+
+        @include mx.light {
+          color: light.$color-black;
+        }
+      }
+
+      @include mx.light {
+        color: light.$color-green;
+      }
+    }
+  }
+
+  &__grid {
+    position: relative;
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
     gap: 24px;
   }
 
   &__card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-width: 0;
+    min-height: 700px;
     display: flex;
-    align-items: center;
     flex-direction: column;
-    gap: 24px; // 16px -> 24px for breathing room without a fixed height
-    background: dark.$color-card-bg;
-    outline: dark.$card-outline;
-    border-radius: 16px;
-    padding: 40px 20px;
-    width: 100%;
-    max-width: 400px;
-    height: auto; // Removed fixed 885px height
+    align-items: center;
+    padding: 24px 22px 24px;
+    border-radius: 26px;
     box-sizing: border-box;
-    transition: transform 0.2s ease;
+
+    @include mx.cinema-surface;
+    @include mx.ambient-shadow(0.9);
+
+    transition:
+      transform mx.$dur-base mx.$ease-out-soft,
+      box-shadow mx.$dur-base mx.$ease-out-soft;
+
+    &::before {
+      @include mx.gradient-border(
+        26px,
+        rgba(255, 255, 255, 0.24),
+        rgba(255, 255, 255, 0.03)
+      );
+      z-index: 5;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 20%;
+      right: 20%;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(208, 78, 47, 0.95),
+        transparent
+      );
+      opacity: 0.5;
+      z-index: 5;
+      pointer-events: none;
+    }
 
     @include mx.light {
-      outline: light.$card-outline;
       background: light.$color-card-bg;
-      box-shadow: 0 3px 4px 0 color.adjust(light.$color-black, $alpha: -0.75);
+      box-shadow: 0 14px 34px -22px
+        color.adjust(light.$color-black, $alpha: -0.55);
+
+      &::before {
+        @include mx.gradient-border(
+          26px,
+          rgba(139, 91, 130, 0.3),
+          rgba(0, 0, 0, 0.03)
+        );
+      }
+
+      &::after {
+        background: linear-gradient(
+          90deg,
+          transparent,
+          light.$color-primary,
+          transparent
+        );
+      }
     }
 
     &:hover {
-      transform: translateY(-5px); // Nice subtle hover effect
+      transform: translateY(-8px);
+      @include mx.ambient-shadow(1.5);
+    }
+
+    &--featured {
+      transform: translateY(-14px);
+      box-shadow:
+        0 22px 42px -24px rgba(0, 0, 0, 0.95),
+        0 18px 36px -28px rgba(208, 78, 47, 0.75);
+
+      @include mx.light {
+        box-shadow: 0 22px 42px -22px
+          color.adjust(light.$color-black, $alpha: -0.45);
+      }
+
+      &:hover {
+        transform: translateY(-20px);
+      }
+    }
+
+    &__spot {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(
+        380px 280px at 50% 0%,
+        rgba(208, 78, 47, 0.1),
+        transparent 70%
+      );
+      pointer-events: none;
+    }
+
+    &__badge {
+      margin-top: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(208, 78, 47, 0.12);
+      border: 1px solid rgba(208, 78, 47, 0.24);
+      color: dark.$color-primary;
+      font-size: 11px;
+      font-weight: 800;
+      z-index: 1;
+
+      @include mx.light {
+        color: light.$color-primary;
+        background: rgba(139, 91, 130, 0.1);
+        border-color: rgba(139, 91, 130, 0.2);
+      }
     }
 
     &__icon {
-      background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
-      border-radius: 20px;
-      height: 90px;
-      width: 90px;
+      width: 76px;
+      height: 76px;
+      margin-top: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
-
-      @include mx.max-w(768px) {
-        height: 75px;
-        width: 75px;
-        border-radius: 16px;
-      }
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+        0 12px 26px -18px rgba(208, 78, 47, 0.95);
+      color: dark.$color-primary;
+      font-size: 42px;
+      z-index: 1;
 
       @include mx.light {
-        background-color: light.$color-primary;
-      }
-
-      > svg {
-        font-size: 60px;
-        color: dark.$color-primary;
-
-        @include mx.max-w(768px) {
-          font-size: 45px;
-        }
-
-        @include mx.light {
-          color: light.$color-white;
-        }
+        background: light.$color-primary;
+        color: light.$color-white;
       }
     }
 
     &__title {
-      font-size: 38px;
-      font-weight: 700;
-      color: dark.$color-white;
-      text-align: center;
-
-      @include mx.max-w(768px) {
-        font-size: 28px;
-      }
+      margin: 20px 0 0;
+      color: dark.$color-primary;
+      font-size: 32px;
+      line-height: 1.2;
+      font-weight: 800;
+      z-index: 1;
 
       @include mx.light {
         color: light.$color-primary;
       }
     }
 
-    &__durations {
-      @include mx.flex-center;
-      gap: 16px;
-      width: 100%;
+    &__description {
+      min-height: 52px;
+      margin: 10px 10px 0;
+      color: color.adjust(dark.$color-gray, $lightness: -4%);
+      line-height: 1.9;
+      font-size: 13px;
+      text-align: center;
+      z-index: 1;
 
-      @include mx.max-w(480px) {
-        gap: 10px;
+      @include mx.light {
+        color: light.$color-dark-gray;
+      }
+    }
+
+    &__separator {
+      width: 66%;
+      height: 8px;
+      margin: 18px 0;
+      opacity: 0.65;
+      @include mx.sprockets(4px, 12px, rgba(255, 255, 255, 0.28));
+      mask-image: linear-gradient(
+        90deg,
+        transparent,
+        #000 20%,
+        #000 80%,
+        transparent
+      );
+      -webkit-mask-image: linear-gradient(
+        90deg,
+        transparent,
+        #000 20%,
+        #000 80%,
+        transparent
+      );
+
+      @include mx.light {
+        @include mx.sprockets(4px, 12px, rgba(0, 0, 0, 0.22));
+      }
+    }
+
+    &__capacity {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 13px;
+      border-radius: 13px;
+      background: rgba(255, 255, 255, 0.035);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+      z-index: 1;
+      box-sizing: border-box;
+
+      span {
+        color: color.adjust(dark.$color-gray, $lightness: -3%);
+        font-size: 12px;
       }
 
-      &__card {
-        @include mx.flex-center;
-        gap: 12px;
-        flex-direction: column;
-        height: 99px;
-        flex: 1; // Allows cards to distribute width evenly
-        max-width: 100px;
-        background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
-        cursor: pointer;
-        border-radius: 12px;
-        transition: background 0.2s ease;
-
-        @include mx.max-w(768px) {
-          height: 85px;
-        }
+      strong {
+        color: dark.$color-white;
+        font-size: 14px;
 
         @include mx.light {
-          background-color: rgba(0, 0, 0, 0.05);
           color: light.$color-black;
+        }
+      }
+
+      @include mx.light {
+        background: rgba(9, 9, 9, 0.035);
+        box-shadow: inset 0 0 0 1px rgba(9, 9, 9, 0.08);
+      }
+    }
+
+    &__durations {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+      z-index: 1;
+
+      button {
+        min-width: 0;
+        min-height: 68px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 7px 4px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 13px;
+        background: rgba(255, 255, 255, 0.03);
+        color: color.adjust(dark.$color-gray, $lightness: -3%);
+        cursor: pointer;
+        font: inherit;
+        transition:
+          transform mx.$dur-fast mx.$ease-out-soft,
+          border-color mx.$dur-fast ease,
+          background-color mx.$dur-fast ease,
+          color mx.$dur-fast ease;
+
+        svg {
+          font-size: 18px;
+        }
+
+        span {
+          font-size: 11px;
+          font-weight: 700;
         }
 
         &:hover {
-          background-color: color.adjust(
-            dark.$color-light-gray,
-            $lightness: -5%,
-            $alpha: -0.8
-          );
-
-          @include mx.light {
-            background-color: light.$color-primary-bg-hover;
-            color: light.$color-white; // Added text color change on hover for light theme
-          }
+          transform: translateY(-2px);
+          border-color: rgba(208, 78, 47, 0.35);
+          color: dark.$color-white;
         }
 
-        &--selected {
-          background-color: color.adjust(
-            dark.$color-light-gray,
-            $alpha: -0.8,
-            $lightness: -10%
-          );
-
-          @include mx.light {
-            background-color: light.$color-primary-bg;
-            color: light.$color-white;
-          }
+        &.is-active {
+          border-color: rgba(208, 78, 47, 0.5);
+          background: rgba(208, 78, 47, 0.12);
+          color: dark.$color-primary;
+          box-shadow: 0 12px 26px -20px rgba(208, 78, 47, 0.85);
         }
 
-        > span {
-          font-weight: 700;
-          font-size: 16px;
+        @include mx.light {
+          border-color: rgba(9, 9, 9, 0.08);
+          background: rgba(9, 9, 9, 0.03);
+          color: light.$color-dark-gray;
 
-          @include mx.max-w(768px) {
-            font-size: 14px;
+          &:hover {
+            border-color: rgba(139, 91, 130, 0.35);
+            color: light.$color-black;
           }
-        }
 
-        > svg {
-          font-size: 32px;
-
-          @include mx.max-w(768px) {
-            font-size: 26px;
+          &.is-active {
+            border-color: rgba(139, 91, 130, 0.4);
+            background: rgba(139, 91, 130, 0.1);
+            color: light.$color-primary;
           }
         }
       }
     }
 
-    &__current-price {
-      background-color: color.adjust(dark.$color-light-gray, $alpha: -0.8);
-      border-radius: 20px;
-      @include mx.flex-center;
-      flex-direction: column;
-      padding: 16px 12px;
-      gap: 14px;
+    &__price {
       width: 100%;
-      box-sizing: border-box;
+      margin-top: 14px;
+      border-radius: 17px;
+      overflow: hidden;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.035);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 
       @include mx.light {
-        background-color: rgba(0, 0, 0, 0.05);
-        color: light.$color-black;
-      }
-
-      &__main {
-        font-size: 42px;
-        font-weight: 600;
-        line-height: 100%;
-        display: flex;
-        align-items: baseline;
-        gap: 8px;
-
-        @include mx.max-w(768px) {
-          font-size: 32px;
-        }
-      }
-
-      &__currency {
-        font-size: 18px; // Smaller text for "تومان"
-        font-weight: 400;
-
-        @include mx.max-w(768px) {
-          font-size: 16px;
-        }
+        background: rgba(9, 9, 9, 0.03);
+        box-shadow: inset 0 0 0 1px rgba(9, 9, 9, 0.08);
       }
 
       &__discount {
-        color: dark.$color-primary;
         display: flex;
-        gap: 12px;
-        font-size: 18px;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        padding: 7px 10px;
+        background:
+          linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.14),
+            rgba(255, 255, 255, 0)
+          ),
+          linear-gradient(135deg, #d0512f, #a83a27);
+        color: dark.$color-white;
+        font-size: 11px;
 
-        @include mx.max-w(768px) {
-          font-size: 16px;
+        span {
+          opacity: 0.78;
+          text-decoration: line-through;
+        }
+
+        strong {
+          font-weight: 800;
         }
 
         @include mx.light {
-          color: light.$color-primary;
+          background: light.$color-primary-bg;
+        }
+      }
+
+      &__value {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 7px;
+        padding: 12px 10px 0;
+        color: dark.$color-white;
+        font-size: 38px;
+        line-height: 1;
+        font-weight: 800;
+        letter-spacing: -1px;
+
+        small {
+          font-size: 12px;
+          font-weight: 500;
+          letter-spacing: 0;
+          color: color.adjust(dark.$color-gray, $lightness: -4%);
         }
 
-        &__old-price {
-          text-decoration: line-through;
-          opacity: 0.8;
-
-          &::after {
-            content: " تومان";
-          }
+        @include mx.light {
+          color: light.$color-black;
         }
+      }
 
-        &__discount-percent {
-          display: flex;
-          align-items: center;
-          background: rgba(
-            dark.$color-primary,
-            0.2
-          ); // Optional: creates a badge effect
-          padding: 2px 8px;
-          border-radius: 8px;
+      &__caption {
+        display: block;
+        padding: 7px 10px 13px;
+        text-align: center;
+        color: color.adjust(dark.$color-gray, $lightness: -2%);
+        font-size: 11px;
 
-          @include mx.light {
-            background: rgba(light.$color-primary, 0.15);
-          }
+        @include mx.light {
+          color: light.$color-dark-gray;
         }
       }
     }
 
-    &__buyBtn {
-      height: 67px;
+    &__coupon {
       width: 100%;
-      max-width: 252px;
-      border-radius: 18px;
-      font-size: 35px;
-      font-weight: 700;
-      background-color: dark.$color-primary-bg;
-      cursor: pointer;
-      transition: background ease 200ms;
-      margin: 8px 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      margin-top: 10px;
+      z-index: 1;
 
-      @include mx.max-w(768px) {
-        height: 56px;
-        font-size: 26px;
-        border-radius: 14px;
+      &__field {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 0 11px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition:
+          border-color mx.$dur-fast ease,
+          box-shadow mx.$dur-fast ease;
+
+        svg {
+          flex: 0 0 auto;
+          color: dark.$color-primary;
+          font-size: 17px;
+        }
+
+        input {
+          min-width: 0;
+          width: 100%;
+          padding: 11px 0;
+          border: 0;
+          outline: 0;
+          background: transparent;
+          color: dark.$color-white;
+          font: inherit;
+          font-size: 12px;
+        }
+
+        &:focus-within {
+          border-color: rgba(208, 78, 47, 0.4);
+          box-shadow: 0 0 0 3px rgba(208, 78, 47, 0.08);
+        }
+
+        @include mx.light {
+          background: light.$color-white;
+          border-color: rgba(9, 9, 9, 0.1);
+
+          input {
+            color: light.$color-black;
+          }
+
+          &:focus-within {
+            border-color: rgba(139, 91, 130, 0.35);
+            box-shadow: 0 0 0 3px rgba(139, 91, 130, 0.08);
+          }
+        }
+      }
+
+      > button {
+        min-width: 54px;
+        padding: 0 13px;
+        border: 0;
+        border-radius: 12px;
+        background: rgba(208, 78, 47, 0.13);
+        color: dark.$color-primary;
+        cursor: pointer;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 800;
+
+        &:disabled {
+          opacity: 0.45;
+          cursor: not-allowed;
+        }
+
+        @include mx.light {
+          background: rgba(139, 91, 130, 0.1);
+          color: light.$color-primary;
+        }
+      }
+    }
+
+    &__buy {
+      width: 100%;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 14px;
+      background: dark.$color-primary-bg;
+      color: dark.$color-white;
+      cursor: pointer;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      box-shadow: 0 16px 32px -20px rgba(208, 78, 47, 0.95);
+      transition:
+        transform mx.$dur-fast mx.$ease-out-soft,
+        background-color mx.$dur-fast ease,
+        opacity mx.$dur-fast ease;
+
+      svg {
+        font-size: 19px;
+      }
+
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        background: dark.$color-primary-bg-hover;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
       }
 
       @include mx.light {
-        background-color: light.$color-primary-bg;
+        background: light.$color-primary-bg;
         color: light.$color-white;
-      }
+        box-shadow: 0 14px 28px -20px rgba(104, 61, 96, 0.95);
 
-      &:hover {
-        background: dark.$color-primary-bg-hover;
-
-        @include mx.light {
+        &:hover:not(:disabled) {
           background: light.$color-primary-bg-hover;
         }
       }
     }
 
     &__features {
-      display: flex;
-      gap: 16px;
-      flex-direction: column;
       width: 100%;
-      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin: auto 0 0;
+      padding-top: 18px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+      list-style: none;
+      z-index: 1;
 
-      @include mx.light {
-        color: light.$color-black;
+      li {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        color: color.adjust(dark.$color-gray, $lightness: -2%);
+        font-size: 11.5px;
+        line-height: 1.75;
+
+        svg {
+          flex: 0 0 auto;
+          margin-top: 3px;
+          color: dark.$color-primary;
+          font-size: 15px;
+        }
+
+        @include mx.light {
+          color: light.$color-dark-gray;
+
+          svg {
+            color: light.$color-primary;
+          }
+        }
       }
 
-      > li {
-        display: flex;
-        align-items: flex-start; // Better for multi-line text
-        gap: 12px;
-        font-size: 16px;
-        line-height: 1.5;
+      @include mx.light {
+        border-top-color: rgba(9, 9, 9, 0.1);
+      }
+    }
 
-        @include mx.max-w(768px) {
-          font-size: 14px;
-        }
+    &--skeleton {
+      pointer-events: none;
+
+      > .skeleton,
+      .plan-details__card__skeleton-duration {
+        flex: 0 0 auto;
+      }
+    }
+
+    &__skeleton-divider {
+      width: 64%;
+      height: 8px;
+      margin: 8px 0;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    &__skeleton-duration {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 4px;
+    }
+  }
+
+  &__state {
+    width: min(620px, 100%);
+    margin: 0 auto;
+    padding: 42px 30px;
+    border-radius: 24px;
+    text-align: center;
+    box-sizing: border-box;
+
+    @include mx.cinema-surface;
+    @include mx.ambient-shadow(0.9);
+
+    svg {
+      margin-bottom: 12px;
+      font-size: 38px;
+      color: dark.$color-primary;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    p {
+      margin: 10px 0 0;
+      color: dark.$color-gray;
+      line-height: 1.9;
+      font-size: 13px;
+    }
+
+    button {
+      margin-top: 18px;
+      padding: 11px 18px;
+      border: 0;
+      border-radius: 12px;
+      background: dark.$color-primary-bg;
+      color: dark.$color-white;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    @include mx.light {
+      svg {
+        color: light.$color-primary;
+      }
+
+      p {
+        color: light.$color-dark-gray;
+      }
+
+      button {
+        background: light.$color-primary-bg;
+      }
+    }
+  }
+
+  .is-spin {
+    animation: plan-details-spin 0.9s linear infinite;
+  }
+
+  @include mx.reduced-motion {
+    &__card,
+    &__card:hover,
+    &__card--featured,
+    &__card--featured:hover {
+      transform: none;
+    }
+
+    &__card__durations button,
+    &__card__buy {
+      transition: none;
+    }
+  }
+
+  @include mx.max-w(1020px) {
+    padding-top: 108px;
+
+    &__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      max-width: 780px;
+    }
+
+    &__card--featured {
+      transform: none;
+
+      &:hover {
+        transform: translateY(-8px);
+      }
+    }
+  }
+
+  @include mx.max-w(720px) {
+    padding: 96px 16px 40px;
+
+    &__header {
+      margin-bottom: 32px;
+
+      h1 {
+        font-size: 30px;
+      }
+
+      > p {
+        font-size: 13px;
+      }
+    }
+
+    &__grid {
+      grid-template-columns: 1fr;
+      max-width: 390px;
+      gap: 18px;
+    }
+
+    &__card {
+      min-height: auto;
+      padding: 22px 18px;
+
+      &:hover,
+      &--featured:hover {
+        transform: none;
+      }
+
+      &--featured {
+        transform: none;
+      }
+    }
+  }
+
+  @include mx.max-w(420px) {
+    padding-inline: 12px;
+
+    &__card {
+      border-radius: 20px;
+
+      &::before {
+        border-radius: 20px;
       }
 
       &__icon {
-        color: dark.$color-primary;
-        font-size: 22px; // Fixed size to prevent shrinking
-        flex-shrink: 0; // Prevents icon from squishing if text wraps
-        margin-top: 2px; // visually aligns icon with first line of text
+        width: 68px;
+        height: 68px;
+        font-size: 36px;
+      }
 
-        @include mx.light {
-          color: light.$color-primary;
-        }
+      &__title {
+        font-size: 28px;
+      }
+
+      &__price__value {
+        font-size: 34px;
       }
     }
+  }
+}
+
+@keyframes plan-details-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
