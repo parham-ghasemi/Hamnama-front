@@ -17,6 +17,7 @@ import { getApiErrorMessage, getApiErrorStatus } from '../../../lib/apiError';
 import Skeleton from '../../../components/skeleton/Skeleton';
 import { toPersianNumerals } from '../../../helpers/NumberConversion';
 import './PlanUsers.scss';
+import { useConfirmationModal } from '../../../context/ConfirmModalContext/ConfirmaModalContext';
 
 const PlanUsersSkeleton = () => (
   <div className="plan-users">
@@ -108,6 +109,18 @@ const PlanUsers = () => {
     onError: (error) =>
       toast.error(getApiErrorMessage(error, 'حذف کاربر ممکن نبود.')),
   });
+
+  const { openConfirmation } = useConfirmationModal();
+  const kickMember = (userId: string) => {
+    openConfirmation({
+      onConfirm: () => kick.mutate(userId),
+      title: 'حذف عضو از اشتراک',
+      body: 'آیا مطمئن هستید که می‌خواهید این عضو را از اشتراک خود حذف کنید؟',
+      primaryButtonText: 'حذف عضو',
+      secondaryButtonText: 'انصراف',
+      primaryButtonClasses: 'user-sidebar__logout__modal-btn',
+    });
+  }
 
   if (query.isLoading) return <PlanUsersSkeleton />;
 
@@ -254,7 +267,7 @@ const PlanUsers = () => {
                     type="button"
                     className="plan-users__member__remove"
                     disabled={kick.isPending}
-                    onClick={() => kick.mutate(member.user_id)}
+                    onClick={() => kickMember(member.user_id)}
                     aria-label={`حذف ${member.username} از پلن`}
                     title="حذف از پلن"
                   >
@@ -285,48 +298,52 @@ const PlanUsers = () => {
         </section>
 
         <aside className="plan-users__aside">
-          {owner ? (
-            <section className="plan-users__panel plan-users__panel--invite">
-              <div className="plan-users__panel__icon">
-                <FiCopy />
-              </div>
-              <div>
-                <span>دعوت عضو جدید</span>
-                <h2>لینک دعوت شما</h2>
-                <p>لینک را برای همراهتان بفرستید تا درخواست عضویت ارسال کند.</p>
-              </div>
+          {
+            members.length < plan.max_users ?
+              owner ? (
+                <section className="plan-users__panel plan-users__panel--invite" >
+                  <div className="plan-users__panel__icon">
+                    <FiCopy />
+                  </div>
+                  <div>
+                    <span>دعوت عضو جدید</span>
+                    <h2>لینک دعوت شما</h2>
+                    <p>لینک را برای همراهتان بفرستید تا درخواست عضویت ارسال کند.</p>
+                  </div>
 
-              <div className="plan-users__invite-url" dir="ltr">
-                <code>{inviteUrl || 'لینک دعوت موجود نیست'}</code>
-              </div>
+                  <div className="plan-users__invite-url" dir="ltr">
+                    <code>{inviteUrl || 'لینک دعوت موجود نیست'}</code>
+                  </div>
 
-              <div className="plan-users__invite-actions">
-                <button type="button" onClick={() => void copyInvite()} disabled={!inviteUrl}>
-                  <FiCopy />
-                  کپی لینک
-                </button>
-                <button
-                  type="button"
-                  onClick={() => refresh.mutate()}
-                  disabled={refresh.isPending}
-                >
-                  <FiRefreshCw className={refresh.isPending ? 'is-spin' : ''} />
-                  لینک جدید
-                </button>
-              </div>
-            </section>
-          ) : (
-            <section className="plan-users__panel plan-users__panel--member-note">
-              <div className="plan-users__panel__icon">
-                <FiShield />
-              </div>
-              <span>عضویت در پلن</span>
-              <h2>شما عضو این پلن هستید</h2>
-              <p>
-                مدیریت اعضا و تأیید درخواست‌های جدید فقط در اختیار مدیر پلن است.
-              </p>
-            </section>
-          )}
+                  <div className="plan-users__invite-actions">
+                    <button type="button" onClick={() => void copyInvite()} disabled={!inviteUrl}>
+                      <FiCopy />
+                      کپی لینک
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => refresh.mutate()}
+                      disabled={refresh.isPending}
+                    >
+                      <FiRefreshCw className={refresh.isPending ? 'is-spin' : ''} />
+                      لینک جدید
+                    </button>
+                  </div>
+                </section>
+              ) : (
+                <section className="plan-users__panel plan-users__panel--member-note">
+                  <div className="plan-users__panel__icon">
+                    <FiShield />
+                  </div>
+                  <span>عضویت در پلن</span>
+                  <h2>شما عضو این پلن هستید</h2>
+                  <p>
+                    مدیریت اعضا و تأیید درخواست‌های جدید فقط در اختیار مدیر پلن است.
+                  </p>
+                </section>
+              )
+              : null
+          }
 
           {owner && requests.length > 0 && (
             <section className="plan-users__panel plan-users__panel--requests">
@@ -405,7 +422,7 @@ const PlanUsers = () => {
           </section>
         </aside>
       </div>
-    </div>
+    </div >
   );
 };
 
