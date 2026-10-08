@@ -185,6 +185,7 @@ const PlanInvite = () => {
           <div className="plan-invite__code" aria-hidden="true">
             <span />
             HAMNAMA INVITATION
+            دعوت نامه هم‌نما
             <span />
           </div>
         </section>

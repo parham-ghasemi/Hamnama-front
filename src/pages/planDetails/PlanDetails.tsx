@@ -249,8 +249,8 @@ const PlanDetails = () => {
                     <div className="plan-details__card__price__main">
                       {hasPrice
                         ? toPersianNumerals(
-                            displayedPrice.toLocaleString('fa-IR'),
-                          )
+                          displayedPrice.toLocaleString('fa-IR'),
+                        )
                         : '—'}
                       <span> تومان</span>
                     </div>
@@ -318,7 +318,7 @@ const PlanDetails = () => {
                     {isCurrent ? (
                       <>
                         <PiCheckCircleFill />
-                        پلن فعلی شماست
+                        پلن فعلی
                       </>
                     ) : hasAnotherPlan ? (
                       <>

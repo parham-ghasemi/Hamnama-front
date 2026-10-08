@@ -31,6 +31,26 @@ const formatTime = (value: string) =>
     minute: "2-digit",
   }).format(new Date(value));
 
+const MIN_MESSAGE_WORDS = 3;
+const MAX_MESSAGE_WORDS = 300;
+
+const countWords = (value: string) =>
+  value.match(/[\p{L}\p{N}]+/gu)?.length ?? 0;
+
+const validateMessageLength = (value: string) => {
+  const wordCount = countWords(value);
+
+  if (wordCount < MIN_MESSAGE_WORDS) {
+    return `پیام باید حداقل ${MIN_MESSAGE_WORDS} کلمه داشته باشد.`;
+  }
+
+  if (wordCount > MAX_MESSAGE_WORDS) {
+    return `پیام نمی‌تواند بیشتر از ${MAX_MESSAGE_WORDS} کلمه باشد.`;
+  }
+
+  return "";
+};
+
 const SupportChatIcon = ({ open }: { open: boolean }) => (
   <svg
     className={`support-chat-fab__icon ${open ? "is-open" : ""}`}
@@ -312,8 +332,10 @@ const SupportChatWidget = () => {
     event.preventDefault();
     setError("");
 
-    if (!initialMessage.trim()) {
-      setError("پیام اول را وارد کنید.");
+    const content = initialMessage.trim();
+    const validationError = validateMessageLength(content);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -333,7 +355,7 @@ const SupportChatWidget = () => {
       const response = await supportApi.createConversation({
         visitor_id: savedVisitorId,
         name: visitorName,
-        message: initialMessage.trim(),
+        message: content,
         turnstile_token: captchaToken,
       });
 
@@ -372,6 +394,13 @@ const SupportChatWidget = () => {
     event.preventDefault();
 
     const content = message.trim();
+
+    const validationError = validateMessageLength(content);
+
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
 
     if (
       !content ||
@@ -530,6 +559,9 @@ const SupportChatWidget = () => {
                     placeholder="چطور می‌توانیم کمکتان کنیم؟"
                     rows={4}
                   />
+                  <small>
+                    {countWords(initialMessage)} / {MAX_MESSAGE_WORDS} کلمه
+                  </small>
                 </label>
 
                 {error ? (
@@ -647,6 +679,9 @@ const SupportChatWidget = () => {
                       rows={2}
                       placeholder="پیامتان را بنویسید…"
                     />
+                    <small>
+                      {countWords(message)} / {MAX_MESSAGE_WORDS} کلمه
+                    </small>
 
                     <button
                       className="support-chat__send"
