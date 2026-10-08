@@ -7,8 +7,8 @@ import { PiUserFill } from 'react-icons/pi';
 import { useConfirmationModal } from '../../../context/ConfirmModalContext/ConfirmaModalContext';
 import { toast } from '../../toast';
 import { FaUserLock } from 'react-icons/fa6';
-import { TbRefresh } from 'react-icons/tb';
-import { useEffect, useState, type MouseEvent } from 'react';
+// import { TbRefresh } from 'react-icons/tb';
+import { useEffect, useState } from 'react';
 import { userApi } from '../../../apiCalls/userApi';
 
 const buildInviteLink = (token: string) =>
@@ -20,7 +20,7 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
   const navigate = useNavigate();
   const [inviteLink, setInviteLink] = useState('');
   const [inviteLoading, setInviteLoading] = useState(false);
-  const [inviteRefreshing, setInviteRefreshing] = useState(false);
+  // const [inviteRefreshing, setInviteRefreshing] = useState(false);
 
   const handleInviteClick = async () => {
     if (!inviteLink) {
@@ -50,23 +50,23 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
     }
   };
 
-  const handleRefreshInvite = async (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
+  // const handleRefreshInvite = async (event: MouseEvent<HTMLButtonElement>) => {
+  //   event.stopPropagation();
 
-    if (inviteRefreshing) return;
-    setInviteRefreshing(true);
+  //   if (inviteRefreshing) return;
+  //   setInviteRefreshing(true);
 
-    try {
-      const { data } = await userApi.refreshInvite();
-      setInviteLink(buildInviteLink(data.token));
-      toast.success('لینک دعوت جدید ساخته شد');
-    } catch (error) {
-      console.error('Failed to refresh invite link', error);
-      toast.error('خطا در ساخت لینک دعوت جدید');
-    } finally {
-      setInviteRefreshing(false);
-    }
-  };
+  //   try {
+  //     const { data } = await userApi.refreshInvite();
+  //     setInviteLink(buildInviteLink(data.token));
+  //     toast.success('لینک دعوت جدید ساخته شد');
+  //   } catch (error) {
+  //     console.error('Failed to refresh invite link', error);
+  //     toast.error('خطا در ساخت لینک دعوت جدید');
+  //   } finally {
+  //     setInviteRefreshing(false);
+  //   }
+  // };
 
   useEffect(() => {
     if (!isOpen || inviteLink || inviteLoading) return;
@@ -171,7 +171,7 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
             >
               <BsGiftFill />
               <span>دعوت از دوستان</span>
-
+              {/* 
               <button
                 type="button"
                 className="username-dropdown__body__invite-refresh"
@@ -181,7 +181,7 @@ const UsernameDropdown = ({ isOpen }: { isOpen: boolean }) => {
                 title="ساخت لینک دعوت جدید"
               >
                 <TbRefresh className={inviteRefreshing ? 'is-spinning' : ''} />
-              </button>
+              </button> */}
             </li>
           </ul>
         </div>
