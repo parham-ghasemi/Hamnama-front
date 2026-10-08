@@ -359,6 +359,10 @@
         opacity: 0.45;
         cursor: progress;
       }
+
+      > svg {
+        font-size: 19px;
+      }
     }
 
     &:hover {
