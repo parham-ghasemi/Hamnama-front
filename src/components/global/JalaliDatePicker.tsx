@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { FiCalendar, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiCalendar, FiChevronDown, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import './JalaliDatePicker.scss';
+import clsx from 'clsx';
 
 export interface JalaliDatePickerProps {
   label: string;
@@ -153,7 +154,9 @@ const JalaliDatePicker = ({ label, value, onChange, min, max, disabled = false }
       >
         <FiCalendar aria-hidden />
         <span>{formatJalali(value)}</span>
-        <span className="jalali-date-picker__trigger-chevron" aria-hidden>⌄</span>
+        <span className={clsx("jalali-date-picker__trigger-chevron", open && 'is-open')} aria-hidden>
+          <FiChevronDown />
+        </span>
       </button>
       {open ? (
         <div className="jalali-date-picker__popover" role="dialog" aria-label={`انتخاب ${label}`}>
