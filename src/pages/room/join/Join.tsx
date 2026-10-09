@@ -16,6 +16,7 @@ import { useConfirmationModal } from '../../../context/ConfirmModalContext/Confi
 import { FaSearch } from 'react-icons/fa';
 import { useAuth } from '../../../context/AuthContext';
 import { billingApi, type PrivatePlanRoom } from '../../../apiCalls/billingApi';
+import { toEnglishNumerals } from '../../../helpers/NumberConversion';
 
 
 const Join = () => {
@@ -308,7 +309,7 @@ const Join = () => {
                 </div>
 
                 <div className="join-page__content__main__cards__card__code__wrapper">
-                  <input className="join-page__content__main__cards__card__code" type='text' placeholder='کد اتاق' value={code} onChange={(e) => setCode(e.target.value)} maxLength={6} />
+                  <input className="join-page__content__main__cards__card__code" type='text' placeholder='کد اتاق' value={code} onChange={(e) => setCode(() => toEnglishNumerals(e.target.value))} maxLength={6} />
                   <span onClick={() => navigator.clipboard.writeText(String(code))}>
                     <IoCopyOutline />
                   </span>
