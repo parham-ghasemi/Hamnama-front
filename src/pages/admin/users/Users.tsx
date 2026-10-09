@@ -20,6 +20,7 @@ import './Users.scss';
 import Skeleton from "../../../components/skeleton/Skeleton";
 import { useAdminAccess } from '../../../components/adminRoute/AdminAccessContext';
 import JalaliDatePicker from '../../../components/global/JalaliDatePicker';
+import TimePicker from '../../../components/global/TimePicker';
 
 type Filter = 'all' | 'banned' | 'active';
 
@@ -150,16 +151,11 @@ const shiftIsoDate = (value: string, offset: number) => {
   return getLocalIsoDate(date);
 };
 
-const formatJalaliDate = (value: string) => {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
-  return new Intl.DateTimeFormat('fa-IR-u-ca-persian', { year: 'numeric', month: 'short', day: 'numeric' }).format(date);
-};
-
 const formatJalaliDateTime = (value: string) => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '—';
   return new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
+    timeZone: 'Asia/Tehran',
     year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
   }).format(date);
 };
@@ -174,11 +170,14 @@ const Users = () => {
   const queryClient = useQueryClient();
   const [initialRange] = useState(() => {
     const end = getLocalIsoDate();
-    return { start: shiftIsoDate(end, -29), end };
+    return { start: shiftIsoDate(end, -29), end, startTime: '00:00', endTime: '23:59' };
   });
   const [rangeStart, setRangeStart] = useState(initialRange.start);
+  const [rangeStartTime, setRangeStartTime] = useState(initialRange.startTime);
   const [rangeEnd, setRangeEnd] = useState(initialRange.end);
+  const [rangeEndTime, setRangeEndTime] = useState(initialRange.endTime);
   const [appliedRange, setAppliedRange] = useState(initialRange);
+  const rangeInvalid = !rangeStartTime || !rangeEndTime || `${rangeStart}T${rangeStartTime}` > `${rangeEnd}T${rangeEndTime}`;
 
   const {
     data: userMetrics,
@@ -186,11 +185,13 @@ const Users = () => {
     isFetching: metricsFetching,
     isError: metricsError,
   } = useQuery({
-    queryKey: ['admin-user-metrics', appliedRange.start, appliedRange.end],
+    queryKey: ['admin-user-metrics', appliedRange.start, appliedRange.startTime, appliedRange.end, appliedRange.endTime],
     retry: false,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      const response = await adminApi.getUserMetrics(appliedRange.start, appliedRange.end);
+      const response = await adminApi.getUserMetrics(
+        appliedRange.start, appliedRange.startTime, appliedRange.end, appliedRange.endTime
+      );
       return response.data;
     },
   });
@@ -226,6 +227,7 @@ const Users = () => {
     queryKey: ['admin-users', params],
     retry: false,
     refetchOnWindowFocus: false,
+    refetchInterval: 30_000,
     queryFn: async () => {
       const response = await adminApi.listUsers(params);
       return response.data;
@@ -434,7 +436,7 @@ const Users = () => {
           <div className="admin-users__section-copy">
             <span className="admin-users__section-kicker"><FiActivity aria-hidden /> تحلیل کاربران</span>
             <h2 id="user-analytics-title">عملکرد در بازه انتخابی</h2>
-            <p>تعداد کاربران یکتا در هر شاخص، بین تاریخ شروع و پایان انتخاب‌شده.</p>
+            <p>تعداد کاربران یکتا در هر شاخص، بین تاریخ و ساعت شروع و پایان انتخاب‌شده.</p>
           </div>
           <div className="admin-users__range-controls">
             <JalaliDatePicker
@@ -443,6 +445,12 @@ const Users = () => {
               max={rangeEnd}
               onChange={setRangeStart}
             />
+            <TimePicker
+              label="از ساعت"
+              value={rangeStartTime}
+              onChange={setRangeStartTime}
+              required
+            />
             <JalaliDatePicker
               label="تا تاریخ"
               value={rangeEnd}
@@ -450,17 +458,35 @@ const Users = () => {
               max={initialRange.end}
               onChange={setRangeEnd}
             />
+            <TimePicker
+              label="تا ساعت"
+              value={rangeEndTime}
+              onChange={setRangeEndTime}
+              required
+            />
             <button
               type="button"
               className="admin-users__action admin-users__action--primary admin-users__range-apply"
-              disabled={rangeStart > rangeEnd || metricsFetching}
-              onClick={() => setAppliedRange({ start: rangeStart, end: rangeEnd })}
+              disabled={rangeInvalid || metricsFetching}
+              onClick={() => setAppliedRange({
+                start: rangeStart,
+                startTime: rangeStartTime,
+                end: rangeEnd,
+                endTime: rangeEndTime,
+              })}
             >
               <FiCalendar />
               {metricsFetching ? 'در حال به‌روزرسانی' : 'اعمال بازه'}
             </button>
           </div>
         </div>
+        {rangeInvalid ? (
+          <div className="admin-users__range-validation" role="alert">
+            {!rangeStartTime || !rangeEndTime
+              ? 'ساعت شروع و پایان را وارد کنید.'
+              : 'زمان پایان باید مساوی یا بعد از زمان شروع باشد.'}
+          </div>
+        ) : null}
 
         {metricsError ? (
           <div className="admin-users__analytics-error" role="alert">
@@ -495,7 +521,7 @@ const Users = () => {
         </div>
         {userMetrics && !metricsError ? (
           <div className="admin-users__range-caption">
-            گزارش از {formatJalaliDate(`${userMetrics.start_date}T12:00:00`)} تا {formatJalaliDate(`${userMetrics.end_date}T12:00:00`)}
+            گزارش از {formatJalaliDateTime(userMetrics.start_at)} تا {formatJalaliDateTime(userMetrics.end_at)}
           </div>
         ) : null}
       </section>
@@ -552,6 +578,7 @@ const Users = () => {
                 <Skeleton variant="text" width={index % 2 ? 82 : 112} />
                 <Skeleton variant="text" width={64} />
                 <Skeleton variant="text" width={96} />
+                <Skeleton variant="text" width={105} />
                 <Skeleton variant="text" width={72} />
                 <Skeleton variant="pill" width={70} height={28} />
               </div>
@@ -569,6 +596,7 @@ const Users = () => {
                   <tr>
                     <th>کاربر</th>
                     <th>شماره</th>
+                    <th>آخرین بازدید</th>
                     <th>وضعیت</th>
                     <th>سطح</th>
                     <th>عملیات</th>
@@ -600,6 +628,15 @@ const Users = () => {
                         </div>
                       </td>
                       <td>{user.phone_number}</td>
+                      <td>
+                        {user.is_online ? (
+                          <span className="admin-users__presence admin-users__presence--online">آنلاین</span>
+                        ) : user.last_online_at ? (
+                          <span className="admin-users__presence">{formatJalaliDateTime(user.last_online_at)}</span>
+                        ) : (
+                          <span className="admin-users__presence admin-users__presence--unknown">—</span>
+                        )}
+                      </td>
                       <td>
                         <div className="admin-users__badges">
                           {user.is_banned ? (

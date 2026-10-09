@@ -34,6 +34,8 @@ export interface WebsiteAnalyticsResponse {
 export interface AdminUserMetricsResponse {
   start_date: string;
   end_date: string;
+  start_at: string;
+  end_at: string;
   new_users: number;
   active_users: number;
   room_creators: number;
@@ -83,6 +85,8 @@ export interface AdminUser {
   ban_reason?: string;
   ban_expires_at?: string;
   banned_at?: string;
+  is_online: boolean;
+  last_online_at?: string | null;
 }
 
 export interface AdminCreateUserPayload {
@@ -314,8 +318,10 @@ export const adminApi = {
   closeTicket: (id: string | number) => api.post(`/admin/tickets/${id}/close`),
   reopenTicket: (id: string | number) => api.post(`/admin/tickets/${id}/reopen`),
 
-  getUserMetrics: (startDate: string, endDate: string) =>
-    api.get<AdminUserMetricsResponse>('/admin/users/metrics', { params: { start_date: startDate, end_date: endDate } }),
+  getUserMetrics: (startDate: string, startTime: string, endDate: string, endTime: string) =>
+    api.get<AdminUserMetricsResponse>('/admin/users/metrics', {
+      params: { start_date: startDate, start_time: startTime, end_date: endDate, end_time: endTime },
+    }),
   listUsers: (params: Record<string, string | number | boolean | undefined>) => api.get<AdminUsersResponse>('/admin/users', { params }),
   createUser: (payload: AdminCreateUserPayload) => api.post('/admin/users', payload),
   updateUser: (id: string, payload: Record<string, unknown>) => api.patch(`/admin/users/${id}`, payload),

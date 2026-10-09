@@ -1,0 +1,58 @@
+.global-time-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  color: var(--users-text, var(--admin-text, currentColor));
+
+  &__label {
+    color: var(--users-muted, #888);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  &__control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--users-border, rgba(128, 128, 128, .25));
+    border-radius: 12px;
+    background: var(--users-surface, transparent);
+    color: var(--users-text, currentColor);
+    transition: border-color 160ms ease, background 160ms ease;
+
+    > svg {
+      flex: 0 0 auto;
+      color: var(--users-primary, #8b82ff);
+    }
+
+    &:focus-within {
+      border-color: var(--users-primary, #8b82ff);
+    }
+
+    input {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-size: 13px;
+      direction: ltr;
+      text-align: center;
+      color-scheme: inherit;
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: .55;
+      }
+    }
+
+    &:has(input:disabled) { opacity: .6; }
+  }
+}
+

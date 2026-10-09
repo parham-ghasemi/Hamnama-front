@@ -60,6 +60,10 @@ button:not(:disabled) {
   cursor: pointer;
 }
 
+input[type="time"]::-webkit-calendar-picker-indicator {
+  background: none;
+}
+
 html.theme-transitioning {
   &,
   * {
