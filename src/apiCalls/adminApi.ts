@@ -31,6 +31,15 @@ export interface WebsiteAnalyticsResponse {
   visits_over_time: Array<{ label: string; count: number }>;
 }
 
+export interface AdminUserMetricsResponse {
+  start_date: string;
+  end_date: string;
+  new_users: number;
+  active_users: number;
+  room_creators: number;
+  room_joiners: number;
+}
+
 export interface AdminNotificationsResponse {
   tickets_needing_response: number;
   support_needing_response: number;
@@ -305,6 +314,8 @@ export const adminApi = {
   closeTicket: (id: string | number) => api.post(`/admin/tickets/${id}/close`),
   reopenTicket: (id: string | number) => api.post(`/admin/tickets/${id}/reopen`),
 
+  getUserMetrics: (startDate: string, endDate: string) =>
+    api.get<AdminUserMetricsResponse>('/admin/users/metrics', { params: { start_date: startDate, end_date: endDate } }),
   listUsers: (params: Record<string, string | number | boolean | undefined>) => api.get<AdminUsersResponse>('/admin/users', { params }),
   createUser: (payload: AdminCreateUserPayload) => api.post('/admin/users', payload),
   updateUser: (id: string, payload: Record<string, unknown>) => api.patch(`/admin/users/${id}`, payload),

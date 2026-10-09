@@ -9,12 +9,17 @@ import {
   FiEdit2,
   FiShield,
   FiSlash,
+  FiActivity,
+  FiCalendar,
+  FiHome,
+  FiUserCheck,
 } from 'react-icons/fi';
 import { toast } from '../../../components/toast';
 import { adminApi, type AdminUser } from '../../../apiCalls/adminApi';
 import './Users.scss';
 import Skeleton from "../../../components/skeleton/Skeleton";
 import { useAdminAccess } from '../../../components/adminRoute/AdminAccessContext';
+import JalaliDatePicker from '../../../components/global/JalaliDatePicker';
 
 type Filter = 'all' | 'banned' | 'active';
 
@@ -131,12 +136,64 @@ const SORT_OPTIONS: DropdownOption<string>[] = [
   { value: '-username', label: 'نام کاربری (معکوس)' },
 ];
 
+const getLocalIsoDate = (date = new Date()) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const shiftIsoDate = (value: string, offset: number) => {
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(year, month - 1, day, 12, 0, 0, 0);
+  date.setDate(date.getDate() + offset);
+  return getLocalIsoDate(date);
+};
+
+const formatJalaliDate = (value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '—';
+  return new Intl.DateTimeFormat('fa-IR-u-ca-persian', { year: 'numeric', month: 'short', day: 'numeric' }).format(date);
+};
+
+const formatJalaliDateTime = (value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '—';
+  return new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
+    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+  }).format(date);
+};
+
+const persianNumber = new Intl.NumberFormat('fa-IR');
+
 const Users = () => {
   const { accessLevel } = useAdminAccess();
 
   const isFullAccess = accessLevel === 3;
 
   const queryClient = useQueryClient();
+  const [initialRange] = useState(() => {
+    const end = getLocalIsoDate();
+    return { start: shiftIsoDate(end, -29), end };
+  });
+  const [rangeStart, setRangeStart] = useState(initialRange.start);
+  const [rangeEnd, setRangeEnd] = useState(initialRange.end);
+  const [appliedRange, setAppliedRange] = useState(initialRange);
+
+  const {
+    data: userMetrics,
+    isLoading: metricsLoading,
+    isFetching: metricsFetching,
+    isError: metricsError,
+  } = useQuery({
+    queryKey: ['admin-user-metrics', appliedRange.start, appliedRange.end],
+    retry: false,
+    refetchOnWindowFocus: false,
+    queryFn: async () => {
+      const response = await adminApi.getUserMetrics(appliedRange.start, appliedRange.end);
+      return response.data;
+    },
+  });
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState('-created_at');
@@ -350,13 +407,16 @@ const Users = () => {
   return (
     <section className="admin-users">
       <header className="admin-users__header">
-        <div>
-          <p className="admin-users__eyebrow">کاربران</p>
-          <h1 className="admin-users__title">مدیریت کاربران</h1>
+        <div className="admin-users__heading-copy">
+          <p className="admin-users__eyebrow">مدیریت ارتباط با کاربران • CRM</p>
+          <h1 className="admin-users__title">مرکز مدیریت کاربران</h1>
+          <p className="admin-users__description">
+            نمای یکپارچه برای بررسی اعضا، رفتار کاربران و شاخص‌های رشد هم‌نما.
+          </p>
         </div>
         <div className="admin-users__header-actions">
           <span className="admin-users__count">
-            {pagination?.total ?? 0} کاربر
+            {persianNumber.format(pagination?.total ?? 0)} نتیجه
           </span>
           <button
             type="button"
@@ -368,6 +428,86 @@ const Users = () => {
           </button>
         </div>
       </header>
+
+      <section className="admin-users__analytics" aria-labelledby="user-analytics-title">
+        <div className="admin-users__section-heading">
+          <div className="admin-users__section-copy">
+            <span className="admin-users__section-kicker"><FiActivity aria-hidden /> تحلیل کاربران</span>
+            <h2 id="user-analytics-title">عملکرد در بازه انتخابی</h2>
+            <p>تعداد کاربران یکتا در هر شاخص، بین تاریخ شروع و پایان انتخاب‌شده.</p>
+          </div>
+          <div className="admin-users__range-controls">
+            <JalaliDatePicker
+              label="از تاریخ"
+              value={rangeStart}
+              max={rangeEnd}
+              onChange={setRangeStart}
+            />
+            <JalaliDatePicker
+              label="تا تاریخ"
+              value={rangeEnd}
+              min={rangeStart}
+              max={initialRange.end}
+              onChange={setRangeEnd}
+            />
+            <button
+              type="button"
+              className="admin-users__action admin-users__action--primary admin-users__range-apply"
+              disabled={rangeStart > rangeEnd || metricsFetching}
+              onClick={() => setAppliedRange({ start: rangeStart, end: rangeEnd })}
+            >
+              <FiCalendar />
+              {metricsFetching ? 'در حال به‌روزرسانی' : 'اعمال بازه'}
+            </button>
+          </div>
+        </div>
+
+        {metricsError ? (
+          <div className="admin-users__analytics-error" role="alert">
+            دریافت آمار این بازه با مشکل مواجه شد. بازه را دوباره اعمال کنید.
+          </div>
+        ) : null}
+        <div className={`admin-users__metrics ${metricsLoading ? 'is-loading' : ''}`} aria-busy={metricsLoading || metricsFetching}>
+          <article className="admin-users__metric admin-users__metric--blue">
+            <span className="admin-users__metric-icon"><FiUserPlus aria-hidden /></span>
+            <span className="admin-users__metric-label">ثبت‌نام‌های جدید</span>
+            <strong className="admin-users__metric-value">{metricsLoading || metricsError ? '—' : persianNumber.format(userMetrics?.new_users ?? 0)}</strong>
+            <span className="admin-users__metric-note">کاربران ساخته‌شده در این بازه</span>
+          </article>
+          <article className="admin-users__metric admin-users__metric--green">
+            <span className="admin-users__metric-icon"><FiUserCheck aria-hidden /></span>
+            <span className="admin-users__metric-label">کاربران فعال</span>
+            <strong className="admin-users__metric-value">{metricsLoading || metricsError ? '—' : persianNumber.format(userMetrics?.active_users ?? 0)}</strong>
+            <span className="admin-users__metric-note">حساب‌های دارای بازدید ثبت‌شده</span>
+          </article>
+          <article className="admin-users__metric admin-users__metric--purple">
+            <span className="admin-users__metric-icon"><FiHome aria-hidden /></span>
+            <span className="admin-users__metric-label">سازندگان اتاق</span>
+            <strong className="admin-users__metric-value">{metricsLoading || metricsError ? '—' : persianNumber.format(userMetrics?.room_creators ?? 0)}</strong>
+            <span className="admin-users__metric-note">کاربران یکتایی که اتاق ساخته‌اند</span>
+          </article>
+          <article className="admin-users__metric admin-users__metric--orange">
+            <span className="admin-users__metric-icon"><FiActivity aria-hidden /></span>
+            <span className="admin-users__metric-label">کاربران پیوسته به اتاق</span>
+            <strong className="admin-users__metric-value">{metricsLoading || metricsError ? '—' : persianNumber.format(userMetrics?.room_joiners ?? 0)}</strong>
+            <span className="admin-users__metric-note">کاربران یکتایی که وارد اتاق شده‌اند</span>
+          </article>
+        </div>
+        {userMetrics && !metricsError ? (
+          <div className="admin-users__range-caption">
+            گزارش از {formatJalaliDate(`${userMetrics.start_date}T12:00:00`)} تا {formatJalaliDate(`${userMetrics.end_date}T12:00:00`)}
+          </div>
+        ) : null}
+      </section>
+
+      <section className="admin-users__directory" aria-labelledby="users-directory-title">
+        <div className="admin-users__directory-heading">
+          <div>
+            <p className="admin-users__section-kicker">پایگاه کاربران</p>
+            <h2 id="users-directory-title">فهرست و مدیریت اعضا</h2>
+            <p>جست‌وجو، بررسی وضعیت و مدیریت دسترسی هر حساب از یک محل.</p>
+          </div>
+        </div>
 
       <div className="admin-users__toolbar">
         <label className="admin-users__search">
@@ -454,7 +594,7 @@ const Users = () => {
                               {user.username}
                             </p>
                             <span className="admin-users__meta">
-                              {user.created_at}
+                              {formatJalaliDateTime(user.created_at)}
                             </span>
                           </div>
                         </div>
@@ -570,6 +710,7 @@ const Users = () => {
           </>
         )}
       </div>
+      </section>
 
       {userModal ? (
         <div
