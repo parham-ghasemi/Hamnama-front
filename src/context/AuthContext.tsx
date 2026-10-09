@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import axios from "axios";
-import api from "../lib/axiosConfig";
+import api, { isTransientAuthRefreshFailure } from "../lib/axiosConfig";
 import {
   clearAccessToken,
   refreshAccessToken,
@@ -80,9 +80,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Failed to fetch user", error);
 
-      // A transient connection failure must not destroy an otherwise valid cached
-      // session. Only a server response proving the session is invalid logs out.
-      if (axios.isAxiosError(error) && [401, 403].includes(error.response?.status ?? 0)) {
+      // A protected request can return 401 for an expired access JWT even when
+      // its follow-up refresh only failed due to a network switch. That is not
+      // evidence that the refresh session was revoked.
+      const transientRefreshFailure = isTransientAuthRefreshFailure(error);
+
+      if (
+        !transientRefreshFailure &&
+        axios.isAxiosError(error) &&
+        [401, 403].includes(error.response?.status ?? 0)
+      ) {
         clearSession();
       }
     }
@@ -95,13 +102,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const cachedUser = readCachedUser();
       if (cachedUser) setUser(cachedUser);
 
-      const token = await refreshAccessToken();
+      const refreshResult = await refreshAccessToken();
 
       if (cancelled) return;
 
+      if (!refreshResult.token && refreshResult.failure === "invalid") {
+        clearSession();
+        return;
+      }
+
       // Always validate an existing cached session when possible. If the request
       // cannot reach the server, fetchUser preserves the cached auth state.
-      if (token || cachedUser) {
+      if (refreshResult.token || cachedUser) {
         await fetchUser();
       }
     };
@@ -120,8 +132,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Refresh the access JWT slightly before its five-minute lifetime expires.
     const interval = window.setInterval(async () => {
-      const token = await refreshAccessToken();
-      if (token) return;
+      const refreshResult = await refreshAccessToken();
+      if (refreshResult.token) return;
+
+      if (refreshResult.failure === "invalid") {
+        clearSession();
+        return;
+      }
 
       // refreshAccessToken can fail because the network is unavailable. Do not
       // discard cached authentication unless a follow-up request proves that
