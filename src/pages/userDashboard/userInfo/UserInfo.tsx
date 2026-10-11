@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PiCameraLight } from 'react-icons/pi';
-import { IoPencilSharp, IoClose, IoChevronDown, IoTrashOutline, IoImageOutline } from 'react-icons/io5';
+import { IoPencilSharp, IoClose, IoChevronDown } from 'react-icons/io5';
 import { toast } from '../../../components/toast';
 import { getApiErrorMessage } from '../../../lib/apiError';
 import { useQuery } from '@tanstack/react-query';
@@ -20,6 +20,7 @@ import { userApi } from '../../../apiCalls/userApi';
 import { toPersianNumerals } from '../../../helpers/NumberConversion';
 import { SEO } from '../../../components/seo/SEO';
 import Skeleton from '../../../components/skeleton/Skeleton';
+import ProfilePictureUploadModal from './component/ProfilePictureUploadModal';
 
 // --- Types --- //
 interface WatchHistoryItem {
@@ -28,9 +29,6 @@ interface WatchHistoryItem {
 }
 
 type TimeframeOption = 'all_time' | 'past_month' | 'past_year' | 'past_week';
-
-// Max upload size for the profile picture.
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
 
 // --- Small shared spinner used by every submitting button --- //
 const Spinner = () => <span className="btn-spinner" aria-hidden="true" />;
@@ -254,174 +252,6 @@ const UpdatePhoneForm = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
-// --- Profile Picture Form --- //
-const UpdateProfilePictureForm = ({ onClose }: { onClose: () => void }) => {
-  const { user, fetchUser } = useAuth();
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Keep the object URL in sync with the selected file and revoke it on cleanup.
-  useEffect(() => {
-    if (!file) {
-      setPreviewUrl(null);
-      return;
-    }
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const selected = e.target.files[0];
-
-      if (!selected.type.startsWith('image/')) {
-        toast.error('فقط فایل تصویری مجاز است');
-        e.target.value = '';
-        return;
-      }
-
-      if (selected.size > MAX_IMAGE_SIZE) {
-        toast.error('حجم عکس نباید بیشتر از ۱۰ مگابایت باشد');
-        e.target.value = '';
-        return;
-      }
-
-      setFile(selected);
-    }
-  };
-
-  const handleUpload = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!file) return;
-
-    setIsUploading(true);
-    try {
-      await userApi.uploadProfilePicture(file);
-      await fetchUser();
-      toast.success('عکس پروفایل با موفقیت آپلود شد');
-      onClose();
-    } catch (error) {
-      toast.error(getApiErrorMessage(error, 'آپلود تصویر انجام نشد.'));
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      await userApi.removeProfilePicture();
-      await fetchUser();
-      toast.success('عکس پروفایل با موفقیت حذف شد');
-      onClose();
-    } catch (error) {
-      toast.error(getApiErrorMessage(error, 'حذف تصویر انجام نشد.'));
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  const currentPicture = user?.profile_picture
-    ? `${import.meta.env['VITE_BASE_URL']}${user.profile_picture}`
-    : null;
-
-  const shownImage = previewUrl || currentPicture;
-  const isBusy = isUploading || isDeleting;
-
-  return (
-    <form onSubmit={handleUpload} className="edit-modal__form">
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleFileChange}
-        ref={fileInputRef}
-        style={{ display: 'none' }}
-      />
-
-      {/* Live preview of the picked (or current) picture */}
-      <div className="avatar-picker">
-        <button
-          type="button"
-          className="avatar-picker__preview"
-          onClick={() => !isBusy && fileInputRef.current?.click()}
-          aria-label="انتخاب عکس پروفایل"
-          disabled={isBusy}
-        >
-          {shownImage ? (
-            <img src={shownImage} alt="پیش‌نمایش عکس پروفایل" />
-          ) : (
-            <span className="avatar-picker__placeholder">
-              <IoImageOutline />
-            </span>
-          )}
-
-          {isUploading && (
-            <span className="avatar-picker__loading">
-              <Spinner />
-            </span>
-          )}
-        </button>
-
-        <div className="avatar-picker__meta">
-          <p className="avatar-picker__meta__name">
-            {file ? file.name : previewUrl || currentPicture ? 'عکس فعلی' : 'عکسی انتخاب نشده'}
-          </p>
-          <span className="avatar-picker__meta__hint">
-            {file
-              ? `${toPersianNumerals((file.size / (1024 * 1024)).toFixed(1))} مگابایت`
-              : 'فرمت تصویری، حداکثر ۱۰ مگابایت'}
-          </span>
-          {file && (
-            <button
-              type="button"
-              className="avatar-picker__meta__clear"
-              onClick={() => {
-                setFile(null);
-                if (fileInputRef.current) fileInputRef.current.value = '';
-              }}
-              disabled={isBusy}
-            >
-              حذف انتخاب
-            </button>
-          )}
-        </div>
-      </div>
-
-      <button
-        type="button"
-        className="secondary-btn"
-        onClick={() => fileInputRef.current?.click()}
-        disabled={isBusy}
-      >
-        {file ? 'انتخاب عکس دیگر' : 'انتخاب عکس جدید'}
-      </button>
-
-      {file && (
-        <button type="submit" disabled={isBusy}>
-          {isUploading && <Spinner />}
-          {isUploading ? 'در حال آپلود...' : 'آپلود عکس'}
-        </button>
-      )}
-
-      {user?.profile_picture && !file && (
-        <button
-          type="button"
-          className="secondary-btn danger-btn"
-          onClick={handleDelete}
-          disabled={isBusy}
-        >
-          {isDeleting ? <Spinner /> : <IoTrashOutline />}
-          {isDeleting ? 'در حال حذف...' : 'حذف عکس فعلی'}
-        </button>
-      )}
-    </form>
-  );
-};
-
 const TIMEFRAME_OPTIONS = [
   { value: 'past_week', label: 'هفته گذشته' },
   { value: 'past_month', label: 'ماه گذشته' },
@@ -449,7 +279,8 @@ const UserInfo = () => {
   const { user, isLoading: isUserLoading } = useAuth();
   const navigate = useNavigate();
 
-  const [editingField, setEditingField] = useState<'username' | 'phone' | 'password' | 'profilePicture' | null>(null);
+  const [editingField, setEditingField] = useState<'username' | 'phone' | 'password' | null>(null);
+  const [isProfilePictureModalOpen, setIsProfilePictureModalOpen] = useState(false);
   const [isModalActive, setIsModalActive] = useState(false);
   const [timeframe, setTimeframe] = useState<TimeframeOption>('past_month');
 
@@ -518,7 +349,7 @@ const UserInfo = () => {
     { key: 'password', label: 'رمز عبور', value: '•••••••••••••' },
   ];
 
-  const handleOpenModal = (field: 'username' | 'phone' | 'password' | 'profilePicture') => {
+  const handleOpenModal = (field: 'username' | 'phone' | 'password') => {
     setEditingField(field);
     setTimeout(() => setIsModalActive(true), 10);
   };
@@ -569,7 +400,7 @@ const UserInfo = () => {
           ) : (
             <>
               <div className="user-info__top-card__right">
-                <div className="user-info__top-card__right__img" onClick={() => handleOpenModal('profilePicture')}>
+                <div className="user-info__top-card__right__img" onClick={() => setIsProfilePictureModalOpen(true)} role="button" tabIndex={0} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') setIsProfilePictureModalOpen(true); }}>
                   {user?.profile_picture ? (
                     <img src={`${import.meta.env['VITE_BASE_URL']}${user?.profile_picture}`} alt="profile image" />
                   ) : (
@@ -733,9 +564,7 @@ const UserInfo = () => {
                     ? 'نام کاربری'
                     : editingField === 'phone'
                       ? 'شماره موبایل'
-                      : editingField === 'profilePicture'
-                        ? 'عکس پروفایل'
-                        : 'رمز عبور'}
+                      : 'رمز عبور'}
                 </h3>
                 <button className="edit-modal__close" onClick={handleCloseModal}>
                   <IoClose />
@@ -745,9 +574,12 @@ const UserInfo = () => {
               {editingField === 'username' && <UpdateUsernameForm onClose={handleCloseModal} />}
               {editingField === 'password' && <UpdatePasswordForm onClose={handleCloseModal} />}
               {editingField === 'phone' && <UpdatePhoneForm onClose={handleCloseModal} />}
-              {editingField === 'profilePicture' && <UpdateProfilePictureForm onClose={handleCloseModal} />}
             </div>
           </div>
+        )}
+
+        {isProfilePictureModalOpen && (
+          <ProfilePictureUploadModal onClose={() => setIsProfilePictureModalOpen(false)} />
         )}
       </div>
     </>

@@ -42,7 +42,7 @@
   }
 
   // Every direct child is a lit cinema card.
-  > *:not(.user-info__blob, .edit-modal-overlay) {
+  > *:not(.user-info__blob, .edit-modal-overlay, .profile-picture-modal-overlay) {
     position: relative;
     border-radius: 20px;
     overflow: hidden;
@@ -979,114 +979,6 @@
         &:hover:not(:disabled) {
           background: rgba(178, 56, 64, 0.16);
         }
-      }
-    }
-  }
-}
-
-/* Profile picture preview inside the modal */
-.avatar-picker {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 14px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px dashed rgba(255, 255, 255, 0.14);
-
-  @include mx.light {
-    background: rgba(9, 9, 9, 0.03);
-    border-color: light.$color-light-gray;
-  }
-
-  &__preview {
-    position: relative;
-    height: 84px !important;
-    width: 84px;
-    flex-shrink: 0;
-    border-radius: 100% !important;
-    overflow: hidden;
-    padding: 0;
-    cursor: pointer;
-    background: linear-gradient(
-      160deg,
-      rgba(224, 163, 64, 0.8) 0%,
-      rgba(208, 78, 47, 0.8) 100%
-    ) !important;
-    box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.16),
-      0 14px 28px -18px rgba(0, 0, 0, 0.9) !important;
-
-    @include mx.light {
-      background: linear-gradient(
-        160deg,
-        rgba(139, 91, 130, 0.9) 0%,
-        rgba(104, 61, 96, 0.9) 100%
-      ) !important;
-    }
-
-    > img {
-      height: 100%;
-      width: 100%;
-      object-fit: cover;
-    }
-  }
-
-  &__placeholder {
-    @include mx.flex-center;
-    height: 100%;
-    width: 100%;
-    font-size: 30px;
-    color: rgba(255, 255, 255, 0.85);
-  }
-
-  &__loading {
-    position: absolute;
-    inset: 0;
-    @include mx.flex-center;
-    background-color: rgba(10, 8, 10, 0.55);
-    backdrop-filter: blur(2px);
-  }
-
-  &__meta {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    min-width: 0;
-
-    &__name {
-      margin: 0;
-      font-size: 14px;
-      font-weight: 800;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    &__hint {
-      font-size: 12.5px;
-      color: dark.$color-gray;
-
-      @include mx.light {
-        color: light.$color-gray;
-      }
-    }
-
-    &__clear {
-      align-self: flex-start;
-      height: auto !important;
-      padding: 0 !important;
-      background: none !important;
-      border: none !important;
-      box-shadow: none !important;
-      color: color.adjust(dark.$color-red, $lightness: 22%) !important;
-      font-size: 12.5px !important;
-      font-weight: 700 !important;
-      text-decoration: underline;
-      cursor: pointer;
-
-      @include mx.light {
-        color: light.$color-red !important;
       }
     }
   }
