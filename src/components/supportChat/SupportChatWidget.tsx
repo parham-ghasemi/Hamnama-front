@@ -33,6 +33,14 @@ const formatTime = (value: string) =>
 
 const MIN_MESSAGE_WORDS = 3;
 const MAX_MESSAGE_WORDS = 300;
+const AUTO_ACKNOWLEDGEMENT_DELAY = 30_000;
+const AUTO_ACKNOWLEDGEMENT_TEXT = "پیام شما به دست تیم پشتیبانی رسید. پاسخ درخواست شما در اولین فرصت از همین‌جا ارسال خواهد شد.";
+
+type AutoAcknowledgement = {
+  id: string;
+  content: string;
+  created_at: string;
+};
 
 const countWords = (value: string) =>
   value.match(/[\p{L}\p{N}]+/gu)?.length ?? 0;
@@ -125,7 +133,34 @@ const SupportChatWidget = () => {
 
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimer = useRef<number | null>(null);
+  const autoAcknowledgementTimer = useRef<number | null>(null);
+  const [autoAcknowledgement, setAutoAcknowledgement] =
+    useState<AutoAcknowledgement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  const clearAutoAcknowledgement = useCallback(() => {
+    if (autoAcknowledgementTimer.current !== null) {
+      window.clearTimeout(autoAcknowledgementTimer.current);
+      autoAcknowledgementTimer.current = null;
+    }
+
+    setAutoAcknowledgement(null);
+  }, []);
+
+  const scheduleAutoAcknowledgement = useCallback(() => {
+    // A newer visitor message replaces both the visible acknowledgment and
+    // any timer that was waiting to display it.
+    clearAutoAcknowledgement();
+
+    autoAcknowledgementTimer.current = window.setTimeout(() => {
+      autoAcknowledgementTimer.current = null;
+      setAutoAcknowledgement({
+        id: `local-support-ack-${Date.now()}`,
+        content: AUTO_ACKNOWLEDGEMENT_TEXT,
+        created_at: new Date().toISOString(),
+      });
+    }, AUTO_ACKNOWLEDGEMENT_DELAY);
+  }, [clearAutoAcknowledgement]);
 
   const toggleOpen = () => {
     if (open) {
@@ -157,6 +192,11 @@ const SupportChatWidget = () => {
     () => () => {
       if (closeAnimationTimer.current) {
         window.clearTimeout(closeAnimationTimer.current);
+      }
+
+      if (autoAcknowledgementTimer.current !== null) {
+        window.clearTimeout(autoAcknowledgementTimer.current);
+        autoAcknowledgementTimer.current = null;
       }
     },
     [],
@@ -211,6 +251,11 @@ const SupportChatWidget = () => {
           if (data.type === "message" && data.payload?.id) {
             const payload = data.payload;
 
+            // A real support reply supersedes the temporary acknowledgment.
+            if (payload.sender_type === "admin") {
+              clearAutoAcknowledgement();
+            }
+
             setConversation((current) => {
               if (!current) return current;
 
@@ -234,6 +279,7 @@ const SupportChatWidget = () => {
           }
 
           if (data.type === "conversation_closed") {
+            clearAutoAcknowledgement();
             setConversation((current) =>
               current
                 ? { ...current, status: "closed" }
@@ -271,7 +317,7 @@ const SupportChatWidget = () => {
         }
       };
     },
-    [closeSocket],
+    [closeSocket, clearAutoAcknowledgement],
   );
 
   useEffect(() => {
@@ -321,7 +367,7 @@ const SupportChatWidget = () => {
     bottomRef.current?.scrollIntoView({
       behavior: "smooth",
     });
-  }, [conversation?.messages.length]);
+  }, [conversation?.messages.length, autoAcknowledgement]);
 
   useEffect(
     () => () => closeSocket(),
@@ -375,6 +421,12 @@ const SupportChatWidget = () => {
       setConversation(response.data);
       setName(visitorName);
       setInitialMessage("");
+
+      if (response.data.messages.some((item) => item.sender_type === "admin")) {
+        clearAutoAcknowledgement();
+      } else {
+        scheduleAutoAcknowledgement();
+      }
     } catch (err: any) {
       if (err?.response?.status === 429) {
         setError(
@@ -439,6 +491,7 @@ const SupportChatWidget = () => {
         }),
       );
 
+      scheduleAutoAcknowledgement();
       setMessage("");
     } catch {
       setError("تأیید امنیتی انجام نشد. دوباره تلاش کنید.");
@@ -450,6 +503,7 @@ const SupportChatWidget = () => {
 
   const restart = () => {
     closeSocket();
+    clearAutoAcknowledgement();
     localStorage.removeItem(CONVERSATION_KEY);
     setConversation(null);
     setCaptchaToken("");
@@ -646,6 +700,23 @@ const SupportChatWidget = () => {
                       </div>
                     ))
                   )}
+
+                  {autoAcknowledgement ? (
+                    <div
+                      key={autoAcknowledgement.id}
+                      className="support-chat__message is-admin"
+                    >
+                      <span className="support-chat__message__label">
+                        پشتیبانی
+                      </span>
+
+                      <p>{autoAcknowledgement.content}</p>
+
+                      <time>
+                        {formatTime(autoAcknowledgement.created_at)}
+                      </time>
+                    </div>
+                  ) : null}
 
                   <div ref={bottomRef} />
                 </div>
